@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TelegramModule, Update, Command, Hears, Action } from "../../../src/nest/index.js";
+import { TelegramModule, Update, Command, Hears, Action, InjectBot, getParamTokenMetadata } from "../../../src/nest/index.js";
 import { Application } from "../../../src/kernel/app.js";
 import { Bot } from "../../../src/client/bot.js";
 
@@ -65,5 +65,18 @@ describe("NestJS Integration Module (tele-bot/nest)", () => {
 
     expect(adminHandlers).toHaveLength(1);
     expect(shopHandlers).toHaveLength(1);
+  });
+
+  it("decorates parameters with @InjectBot and retrieves injection token metadata", () => {
+    class BotConsumer {
+      constructor(
+        @InjectBot("customBot") public bot: Bot,
+        @InjectBot() public defaultBot: Bot,
+      ) {}
+    }
+
+    const tokens = getParamTokenMetadata(BotConsumer);
+    expect(tokens[0]).toBe("TELEGRAM_BOT_CUSTOMBOT");
+    expect(tokens[1]).toBe("TELEGRAM_APPLICATION");
   });
 });
