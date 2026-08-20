@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   InlineKeyboardMarkup,
+  InlineKeyboardButton,
   ReplyKeyboardMarkup,
   ReplyKeyboardRemove,
   ForceReply,
@@ -28,6 +29,36 @@ describe("Keyboards", () => {
     expect(markup.inline_keyboard).toHaveLength(2);
     expect(markup.inline_keyboard[0]?.[0]?.text).toBe("Option 1");
     expect(markup.inline_keyboard[0]?.[0]?.callback_data).toBe("opt_1");
+  });
+
+  it("supports python-telegram-bot style construction via InlineKeyboardButton/InlineKeyboardMarkup classes", () => {
+    const markup = new InlineKeyboardMarkup([
+      [
+        new InlineKeyboardButton("Option 1", { callback_data: "opt_1" }),
+        new InlineKeyboardButton("Option 2", { callback_data: "opt_2" }),
+      ],
+      [new InlineKeyboardButton("Website", { url: "https://example.com" })],
+    ]);
+
+    expect(markup.inline_keyboard).toEqual([
+      [
+        { text: "Option 1", callback_data: "opt_1" },
+        { text: "Option 2", callback_data: "opt_2" },
+      ],
+      [{ text: "Website", url: "https://example.com" }],
+    ]);
+  });
+
+  it("InlineKeyboardButton serializes to a plain JSON object matching the Bot API shape", () => {
+    const button = new InlineKeyboardButton("Pay", { pay: true });
+    expect(JSON.parse(JSON.stringify(button))).toEqual({ text: "Pay", pay: true });
+  });
+
+  it("accepts an InlineKeyboardMarkup class instance as a plain InlineKeyboardMarkup value", () => {
+    const asPlainType: InlineKeyboardMarkup = new InlineKeyboardMarkup([
+      [new InlineKeyboardButton("Ok", { callback_data: "ok" })],
+    ]);
+    expect(asPlainType.inline_keyboard[0]?.[0]?.text).toBe("Ok");
   });
 
   it("InlineKeyboard fluent builder constructs InlineKeyboardMarkup", () => {

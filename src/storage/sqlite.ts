@@ -226,6 +226,36 @@ export class SqlitePersistence implements Persistence {
   }
 
   /**
+   * Deletes user data for the given user ID.
+   *
+   * @param userId - Telegram user ID.
+   */
+  async deleteUserData(userId: number): Promise<void> {
+    const stmt = this.db.prepare("DELETE FROM user_data WHERE user_id = ?");
+    stmt.run(userId);
+  }
+
+  /**
+   * Deletes chat data for the given chat ID.
+   *
+   * @param chatId - Telegram chat ID.
+   */
+  async deleteChatData(chatId: number | string): Promise<void> {
+    const stmt = this.db.prepare("DELETE FROM chat_data WHERE chat_id = ?");
+    stmt.run(String(chatId));
+  }
+
+  /**
+   * Deletes state for a conversation key.
+   *
+   * @param key - Conversation identifier.
+   */
+  async deleteConversation(key: string): Promise<void> {
+    const stmt = this.db.prepare("DELETE FROM conversations WHERE key = ?");
+    stmt.run(key);
+  }
+
+  /**
    * Retrieves persisted jobs.
    *
    * @returns List of persisted jobs.

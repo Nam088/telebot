@@ -137,6 +137,32 @@ describe.each(factories)("$name Contract Tests", ({ create }) => {
     expect(await persistence.getJobs()).toEqual(newJobs);
   });
 
+  it("supports deleting user, chat, and conversation data", async () => {
+    if (persistence.deleteUserData) {
+      await persistence.setUserData(999, { foo: "bar" });
+      expect(await persistence.getUserData(999)).toEqual({ foo: "bar" });
+      await persistence.deleteUserData(999);
+      expect(await persistence.getUserData(999)).toEqual({});
+    }
+
+    if (persistence.deleteChatData) {
+      await persistence.setChatData("chat_999", { topic: "general" });
+      expect(await persistence.getChatData("chat_999")).toEqual({ topic: "general" });
+      await persistence.deleteChatData("chat_999");
+      expect(await persistence.getChatData("chat_999")).toEqual({});
+    }
+
+    if (persistence.deleteConversation) {
+      await persistence.updateConversation("chat:user", "STEP_1");
+      let convs = await persistence.getConversations();
+      expect(convs.get("chat:user")).toBe("STEP_1");
+
+      await persistence.deleteConversation("chat:user");
+      convs = await persistence.getConversations();
+      expect(convs.has("chat:user")).toBe(false);
+    }
+  });
+
   it("supports optional flush without error", async () => {
     if (persistence.flush) {
       await expect(persistence.flush()).resolves.toBeUndefined();
