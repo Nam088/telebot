@@ -1,32 +1,42 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["src/index.ts"],
+  "name": "tele-bot API Documentation",
+  "entryPoints": [
+    "src/index.ts",
+    "src/client/index.ts",
+    "src/kernel/index.ts",
+    "src/routing/index.ts",
+    "src/filters/index.ts",
+    "src/storage/index.ts",
+    "src/scheduler/index.ts",
+    "src/components/index.ts",
+    "src/utils/index.ts"
+  ],
   "out": "docs",
-  "plugin": [],
   "readme": "README.md",
-  "name": "tele-bot",
-  "excludePrivate": true,
-  "excludeProtected": false,
-  "excludeInternal": true,
+  "githubPages": true,
+  "cleanOutputDir": true,
+  "includeVersion": true,
   "disableSources": true,
-
-
-  "externalSymbolLinkMappings": {
-    "typescript": {
-      "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-      "TypeError": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
-    },
-    "lib": {
-      "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-      "TypeError": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
-    },
-    "global": {
-      "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-      "TypeError": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
-    },
-    "@types/node": {
-      "Error": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
-      "TypeError": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError"
-    }
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "categorizeByGroup": true,
+  "groupReferencesByType": true,
+  "visibilityFilters": {
+    "protected": true,
+    "private": false,
+    "inherited": true,
+    "external": false
+  },
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
+  "lightHighlightTheme": "github-light",
+  "darkHighlightTheme": "github-dark",
+  "navigationLinks": {
+    "GitHub Repository": "https://github.com/nam088/telegram-bot-node",
+    "Telegram Bot API": "https://core.telegram.org/bots/api"
   }
 }
