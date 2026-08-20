@@ -8,10 +8,15 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Run Release Please
         uses: googleapis/release-please-action@v4
@@ -29,7 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         if: ${{ steps.release.outputs.release_created }}
@@ -39,8 +43,6 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: npm run build
 
-      - name: Publish to npm
+      - name: Publish to npm using Trusted Publishing (OIDC)
         if: ${{ steps.release.outputs.release_created }}
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
