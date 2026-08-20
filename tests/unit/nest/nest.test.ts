@@ -38,14 +38,32 @@ describe("NestJS Integration Module (tele-bot/nest)", () => {
     expect(asyncMod.providers).toHaveLength(2);
   });
 
-  it("binds decorated handlers from services onto Application instance", () => {
-    const app = new Application(new Bot("TEST_TOKEN"));
-    const service = new SampleUpdateService();
+  it("supports multiple named bots and isolates their handlers", () => {
+    @Update("adminBot")
+    class AdminBotService {
+      @Command("admin_panel")
+      public onAdmin() {}
+    }
 
-    TelegramModule.bindHandlers(app, [service]);
+    @Update("shopBot")
+    class ShopBotService {
+      @Command("buy")
+      public onBuy() {}
+    }
 
-    const handlers = (app as any).handlers.get(0);
-    expect(handlers).toBeDefined();
-    expect(handlers.length).toBeGreaterThanOrEqual(3);
+    const adminApp = new Application(new Bot("TEST_TOKEN"));
+    const shopApp = new Application(new Bot("TEST_TOKEN"));
+
+    const adminService = new AdminBotService();
+    const shopService = new ShopBotService();
+
+    TelegramModule.bindHandlers(adminApp, [adminService, shopService], "adminBot");
+    TelegramModule.bindHandlers(shopApp, [adminService, shopService], "shopBot");
+
+    const adminHandlers = (adminApp as any).handlers.get(0);
+    const shopHandlers = (shopApp as any).handlers.get(0);
+
+    expect(adminHandlers).toHaveLength(1);
+    expect(shopHandlers).toHaveLength(1);
   });
 });
