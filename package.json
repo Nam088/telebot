@@ -43,7 +43,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -89,6 +90,7 @@
     "eslint-config-prettier": "10.1.8",
     "husky": "9.1.7",
     "prettier": "3.9.6",
+    "tsup": "8.5.1",
     "tsx": "^4.19.0",
     "typedoc": "^0.28.0",
     "typescript": "^5.5.0",
