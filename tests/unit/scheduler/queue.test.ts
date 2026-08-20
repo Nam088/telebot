@@ -89,4 +89,95 @@ describe("JobQueue and Job", () => {
     expect(jobQueue.getJobsByName("alpha")).toEqual([j1, j2]);
     expect(jobQueue.getJobsByChatId(111)).toEqual([j1, j3]);
   });
+
+  it("handles job callback throwing error without crashing queue", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const throwingCallback = vi.fn().mockImplementation(() => {
+      throw new Error("Job failed catastrophically");
+    });
+
+    const job = jobQueue.runOnce(throwingCallback, 0.01, undefined, "error_job");
+    await new Promise((resolve) => setTimeout(resolve, 30));
+
+    expect(throwingCallback).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("handles Date objects for runOnce and runRepeating", async () => {
+    const cb1 = vi.fn();
+    const targetDate = new Date(Date.now() + 20);
+    const j1 = jobQueue.runOnce(cb1, targetDate, undefined, "date_once");
+
+    const cb2 = vi.fn();
+    const firstDate = new Date(Date.now() + 20);
+    const j2 = jobQueue.runRepeating(cb2, 0.05, firstDate, undefined, "date_repeat");
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(cb1).toHaveBeenCalledTimes(1);
+    expect(cb2).toHaveBeenCalled();
+    j2.scheduleRemoval();
+  });
+
+  it("serializes to persisted jobs and restores them with named callbacks", async () => {
+    const cb = vi.fn();
+    jobQueue.registerCallback("persisted_task", cb);
+
+    const now = Date.now();
+    const persistedJobs = [
+      {
+        name: "persisted_task",
+        nextRun: now - 5000, // In past
+        interval: 1000, // 1 second interval
+        data: { payload: 42 },
+      },
+      {
+        name: "unregistered_task",
+        nextRun: now + 5000,
+        interval: 5000,
+      },
+    ];
+
+    jobQueue.restoreFromPersistedJobs(persistedJobs);
+
+    const restoredJobs = jobQueue.getJobsByName("persisted_task");
+    expect(restoredJobs.length).toBe(1);
+    expect(restoredJobs[0]?.data).toEqual({ payload: 42 });
+    expect(restoredJobs[0]?.next_t).toBeGreaterThanOrEqual(now);
+
+    // Unregistered callback is ignored safely
+    expect(jobQueue.getJobsByName("unregistered_task").length).toBe(0);
+
+    // Test toPersistedJobs
+    const serialized = jobQueue.toPersistedJobs();
+    expect(serialized.length).toBeGreaterThanOrEqual(1);
+    expect(serialized.find((j) => j.name === "persisted_task")?.data).toEqual({ payload: 42 });
+  });
+
+  it("handles daily job scheduling with specific day filters and past hour calculations", () => {
+    const cb = vi.fn();
+    const now = new Date();
+
+    // Schedule for an hour in the past today -> must roll over to tomorrow
+    const pastHour = (now.getHours() - 1 + 24) % 24;
+    const dailyJob = jobQueue.runDaily(cb, { hour: pastHour, minute: 0, second: 0 }, [0, 1, 2, 3, 4, 5, 6], undefined, "past_hour_job");
+
+    expect(dailyJob.next_t).toBeGreaterThan(Date.now());
+  });
+
+  it("stops all timers cleanly on jobQueue.stop()", async () => {
+    const cb = vi.fn();
+    const j1 = jobQueue.runRepeating(cb, 0.01, 0.01);
+    const j2 = jobQueue.runOnce(cb, 0.01);
+
+    expect(jobQueue.jobs().length).toBe(2);
+
+    jobQueue.stop();
+    expect(jobQueue.isRunning).toBe(false);
+    expect(jobQueue.jobs().length).toBe(0);
+
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(cb).not.toHaveBeenCalled();
+  });
 });
