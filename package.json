@@ -1,0 +1,49 @@
+{
+  "name": "telegram-bot-node",
+  "version": "1.0.0",
+  "description": "Zero-dependency Telegram Bot framework & Python migration for Node.js / TypeScript",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "docs": "typedoc",
+    "dev:echo": "tsx examples/echobot.ts",
+    "dev:keyboard": "tsx examples/inlinekeyboard.ts",
+    "dev:conversation": "tsx examples/conversationbot.ts",
+    "dev:timer": "tsx examples/timerbot.ts",
+    "dev:poll": "tsx examples/pollbot.ts",
+    "dev:chatmember": "tsx examples/chatmemberbot.ts",
+    "dev:deeplink": "tsx examples/deeplinking.ts"
+  },
+  "keywords": [
+    "telegram",
+    "telegram-bot",
+    "python-telegram-bot",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "pino": "^9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "pino": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "2.1.9",
+    "tsx": "^4.19.0",
+    "typedoc": "^0.28.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}
