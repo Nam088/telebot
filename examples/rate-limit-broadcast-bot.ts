@@ -75,7 +75,7 @@ app.addHandler(
       try {
         await context.bot.sendMessage({
           chat_id: chatId,
-          text: `📢 Announcement:\n\n${message}`,
+          text: ` Announcement:\n\n${message}`,
         });
         successCount++;
       } catch (err: unknown) {
