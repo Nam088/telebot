@@ -1,0 +1,138 @@
+name: Automated Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+      - develop
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # -------------------------------------------------------------
+  # 1. DEVELOP BRANCH: Nightly / Canarary releases based on commit
+  # -------------------------------------------------------------
+  release-dev:
+    name: Auto Release (Develop -> @canary / @dev)
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Quality Gates
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm run build
+          npm test
+
+      - name: Generate Dev Version & Publish
+        run: |
+          # Bump version to 1.0.0-dev.<run_number>.<commit_sha>
+          VERSION=$(node -p "require('./package.json').version.split('-')[0]")-dev.${{ github.run_number }}.${{ github.sha }}
+          npm version $VERSION --no-git-tag-version
+          npm publish --provenance --access public --tag dev
+
+  # -------------------------------------------------------------
+  # 2. BETA BRANCH: Pre-releases based on commit
+  # -------------------------------------------------------------
+  release-beta:
+    name: Auto Release (Beta -> @beta)
+    if: github.ref == 'refs/heads/beta'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Quality Gates
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm run build
+          npm test
+          npm run docs
+
+      - name: Generate Beta Version & Publish
+        run: |
+          # Bump version to 1.0.0-beta.<run_number>
+          BASE_VERSION=$(node -p "require('./package.json').version.split('-')[0]")
+          BETA_VERSION="${BASE_VERSION}-beta.${{ github.run_number }}"
+          npm version $BETA_VERSION --no-git-tag-version
+          
+          # Git tag and push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$BETA_VERSION" -m "Release v$BETA_VERSION"
+          git push origin "v$BETA_VERSION"
+          
+          npm publish --provenance --access public --tag beta
+
+  # -------------------------------------------------------------
+  # 3. MAIN BRANCH: Stable Production Releases via Release Please
+  # -------------------------------------------------------------
+  release-main:
+    name: Auto Release (Main -> Stable @latest)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: node
+          package-name: telebot-ts
+
+      - name: Checkout Code
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm ci
+
+      - name: Build Package & Docs
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          npm run build
+          npm run docs
+
+      - name: Publish Stable to npm (Trusted Publishing OIDC)
+        if: ${{ steps.release.outputs.release_created }}
+        run: npm publish --provenance --access public --tag latest
