@@ -1,8 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/Nam088/telebot-ts/compare/v1.0.0...v1.0.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* **ci:** remove dist release assets upload to prevent ReleaseAsset already_exists conflict ([bbe1163](https://github.com/Nam088/telebot-ts/commit/bbe1163480ec2b3d3078a2293247f02d44e7e298))
+
+## Changelog
+
 All notable changes to `telebot-ts` will be documented in this file.
 
-# 1.0.0 (2026-08-20)
+## 1.0.0 (2026-08-20)
 
 
 ### Bug Fixes
