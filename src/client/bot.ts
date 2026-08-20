@@ -15,6 +15,8 @@ import type {
   ChatInviteLink,
   UserProfilePhotos,
   File,
+  Poll,
+  ReactionType,
   WebhookInfo,
   SendMessageOptions,
   GetUpdatesOptions,
@@ -35,6 +37,11 @@ import type {
   EditMessageTextOptions,
   EditMessageCaptionOptions,
   EditMessageReplyMarkupOptions,
+  EditMessageMediaOptions,
+  EditMessageLiveLocationOptions,
+  StopMessageLiveLocationOptions,
+  StopPollOptions,
+  SetMessageReactionOptions,
   AnswerCallbackQueryOptions,
   AnswerInlineQueryOptions,
   PromoteChatMemberOptions,
@@ -1118,4 +1125,282 @@ export class Bot {
       message_thread_id: messageThreadId,
     });
   }
+
+  /**
+   * Deletes multiple messages simultaneously.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param messageIds - Array of message identifiers to delete.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When deleting messages fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteMessages(123456, [101, 102, 103]);
+   * ```
+   */
+  public async deleteMessages(chatId: number | string, messageIds: number[]): Promise<boolean> {
+    return this.request<boolean>("deleteMessages", {
+      chat_id: chatId,
+      message_ids: messageIds,
+    });
+  }
+
+  /**
+   * Forwards multiple messages of any kind simultaneously.
+   *
+   * @param options - Forwarding parameters including destination `chat_id`, origin `from_chat_id`, and `message_ids`.
+   * @returns Array of message identifier objects on success.
+   * @throws {@link TelegramApiError} When forwarding messages fails.
+   *
+   * @example
+   * ```ts
+   * const sentIds = await bot.forwardMessages({
+   *   chat_id: 123456,
+   *   from_chat_id: 654321,
+   *   message_ids: [101, 102],
+   * });
+   * ```
+   */
+  public async forwardMessages(options: {
+    chat_id: number | string;
+    from_chat_id: number | string;
+    message_ids: number[];
+    disable_notification?: boolean;
+    protect_content?: boolean;
+  }): Promise<Array<{ message_id: number }>> {
+    return this.request<Array<{ message_id: number }>>(
+      "forwardMessages",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Copies multiple messages of any kind simultaneously without link to the original message.
+   *
+   * @param options - Copying parameters including destination `chat_id`, origin `from_chat_id`, and `message_ids`.
+   * @returns Array of sent message identifier objects on success.
+   * @throws {@link TelegramApiError} When copying messages fails.
+   *
+   * @example
+   * ```ts
+   * const copiedIds = await bot.copyMessages({
+   *   chat_id: 123456,
+   *   from_chat_id: 654321,
+   *   message_ids: [101, 102],
+   *   remove_caption: false,
+   * });
+   * ```
+   */
+  public async copyMessages(options: {
+    chat_id: number | string;
+    from_chat_id: number | string;
+    message_ids: number[];
+    disable_notification?: boolean;
+    protect_content?: boolean;
+    remove_caption?: boolean;
+  }): Promise<Array<{ message_id: number }>> {
+    return this.request<Array<{ message_id: number }>>(
+      "copyMessages",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Edits animation, audio, document, photo, or video messages, or adds media to text messages.
+   *
+   * @param options - Options including target message identifier and new `media` content.
+   * @returns The edited {@link Message} on success, or `true` if edited by inline message ID.
+   * @throws {@link TelegramApiError} When editing media fails.
+   *
+   * @example
+   * ```ts
+   * await bot.editMessageMedia({
+   *   chat_id: 123456,
+   *   message_id: 42,
+   *   media: {
+   *     type: "photo",
+   *     media: "https://example.com/new-pic.jpg",
+   *     caption: "Updated caption",
+   *   },
+   * });
+   * ```
+   */
+  public async editMessageMedia(options: EditMessageMediaOptions): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editMessageMedia",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Edits live location messages sent by the bot or via the bot.
+   *
+   * @param options - Options including coordinates, target message identifier, heading, and accuracy.
+   * @returns The edited {@link Message} on success, or `true` if edited by inline message ID.
+   * @throws {@link TelegramApiError} When editing live location fails.
+   *
+   * @example
+   * ```ts
+   * await bot.editMessageLiveLocation({
+   *   chat_id: 123456,
+   *   message_id: 42,
+   *   latitude: 37.7749,
+   *   longitude: -122.4194,
+   * });
+   * ```
+   */
+  public async editMessageLiveLocation(options: EditMessageLiveLocationOptions): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editMessageLiveLocation",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Stops updating a live location message before live_period expires.
+   *
+   * @param options - Options identifying the target live location message to stop.
+   * @returns The stopped {@link Message} on success, or `true` if stopped by inline message ID.
+   * @throws {@link TelegramApiError} When stopping live location fails.
+   *
+   * @example
+   * ```ts
+   * await bot.stopMessageLiveLocation({
+   *   chat_id: 123456,
+   *   message_id: 42,
+   * });
+   * ```
+   */
+  public async stopMessageLiveLocation(options: StopMessageLiveLocationOptions): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "stopMessageLiveLocation",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Stops a poll which was sent by the bot.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param messageId - Identifier of the original message with the poll.
+   * @param options - Additional options including reply markup.
+   * @returns The stopped {@link Poll} on success.
+   * @throws {@link TelegramApiError} When stopping poll fails.
+   *
+   * @example
+   * ```ts
+   * const finalPoll = await bot.stopPoll(123456, 42);
+   * console.log(`Total voters: ${finalPoll.total_voter_count}`);
+   * ```
+   */
+  public async stopPoll(
+    chatId: number | string,
+    messageId: number,
+    options: StopPollOptions = {}
+  ): Promise<Poll> {
+    const payload: Record<string, unknown> = {
+      chat_id: chatId,
+      message_id: messageId,
+      ...options,
+    };
+    return this.request<Poll>("stopPoll", payload);
+  }
+
+  /**
+   * Changes the chosen reactions on a message.
+   *
+   * @param options - Reaction parameters including `chat_id`, `message_id`, and `reaction` array/string.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting message reaction fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setMessageReaction({
+   *   chat_id: 123456,
+   *   message_id: 42,
+   *   reaction: [{ type: "emoji", emoji: "👍" }],
+   * });
+   * ```
+   */
+  public async setMessageReaction(options: SetMessageReactionOptions): Promise<boolean> {
+    let reactionPayload: unknown = options.reaction;
+    if (typeof options.reaction === "string") {
+      reactionPayload = [{ type: "emoji", emoji: options.reaction }];
+    } else if (
+      options.reaction &&
+      typeof options.reaction === "object" &&
+      !Array.isArray(options.reaction)
+    ) {
+      reactionPayload = [options.reaction];
+    } else if (Array.isArray(options.reaction)) {
+      reactionPayload = options.reaction.map((r) =>
+        typeof r === "string" ? { type: "emoji", emoji: r } : r
+      );
+    }
+
+    const payload: Record<string, unknown> = {
+      chat_id: options.chat_id,
+      message_id: options.message_id,
+    };
+    if (reactionPayload !== undefined) {
+      payload["reaction"] = reactionPayload;
+    }
+    if (options.is_big !== undefined) {
+      payload["is_big"] = options.is_big;
+    }
+    return this.request<boolean>("setMessageReaction", payload);
+  }
+
+  /**
+   * Deletes a specific reaction from a message.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param messageId - Identifier of the target message.
+   * @param isBig - Optional flag to animate the reaction change with a big animation.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When clearing reaction fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteMessageReaction(123456, 42);
+   * ```
+   */
+  public async deleteMessageReaction(
+    chatId: number | string,
+    messageId: number,
+    isBig?: boolean
+  ): Promise<boolean> {
+    return this.setMessageReaction({
+      chat_id: chatId,
+      message_id: messageId,
+      reaction: [],
+      is_big: isBig,
+    });
+  }
+
+  /**
+   * Deletes all reactions on a message.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param messageId - Identifier of the target message.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When clearing all reactions fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteAllMessageReactions(123456, 42);
+   * ```
+   */
+  public async deleteAllMessageReactions(
+    chatId: number | string,
+    messageId: number
+  ): Promise<boolean> {
+    return this.setMessageReaction({
+      chat_id: chatId,
+      message_id: messageId,
+      reaction: [],
+    });
+  }
 }
+

@@ -44,6 +44,11 @@ export type {
   ChatBoostRemoved,
   BusinessConnection,
   BusinessMessagesDeleted,
+  ReactionTypeEmoji,
+  ReactionTypeCustomEmoji,
+  ReactionTypePaid,
+  ReactionType,
+  ReactionCount,
   MessageReactionUpdated,
   MessageReactionCountUpdated,
   UserProfilePhotos,
@@ -56,6 +61,11 @@ export type {
   EditMessageTextOptions,
   EditMessageCaptionOptions,
   EditMessageReplyMarkupOptions,
+  EditMessageMediaOptions,
+  EditMessageLiveLocationOptions,
+  StopMessageLiveLocationOptions,
+  StopPollOptions,
+  SetMessageReactionOptions,
   AnswerCallbackQueryOptions,
   AnswerInlineQueryOptions,
   InlineQueryResult,
@@ -87,3 +97,4 @@ export type {
 export { TelegramApiError } from "./types.js";
 export * from "./constants.js";
 export * from "./bot.js";
+

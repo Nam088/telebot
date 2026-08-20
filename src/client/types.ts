@@ -758,6 +758,45 @@ export interface BusinessMessagesDeleted {
 }
 
 /**
+ * Reaction type using normal emoji.
+ */
+export interface ReactionTypeEmoji {
+  type: "emoji";
+  emoji: string;
+}
+
+/**
+ * Reaction type using custom emoji.
+ */
+export interface ReactionTypeCustomEmoji {
+  type: "custom_emoji";
+  custom_emoji_id: string;
+}
+
+/**
+ * Reaction type for paid reactions.
+ */
+export interface ReactionTypePaid {
+  type: "paid";
+}
+
+/**
+ * Union type representing all supported Telegram reaction types.
+ */
+export type ReactionType =
+  | ReactionTypeEmoji
+  | ReactionTypeCustomEmoji
+  | ReactionTypePaid;
+
+/**
+ * Represents a reaction added to a message along with the number of times it was added.
+ */
+export interface ReactionCount {
+  type: ReactionType;
+  total_count: number;
+}
+
+/**
  * Represents a change of a reaction on a message performed by a user.
  */
 export interface MessageReactionUpdated {
@@ -766,8 +805,8 @@ export interface MessageReactionUpdated {
   user?: User;
   actor_chat?: Chat;
   date: number;
-  old_reaction: unknown[];
-  new_reaction: unknown[];
+  old_reaction: ReactionType[];
+  new_reaction: ReactionType[];
 }
 
 /**
@@ -777,7 +816,7 @@ export interface MessageReactionCountUpdated {
   chat: Chat;
   message_id: number;
   date: number;
-  reactions: unknown[];
+  reactions: ReactionCount[];
 }
 
 /**
@@ -1360,8 +1399,95 @@ export interface SetWebhookOptions {
 }
 
 /**
+ * Options passed to `editMessageMedia` requests.
+ */
+export interface EditMessageMediaOptions {
+  /** The new media content of the message. */
+  media: InputMedia;
+  /** Unique identifier for the target chat or username of the target channel. Required if inline_message_id is not specified. */
+  chat_id?: number | string;
+  /** Identifier of the message to edit. Required if inline_message_id is not specified. */
+  message_id?: number;
+  /** Identifier of the inline message. Required if chat_id and message_id are not specified. */
+  inline_message_id?: string;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message was sent. */
+  business_connection_id?: string;
+}
+
+/**
+ * Options passed to `editMessageLiveLocation` requests.
+ */
+export interface EditMessageLiveLocationOptions {
+  /** Latitude of new location. */
+  latitude: number;
+  /** Longitude of new location. */
+  longitude: number;
+  /** Unique identifier for the target chat or username of the target channel. Required if inline_message_id is not specified. */
+  chat_id?: number | string;
+  /** Identifier of the message to edit. Required if inline_message_id is not specified. */
+  message_id?: number;
+  /** Identifier of the inline message. Required if chat_id and message_id are not specified. */
+  inline_message_id?: string;
+  /** Radius of uncertainty for the location, measured in meters; 0-1500. */
+  horizontal_accuracy?: number;
+  /** Direction in which the user is moving, in degrees; 1-360. */
+  heading?: number;
+  /** Maximum distance for proximity alerts about approaching another chat member, in meters; 1-100000. */
+  proximity_alert_radius?: number;
+  /** New period in seconds during which the location can be updated, starting from the message send date. */
+  live_period?: number;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message was sent. */
+  business_connection_id?: string;
+}
+
+/**
+ * Options passed to `stopMessageLiveLocation` requests.
+ */
+export interface StopMessageLiveLocationOptions {
+  /** Unique identifier for the target chat or username of the target channel. Required if inline_message_id is not specified. */
+  chat_id?: number | string;
+  /** Identifier of the message with live location to stop. Required if inline_message_id is not specified. */
+  message_id?: number;
+  /** Identifier of the inline message. Required if chat_id and message_id are not specified. */
+  inline_message_id?: string;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message was sent. */
+  business_connection_id?: string;
+}
+
+/**
+ * Options passed to `stopPoll` requests.
+ */
+export interface StopPollOptions {
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message was sent. */
+  business_connection_id?: string;
+}
+
+/**
+ * Options passed to `setMessageReaction` requests.
+ */
+export interface SetMessageReactionOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Identifier of the target message. */
+  message_id: number;
+  /** List of reaction types to set on the message. */
+  reaction?: (ReactionType | string)[] | ReactionType | string;
+  /** Pass True to set the reaction with a big animation. */
+  is_big?: boolean;
+}
+
+/**
  * Type alias representing a raw Telegram Update structure.
  */
 export type Update = RawUpdate;
+
 
 

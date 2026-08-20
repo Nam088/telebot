@@ -307,4 +307,202 @@ describe("Bot API media and messaging methods", () => {
     expect(await bot7.reopenForumTopic(123, 1)).toBe(true);
     expect(await bot7.deleteForumTopic(123, 1)).toBe(true);
   });
+
+  it("deleteMessages, forwardMessages, copyMessages", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const delRes = await bot1.deleteMessages(123456, [101, 102, 103]);
+    expect(delRes).toBe(true);
+    expect(fetch1).toHaveBeenCalledTimes(1);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ chat_id: 123456, message_ids: [101, 102, 103] });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot([{ message_id: 201 }, { message_id: 202 }]);
+    const fwdRes = await bot2.forwardMessages({
+      chat_id: 123456,
+      from_chat_id: 654321,
+      message_ids: [101, 102],
+      disable_notification: true,
+      protect_content: false,
+    });
+    expect(fwdRes).toEqual([{ message_id: 201 }, { message_id: 202 }]);
+    expect(fetch2).toHaveBeenCalledTimes(1);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      chat_id: 123456,
+      from_chat_id: 654321,
+      message_ids: [101, 102],
+      disable_notification: true,
+      protect_content: false,
+    });
+
+    const { bot: bot3, fakeFetch: fetch3 } = createMockBot([{ message_id: 301 }, { message_id: 302 }]);
+    const copyRes = await bot3.copyMessages({
+      chat_id: 123456,
+      from_chat_id: 654321,
+      message_ids: [101, 102],
+      remove_caption: true,
+    });
+    expect(copyRes).toEqual([{ message_id: 301 }, { message_id: 302 }]);
+    expect(fetch3).toHaveBeenCalledTimes(1);
+    const body3 = JSON.parse(fetch3.mock.calls[0][1].body);
+    expect(body3).toEqual({
+      chat_id: 123456,
+      from_chat_id: 654321,
+      message_ids: [101, 102],
+      remove_caption: true,
+    });
+  });
+
+  it("editMessageMedia, editMessageLiveLocation, stopMessageLiveLocation", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot({ message_id: 42, photo: [] });
+    const mediaRes = await bot1.editMessageMedia({
+      chat_id: 123456,
+      message_id: 42,
+      media: {
+        type: "photo",
+        media: "https://example.com/pic.jpg",
+        caption: "New caption",
+      },
+    });
+    expect(mediaRes).toEqual({ message_id: 42, photo: [] });
+    expect(fetch1).toHaveBeenCalledTimes(1);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1.chat_id).toBe(123456);
+    expect(body1.message_id).toBe(42);
+    expect(body1.media).toEqual({
+      type: "photo",
+      media: "https://example.com/pic.jpg",
+      caption: "New caption",
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot({ message_id: 43, location: { latitude: 37.77, longitude: -122.41 } });
+    const locRes = await bot2.editMessageLiveLocation({
+      chat_id: 123456,
+      message_id: 43,
+      latitude: 37.77,
+      longitude: -122.41,
+      horizontal_accuracy: 10,
+      heading: 90,
+      proximity_alert_radius: 50,
+      live_period: 3600,
+    });
+    expect(locRes).toEqual({ message_id: 43, location: { latitude: 37.77, longitude: -122.41 } });
+    expect(fetch2).toHaveBeenCalledTimes(1);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      chat_id: 123456,
+      message_id: 43,
+      latitude: 37.77,
+      longitude: -122.41,
+      horizontal_accuracy: 10,
+      heading: 90,
+      proximity_alert_radius: 50,
+      live_period: 3600,
+    });
+
+    const { bot: bot3, fakeFetch: fetch3 } = createMockBot(true);
+    const stopLocRes = await bot3.stopMessageLiveLocation({
+      inline_message_id: "inl_123",
+    });
+    expect(stopLocRes).toBe(true);
+    expect(fetch3).toHaveBeenCalledTimes(1);
+    const body3 = JSON.parse(fetch3.mock.calls[0][1].body);
+    expect(body3).toEqual({ inline_message_id: "inl_123" });
+  });
+
+  it("stopPoll", async () => {
+    const expectedPoll = {
+      id: "poll_1",
+      question: "Which one?",
+      options: [{ text: "A", voter_count: 5 }, { text: "B", voter_count: 3 }],
+      total_voter_count: 8,
+      is_closed: true,
+      is_anonymous: true,
+      type: "regular",
+      allows_multiple_answers: false,
+    };
+    const { bot, fakeFetch } = createMockBot(expectedPoll);
+    const res = await bot.stopPoll(123456, 42, { reply_markup: { inline_keyboard: [] } });
+    expect(res).toEqual(expectedPoll);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reply_markup: { inline_keyboard: [] },
+    });
+  });
+
+  it("setMessageReaction, deleteMessageReaction, deleteAllMessageReactions", async () => {
+    // string reaction
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.setMessageReaction({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: "👍",
+      is_big: true,
+    });
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: [{ type: "emoji", emoji: "👍" }],
+      is_big: true,
+    });
+
+    // ReactionType object
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.setMessageReaction({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: { type: "custom_emoji", custom_emoji_id: "cust_123" },
+    });
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: [{ type: "custom_emoji", custom_emoji_id: "cust_123" }],
+    });
+
+    // Array of reactions (strings & ReactionType)
+    const { bot: bot3, fakeFetch: fetch3 } = createMockBot(true);
+    const res3 = await bot3.setMessageReaction({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: ["🔥", { type: "paid" }],
+    });
+    expect(res3).toBe(true);
+    const body3 = JSON.parse(fetch3.mock.calls[0][1].body);
+    expect(body3).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: [{ type: "emoji", emoji: "🔥" }, { type: "paid" }],
+    });
+
+    // deleteMessageReaction
+    const { bot: bot4, fakeFetch: fetch4 } = createMockBot(true);
+    const res4 = await bot4.deleteMessageReaction(123456, 42, true);
+    expect(res4).toBe(true);
+    const body4 = JSON.parse(fetch4.mock.calls[0][1].body);
+    expect(body4).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: [],
+      is_big: true,
+    });
+
+    // deleteAllMessageReactions
+    const { bot: bot5, fakeFetch: fetch5 } = createMockBot(true);
+    const res5 = await bot5.deleteAllMessageReactions(123456, 42);
+    expect(res5).toBe(true);
+    const body5 = JSON.parse(fetch5.mock.calls[0][1].body);
+    expect(body5).toEqual({
+      chat_id: 123456,
+      message_id: 42,
+      reaction: [],
+    });
+  });
 });
+
