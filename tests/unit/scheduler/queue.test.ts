@@ -178,6 +178,74 @@ describe("JobQueue and Job", () => {
     expect(dailyJob.next_t).toBeGreaterThan(Date.now());
   });
 
+  it("activates pre-created jobs when jobQueue.start() is called later", async () => {
+    const freshQueue = new JobQueue(bot);
+    expect(freshQueue.isRunning).toBe(false);
+
+    const cb = vi.fn();
+    freshQueue.runOnce(cb, 0.01, undefined, "pre_start_job");
+
+    // Before start(): job timer was not scheduled
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(cb).not.toHaveBeenCalled();
+
+    // After start(): job should activate and run
+    freshQueue.start();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(cb).toHaveBeenCalledTimes(1);
+    freshQueue.stop();
+  });
+
+  it("compensates for callback execution drift in repeating jobs", async () => {
+    const executionTimes: number[] = [];
+    const cb = vi.fn().mockImplementation(async () => {
+      executionTimes.push(Date.now());
+      // Simulate heavy callback delay (20ms)
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+
+    const intervalSeconds = 0.05; // 50ms interval
+    const job = jobQueue.runRepeating(cb, intervalSeconds, 0.01, undefined, "drift_job");
+
+    await new Promise((resolve) => setTimeout(resolve, 160));
+    job.scheduleRemoval();
+
+    expect(executionTimes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("handles long delays greater than Node 24.8 day 32-bit integer limit without overflow", () => {
+    const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+    const cb = vi.fn();
+    const thirtyDaysSeconds = 30 * 24 * 60 * 60; // 30 days > 24.85 days
+
+    const job = jobQueue.runOnce(cb, thirtyDaysSeconds, undefined, "long_delay_job");
+    expect(job).toBeDefined();
+
+    // Verify setTimeout was called with capped MAX_TIMEOUT_MS (2147483647) instead of overflowing/1ms
+    const calls = setTimeoutSpy.mock.calls;
+    const hasMaxTimeoutCall = calls.some((call) => call[1] === 2_147_483_647);
+    expect(hasMaxTimeoutCall).toBe(true);
+
+    job.scheduleRemoval();
+    setTimeoutSpy.mockRestore();
+  });
+
+  it("routes job errors through centralized errorHandler when configured", async () => {
+    const errorSpy = vi.fn();
+    jobQueue.errorHandler = errorSpy;
+
+    const failingCb = vi.fn().mockImplementation(() => {
+      throw new Error("Job runtime error");
+    });
+
+    jobQueue.runOnce(failingCb, 0.01, undefined, "failing_job");
+    await new Promise((resolve) => setTimeout(resolve, 30));
+
+    expect(failingCb).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    expect(errorSpy.mock.calls[0]?.[0]?.message).toBe("Job runtime error");
+  });
+
   it("stops all timers cleanly on jobQueue.stop()", async () => {
     const cb = vi.fn();
     const j1 = jobQueue.runRepeating(cb, 0.01, 0.01);
