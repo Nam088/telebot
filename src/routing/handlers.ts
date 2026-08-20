@@ -287,6 +287,12 @@ export class CallbackQueryHandler<
     this.pattern = pat;
   }
 
+  /**
+   * Checks whether the update contains a matching `callback_query` and evaluates its data against the pattern.
+   *
+   * @param update - The update to test.
+   * @returns `true` if the callback query matches the configured pattern or predicate.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     const query = update.callback_query;
     if (!query) return false;
@@ -306,6 +312,13 @@ export class CallbackQueryHandler<
     return false;
   }
 
+  /**
+   * Populates `context.matches` if using a RegExp pattern and executes the callback.
+   *
+   * @param update - The incoming update.
+   * @param context - Callback context instance.
+   * @returns Result from callback execution.
+   */
   override async handleUpdate(update: Update, context: C): Promise<R> {
     const query = update.callback_query;
     if (query?.data && this.pattern instanceof RegExp) {

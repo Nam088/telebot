@@ -67,7 +67,7 @@ export abstract class BaseBotClient {
    *
    * @param token - Telegram bot token received from BotFather. Must follow format `<bot_id>:<secret_token>`.
    * @param options - Configuration options for the client including custom fetch or local API server URL.
-   * @throws {@link TypeError} When the token is empty or invalid.
+   * @throws When the token is empty or invalid.
    */
   constructor(token: string, options: BotOptions = {}) {
     validateToken(token);

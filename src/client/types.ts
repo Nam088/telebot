@@ -2288,3 +2288,24 @@ export interface EncryptedCredentials {
   /** Base64-encoded secret hash for verification. */
   secret: string;
 }
+
+// ==========================================
+// Bot API 10.0, 10.1 & 10.2 Extensions
+// ==========================================
+
+export interface SendRichMessageOptions {
+  chat_id: number | string;
+  rich_message: unknown;
+  receiver_user_id?: number;
+  callback_query_id?: string;
+  reply_markup?: unknown;
+  message_thread_id?: number;
+}
+
+export interface EditEphemeralMessageTextOptions {
+  chat_id: number | string;
+  message_id: number;
+  text: string;
+  parse_mode?: string;
+  reply_markup?: unknown;
+}
