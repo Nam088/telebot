@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { JobQueue, Job } from "../../../src/scheduler/queue.js";
+import { JobQueue } from "../../../src/scheduler/queue.js";
+import { Job } from "../../../src/scheduler/job.js";
 import { Bot } from "../../../src/client/bot.js";
 import { CallbackContext } from "../../../src/kernel/context.js";
 import { MemoryPersistence } from "../../../src/storage/memory.js";

@@ -10,7 +10,7 @@
 import { BaseHandler } from "./handlers.js";
 import { Update } from "../kernel/update.js";
 import { CallbackContext } from "../kernel/context.js";
-import type { BaseFilter } from "../filters/matchers.js";
+import type { BaseFilter } from "../filters/base.js";
 
 /**
  * Controller interface passed as the first argument to modern linear conversation functions.

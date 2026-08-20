@@ -6,3 +6,4 @@
 
 export * from "./queue.js";
 export * from "./rrule.js";
+export * from "./job.js";
