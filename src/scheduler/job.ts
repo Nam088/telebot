@@ -41,6 +41,10 @@ export class Job<Data = unknown> {
   public readonly rrule?: RRule;
   /** Epoch timestamp in milliseconds when the job is next scheduled to execute. */
   public next_t: number;
+  /** Optional RFC 5545 rrule string or options for persistence recovery. */
+  public readonly rruleOptions?: string | import('./rrule.js').RRuleOptions;
+  /** Optional timezone for persistence recovery. */
+  public readonly timezone?: string;
   private _timer?: NodeJS.Timeout;
   private readonly _jobQueue: JobQueue;
 
@@ -54,6 +58,8 @@ export class Job<Data = unknown> {
     nextRunMs: number;
     intervalMs?: number;
     rrule?: RRule;
+    rruleOptions?: string | import('./rrule.js').RRuleOptions;
+    timezone?: string;
     data?: Data;
     chat_id?: number | string;
     user_id?: number;
@@ -64,6 +70,8 @@ export class Job<Data = unknown> {
     this.next_t = options.nextRunMs;
     this.intervalMs = options.intervalMs;
     this.rrule = options.rrule;
+    this.rruleOptions = options.rruleOptions;
+    this.timezone = options.timezone;
     this.data = options.data;
     this.chat_id = options.chat_id;
     this.user_id = options.user_id;
