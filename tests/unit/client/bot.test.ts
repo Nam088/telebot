@@ -506,3 +506,337 @@ describe("Bot API media and messaging methods", () => {
   });
 });
 
+describe("Bot API stickers and custom emoji methods", () => {
+  const createMockBot = (result: unknown) => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result }),
+    });
+    return { bot: new Bot("TEST_TOKEN", { fetch: fakeFetch }), fakeFetch };
+  };
+
+  it("sendSticker sends sticker payload and returns message", async () => {
+    const expectedMsg = {
+      message_id: 101,
+      chat: { id: 123456, type: "private" },
+      sticker: {
+        file_id: "stk_1",
+        file_unique_id: "u_stk_1",
+        type: "regular",
+        width: 512,
+        height: 512,
+        is_animated: false,
+        is_video: false,
+      },
+    };
+    const { bot, fakeFetch } = createMockBot(expectedMsg);
+
+    const res = await bot.sendSticker({
+      chat_id: 123456,
+      sticker: "CAACAgIAAxkBAAE...",
+      emoji: "👍",
+    });
+    expect(res).toEqual(expectedMsg);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const url = fakeFetch.mock.calls[0][0];
+    expect(url).toContain("/sendSticker");
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      chat_id: 123456,
+      sticker: "CAACAgIAAxkBAAE...",
+      emoji: "👍",
+    });
+  });
+
+  it("getStickerSet retrieves a sticker set", async () => {
+    const expectedSet = {
+      name: "animals_by_bot",
+      title: "Animals Pack",
+      sticker_type: "regular",
+      stickers: [
+        {
+          file_id: "stk_1",
+          file_unique_id: "u_stk_1",
+          type: "regular",
+          width: 512,
+          height: 512,
+          is_animated: false,
+          is_video: false,
+        },
+      ],
+    };
+    const { bot, fakeFetch } = createMockBot(expectedSet);
+
+    const res = await bot.getStickerSet("animals_by_bot");
+    expect(res).toEqual(expectedSet);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({ name: "animals_by_bot" });
+  });
+
+  it("getCustomEmojiStickers retrieves custom emoji stickers", async () => {
+    const expectedStickers = [
+      {
+        file_id: "emoji_1",
+        file_unique_id: "u_emoji_1",
+        type: "custom_emoji",
+        custom_emoji_id: "5368324170671202286",
+        width: 100,
+        height: 100,
+        is_animated: false,
+        is_video: false,
+      },
+    ];
+    const { bot, fakeFetch } = createMockBot(expectedStickers);
+
+    const res = await bot.getCustomEmojiStickers(["5368324170671202286"]);
+    expect(res).toEqual(expectedStickers);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({ custom_emoji_ids: ["5368324170671202286"] });
+  });
+
+  it("uploadStickerFile uploads sticker and returns File", async () => {
+    const expectedFile = {
+      file_id: "f_stk_upload_1",
+      file_unique_id: "u_f_stk_1",
+      file_size: 1024,
+      file_path: "stickers/f_stk_upload_1.png",
+    };
+    const { bot, fakeFetch } = createMockBot(expectedFile);
+
+    const res = await bot.uploadStickerFile(
+      123456,
+      {
+        filename: "test.png",
+        data: new Uint8Array([1, 2, 3]),
+        contentType: "image/png",
+      },
+      "static"
+    );
+    expect(res).toEqual(expectedFile);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    const callArgs = fakeFetch.mock.calls[0];
+    expect(callArgs[0]).toContain("/uploadStickerFile");
+    expect(callArgs[1].body).toBeInstanceOf(FormData);
+  });
+
+  it("createNewStickerSet creates sticker set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.createNewStickerSet({
+      user_id: 123456,
+      name: "pack_by_bot",
+      title: "My Pack",
+      stickers: [
+        {
+          sticker: "CAACAgIAAxkBAAE...",
+          format: "static",
+          emoji_list: ["🐶"],
+        },
+      ],
+      sticker_type: "regular",
+    });
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      user_id: 123456,
+      name: "pack_by_bot",
+      title: "My Pack",
+      stickers: [
+        {
+          sticker: "CAACAgIAAxkBAAE...",
+          format: "static",
+          emoji_list: ["🐶"],
+        },
+      ],
+      sticker_type: "regular",
+    });
+  });
+
+  it("addStickerToSet adds sticker to set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.addStickerToSet({
+      user_id: 123456,
+      name: "pack_by_bot",
+      sticker: {
+        sticker: "CAACAgIAAxkBAAE...",
+        format: "static",
+        emoji_list: ["🐱"],
+      },
+    });
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      user_id: 123456,
+      name: "pack_by_bot",
+      sticker: {
+        sticker: "CAACAgIAAxkBAAE...",
+        format: "static",
+        emoji_list: ["🐱"],
+      },
+    });
+  });
+
+  it("setStickerPositionInSet sets position of sticker in set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.setStickerPositionInSet("stk_123", 2);
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      sticker: "stk_123",
+      position: 2,
+    });
+  });
+
+  it("deleteStickerFromSet deletes sticker from set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.deleteStickerFromSet("stk_123");
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({ sticker: "stk_123" });
+  });
+
+  it("deleteStickerSet deletes an entire sticker set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.deleteStickerSet("pack_by_bot");
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({ name: "pack_by_bot" });
+  });
+
+  it("replaceStickerInSet replaces sticker with a new one", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.replaceStickerInSet({
+      user_id: 123456,
+      name: "pack_by_bot",
+      old_sticker: "old_stk_1",
+      sticker: {
+        sticker: "new_stk_2",
+        format: "static",
+        emoji_list: ["🦊"],
+      },
+    });
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      user_id: 123456,
+      name: "pack_by_bot",
+      old_sticker: "old_stk_1",
+      sticker: {
+        sticker: "new_stk_2",
+        format: "static",
+        emoji_list: ["🦊"],
+      },
+    });
+  });
+
+  it("setStickerSetThumbnail updates thumbnail or drops it", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.setStickerSetThumbnail("pack_by_bot", 123456, "static", "thumb_file_id");
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      name: "pack_by_bot",
+      user_id: 123456,
+      format: "static",
+      thumbnail: "thumb_file_id",
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.setStickerSetThumbnail("pack_by_bot", 123456, "static");
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      name: "pack_by_bot",
+      user_id: 123456,
+      format: "static",
+    });
+  });
+
+  it("setCustomEmojiStickerSetThumbnail sets or drops custom emoji thumbnail", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.setCustomEmojiStickerSetThumbnail("custom_pack", "5368324170671202286");
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      name: "custom_pack",
+      custom_emoji_id: "5368324170671202286",
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.setCustomEmojiStickerSetThumbnail("custom_pack");
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ name: "custom_pack" });
+  });
+
+  it("setStickerSetTitle changes title of sticker set", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.setStickerSetTitle("pack_by_bot", "New Title");
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      name: "pack_by_bot",
+      title: "New Title",
+    });
+  });
+
+  it("setStickerEmojiList updates emoji list of sticker", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+
+    const res = await bot.setStickerEmojiList("stk_123", ["🚀", "⭐"]);
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      sticker: "stk_123",
+      emoji_list: ["🚀", "⭐"],
+    });
+  });
+
+  it("setStickerKeywords sets or removes keywords", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.setStickerKeywords("stk_123", ["space", "launch"]);
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      sticker: "stk_123",
+      keywords: ["space", "launch"],
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.setStickerKeywords("stk_123");
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ sticker: "stk_123" });
+  });
+
+  it("setStickerMaskPosition sets or removes mask position", async () => {
+    const maskPos = {
+      point: "forehead",
+      x_shift: 0.1,
+      y_shift: -0.2,
+      scale: 1.5,
+    };
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.setStickerMaskPosition("stk_123", maskPos);
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      sticker: "stk_123",
+      mask_position: maskPos,
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.setStickerMaskPosition("stk_123");
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ sticker: "stk_123" });
+  });
+});
+
+

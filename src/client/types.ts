@@ -12,6 +12,7 @@ import type {
   ChatMemberStatus,
   ChatAction,
 } from "./constants.js";
+import type { InputFile } from "../utils/http.js";
 
 /**
  * Error thrown when a Telegram Bot API request returns a non-OK (`ok: false`) response.
@@ -391,7 +392,7 @@ export interface ExternalReplyInfo {
   audio?: Audio;
   document?: Document;
   photo?: PhotoSize[];
-  sticker?: unknown;
+  sticker?: Sticker;
   story?: unknown;
   video?: Video;
   video_note?: VideoNote;
@@ -534,7 +535,7 @@ export interface Message {
   audio?: Audio;
   document?: Document;
   photo?: PhotoSize[];
-  sticker?: unknown;
+  sticker?: Sticker;
   story?: Story;
   video?: Video;
   video_note?: VideoNote;
@@ -1485,9 +1486,342 @@ export interface SetMessageReactionOptions {
 }
 
 /**
+ * Represents a sticker.
+ */
+export interface Sticker {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file, which is supposed to be the same over time and for different bots. */
+  file_unique_id: string;
+  /** Type of the sticker, currently one of "regular", "mask", "custom_emoji". */
+  type: "regular" | "mask" | "custom_emoji";
+  /** Sticker width. */
+  width: number;
+  /** Sticker height. */
+  height: number;
+  /** True, if the sticker is animated. */
+  is_animated: boolean;
+  /** True, if the sticker is a video sticker. */
+  is_video: boolean;
+  /** Sticker thumbnail in the .WEBP or .JPG format. */
+  thumbnail?: PhotoSize;
+  /** Emoji associated with the sticker. */
+  emoji?: string;
+  /** Name of the sticker set to which the sticker belongs. */
+  set_name?: string;
+  /** For premium regular stickers, premium animation for the sticker. */
+  premium_animation?: File;
+  /** For mask stickers, the position where the mask should be placed. */
+  mask_position?: MaskPosition;
+  /** For custom emoji stickers, unique identifier of the custom emoji. */
+  custom_emoji_id?: string;
+  /** True, if the sticker must be repainted to a text color in messages. */
+  needs_repainting?: boolean;
+  /** File size in bytes. */
+  file_size?: number;
+}
+
+/**
+ * Describes the position on faces where a mask should be placed by default.
+ */
+export interface MaskPosition {
+  /** The part of the face relative to which the mask should be placed. One of "forehead", "eyes", "mouth", or "chin". */
+  point: string;
+  /** Shift by X-axis measured in widths of the mask scaled to the face size, from left to right. */
+  x_shift: number;
+  /** Shift by Y-axis measured in heights of the mask scaled to the face size, from top to bottom. */
+  y_shift: number;
+  /** Mask scaling coefficient. */
+  scale: number;
+}
+
+/**
+ * Represents a sticker set.
+ */
+export interface StickerSet {
+  /** Sticker set name. */
+  name: string;
+  /** Sticker set title. */
+  title: string;
+  /** Type of stickers in the set, currently one of "regular", "mask", "custom_emoji". */
+  sticker_type: "regular" | "mask" | "custom_emoji";
+  /** List of all stickers in the set. */
+  stickers: Sticker[];
+  /** Sticker set thumbnail in the .WEBP, .TGS, or .WEBM format. */
+  thumbnail?: PhotoSize;
+}
+
+/**
+ * Describes a sticker to be added to or created in a sticker set.
+ */
+export interface InputSticker {
+  /** The added sticker. Pass a file_id as a string or an InputFile object. */
+  sticker: string | InputFile;
+  /** Format of the sticker, must be one of "static", "animated", "video". */
+  format: "static" | "animated" | "video";
+  /** List of 1-20 emoji associated with the sticker. */
+  emoji_list: string[];
+  /** Position where the mask should be placed on faces. For "mask" stickers only. */
+  mask_position?: MaskPosition;
+  /** List of 0-20 search keywords for the sticker with total length up to 64 characters. For "regular" and "custom_emoji" stickers only. */
+  keywords?: string[];
+}
+
+/**
+ * Options passed to `sendSticker` requests.
+ */
+export interface SendStickerOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers, or an HTTP URL as String, or upload a new one using InputFile. */
+  sticker: string | InputFile;
+  /** Unique identifier for the target message thread (topic) of the forum. */
+  message_thread_id?: number;
+  /** Emoji associated with the sticker; only for just uploaded stickers. */
+  emoji?: string;
+  /** Sends the message silently. Users will receive a notification with no sound. */
+  disable_notification?: boolean;
+  /** Protects the contents of the sent message from forwarding and saving. */
+  protect_content?: boolean;
+  /** Unique identifier of the message effect to be added to the message. */
+  message_effect_id?: string;
+  /** Description of the message to reply to. */
+  reply_parameters?: unknown;
+  /** Additional interface options. */
+  reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
+}
+
+/**
+ * Options passed to `createNewStickerSet` requests.
+ */
+export interface CreateNewStickerSetOptions {
+  /** User identifier of created sticker set owner. */
+  user_id: number;
+  /** Short name of sticker set, to be used in t.me/addstickers/ URLs. */
+  name: string;
+  /** Sticker set title, 1-64 characters. */
+  title: string;
+  /** A list of 1-50 initial stickers to be added to the sticker set. */
+  stickers: InputSticker[];
+  /** Type of stickers in the set, pass "regular", "mask", or "custom_emoji". By default, a regular sticker set is created. */
+  sticker_type?: "regular" | "mask" | "custom_emoji";
+  /** Pass True if stickers in the sticker set must be repainted to the color of text when used in messages. For "custom_emoji" only. */
+  needs_repainting?: boolean;
+}
+
+/**
+ * Options passed to `addStickerToSet` requests.
+ */
+export interface AddStickerToSetOptions {
+  /** User identifier of sticker set owner. */
+  user_id: number;
+  /** Sticker set name. */
+  name: string;
+  /** A object with information about the added sticker. */
+  sticker: InputSticker;
+}
+
+/**
+ * Options passed to `replaceStickerInSet` requests.
+ */
+export interface ReplaceStickerInSetOptions {
+  /** User identifier of the sticker set owner. */
+  user_id: number;
+  /** Sticker set name. */
+  name: string;
+  /** File identifier of the replaced sticker. */
+  old_sticker: string;
+  /** A object with information about the added sticker. */
+  sticker: InputSticker;
+}
+
+/**
  * Type alias representing a raw Telegram Update structure.
  */
 export type Update = RawUpdate;
 
 
 
+
+/**
+ * Represents a game high score for a user.
+ */
+export interface GameHighScore {
+  position: number;
+  user: User;
+  score: number;
+}
+
+/**
+ * Abstract base for passport element errors.
+ */
+export interface PassportElementError {
+  source: string;
+  type: string;
+  message: string;
+}
+
+/**
+ * Represents a list of gifts.
+ */
+export interface Gifts {
+  gifts: Gift[];
+}
+
+/**
+ * Represents a gift that can be sent by the bot.
+ */
+export interface Gift {
+  id: string;
+  sticker: Sticker;
+  star_count: number;
+  total_count?: number;
+  remaining_count?: number;
+}
+
+/**
+ * Represents the boost status of a chat.
+ */
+export interface UserChatBoosts {
+  boosts: unknown[];
+}
+
+/**
+ * Options passed to sendInvoice requests.
+ */
+export interface SendInvoiceOptions {
+  chat_id: number | string;
+  title: string;
+  description: string;
+  payload: string;
+  currency: string;
+  prices: LabeledPrice[];
+  provider_token?: string;
+  max_tip_amount?: number;
+  suggested_tip_amounts?: number[];
+  start_parameter?: string;
+  provider_data?: string;
+  photo_url?: string;
+  photo_size?: number;
+  photo_width?: number;
+  photo_height?: number;
+  need_name?: boolean;
+  need_phone_number?: boolean;
+  need_email?: boolean;
+  need_shipping_address?: boolean;
+  send_phone_number_to_provider?: boolean;
+  send_email_to_provider?: boolean;
+  is_flexible?: boolean;
+  disable_notification?: boolean;
+  protect_content?: boolean;
+  reply_parameters?: unknown;
+  reply_markup?: InlineKeyboardMarkup;
+  message_thread_id?: number;
+}
+
+/**
+ * Portion of the price of a product or service.
+ */
+export interface LabeledPrice {
+  label: string;
+  amount: number;
+}
+
+/**
+ * Options for answerShippingQuery requests.
+ */
+export interface AnswerShippingQueryOptions {
+  shipping_query_id: string;
+  ok: boolean;
+  shipping_options?: ShippingOption[];
+  error_message?: string;
+}
+
+/**
+ * Shipping option for payment.
+ */
+export interface ShippingOption {
+  id: string;
+  title: string;
+  prices: LabeledPrice[];
+}
+
+/**
+ * Options for answerPreCheckoutQuery requests.
+ */
+export interface AnswerPreCheckoutQueryOptions {
+  pre_checkout_query_id: string;
+  ok: boolean;
+  error_message?: string;
+}
+
+/**
+ * Contains a list of Telegram Star transactions.
+ */
+export interface StarTransactions {
+  transactions: StarTransaction[];
+}
+
+/**
+ * Describes a Telegram Star transaction.
+ */
+export interface StarTransaction {
+  id: string;
+  amount: number;
+  nanostar_amount?: number;
+  date: number;
+  source?: unknown;
+  receiver?: unknown;
+}
+
+/**
+ * Represents the rights of an administrator in a chat.
+ */
+export interface ChatAdministratorRights {
+  is_anonymous: boolean;
+  can_manage_chat: boolean;
+  can_delete_messages: boolean;
+  can_manage_video_chats: boolean;
+  can_restrict_members: boolean;
+  can_promote_members: boolean;
+  can_change_info: boolean;
+  can_invite_users: boolean;
+  can_post_stories?: boolean;
+  can_edit_stories?: boolean;
+  can_delete_stories?: boolean;
+  can_post_messages?: boolean;
+  can_edit_messages?: boolean;
+  can_pin_messages?: boolean;
+  can_manage_topics?: boolean;
+}
+
+/**
+ * Describes a menu button in a chat.
+ */
+export type MenuButton =
+  | { type: "default" }
+  | { type: "commands" }
+  | { type: "web_app"; text: string; web_app: { url: string } };
+
+/**
+ * Represents the bot's name.
+ */
+export interface BotName {
+  name: string;
+}
+
+/**
+ * Represents the bot's description.
+ */
+export interface BotDescription {
+  description: string;
+}
+
+/**
+ * Represents the bot's short description.
+ */
+export interface BotShortDescription {
+  short_description: string;
+}

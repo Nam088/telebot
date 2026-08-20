@@ -48,6 +48,14 @@ import type {
   CreateChatInviteLinkOptions,
   EditChatInviteLinkOptions,
   SetWebhookOptions,
+  Sticker,
+  StickerSet,
+  MaskPosition,
+  InputSticker,
+  SendStickerOptions,
+  CreateNewStickerSetOptions,
+  AddStickerToSetOptions,
+  ReplaceStickerInSetOptions,
 } from "./types.js";
 import type { ParseMode } from "./constants.js";
 import type { InputFile } from "../utils/http.js";
@@ -1401,6 +1409,357 @@ export class Bot {
       message_id: messageId,
       reaction: [],
     });
+  }
+
+  /**
+   * Sends a static, animated, or video sticker.
+   *
+   * @param options - Options including recipient `chat_id` and `sticker` payload.
+   * @returns The sent {@link Message} on success.
+   * @throws {@link TelegramApiError} When sending sticker fails.
+   *
+   * @example
+   * ```ts
+   * await bot.sendSticker({
+   *   chat_id: 123456,
+   *   sticker: "CAACAgIAAxkBAAE...",
+   * });
+   * ```
+   */
+  public async sendSticker(options: SendStickerOptions): Promise<Message> {
+    return this.request<Message>("sendSticker", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Retrieves a sticker set by its name.
+   *
+   * @param name - Name of the sticker set.
+   * @returns A {@link StickerSet} object.
+   * @throws {@link TelegramApiError} When retrieving the sticker set fails.
+   *
+   * @example
+   * ```ts
+   * const set = await bot.getStickerSet("animals_by_bot");
+   * console.log(`Sticker set title: ${set.title}, total: ${set.stickers.length}`);
+   * ```
+   */
+  public async getStickerSet(name: string): Promise<StickerSet> {
+    return this.request<StickerSet>("getStickerSet", { name });
+  }
+
+  /**
+   * Retrieves custom emoji stickers by their unique identifiers.
+   *
+   * @param customEmojiIds - List of custom emoji identifiers (1-200 identifiers).
+   * @returns An array of {@link Sticker} objects.
+   * @throws {@link TelegramApiError} When retrieving custom emoji stickers fails.
+   *
+   * @example
+   * ```ts
+   * const stickers = await bot.getCustomEmojiStickers(["5368324170671202286"]);
+   * ```
+   */
+  public async getCustomEmojiStickers(customEmojiIds: string[]): Promise<Sticker[]> {
+    return this.request<Sticker[]>("getCustomEmojiStickers", {
+      custom_emoji_ids: customEmojiIds,
+    });
+  }
+
+  /**
+   * Uploads a sticker file with a .WEBP, .PNG, .TGS, or .WEBM file for later use in `createNewStickerSet` and `addStickerToSet` methods.
+   *
+   * @param userId - User identifier of the sticker file owner.
+   * @param sticker - A file with the sticker in .WEBP, .PNG, .TGS, or .WEBM format.
+   * @param stickerFormat - Format of the sticker: "static", "animated", or "video".
+   * @returns The uploaded {@link File} object.
+   * @throws {@link TelegramApiError} When uploading the sticker file fails.
+   *
+   * @example
+   * ```ts
+   * const file = await bot.uploadStickerFile(123456, { filename: "sticker.png", data: buffer }, "static");
+   * ```
+   */
+  public async uploadStickerFile(
+    userId: number,
+    sticker: string | InputFile,
+    stickerFormat: "static" | "animated" | "video"
+  ): Promise<File> {
+    return this.request<File>("uploadStickerFile", {
+      user_id: userId,
+      sticker,
+      sticker_format: stickerFormat,
+    });
+  }
+
+  /**
+   * Creates a new sticker set owned by a user.
+   *
+   * @param options - Options including user identifier, sticker set name, title, and initial stickers list.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When creating sticker set fails.
+   *
+   * @example
+   * ```ts
+   * await bot.createNewStickerSet({
+   *   user_id: 123456,
+   *   name: "animals_by_mybot",
+   *   title: "Animals Pack",
+   *   stickers: [
+   *     {
+   *       sticker: "CAACAgIAAxkBAAE...",
+   *       format: "static",
+   *       emoji_list: ["🐶"],
+   *     },
+   *   ],
+   * });
+   * ```
+   */
+  public async createNewStickerSet(options: CreateNewStickerSetOptions): Promise<boolean> {
+    return this.request<boolean>("createNewStickerSet", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Adds a new sticker to a set created by the bot.
+   *
+   * @param options - Options including user identifier, sticker set name, and sticker description.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When adding sticker fails.
+   *
+   * @example
+   * ```ts
+   * await bot.addStickerToSet({
+   *   user_id: 123456,
+   *   name: "animals_by_mybot",
+   *   sticker: {
+   *     sticker: "CAACAgIAAxkBAAE...",
+   *     format: "static",
+   *     emoji_list: ["🐱"],
+   *   },
+   * });
+   * ```
+   */
+  public async addStickerToSet(options: AddStickerToSetOptions): Promise<boolean> {
+    return this.request<boolean>("addStickerToSet", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Moves a sticker in a set created by the bot to a specific position.
+   *
+   * @param sticker - File identifier of the sticker.
+   * @param position - New 0-based position of the sticker in the set.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting position fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerPositionInSet("CAACAgIAAxkBAAE...", 0);
+   * ```
+   */
+  public async setStickerPositionInSet(sticker: string, position: number): Promise<boolean> {
+    return this.request<boolean>("setStickerPositionInSet", {
+      sticker,
+      position,
+    });
+  }
+
+  /**
+   * Deletes a sticker from a set created by the bot.
+   *
+   * @param sticker - File identifier of the sticker.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When deleting sticker fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteStickerFromSet("CAACAgIAAxkBAAE...");
+   * ```
+   */
+  public async deleteStickerFromSet(sticker: string): Promise<boolean> {
+    return this.request<boolean>("deleteStickerFromSet", { sticker });
+  }
+
+  /**
+   * Deletes a sticker set that was created by the bot.
+   *
+   * @param name - Sticker set name.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When deleting sticker set fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteStickerSet("animals_by_mybot");
+   * ```
+   */
+  public async deleteStickerSet(name: string): Promise<boolean> {
+    return this.request<boolean>("deleteStickerSet", { name });
+  }
+
+  /**
+   * Replaces an existing sticker in a sticker set with a new one.
+   *
+   * @param options - Options including user identifier, sticker set name, old sticker identifier, and new sticker data.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When replacing sticker fails.
+   *
+   * @example
+   * ```ts
+   * await bot.replaceStickerInSet({
+   *   user_id: 123456,
+   *   name: "animals_by_mybot",
+   *   old_sticker: "CAACAgIAAxkBAAE...",
+   *   sticker: {
+   *     sticker: "CAACAgIAAxkBAAF...",
+   *     format: "static",
+   *     emoji_list: ["🐶"],
+   *   },
+   * });
+   * ```
+   */
+  public async replaceStickerInSet(options: ReplaceStickerInSetOptions): Promise<boolean> {
+    return this.request<boolean>("replaceStickerInSet", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Sets the thumbnail of a regular or mask sticker set.
+   *
+   * @param name - Sticker set name.
+   * @param userId - User identifier of the sticker set owner.
+   * @param format - Format of the thumbnail: "static", "animated", or "video".
+   * @param thumbnail - A thumbnail in .WEBP or .PNG format for static, .TGS for animated, or .WEBM for video stickers. Pass undefined to drop thumbnail.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting sticker set thumbnail fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerSetThumbnail("animals_by_mybot", 123456, "static", "https://example.com/thumb.png");
+   * ```
+   */
+  public async setStickerSetThumbnail(
+    name: string,
+    userId: number,
+    format: "static" | "animated" | "video",
+    thumbnail?: string | InputFile
+  ): Promise<boolean> {
+    const payload: Record<string, unknown> = {
+      name,
+      user_id: userId,
+      format,
+    };
+    if (thumbnail !== undefined) {
+      payload["thumbnail"] = thumbnail;
+    }
+    return this.request<boolean>("setStickerSetThumbnail", payload);
+  }
+
+  /**
+   * Sets the thumbnail of a custom emoji sticker set.
+   *
+   * @param name - Sticker set name.
+   * @param customEmojiId - Custom emoji identifier of a sticker from the set; pass undefined to drop the thumbnail.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting thumbnail fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setCustomEmojiStickerSetThumbnail("custom_emojis_by_mybot", "5368324170671202286");
+   * ```
+   */
+  public async setCustomEmojiStickerSetThumbnail(
+    name: string,
+    customEmojiId?: string
+  ): Promise<boolean> {
+    const payload: Record<string, unknown> = { name };
+    if (customEmojiId !== undefined) {
+      payload["custom_emoji_id"] = customEmojiId;
+    }
+    return this.request<boolean>("setCustomEmojiStickerSetThumbnail", payload);
+  }
+
+  /**
+   * Sets the title of a created sticker set.
+   *
+   * @param name - Sticker set name.
+   * @param title - Sticker set title, 1-64 characters.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting title fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerSetTitle("animals_by_mybot", "Updated Animal Stickers");
+   * ```
+   */
+  public async setStickerSetTitle(name: string, title: string): Promise<boolean> {
+    return this.request<boolean>("setStickerSetTitle", { name, title });
+  }
+
+  /**
+   * Changes the list of emoji associated with a sticker.
+   *
+   * @param sticker - File identifier of the sticker.
+   * @param emojiList - A list of 1-20 emoji associated with the sticker.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting emoji list fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerEmojiList("CAACAgIAAxkBAAE...", ["🎉", "🎊"]);
+   * ```
+   */
+  public async setStickerEmojiList(sticker: string, emojiList: string[]): Promise<boolean> {
+    return this.request<boolean>("setStickerEmojiList", {
+      sticker,
+      emoji_list: emojiList,
+    });
+  }
+
+  /**
+   * Changes search keywords for a sticker.
+   *
+   * @param sticker - File identifier of the sticker.
+   * @param keywords - A list of 0-20 search keywords for the sticker with total length up to 64 characters.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting sticker keywords fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerKeywords("CAACAgIAAxkBAAE...", ["party", "celebration"]);
+   * ```
+   */
+  public async setStickerKeywords(sticker: string, keywords?: string[]): Promise<boolean> {
+    const payload: Record<string, unknown> = { sticker };
+    if (keywords !== undefined) {
+      payload["keywords"] = keywords;
+    }
+    return this.request<boolean>("setStickerKeywords", payload);
+  }
+
+  /**
+   * Changes the mask position of a mask sticker.
+   *
+   * @param sticker - File identifier of the sticker.
+   * @param maskPosition - An object with the position where the mask should be placed on faces, or undefined to remove the mask position.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting mask position fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerMaskPosition("CAACAgIAAxkBAAE...", {
+   *   point: "forehead",
+   *   x_shift: 0,
+   *   y_shift: 0,
+   *   scale: 1,
+   * });
+   * ```
+   */
+  public async setStickerMaskPosition(
+    sticker: string,
+    maskPosition?: MaskPosition
+  ): Promise<boolean> {
+    const payload: Record<string, unknown> = { sticker };
+    if (maskPosition !== undefined) {
+      payload["mask_position"] = maskPosition;
+    }
+    return this.request<boolean>("setStickerMaskPosition", payload);
   }
 }
 

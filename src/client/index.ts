@@ -93,6 +93,14 @@ export type {
   InputMediaAudio,
   InputMediaDocument,
   InputMedia,
+  Sticker,
+  MaskPosition,
+  StickerSet,
+  InputSticker,
+  SendStickerOptions,
+  CreateNewStickerSetOptions,
+  AddStickerToSetOptions,
+  ReplaceStickerInSetOptions,
 } from "./types.js";
 export { TelegramApiError } from "./types.js";
 export * from "./constants.js";
