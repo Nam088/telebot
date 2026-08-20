@@ -327,59 +327,58 @@ export class RRule {
     while (secondsAdvanced < maxSeconds) {
       const parts = this.getZonedParts(candidate, tz);
 
-      // Check second match
+      // 1. Second filter: Step 1 second
       if (this.normalizedSeconds && !this.normalizedSeconds.includes(parts.second)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
       }
 
-      // Check minute match
+      // 2. Minute filter: Step 1 minute
       if (this.normalizedMinutes && !this.normalizedMinutes.includes(parts.minute)) {
-        candidate = new Date(candidate.getTime() + 1000);
-        secondsAdvanced += 1;
+        candidate = new Date(candidate.getTime() + 60 * 1000);
+        secondsAdvanced += 60;
         continue;
       }
 
-      // Check hour match
+      // 3. Hour filter: Step 1 hour
       if (this.normalizedHours && !this.normalizedHours.includes(parts.hour)) {
-        candidate = new Date(candidate.getTime() + 1000);
-        secondsAdvanced += 1;
+        candidate = new Date(candidate.getTime() + 3600 * 1000);
+        secondsAdvanced += 3600;
         continue;
       }
 
-      // Weekday filter (including nth position matching like 1FR or -1FR)
+      // 4. Weekday filter (including nth position matching like 1FR or -1FR)
       if (this.normalizedWeekdays) {
         const currentCode = WEEKDAY_INTL_TO_CODE[parts.weekday];
         const matchingRule = this.normalizedWeekdays.find((w) => w.code === currentCode);
         if (!matchingRule) {
-          candidate = new Date(candidate.getTime() + 1000);
-          secondsAdvanced += 1;
+          candidate = new Date(candidate.getTime() + 3600 * 1000);
+          secondsAdvanced += 3600;
           continue;
         }
 
         // If nth qualifier is specified (e.g. 1st Friday or -1 last Friday of month)
         if (matchingRule.nth !== undefined) {
           const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
+          let nthMatches = false;
           if (matchingRule.nth > 0) {
             const nthDay = Math.floor((parts.day - 1) / 7) + 1;
-            if (nthDay !== matchingRule.nth) {
-              candidate = new Date(candidate.getTime() + 1000);
-              secondsAdvanced += 1;
-              continue;
-            }
+            nthMatches = nthDay === matchingRule.nth;
           } else if (matchingRule.nth < 0) {
             const negativeNth = -Math.floor((daysInMonth - parts.day) / 7) - 1;
-            if (negativeNth !== matchingRule.nth) {
-              candidate = new Date(candidate.getTime() + 1000);
-              secondsAdvanced += 1;
-              continue;
-            }
+            nthMatches = negativeNth === matchingRule.nth;
+          }
+
+          if (!nthMatches) {
+            candidate = new Date(candidate.getTime() + 3600 * 1000);
+            secondsAdvanced += 3600;
+            continue;
           }
         }
       }
 
-      // Monthday filter (supports positive 1..31 and negative -1..-31)
+      // 5. Monthday filter (supports positive 1..31 and negative -1..-31)
       if (this.normalizedMonthdays) {
         const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
         const matchesMonthday = this.normalizedMonthdays.some((md) => {
@@ -389,13 +388,13 @@ export class RRule {
         });
 
         if (!matchesMonthday) {
-          candidate = new Date(candidate.getTime() + 1000);
-          secondsAdvanced += 1;
+          candidate = new Date(candidate.getTime() + 3600 * 1000);
+          secondsAdvanced += 3600;
           continue;
         }
       }
 
-      // Yearday filter
+      // 6. Yearday filter
       if (this.normalizedYeardays) {
         const dayOfYear = this.getDayOfYear(candidate, parts.year);
         const totalDays = this.isLeapYear(parts.year) ? 366 : 365;
@@ -406,20 +405,20 @@ export class RRule {
         });
 
         if (!matchesYearday) {
-          candidate = new Date(candidate.getTime() + 1000);
-          secondsAdvanced += 1;
+          candidate = new Date(candidate.getTime() + 3600 * 1000);
+          secondsAdvanced += 3600;
           continue;
         }
       }
 
-      // Month filter
+      // 7. Year / Month filter
       if (this.normalizedMonths && !this.normalizedMonths.includes(parts.month)) {
-        candidate = new Date(candidate.getTime() + 1000);
-        secondsAdvanced += 1;
+        candidate = new Date(candidate.getTime() + 3600 * 1000);
+        secondsAdvanced += 3600;
         continue;
       }
 
-      // Match found
+      // Match found!
       if (this.options.until && candidate.getTime() > this.options.until.getTime()) {
         return null;
       }
