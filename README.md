@@ -9,19 +9,19 @@
 
 ---
 
-## ⚡ Highlights
+## Highlights
 
-- 🚀 **Zero Required Runtime Dependencies**: Built strictly on modern Node.js 22+ built-ins (`globalThis.fetch`, `node:sqlite`, `node:http`, `node:crypto`).
-- 🔒 **End-to-End Type Safety**: 100% TypeScript coverage under strict mode (`strict: true`, `noUncheckedIndexedAccess: true`).
-- 🧩 **Domain-Driven Micro-Kernel Architecture**: Subpath exports for tree-shaking (`tele-bot/client`, `tele-bot/kernel`, `tele-bot/routing`, `tele-bot/filters`, `tele-bot/storage`, `tele-bot/scheduler`, `tele-bot/ui`).
-- 💬 **Stateful Dialogs & FSM**: Supports both traditional FSM (`ConversationHandler`) and modern sequential async dialogs (`LinearConversation`).
-- ⏰ **Native Task Scheduling**: Built-in background job scheduler (`runOnce`, `runRepeating`, `runDaily`) with restart state recovery.
-- 💾 **Plug-and-Play Storage**: In-memory, atomic JSON file store, and high-performance native SQLite driver (`node:sqlite`).
-- 🌐 **Dual Deployment Modes**: Seamlessly switch between Long Polling and production HTTP Webhook Server with `secret_token` verification.
+- **Zero Required Runtime Dependencies**: Built strictly on modern Node.js 22+ built-ins (`globalThis.fetch`, `node:sqlite`, `node:http`, `node:crypto`).
+- **End-to-End Type Safety**: 100% TypeScript coverage under strict mode (`strict: true`, `noUncheckedIndexedAccess: true`).
+- **Domain-Driven Micro-Kernel Architecture**: Subpath exports for tree-shaking (`tele-bot/client`, `tele-bot/kernel`, `tele-bot/routing`, `tele-bot/filters`, `tele-bot/storage`, `tele-bot/scheduler`, `tele-bot/ui`).
+- **Stateful Dialogs & FSM**: Supports both traditional FSM (`ConversationHandler`) and modern sequential async dialogs (`LinearConversation`).
+- **Native Task Scheduling**: Built-in background job scheduler (`runOnce`, `runRepeating`, `runDaily`) with restart state recovery.
+- **Plug-and-Play Storage**: In-memory, atomic JSON file store, and high-performance native SQLite driver (`node:sqlite`).
+- **Dual Deployment Modes**: Seamlessly switch between Long Polling and production HTTP Webhook Server with `secret_token` verification.
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install tele-bot
@@ -31,7 +31,7 @@ npm install tele-bot
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Echo Bot (Long Polling)
 
@@ -72,85 +72,74 @@ await app.runPolling({ drop_pending_updates: true });
 
 ---
 
-## 📚 Core Features & Architecture
+## Core Features & Architecture
 
 ### 1. Modern Linear Conversations (`LinearConversation`)
 
 Write intuitive multi-step conversation scripts sequentially in a single `async/await` function without managing messy state machines:
 
 ```typescript
-import { ApplicationBuilder, LinearConversation } from "tele-bot";
+import { LinearConversation } from "tele-bot";
 
-const survey = new LinearConversation(async (conversation, context) => {
-  // Step 1: Ask user name and wait for their answer
-  const name = await conversation.ask("What is your name?");
+const onboarding = new LinearConversation(async (control) => {
+  await control.reply("What is your name?");
+  const nameUpdate = await control.wait();
+  const name = nameUpdate.effective_message?.text ?? "Anonymous";
 
-  // Step 2: Ask age and validate naturally with a loop
-  let age: number | undefined;
-  while (!age) {
-    const answer = await conversation.ask(`Nice to meet you, ${name}! How old are you?`);
-    const parsed = parseInt(answer, 10);
-    if (!isNaN(parsed) && parsed > 0) {
-      age = parsed;
-    } else {
-      await context.bot.sendMessage({
-        chat_id: context.update!.effective_chat!.id,
-        text: "Please enter a valid positive number!",
-      });
-    }
-  }
+  await control.reply(`Nice to meet you, ${name}! What is your favorite programming language?`);
+  const langUpdate = await control.wait();
+  const lang = langUpdate.effective_message?.text ?? "TypeScript";
 
-  // Step 3: Complete conversation
-  await context.bot.sendMessage({
-    chat_id: context.update!.effective_chat!.id,
-    text: `Thank you! Your profile has been saved: ${name}, ${age} years old.`,
-  });
-}, {
-  entry_command: "survey",
+  await control.reply(`Great! Registration complete for ${name} (${lang}).`);
 });
 
-app.addHandler(survey);
+app.addHandler(onboarding.createHandler("/register"));
 ```
 
 ---
 
-### 2. State Persistence (JSON & Native SQLite)
+### 2. Finite State Machine (`ConversationHandler`)
 
-Persist `user_data`, `chat_data`, `bot_data`, and active conversations across bot restarts:
+For complex branching workflows with fallback commands, timeout handlers, and persistent states across server restarts:
 
 ```typescript
-import { ApplicationBuilder, SqlitePersistence } from "tele-bot";
+import { ConversationHandler, CommandHandler, MessageHandler, filters } from "tele-bot";
 
-// Native SQLite storage using Node.js 22+ built-in `node:sqlite`
-const persistence = new SqlitePersistence({
-  dbPath: "./data/bot_state.sqlite",
+const GENDER = 1;
+const PHOTO = 2;
+const LOCATION = 3;
+
+const convHandler = new ConversationHandler({
+  entry_points: [new CommandHandler("start", startCallback)],
+  states: {
+    [GENDER]: [new MessageHandler(filters.Regex(/^(Boy|Girl|Other)$/), genderCallback)],
+    [PHOTO]: [
+      new MessageHandler(filters.PHOTO, photoCallback),
+      new CommandHandler("skip", skipPhotoCallback),
+    ],
+    [LOCATION]: [new MessageHandler(filters.LOCATION, locationCallback)],
+  },
+  fallbacks: [new CommandHandler("cancel", cancelCallback)],
 });
 
-const app = new ApplicationBuilder()
-  .token(process.env.BOT_TOKEN!)
-  .persistence(persistence)
-  .build();
+app.addHandler(convHandler);
 ```
 
 ---
 
-### 3. Background Task Scheduler (`JobQueue`)
+### 3. Background Job Scheduler (`JobQueue`)
 
-Schedule delayed timers, intervals, and daily recurring jobs:
+Execute delayed one-shot jobs, repeating interval tasks, or scheduled daily notifications:
 
 ```typescript
-import { ApplicationBuilder, CommandHandler } from "tele-bot";
-
-const app = new ApplicationBuilder().token(process.env.BOT_TOKEN!).build();
-
-// Schedule a reminder after 60 seconds
-app.addHandler(new CommandHandler("remind", async (update, context) => {
+app.addHandler(new CommandHandler("remindme", async (update, context) => {
   const chatId = update.effective_chat!.id;
 
+  // Run a one-shot background job in 60 seconds
   context.job_queue?.runOnce(async (jobCtx) => {
     await jobCtx.bot.sendMessage({
       chat_id: chatId,
-      text: "⏰ Ding! Your 60-second reminder is up!",
+      text: "Ding! Your 60-second reminder is up!",
     });
   }, 60);
 
@@ -171,10 +160,10 @@ Easily create inline button grids and custom reply keyboards:
 import { InlineKeyboard } from "tele-bot";
 
 const keyboard = new InlineKeyboard()
-  .text("👍 Like", "like_click")
-  .text("👎 Dislike", "dislike_click")
+  .text("Like", "like_click")
+  .text("Dislike", "dislike_click")
   .row()
-  .url("🌐 Official Website", "https://telegram.org");
+  .url("Official Website", "https://telegram.org");
 
 await bot.sendMessage({
   chat_id: 123456,
@@ -206,7 +195,7 @@ await app.runWebhook({
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 ```bash
 # Run full unit & integration test suite
@@ -219,16 +208,13 @@ npm run test:coverage
 npm run docs
 ```
 
----
+## Design Conventions
 
-## 🏛️ Design Conventions
-
-- **Verbs / Methods you call (`()`)** ➔ `camelCase`: `bot.sendMessage()`, `app.runPolling()`, `app.addHandler()`, `jobQueue.runOnce()`.
-- **Nouns / Properties / Telegram Schema** ➔ `snake_case`: `context.user_data`, `context.chat_data`, `context.job_queue`, `update.effective_user`, `chat_id`, `message_id`.
+- **Verbs / Methods you call (`()`)** -> `camelCase`: `bot.sendMessage()`, `app.runPolling()`, `app.addHandler()`, `jobQueue.runOnce()`.
+- **Nouns / Properties / Telegram Schema** -> `snake_case`: `context.user_data`, `context.chat_data`, `context.job_queue`, `update.effective_user`, `chat_id`, `message_id`.
 
 ---
 
-## 📄 License
+## License
 
-MIT © 2026 tele-bot contributors
-
+MIT (c) 2026 tele-bot contributors
