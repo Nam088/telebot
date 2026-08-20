@@ -54,13 +54,38 @@ describe("RRule Recurrence Rule Engine & Timezone Tests", () => {
     expect(rrule.after(anchor)).toBeNull();
   });
 
-  it("executes scheduled job with runRRule in JobQueue", async () => {
+  it("supports standard rrule.js object syntax with RRule constants (RRule.WEEKLY, RRule.MO, RRule.FR)", () => {
+    const rrule = new RRule({
+      freq: RRule.WEEKLY,
+      interval: 2,
+      byweekday: [RRule.MO, RRule.FR],
+      byhour: 14,
+      byminute: 30,
+      tzid: "America/New_York",
+    });
+
+    expect(rrule.options.freq).toBe(RRule.WEEKLY);
+    expect(rrule.options.interval).toBe(2);
+    expect(rrule.options.tzid).toBe("America/New_York");
+  });
+
+  it("supports nth weekday representation (e.g. RRule.FR.nth(1))", () => {
+    const firstFriday = RRule.FR.nth(1);
+    expect(firstFriday.weekday).toBe(4);
+    expect(firstFriday.n).toBe(1);
+    expect(firstFriday.toString()).toBe("1FR");
+  });
+
+  it("executes scheduled job with runRRule in JobQueue using structured Object", async () => {
     const queue = new JobQueue(bot);
     queue.start();
 
     const cb = vi.fn();
     const job = queue.runRRule(cb, {
-      rrule: "FREQ=DAILY;BYHOUR=9",
+      rrule: {
+        freq: RRule.DAILY,
+        byhour: 9,
+      },
       timezone: "Asia/Ho_Chi_Minh",
       data: { topic: "standup" },
     });

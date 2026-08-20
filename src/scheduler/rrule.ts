@@ -1,64 +1,159 @@
 /**
  * Zero-dependency RFC 5545 iCalendar Recurrence Rule (RRule) Engine with Timezone support.
  *
- * Implements frequency parsing (MINUTELY, HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY),
- * intervals, weekday filters (MO, TU, WE, TH, FR, SA, SU), monthday/hour/minute constraints,
- * and exact timezone conversions using native `Intl.DateTimeFormat`.
+ * Full parity with RFC 5545 and standard rrule.js options:
+ * - Constants: RRule.YEARLY (0), RRule.MONTHLY (1), RRule.WEEKLY (2), RRule.DAILY (3), RRule.HOURLY (4), RRule.MINUTELY (5), RRule.SECONDLY (6)
+ * - Weekdays: RRule.MO (0), RRule.TU (1), RRule.WE (2), RRule.TH (3), RRule.FR (4), RRule.SA (5), RRule.SU (6)
+ * - Full Option keys: freq, interval, dtstart, tzid, timezone, until, count, byweekday, byday, bymonth, bymonthday, byhour, byminute, bysecond, wkst.
  *
  * @packageDocumentation
  */
 
-/** Supported RRule frequency types. */
-export type RRuleFrequency =
-  "SECONDLY" | "MINUTELY" | "HOURLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+/**
+ * RFC 5545 Frequency constants.
+ */
+export const Frequency = {
+  YEARLY: 0,
+  MONTHLY: 1,
+  WEEKLY: 2,
+  DAILY: 3,
+  HOURLY: 4,
+  MINUTELY: 5,
+  SECONDLY: 6,
+} as const;
 
-/** Weekday abbreviation identifiers. */
-export type RRuleWeekday = "SU" | "MO" | "TU" | "WE" | "TH" | "FR" | "SA";
+export type FrequencyType = (typeof Frequency)[keyof typeof Frequency];
 
 /**
- * Parsed configuration options for an RRule schedule.
+ * Weekday representation with RFC 5545 nth occurrence support.
+ */
+export class Weekday {
+  public readonly weekday: number;
+  public readonly n?: number;
+
+  constructor(weekday: number, n?: number) {
+    this.weekday = weekday;
+    this.n = n;
+  }
+
+  /** Returns an instance representing the nth occurrence of this weekday (e.g. 1st Friday of month). */
+  public nth(n: number): Weekday {
+    return new Weekday(this.weekday, n);
+  }
+
+  public toString(): string {
+    const names = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+    const name = names[this.weekday] ?? "MO";
+    return this.n !== undefined ? `${this.n}${name}` : name;
+  }
+}
+
+/** Supported RRule frequency types. */
+export type RRuleFrequency =
+  "SECONDLY" | "MINUTELY" | "HOURLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY" | FrequencyType;
+
+/** Weekday abbreviation identifiers. */
+export type RRuleWeekday = "SU" | "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | number | Weekday;
+
+/**
+ * Standard RFC 5545 RRule options.
  */
 export interface RRuleOptions {
-  /** Recurrence frequency (e.g. `DAILY`, `WEEKLY`, `MONTHLY`). */
+  /** Recurrence frequency (e.g. `RRule.DAILY`, `RRule.WEEKLY` or `"DAILY"`). */
   freq: RRuleFrequency;
   /** Interval between occurrences (default: `1`). */
   interval?: number;
-  /** Array of target weekdays (e.g. `["MO", "WE", "FR"]`). */
-  byweekday?: RRuleWeekday[];
-  /** Array of days of the month (1 to 31). */
-  bymonthday?: number[];
-  /** Array of months in year (1 to 12). */
-  bymonth?: number[];
-  /** Target hours (0 to 23). */
-  byhour?: number[];
-  /** Target minutes (0 to 59). */
-  byminute?: number[];
-  /** Target seconds (0 to 59). */
-  bysecond?: number[];
+  /** Array of target weekdays or single weekday (e.g. `[RRule.MO, RRule.FR]`, `["MO", "FR"]`, `[0, 4]`). */
+  byweekday?: RRuleWeekday[] | RRuleWeekday;
+  /** Alias for `byweekday` matching RFC 5545 standard naming. */
+  byday?: RRuleWeekday[] | RRuleWeekday;
+  /** Array of days of the month (1 to 31) or single day. */
+  bymonthday?: number[] | number;
+  /** Array of months in year (1 to 12) or single month. */
+  bymonth?: number[] | number;
+  /** Target hours (0 to 23) or single hour. */
+  byhour?: number[] | number;
+  /** Target minutes (0 to 59) or single minute. */
+  byminute?: number[] | number;
+  /** Target seconds (0 to 59) or single second. */
+  bysecond?: number[] | number;
   /** Maximum number of occurrences before stopping. */
   count?: number;
   /** Cut-off date after which no occurrences should be generated. */
   until?: Date;
-  /** IANA Timezone identifier (e.g. `"Asia/Ho_Chi_Minh"`, `"America/New_York"`). Defaults to host timezone. */
+  /** IANA Timezone identifier (e.g. `"Asia/Ho_Chi_Minh"`, `"America/New_York"`). */
+  tzid?: string;
+  /** Alias for `tzid`. */
   timezone?: string;
   /** Starting anchor date for the recurrence series. */
   dtstart?: Date;
+  /** Week start day (default: `RRule.MO`). */
+  wkst?: Weekday | number;
 }
 
-const NUM_TO_WEEKDAY: RRuleWeekday[] = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+const WEEKDAY_TO_INTL: Record<string, number> = {
+  SU: 0,
+  MO: 1,
+  TU: 2,
+  WE: 3,
+  TH: 4,
+  FR: 5,
+  SA: 6,
+};
+
+const FREQ_MAP: Record<number, string> = {
+  0: "YEARLY",
+  1: "MONTHLY",
+  2: "WEEKLY",
+  3: "DAILY",
+  4: "HOURLY",
+  5: "MINUTELY",
+  6: "SECONDLY",
+};
+
+const WEEKDAY_INTL_TO_CODE: string[] = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
 /**
  * Zero-dependency RFC 5545 Recurrence Rule parser and next-date iterator.
  *
  * @example
  * ```ts
- * const rule = new RRule("FREQ=WEEKLY;BYDAY=MO,WE,FR;BYHOUR=9;BYMINUTE=0", "Asia/Ho_Chi_Minh");
+ * const rule = new RRule({
+ *   freq: RRule.WEEKLY,
+ *   byweekday: [RRule.MO, RRule.FR],
+ *   byhour: 9,
+ *   byminute: 0,
+ *   tzid: "Asia/Ho_Chi_Minh",
+ * });
  * const nextDate = rule.after(new Date());
  * ```
  */
 export class RRule {
-  /** The parsed recurrence options. */
+  public static readonly YEARLY = Frequency.YEARLY;
+  public static readonly MONTHLY = Frequency.MONTHLY;
+  public static readonly WEEKLY = Frequency.WEEKLY;
+  public static readonly DAILY = Frequency.DAILY;
+  public static readonly HOURLY = Frequency.HOURLY;
+  public static readonly MINUTELY = Frequency.MINUTELY;
+  public static readonly SECONDLY = Frequency.SECONDLY;
+
+  public static readonly MO = new Weekday(0);
+  public static readonly TU = new Weekday(1);
+  public static readonly WE = new Weekday(2);
+  public static readonly TH = new Weekday(3);
+  public static readonly FR = new Weekday(4);
+  public static readonly SA = new Weekday(5);
+  public static readonly SU = new Weekday(6);
+
+  /** The normalized recurrence options. */
   public readonly options: RRuleOptions;
+
+  private readonly normalizedDays?: string[];
+  private readonly normalizedMonths?: number[];
+  private readonly normalizedMonthdays?: number[];
+  private readonly normalizedHours?: number[];
+  private readonly normalizedMinutes?: number[];
+  private readonly normalizedSeconds?: number[];
 
   /**
    * Constructs a new {@link RRule} instance from an RFC 5545 string or options object.
@@ -73,16 +168,55 @@ export class RRule {
       this.options = { ...rule };
     }
 
-    if (defaultTimezone && !this.options.timezone) {
-      this.options.timezone = defaultTimezone;
+    if (defaultTimezone && !this.options.tzid && !this.options.timezone) {
+      this.options.tzid = defaultTimezone;
+    }
+
+    // Normalizations for high-performance iteration
+    const rawDays = this.options.byweekday ?? this.options.byday;
+    if (rawDays !== undefined) {
+      const daysArr = Array.isArray(rawDays) ? rawDays : [rawDays];
+      this.normalizedDays = daysArr.map((d) => {
+        if (typeof d === "string") return d.toUpperCase();
+        if (typeof d === "number") return ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d] ?? "MO";
+        if (d instanceof Weekday)
+          return ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d.weekday] ?? "MO";
+        return "MO";
+      });
+    }
+
+    if (this.options.bymonth !== undefined) {
+      this.normalizedMonths = Array.isArray(this.options.bymonth)
+        ? this.options.bymonth
+        : [this.options.bymonth];
+    }
+    if (this.options.bymonthday !== undefined) {
+      this.normalizedMonthdays = Array.isArray(this.options.bymonthday)
+        ? this.options.bymonthday
+        : [this.options.bymonthday];
+    }
+    if (this.options.byhour !== undefined) {
+      this.normalizedHours = Array.isArray(this.options.byhour)
+        ? this.options.byhour
+        : [this.options.byhour];
+    }
+    if (this.options.byminute !== undefined) {
+      this.normalizedMinutes = Array.isArray(this.options.byminute)
+        ? this.options.byminute
+        : [this.options.byminute];
+    }
+    if (this.options.bysecond !== undefined) {
+      this.normalizedSeconds = Array.isArray(this.options.bysecond)
+        ? this.options.bysecond
+        : [this.options.bysecond];
     }
   }
 
   /**
-   * Parses an RFC 5545 string into {@link RRuleOptions}.
+   * Parses an RFC 5545 string into structured {@link RRuleOptions}.
    *
-   * @param str - Standard RRule string.
-   * @returns Structured {@link RRuleOptions}.
+   * @param str - Standard RFC 5545 string.
+   * @returns Structured options object.
    */
   public static parseString(str: string): RRuleOptions {
     const clean = str.replace(/^RRULE:/i, "").trim();
@@ -131,12 +265,12 @@ export class RRule {
           break;
         case "TZID":
         case "TIMEZONE":
-          options.timezone = val;
+          options.tzid = val;
           break;
       }
     }
 
-    if (!options.freq) {
+    if (options.freq === undefined) {
       throw new Error(`Invalid RRule string: missing FREQ attribute in "${str}"`);
     }
 
@@ -151,13 +285,12 @@ export class RRule {
    */
   public after(afterDate: Date = new Date()): Date | null {
     const afterMs = afterDate.getTime();
-    const tz = this.options.timezone;
+    const tz = this.options.tzid ?? this.options.timezone;
 
     if (this.options.until && afterMs >= this.options.until.getTime()) {
       return null;
     }
 
-    // Step by minute / second if specified, otherwise by day/hour
     let candidate = new Date(afterMs + 1000);
     const maxSeconds = 366 * 24 * 3600; // Look up to 1 year ahead
     let secondsAdvanced = 0;
@@ -166,30 +299,30 @@ export class RRule {
       const parts = this.getZonedParts(candidate, tz);
 
       // Check second match
-      if (this.options.bysecond && !this.options.bysecond.includes(parts.second)) {
+      if (this.normalizedSeconds && !this.normalizedSeconds.includes(parts.second)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
       }
 
       // Check minute match
-      if (this.options.byminute && !this.options.byminute.includes(parts.minute)) {
+      if (this.normalizedMinutes && !this.normalizedMinutes.includes(parts.minute)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
       }
 
       // Check hour match
-      if (this.options.byhour && !this.options.byhour.includes(parts.hour)) {
+      if (this.normalizedHours && !this.normalizedHours.includes(parts.hour)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
       }
 
       // Weekday filter
-      if (this.options.byweekday) {
-        const currentWeekday = NUM_TO_WEEKDAY[parts.weekday];
-        if (!currentWeekday || !this.options.byweekday.includes(currentWeekday)) {
+      if (this.normalizedDays) {
+        const currentWeekday = WEEKDAY_INTL_TO_CODE[parts.weekday];
+        if (!currentWeekday || !this.normalizedDays.includes(currentWeekday)) {
           candidate = new Date(candidate.getTime() + 1000);
           secondsAdvanced += 1;
           continue;
@@ -197,14 +330,14 @@ export class RRule {
       }
 
       // Monthday filter
-      if (this.options.bymonthday && !this.options.bymonthday.includes(parts.day)) {
+      if (this.normalizedMonthdays && !this.normalizedMonthdays.includes(parts.day)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
       }
 
       // Month filter
-      if (this.options.bymonth && !this.options.bymonth.includes(parts.month)) {
+      if (this.normalizedMonths && !this.normalizedMonths.includes(parts.month)) {
         candidate = new Date(candidate.getTime() + 1000);
         secondsAdvanced += 1;
         continue;
