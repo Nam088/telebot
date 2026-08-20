@@ -12,7 +12,7 @@ import type { BotOptions } from "./methods/base.js";
 export type { BotOptions } from "./methods/base.js";
 
 /**
- * Primary HTTP Client for executing Telegram Bot API 8.0+ requests.
+ * Primary HTTP Client for executing Telegram Bot API requests.
  *
  * Inherits all domain method mixins with full autocomplete and type safety.
  *
