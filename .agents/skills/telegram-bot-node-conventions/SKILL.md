@@ -1,62 +1,100 @@
 ---
 name: telegram-bot-node-conventions
-description: Use when writing, reviewing, or porting code in the telegram-bot-node repo (the zero-dependency TypeScript port of python-telegram-bot/PTB) — adding or reviewing a Handler, Filter, Bot API method, Persistence method, CallbackContext property, or any other public export, and when writing its doc comments.
+description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or TypeDoc docstrings to the tele-bot framework. Use whenever creating, modifying, or reviewing code in the repository.
 ---
 
-# Telegram Bot Node Conventions
+# Telegram Bot Node Conventions & Feature Development Workflow
 
-## Overview
-`telegram-bot-node` ports `python-telegram-bot` (PTB) to a zero-required-dependency TypeScript framework, so a PTB bot can be migrated with minimal code changes. Every new public symbol must follow this repo's PTB naming split, its dependency policy, and TypeDoc-recognized doc comments. Full rationale lives in this repo's `AGENTS.md` and `specs/001-telegram-bot-framework/{spec.md,technical-context.md}` — this is the quick-reference version, tested to actually change output (an agent without it writes `context.chatData`; one with it writes `context.chat_data`).
+## 1. Overview
+`tele-bot` is a zero-required-dependency, TypeScript-first Telegram Bot framework for Node.js.
+When adding new methods, features, handlers, or drivers, agents must strictly follow the architectural patterns, naming conventions, zero-dependency policy, TDD workflow, and TypeDoc documentation standards described below.
 
-## Naming split
+---
+
+## 2. Naming Conventions (Strict Parity)
 
 | Kind | Rule | Example |
 |---|---|---|
-| Method you call (`x()`) | camelCase, converted from PTB's snake_case | `add_handler` → `addHandler`, `send_message` → `sendMessage` |
-| Property / options key you read or write | keep PTB's exact snake_case | `context.user_data`, `context.chat_data`, `options.allowed_updates`, `disable_notification` |
-| Class / filter constant | unchanged from PTB | `CommandHandler`, `filters.TEXT`, `filters.ChatType.PRIVATE` |
-| Python operator overload (`&`, `\|`, `~` on filters) | explicit method, no JS equivalent | `.and()`, `.or()`, `.not()` |
+| **Method you call (`x()`)** | `camelCase` | `sendMessage`, `addHandler`, `runRRule`, `deleteUserData` |
+| **Property / Storage key / API option** | `snake_case` | `context.user_data`, `context.chat_data`, `options.allowed_updates`, `chat_id`, `message_id` |
+| **Class / Filter constant** | `PascalCase` / `UPPER_SNAKE_CASE` | `CommandHandler`, `RRule`, `filters.TEXT`, `filters.ChatType.PRIVATE` |
+| **Filter Boolean combinators** | Explicit method calls | `.and()`, `.or()`, `.not()` |
+| **Filenames** | Multi-word source files use `.` | `conversation.handler.ts`, `linear-conversation.ts`, `rrule.ts` |
 
-Quick test: is it called with `()`? → camelCase. Is it a value or object-literal key being read/written? → keep PTB's snake_case.
+---
 
-Before naming anything, check the real PTB source vendored in the repo at `python-telegram-bot/src/telegram/` — don't guess PTB's exact name from memory.
+## 3. How to Add a New Bot API Method (Domain Mixin Pattern)
 
-Filenames are a separate rule from identifiers: multi-word source files use `.` as the separator (`conversation.handler.ts`, `job.queue.ts`), never `_` — this doesn't affect the `job_queue` *property* name, which stays snake_case per the table above.
+The `Bot` client uses modular domain mixins in `src/client/methods/`. When adding a new Telegram Bot API method:
 
-## Dependency policy
+1. **Step 1: Define Types in `src/client/types.ts`**
+   - Add the payload interface (e.g. `SendXOptions`) and response interface with exhaustive property-level JSDoc.
+   - Re-export in `src/client/index.ts` and `src/index.ts`.
+2. **Step 2: Implement in appropriate domain mixin in `src/client/methods/`**
+   - `messages.ts`: Message, media, poll, reactions, drafts, live locations.
+   - `chats.ts`: Chat administration, member restrictions, permissions, invite links.
+   - `stickers.ts`: Sticker sets, custom emojis, uploads.
+   - `payments.ts`: Invoices, Telegram Stars, payments, subscriptions.
+   - `topics.ts`: Forum topics, bot profile/identity, menu buttons.
+   - `business.ts`: Business connections, stories, HTML5 games, gifts, verification, passport.
+3. **Step 3: Add complete TSDoc**
+   - One-line summary.
+   - `@param options - ...`
+   - `@returns The Telegram response object wrapped in Promise.`
+   - `@throws {@link TelegramApiError} When Telegram API returns an error code.`
+   - `@example` Runnable TypeScript snippet.
+4. **Step 4: Add Unit Tests in `tests/unit/client/methods/<domain>.test.ts` or `bot.test.ts`**
+   - Mock fetch response using mock adapter to test payload serialization and error handling.
 
-- Nothing in `"dependencies"` beyond Node.js built-ins (`fetch`, `http`, `https`, `fs`, `path`, `crypto`, `util`, `events`, `sqlite`).
-- Exactly one allowed optional peer dependency: `pino` (opt-in structured logging); the framework must work fully without it.
-- Adding any other runtime dependency requires updating `spec.md` NFR-1 and Success Criteria #4 first — don't add the dependency and leave the spec claiming zero dependencies.
-- Minimum Node.js version: 22+ (needed for the built-in `node:sqlite` used by `SqlitePersistence`).
+---
 
-## Doc comments (required on every public export)
+## 4. How to Add a New Storage Persistence Driver
 
-Use only tags [TypeDoc](https://typedoc.org) recognizes, so `npx typedoc` renders them correctly:
-- One-line summary, `@param` per parameter, exactly one `@returns` (TypeDoc only honors one per comment).
-- `@example` with a runnable snippet on every public entry point (`Application`, each `*Handler`, `filters.*`, `CallbackContext`).
-- `@throws {@link ErrorType}` on anything that can reject/throw.
-- `@defaultValue` on optional fields with a runtime default.
-- `@remarks` for PTB-vs-Node behavior differences.
-- `@deprecated` only for APIs kept as a migration bridge.
+All storage drivers must implement the `Persistence` interface or inherit from `BasePersistence` in `src/storage/`:
 
-## Testing, error handling, git (full detail in `AGENTS.md`)
+1. **Step 1: Inherit from `BasePersistence` (`src/storage/driver.ts`)**
+   - Implement the 3 raw primitives:
+     - `getRaw(key: string): Promise<Record<string, unknown> | null>`
+     - `setRaw(key: string, data: Record<string, unknown>): Promise<void>`
+     - `deleteRaw(key: string): Promise<void>`
+2. **Step 2: Export in `src/storage/index.ts` and `src/index.ts`**
+3. **Step 3: Create tests in `tests/unit/storage/`**
+   - Test user data, chat data, bot data, conversation states, and deletion methods (`deleteUserData`, `deleteChatData`, `deleteConversation`).
+4. **Step 4: Create runnable example in `examples/`**
 
-- Write the unit test first for any new handler/filter/Bot API/persistence method; mirror `src/` paths under `tests/unit/`; never hit real Telegram in a default test run (inject a fake `fetch` instead).
-- Retry only on `429`/`5xx` with exponential backoff (`1s,2s,4s,8s`, cap `30s`); honor `429`'s `retry_after` exactly; public methods reject with a typed error (e.g. `TelegramApiError`), not a bare `Error`.
-- One branch per FR/NFR; commit messages reference the requirement (`feat(ext): add ConversationHandler (FR-4)`); `npm run build && npm test` clean before opening a PR.
-- This repo only has `spec.md`/`technical-context.md` so far — run `/speckit-plan` → `/speckit-tasks` → `/speckit-implement` rather than coding straight from the spec.
+---
 
-## Common mistakes
+## 5. How to Add a New Handler or Filter
 
-- Writing `context.userData`/`chatData` instead of `context.user_data`/`chat_data` — breaks the "same property name" migration promise (confirmed to happen by default without this skill).
-- camelCasing an options key that mirrors a Telegram/PTB field, e.g. `options.allowedUpdates` instead of `options.allowed_updates`.
-- Adding a package to `dependencies` without updating NFR-1 in `spec.md`.
-- A doc comment with prose but no `@param`/`@returns` — TypeDoc won't structure it, defeating the point of NFR-4.
+1. **New Handler (`src/routing/handlers.ts`)**:
+   - Inherit from `BaseHandler<C, R>`.
+   - Implement `checkUpdate(update: Update): Promise<boolean>`.
+   - Implement `handleUpdate(update: Update, context: C): Promise<R>`.
+2. **New Filter (`src/filters/matchers.ts`)**:
+   - Inherit from `BaseFilter`.
+   - Implement `checkUpdate(update: Update): boolean | Promise<boolean>`.
+   - Support `.and()`, `.or()`, `.not()`.
 
-## Reference
+---
 
-- Full rules + rationale: `AGENTS.md` (repo root)
-- Requirements/success criteria: `specs/001-telegram-bot-framework/spec.md`
-- Architecture/data models/perf targets: `specs/001-telegram-bot-framework/technical-context.md`
-- Ground-truth PTB source: `python-telegram-bot/`
+## 6. How to Add / Extend Scheduler Features (`src/scheduler/`)
+
+1. **JobQueue & Job Lifecycle (`src/scheduler/queue.ts`)**:
+   - Always handle timer chunking (>24.8 days limit in `setTimeout`).
+   - Reschedule jobs on `JobQueue.start()` if jobs were added prior to start or restored from persistence.
+   - Maintain $O(1)$ multi-index maps (`_jobsByName`, `_jobsByChatId`).
+2. **RFC 5545 RRule Engine (`src/scheduler/rrule.ts`)**:
+   - Retain full compatibility with `rrule.js` options (`freq`, `interval`, `dtstart`, `until`, `count`, `tzid`, `byweekday`, `bymonthday`, `byhour`, `byminute`, `bysecond`, `byyearday`, `byweekno`, `bysetpos`).
+   - Use hierarchical adaptive stepping for maximum execution speed.
+
+---
+
+## 7. Mandatory Quality Gates & Verification Checklist
+
+Before considering any feature, bug fix, or refactor complete, execute:
+1. `npm run format:check` → Formatting check.
+2. `npm run lint` → ESLint static analysis.
+3. `npm run build` → TypeScript compilation (0 errors).
+4. `npm test` → 100% test suites pass.
+5. `npm run docs` (or `npx typedoc`) → Documentation generated with **0 errors and 0 warnings**.
+6. `npm run test:coverage` → Ensure line coverage stays **>90%**.
