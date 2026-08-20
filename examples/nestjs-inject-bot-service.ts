@@ -32,14 +32,14 @@ class NotificationService {
     // You can call all Bot API methods directly via this.app.bot
     await this.app.bot.sendMessage({
       chat_id: chatId,
-      text: `🔔 System Alert: ${message}`,
+      text: ` System Alert: ${message}`,
     });
   }
 
   public async sendDailyReport(chatId: number | string, reportData: string) {
     await this.app.bot.sendMessage({
       chat_id: chatId,
-      text: `📊 Daily Business Report:\n${reportData}`,
+      text: ` Daily Business Report:\n${reportData}`,
     });
   }
 }

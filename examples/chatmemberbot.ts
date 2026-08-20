@@ -26,12 +26,12 @@ async function handleChatMember(update: Update, context: CallbackContext) {
   if (oldStatus === "left" && newStatus === "member") {
     await context.bot.sendMessage({
       chat_id: update.effective_chat.id,
-      text: `Welcome to the group, ${user.first_name}! 👋`,
+      text: `Welcome to the group, ${user.first_name}! `,
     });
   } else if (newStatus === "left" || newStatus === "kicked") {
     await context.bot.sendMessage({
       chat_id: update.effective_chat.id,
-      text: `Goodbye, ${user.first_name}! 👋`,
+      text: `Goodbye, ${user.first_name}! `,
     });
   }
 }
@@ -46,7 +46,7 @@ async function handleMyChatMember(update: Update, context: CallbackContext) {
   if (newStatus === "administrator") {
     await context.bot.sendMessage({
       chat_id: update.effective_chat.id,
-      text: "Thank you for promoting me to administrator! 🛡️",
+      text: "Thank you for promoting me to administrator! ",
     });
   }
 }
