@@ -155,4 +155,75 @@ export class CallbackContext<
     this.matches = options.matches;
     this.update = options.update;
   }
+
+  /**
+   * Convenience shortcut to send a text reply to the current chat.
+   *
+   * @param text - Message text to send.
+   * @param options - Additional parameters for sending message.
+   * @returns The sent {@link Message}.
+   *
+   * @example
+   * ```ts
+   * await context.reply("Hello there!");
+   * ```
+   */
+  public async reply(
+    text: string,
+    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text"> = {}
+  ): Promise<import("../client/types.js").Message> {
+    const chatId = this.update?.effective_chat?.id;
+    if (!chatId) {
+      throw new Error("Cannot call context.reply() when update has no effective_chat.");
+    }
+    return this.bot.sendMessage({
+      chat_id: chatId,
+      text,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to send a photo to the current chat.
+   *
+   * @param photo - File ID, URL, or {@link InputFile}.
+   * @param options - Additional photo options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithPhoto(
+    photo: string | import("../utils/http.js").InputFile,
+    options: Omit<import("../client/types.js").SendPhotoOptions, "chat_id" | "photo"> = {}
+  ): Promise<import("../client/types.js").Message> {
+    const chatId = this.update?.effective_chat?.id;
+    if (!chatId) {
+      throw new Error("Cannot call context.replyWithPhoto() when update has no effective_chat.");
+    }
+    return this.bot.sendPhoto({
+      chat_id: chatId,
+      photo,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to send a document/file to the current chat.
+   *
+   * @param document - File ID, URL, or {@link InputFile}.
+   * @param options - Additional document options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithDocument(
+    document: string | import("../utils/http.js").InputFile,
+    options: Omit<import("../client/types.js").SendDocumentOptions, "chat_id" | "document"> = {}
+  ): Promise<import("../client/types.js").Message> {
+    const chatId = this.update?.effective_chat?.id;
+    if (!chatId) {
+      throw new Error("Cannot call context.replyWithDocument() when update has no effective_chat.");
+    }
+    return this.bot.sendDocument({
+      chat_id: chatId,
+      document,
+      ...options,
+    });
+  }
 }

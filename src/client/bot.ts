@@ -42,6 +42,7 @@ import type {
   EditChatInviteLinkOptions,
   SetWebhookOptions,
 } from "./types.js";
+import type { ParseMode } from "./constants.js";
 import type { InputFile } from "../utils/http.js";
 import { buildRequestBody } from "../utils/http.js";
 
@@ -969,5 +970,152 @@ export class Bot {
    */
   public async getWebhookInfo(): Promise<WebhookInfo> {
     return this.request<WebhookInfo>("getWebhookInfo");
+  }
+
+  /**
+   * Forwards a message of any kind from one chat to another.
+   *
+   * @param options - Forwarding parameters including destination `chat_id`, origin `from_chat_id`, and `message_id`.
+   * @returns The forwarded {@link Message} on success.
+   * @throws {@link TelegramApiError} When message forwarding fails.
+   */
+  public async forwardMessage(options: {
+    chat_id: number | string;
+    from_chat_id: number | string;
+    message_id: number;
+    disable_notification?: boolean;
+    protect_content?: boolean;
+    message_thread_id?: number;
+  }): Promise<Message> {
+    return this.request<Message>("forwardMessage", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Copies a message of any kind from one chat to another without link to original message.
+   *
+   * @param options - Copying parameters.
+   * @returns The sent message identifier descriptor.
+   * @throws {@link TelegramApiError} When message copying fails.
+   */
+  public async copyMessage(options: {
+    chat_id: number | string;
+    from_chat_id: number | string;
+    message_id: number;
+    caption?: string;
+    parse_mode?: ParseMode;
+    caption_entities?: unknown[];
+    disable_notification?: boolean;
+    protect_content?: boolean;
+    reply_markup?: unknown;
+    message_thread_id?: number;
+  }): Promise<{ message_id: number }> {
+    return this.request<{ message_id: number }>("copyMessage", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Changes the list of the bot's commands for the given scope and user language.
+   *
+   * @param options - Parameters including list of `commands`, optional `scope`, and `language_code`.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When setting commands fails.
+   */
+  public async setMyCommands(options: {
+    commands: Array<{ command: string; description: string }>;
+    scope?: unknown;
+    language_code?: string;
+  }): Promise<boolean> {
+    return this.request<boolean>("setMyCommands", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Gets the current list of the bot's commands for the given scope and user language.
+   *
+   * @param options - Optional `scope` and `language_code`.
+   * @returns Array of command objects.
+   * @throws {@link TelegramApiError} When request fails.
+   */
+  public async getMyCommands(options: {
+    scope?: unknown;
+    language_code?: string;
+  } = {}): Promise<Array<{ command: string; description: string }>> {
+    return this.request<Array<{ command: string; description: string }>>(
+      "getMyCommands",
+      options as unknown as Record<string, unknown>
+    );
+  }
+
+  /**
+   * Deletes the list of the bot's commands for the given scope and user language.
+   *
+   * @param options - Optional `scope` and `language_code`.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When request fails.
+   */
+  public async deleteMyCommands(options: {
+    scope?: unknown;
+    language_code?: string;
+  } = {}): Promise<boolean> {
+    return this.request<boolean>("deleteMyCommands", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Creates a topic in a forum supergroup chat.
+   *
+   * @param options - Parameters including target `chat_id`, `name`, optional `icon_color`, and `icon_custom_emoji_id`.
+   * @returns The created topic descriptor on success.
+   * @throws {@link TelegramApiError} When creation fails.
+   */
+  public async createForumTopic(options: {
+    chat_id: number | string;
+    name: string;
+    icon_color?: number;
+    icon_custom_emoji_id?: string;
+  }): Promise<{ message_thread_id: number; name: string; icon_color: number; icon_custom_emoji_id?: string }> {
+    return this.request<any>("createForumTopic", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Closes an open topic in a forum supergroup chat.
+   *
+   * @param chatId - Unique identifier for the target chat.
+   * @param messageThreadId - Unique identifier for the target message thread of the forum topic.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When request fails.
+   */
+  public async closeForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
+    return this.request<boolean>("closeForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
+  }
+
+  /**
+   * Reopens a closed topic in a forum supergroup chat.
+   *
+   * @param chatId - Unique identifier for the target chat.
+   * @param messageThreadId - Unique identifier for the target message thread of the forum topic.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When request fails.
+   */
+  public async reopenForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
+    return this.request<boolean>("reopenForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
+  }
+
+  /**
+   * Deletes a forum topic along with all its messages in a forum supergroup chat.
+   *
+   * @param chatId - Unique identifier for the target chat.
+   * @param messageThreadId - Unique identifier for the target message thread of the forum topic.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When request fails.
+   */
+  public async deleteForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
+    return this.request<boolean>("deleteForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
   }
 }

@@ -279,8 +279,32 @@ describe("Bot API media and messaging methods", () => {
     expect(await botWebhook.setWebhook({ url: "https://example.com/hook" })).toBe(true);
     expect(await botWebhook.deleteWebhook()).toBe(true);
 
-    const { bot: botWebhookInfo } = createMockBot({ url: "https://example.com/hook", has_custom_certificate: false, pending_update_count: 0 });
-    expect(await botWebhookInfo.getWebhookInfo()).toBeDefined();
+    const { bot: botInfo } = createMockBot({ url: "https://example.com", has_custom_certificate: false, pending_update_count: 0 });
+    expect(await botInfo.getWebhookInfo()).toEqual({ url: "https://example.com", has_custom_certificate: false, pending_update_count: 0 });
+  });
+
+  it("forwardMessage, copyMessage, commands and forum topic methods", async () => {
+    const { bot: bot1 } = createMockBot({ message_id: 100 });
+    expect(await bot1.forwardMessage({ chat_id: 123, from_chat_id: 456, message_id: 10 })).toBeDefined();
+
+    const { bot: bot2 } = createMockBot({ message_id: 101 });
+    expect(await bot2.copyMessage({ chat_id: 123, from_chat_id: 456, message_id: 10 })).toEqual({ message_id: 101 });
+
+    const { bot: bot3 } = createMockBot(true);
+    expect(await bot3.setMyCommands({ commands: [{ command: "start", description: "Start bot" }] })).toBe(true);
+
+    const { bot: bot4 } = createMockBot([{ command: "start", description: "Start bot" }]);
+    expect(await bot4.getMyCommands()).toEqual([{ command: "start", description: "Start bot" }]);
+
+    const { bot: bot5 } = createMockBot(true);
+    expect(await bot5.deleteMyCommands()).toBe(true);
+
+    const { bot: bot6 } = createMockBot({ message_thread_id: 1, name: "General", icon_color: 123 });
+    expect(await bot6.createForumTopic({ chat_id: 123, name: "General" })).toBeDefined();
+
+    const { bot: bot7 } = createMockBot(true);
+    expect(await bot7.closeForumTopic(123, 1)).toBe(true);
+    expect(await bot7.reopenForumTopic(123, 1)).toBe(true);
+    expect(await bot7.deleteForumTopic(123, 1)).toBe(true);
   });
 });
-

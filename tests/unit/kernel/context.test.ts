@@ -60,4 +60,43 @@ describe("CallbackContext", () => {
     expect(capturedContext?.user_data).toBeUndefined();
     expect(capturedContext?.chat_data).toBeUndefined();
   });
+
+  it("context.reply, replyWithPhoto, and replyWithDocument shortcuts", async () => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result: { message_id: 99 } }),
+    });
+    const bot = new Bot("TEST_TOKEN", { fetch: fakeFetch });
+
+    const update = new Update({
+      update_id: 1,
+      message: {
+        message_id: 1,
+        date: 123456,
+        chat: { id: 777, type: "private" },
+        from: { id: 888, is_bot: false, first_name: "Tester" },
+        text: "Hi",
+      },
+    });
+
+    const ctx = new CallbackContext({
+      bot,
+      update,
+    });
+
+    const res1 = await ctx.reply("Hello!");
+    expect(res1).toEqual({ message_id: 99 });
+
+    const res2 = await ctx.replyWithPhoto("https://example.com/pic.jpg");
+    expect(res2).toEqual({ message_id: 99 });
+
+    const res3 = await ctx.replyWithDocument("https://example.com/file.pdf");
+    expect(res3).toEqual({ message_id: 99 });
+
+    // Edge case: when update has no chat
+    const emptyCtx = new CallbackContext({ bot });
+    await expect(emptyCtx.reply("Test")).rejects.toThrow("Cannot call context.reply()");
+    await expect(emptyCtx.replyWithPhoto("url")).rejects.toThrow("Cannot call context.replyWithPhoto()");
+    await expect(emptyCtx.replyWithDocument("url")).rejects.toThrow("Cannot call context.replyWithDocument()");
+  });
 });

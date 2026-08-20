@@ -106,6 +106,24 @@ export class Application {
   }
 
   /**
+   * Registers multiple update handlers simultaneously into a handler group.
+   *
+   * @param handlers - Array of {@link BaseHandler} instances.
+   * @param group - Numerical priority group.
+   * @defaultValue `0`
+   *
+   * @example
+   * ```ts
+   * app.addHandlers([startHandler, helpHandler, echoHandler]);
+   * ```
+   */
+  public addHandlers(handlers: BaseHandler[], group: number = 0): void {
+    for (const handler of handlers) {
+      this.addHandler(handler, group);
+    }
+  }
+
+  /**
    * Registers a global error handler callback.
    *
    * @param callback - Function invoked when an error occurs during update processing or polling.
