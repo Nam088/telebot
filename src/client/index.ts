@@ -1,12 +1,3 @@
-/**
- * Telegram Bot API module.
- *
- * Provides core types, client classes ({@link Bot}), update wrapper ({@link Update}),
- * error definitions ({@link TelegramApiError}), and constants/enums ({@link ParseMode}, {@link ChatType}, etc.).
- *
- * @packageDocumentation
- */
-
 export type {
   User,
   Chat,
@@ -65,7 +56,9 @@ export type {
   EditMessageTextOptions,
   EditMessageCaptionOptions,
   EditMessageReplyMarkupOptions,
-  ChatAction,
+  AnswerCallbackQueryOptions,
+  AnswerInlineQueryOptions,
+  InlineQueryResult,
   SendPhotoOptions,
   SendAudioOptions,
   SendDocumentOptions,
@@ -73,12 +66,6 @@ export type {
   SendAnimationOptions,
   SendVoiceOptions,
   SendVideoNoteOptions,
-  InputMediaPhoto,
-  InputMediaVideo,
-  InputMediaAnimation,
-  InputMediaAudio,
-  InputMediaDocument,
-  InputMedia,
   SendMediaGroupOptions,
   SendLocationOptions,
   SendVenueOptions,
@@ -86,16 +73,17 @@ export type {
   SendPollOptions,
   SendDiceOptions,
   SendChatActionOptions,
-  AnswerCallbackQueryOptions,
-  InlineQueryResult,
-  AnswerInlineQueryOptions,
   PromoteChatMemberOptions,
   CreateChatInviteLinkOptions,
   EditChatInviteLinkOptions,
   SetWebhookOptions,
+  InputMediaPhoto,
+  InputMediaVideo,
+  InputMediaAnimation,
+  InputMediaAudio,
+  InputMediaDocument,
+  InputMedia,
 } from "./types.js";
 export { TelegramApiError } from "./types.js";
 export * from "./constants.js";
 export * from "./bot.js";
-export * from "./update.js";
-

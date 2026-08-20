@@ -17,7 +17,7 @@ import type {
   InputMediaAudio,
   InputMediaDocument,
   InputMedia,
-} from "../telegram/types.js";
+} from "../client/types.js";
 import type { InputFile } from "../utils/http.js";
 
 export type {

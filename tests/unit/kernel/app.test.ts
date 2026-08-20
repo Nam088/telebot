@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { Application, ApplicationBuilder } from "../../../src/ext/application.js";
-import { CommandHandler } from "../../../src/ext/handlers.js";
-import { Bot } from "../../../src/telegram/bot.js";
-import { MemoryPersistence } from "../../../src/ext/persistence.js";
+import { Application, ApplicationBuilder } from "../../../src/kernel/app.js";
+import { CommandHandler } from "../../../src/routing/handlers.js";
+import { Bot } from "../../../src/client/bot.js";
+import { MemoryPersistence } from "../../../src/storage/memory.js";
 
 describe("Application and ApplicationBuilder", () => {
   it("builds application with ApplicationBuilder", () => {

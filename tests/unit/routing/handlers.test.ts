@@ -8,11 +8,11 @@ import {
   PollAnswerHandler,
   ChatMemberHandler,
   TypeHandler,
-} from "../../../src/ext/handlers.js";
-import { filters } from "../../../src/ext/filters.js";
-import { Update } from "../../../src/telegram/update.js";
-import { CallbackContext } from "../../../src/ext/context.js";
-import { Bot } from "../../../src/telegram/bot.js";
+} from "../../../src/routing/handlers.js";
+import { filters } from "../../../src/filters/matchers.js";
+import { Update } from "../../../src/kernel/update.js";
+import { CallbackContext } from "../../../src/kernel/context.js";
+import { Bot } from "../../../src/client/bot.js";
 
 describe("CommandHandler and MessageHandler", () => {
   const bot = new Bot("TEST_TOKEN");

@@ -11,7 +11,7 @@ import {
   InputMediaAnimation,
   InputMediaAudio,
   InputMediaDocument,
-} from "../../../src/ext/keyboards.js";
+} from "../../../src/components/keyboard.js";
 
 describe("Keyboards", () => {
   it("InlineKeyboardMarkup creates valid structure", () => {

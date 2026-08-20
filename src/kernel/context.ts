@@ -4,14 +4,11 @@
  * @packageDocumentation
  */
 
-import type { Bot } from "../telegram/bot.js";
-import type { Update } from "../telegram/update.js";
+import type { Bot } from "../client/bot.js";
+import type { Update } from "./update.js";
 
 /**
  * Context object passed to handler callbacks, error handlers, and job callbacks.
- *
- * Provides access to the {@link Bot} instance, contextual data buckets (`user_data`, `chat_data`, `bot_data`),
- * command arguments, regex match results, and the active {@link Update}.
  *
  * @typeParam UserData - Custom type definition for user-level persisted state.
  * @typeParam ChatData - Custom type definition for chat-level persisted state.
@@ -54,7 +51,7 @@ export class CallbackContext<
   public job?: unknown;
 
   /**
-   * Positional arguments parsed from a command message (e.g. `/echo hello world` -> `["hello", "world"]`).
+   * Positional arguments parsed from a command message.
    */
   public args?: string[];
 
@@ -117,4 +114,3 @@ export class CallbackContext<
     this.update = options.update;
   }
 }
-

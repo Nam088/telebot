@@ -24,139 +24,44 @@ import type {
   BusinessMessagesDeleted,
   MessageReactionUpdated,
   MessageReactionCountUpdated,
-} from "./types.js";
-import type { Bot } from "./bot.js";
+} from "../client/types.js";
+import type { Bot } from "../client/bot.js";
 
 /**
- * Wrapper class around raw Telegram {@link RawUpdate} objects providing convenience getters
- * (`effective_user`, `effective_chat`, `effective_message`, `effective_sender`).
+ * Wrapper for Telegram Update objects with convenience getters.
  *
- * @remarks
- * Property names mirror `python-telegram-bot` (`update.effective_user`, `update.effective_chat`, etc.)
- * in `snake_case` format.
+ * Encapsulates the raw update delivered by Telegram and exposes lazy resolution
+ * getters for the active user, chat, message, and sender.
  *
  * @example
  * ```ts
- * import { Update } from "telegram-bot-node";
- *
- * const update = new Update(rawUpdate, bot);
- * console.log(`Received update #${update.update_id} from ${update.effective_user?.first_name}`);
+ * const user = update.effective_user;
+ * const chat = update.effective_chat;
  * ```
  */
 export class Update implements RawUpdate {
-  /**
-   * The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially.
-   */
   public readonly update_id: number;
-
-  /**
-   * New incoming message of any kind — text, photo, sticker, etc.
-   */
   public readonly message?: Message;
-
-  /**
-   * New version of a message that is known to the bot and was edited.
-   */
   public readonly edited_message?: Message;
-
-  /**
-   * New incoming channel post of any kind — text, photo, sticker, etc.
-   */
   public readonly channel_post?: Message;
-
-  /**
-   * New version of a channel post that is known to the bot and was edited.
-   */
   public readonly edited_channel_post?: Message;
-
-  /**
-   * The bot was connected to or disconnected from a business account, or a user edited an existing connection with the bot.
-   */
   public readonly business_connection?: BusinessConnection;
-
-  /**
-   * New message from a connected business account.
-   */
   public readonly business_message?: Message;
-
-  /**
-   * New version of a message from a connected business account.
-   */
   public readonly edited_business_message?: Message;
-
-  /**
-   * Messages were deleted from a connected business account.
-   */
   public readonly deleted_business_messages?: BusinessMessagesDeleted;
-
-  /**
-   * A reaction to a message was changed by a user.
-   */
   public readonly message_reaction?: MessageReactionUpdated;
-
-  /**
-   * Reactions to a message with anonymous reactions were changed.
-   */
   public readonly message_reaction_count?: MessageReactionCountUpdated;
-
-  /**
-   * New incoming inline query.
-   */
   public readonly inline_query?: InlineQuery;
-
-  /**
-   * The result of an inline query that was chosen by a user and sent to their chat partner.
-   */
   public readonly chosen_inline_result?: ChosenInlineResult;
-
-  /**
-   * New incoming callback query.
-   */
   public readonly callback_query?: CallbackQuery;
-
-  /**
-   * New incoming shipping query. Only for invoices with flexible price.
-   */
   public readonly shipping_query?: ShippingQuery;
-
-  /**
-   * New incoming pre-checkout query. Contains full information about checkout.
-   */
   public readonly pre_checkout_query?: PreCheckoutQuery;
-
-  /**
-   * New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot.
-   */
   public readonly poll?: Poll;
-
-  /**
-   * A user changed their answer in a non-anonymous poll.
-   */
   public readonly poll_answer?: PollAnswer;
-
-  /**
-   * The bot's chat member status was updated in a chat.
-   */
   public readonly my_chat_member?: ChatMemberUpdated;
-
-  /**
-   * A chat member's status was updated in a chat.
-   */
   public readonly chat_member?: ChatMemberUpdated;
-
-  /**
-   * A request to join the chat has been sent.
-   */
   public readonly chat_join_request?: ChatJoinRequest;
-
-  /**
-   * A chat boost was added.
-   */
   public readonly chat_boost?: ChatBoostUpdated;
-
-  /**
-   * A boost was removed from a chat.
-   */
   public readonly removed_chat_boost?: ChatBoostRemoved;
 
   private _bot?: Bot;
@@ -166,11 +71,6 @@ export class Update implements RawUpdate {
    *
    * @param raw - The raw update payload received from the Telegram API.
    * @param bot - Optional {@link Bot} instance associated with this update.
-   *
-   * @example
-   * ```ts
-   * const update = new Update(rawPayload);
-   * ```
    */
   constructor(raw: RawUpdate, bot?: Bot) {
     this.update_id = raw.update_id;
@@ -200,9 +100,7 @@ export class Update implements RawUpdate {
   }
 
   /**
-   * The user that sent the message or triggered the update, resolved across message, callback_query, inline_query, etc.
-   *
-   * @returns The resolved {@link User} object, or `undefined` if no user is associated with this update.
+   * The user that sent the message or triggered the update, resolved across update types.
    */
   get effective_user(): User | undefined {
     if (this.message?.from) return this.message.from;
@@ -224,9 +122,7 @@ export class Update implements RawUpdate {
   }
 
   /**
-   * The chat that this update belongs to, resolved across message, channel_post, callback_query, chat_member, etc.
-   *
-   * @returns The resolved {@link Chat} object, or `undefined` if no chat is associated with this update.
+   * The chat that this update belongs to.
    */
   get effective_chat(): Chat | undefined {
     if (this.message?.chat) return this.message.chat;
@@ -249,9 +145,7 @@ export class Update implements RawUpdate {
   }
 
   /**
-   * The message contained in this update (either regular message, edited message, channel post, or callback query message).
-   *
-   * @returns The resolved {@link Message} object, or `undefined` if none present.
+   * The message contained in this update.
    */
   get effective_message(): Message | undefined {
     return (
@@ -267,8 +161,6 @@ export class Update implements RawUpdate {
 
   /**
    * The sender of the message (either a {@link User} or a {@link Chat} channel sender).
-   *
-   * @returns The resolved sender {@link User} or {@link Chat}, or `undefined`.
    */
   get effective_sender(): User | Chat | undefined {
     const msg = this.effective_message;
@@ -279,4 +171,3 @@ export class Update implements RawUpdate {
     return this.effective_user;
   }
 }
-

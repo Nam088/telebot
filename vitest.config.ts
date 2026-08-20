@@ -6,8 +6,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['src/telegram/**/*.ts', 'src/ext/**/*.ts'],
-      exclude: ['src/**/*.d.ts', 'src/**/types.ts', 'src/index.ts', 'src/telegram/index.ts', 'src/ext/index.ts', 'src/utils/index.ts'],
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts', 'src/client/types.ts', 'src/**/index.ts', 'src/utils/index.ts'],
       thresholds: {
         lines: 80,
       },

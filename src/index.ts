@@ -1,13 +1,13 @@
 /**
- * Main entry point for the telegram-bot-node framework.
- *
- * Re-exports the core Telegram Bot API client types and classes from the Telegram module,
- * as well as application, handlers, filters, and persistence utilities from the Ext module.
+ * tele-bot — Zero-dependency, type-safe Telegram Bot framework for Node.js and TypeScript.
  *
  * @packageDocumentation
  */
 
-export * from "./telegram/index.js";
-export * from "./ext/index.js";
-
-
+export * from "./client/index.js";
+export * from "./kernel/index.js";
+export * from "./routing/index.js";
+export * from "./filters/index.js";
+export * from "./storage/index.js";
+export * from "./components/index.js";
+export * from "./utils/index.js";

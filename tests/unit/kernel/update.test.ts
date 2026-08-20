@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Update } from "../../../src/telegram/update.js";
+import { Update } from "../../../src/kernel/update.js";
 
 describe("Update wrapper", () => {
   it("resolves effective_user and effective_chat from message", () => {

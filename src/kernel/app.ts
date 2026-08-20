@@ -1,23 +1,18 @@
 /**
- * Application runner and builder abstractions.
+ * Application runtime and update orchestrator.
  *
  * @packageDocumentation
  */
 
-import { Bot, type BotOptions } from "../telegram/bot.js";
-import { Update } from "../telegram/update.js";
-import type { RawUpdate } from "../telegram/types.js";
-import { BaseHandler } from "./handlers.js";
+import { Bot, type BotOptions } from "../client/bot.js";
+import { Update } from "./update.js";
+import type { RawUpdate } from "../client/types.js";
+import { BaseHandler } from "../routing/handlers.js";
 import { CallbackContext } from "./context.js";
-import { type Persistence, MemoryPersistence } from "./persistence.js";
+import { type Persistence, MemoryPersistence } from "../storage/memory.js";
 
 /**
- * Global error handler callback signature.
- *
- * @param error - The caught {@link Error}.
- * @param update - The {@link Update} during which the error occurred (if available).
- * @param context - The active {@link CallbackContext} (if available).
- * @returns Resolves when error handling completes.
+ * Error handler callback signature.
  */
 export type ErrorHandlerCallback = (
   error: Error,
@@ -26,11 +21,11 @@ export type ErrorHandlerCallback = (
 ) => Promise<void> | void;
 
 /**
- * Options for configuring an {@link Application} instance.
+ * Configuration options for creating an {@link Application}.
  */
 export interface ApplicationOptions {
   /**
-   * Persistence backend implementation used for storing `user_data`, `chat_data`, and `bot_data`.
+   * Custom persistence backend instance for state management.
    *
    * @defaultValue `new MemoryPersistence()`
    */
@@ -38,25 +33,12 @@ export interface ApplicationOptions {
 }
 
 /**
- * Main application class managing handlers, dispatching updates, and executing polling or webhook loops.
- *
- * @remarks
- * Handlers are organized into numerical groups (default: 0). Within each group, handlers are evaluated
- * sequentially until the first matching handler processes the update. Handlers in subsequent groups
- * will also be evaluated in group order.
+ * Main application class responsible for managing handlers, polling loops, webhook servers, and error handling.
  *
  * @example
  * ```ts
- * import { ApplicationBuilder, CommandHandler, filters, MessageHandler } from "telegram-bot-node";
- *
- * const app = new ApplicationBuilder()
- *   .token(process.env.BOT_TOKEN!)
- *   .build();
- *
- * app.addHandler(new CommandHandler("start", async (update, context) => {
- *   await context.bot.sendMessage({ chat_id: update.effective_chat!.id, text: "Hi!" });
- * }));
- *
+ * const app = new ApplicationBuilder().token("BOT_TOKEN").build();
+ * app.addHandler(new CommandHandler("start", startCallback));
  * await app.runPolling();
  * ```
  */
@@ -96,15 +78,9 @@ export class Application {
   /**
    * Registers an update handler into a specific handler group.
    *
-   * @param handler - The {@link BaseHandler} subclass instance (e.g. {@link CommandHandler}, {@link MessageHandler}).
-   * @param group - The numerical priority group. Handlers in group 0 run before group 1, etc.
-   *
+   * @param handler - The {@link BaseHandler} subclass instance.
+   * @param group - Numerical priority group. Handlers in group 0 run before group 1.
    * @defaultValue `0`
-   *
-   * @example
-   * ```ts
-   * app.addHandler(new CommandHandler("help", helpHandler), 0);
-   * ```
    */
   public addHandler(handler: BaseHandler, group: number = 0): void {
     if (!this.handlers.has(group)) {
@@ -117,13 +93,6 @@ export class Application {
    * Registers a global error handler callback.
    *
    * @param callback - Function invoked when an error occurs during update processing or polling.
-   *
-   * @example
-   * ```ts
-   * app.addErrorHandler(async (err, update) => {
-   *   console.error("Unhandled error processing update:", err);
-   * });
-   * ```
    */
   public addErrorHandler(callback: ErrorHandlerCallback): void {
     this.errorHandlers.push(callback);
@@ -191,19 +160,7 @@ export class Application {
    * Starts long polling for updates from Telegram Bot API.
    *
    * @param options - Polling configuration options.
-   * @param options.allowed_updates - Array of update types to receive (e.g. `["message", "callback_query"]`).
-   * @param options.drop_pending_updates - Whether to ignore and skip existing pending updates on startup.
-   * @param options.poll_interval - Extra delay in milliseconds between polling calls.
-   * @param options.timeout - Long polling timeout in seconds passed to Telegram Bot API.
-   * @returns Resolves when polling stops (via {@link stop}).
-   *
-   * @example
-   * ```ts
-   * await app.runPolling({
-   *   drop_pending_updates: true,
-   *   timeout: 20,
-   * });
-   * ```
+   * @returns Resolves when polling stops.
    */
   public async runPolling(options: {
     allowed_updates?: string[];
@@ -258,14 +215,6 @@ export class Application {
 
   /**
    * Stops the active polling loop and aborts pending network requests.
-   *
-   * @example
-   * ```ts
-   * process.on("SIGINT", () => {
-   *   app.stop();
-   *   process.exit(0);
-   * });
-   * ```
    */
   public stop(): void {
     this.isRunning = false;
@@ -274,16 +223,7 @@ export class Application {
 }
 
 /**
- * Fluent builder for creating configured {@link Application} instances.
- *
- * @example
- * ```ts
- * import { ApplicationBuilder } from "telegram-bot-node";
- *
- * const app = new ApplicationBuilder()
- *   .token(process.env.BOT_TOKEN!)
- *   .build();
- * ```
+ * Fluent builder for creating {@link Application} instances.
  */
 export class ApplicationBuilder {
   private _token?: string;
@@ -291,10 +231,7 @@ export class ApplicationBuilder {
   private _appOptions: ApplicationOptions = {};
 
   /**
-   * Sets the Telegram bot authentication token.
-   *
-   * @param token - Telegram bot token received from BotFather.
-   * @returns This builder instance for chaining.
+   * Sets the Telegram bot token.
    */
   public token(token: string): this {
     this._token = token;
@@ -303,9 +240,6 @@ export class ApplicationBuilder {
 
   /**
    * Configures optional settings for the underlying {@link Bot} client.
-   *
-   * @param options - {@link BotOptions} configuration object.
-   * @returns This builder instance for chaining.
    */
   public botOptions(options: BotOptions): this {
     this._botOptions = options;
@@ -314,9 +248,6 @@ export class ApplicationBuilder {
 
   /**
    * Configures the persistence backend for state management.
-   *
-   * @param persistence - {@link Persistence} implementation.
-   * @returns This builder instance for chaining.
    */
   public persistence(persistence: Persistence): this {
     this._appOptions.persistence = persistence;
@@ -325,14 +256,6 @@ export class ApplicationBuilder {
 
   /**
    * Constructs the configured {@link Application} instance.
-   *
-   * @returns A fully constructed {@link Application}.
-   * @throws When token has not been provided.
-   *
-   * @example
-   * ```ts
-   * const app = builder.build();
-   * ```
    */
   public build(): Application {
     if (!this._token) {
@@ -342,4 +265,3 @@ export class ApplicationBuilder {
     return new Application(bot, this._appOptions);
   }
 }
-

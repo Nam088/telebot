@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
-import { Bot } from "../../../src/telegram/bot.js";
-import { TelegramApiError } from "../../../src/telegram/types.js";
+import { Bot } from "../../../src/client/bot.js";
+import { TelegramApiError } from "../../../src/client/types.js";
 
 describe("Bot client core", () => {
   it("creates an instance with a token", () => {

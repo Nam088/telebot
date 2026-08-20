@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { filters } from "../../../src/ext/filters.js";
-import { Update } from "../../../src/telegram/update.js";
-import { CallbackContext } from "../../../src/ext/context.js";
-import { Bot } from "../../../src/telegram/bot.js";
-import { MessageHandler } from "../../../src/ext/handlers.js";
+import { filters } from "../../../src/filters/matchers.js";
+import { Update } from "../../../src/kernel/update.js";
+import { CallbackContext } from "../../../src/kernel/context.js";
+import { Bot } from "../../../src/client/bot.js";
+import { MessageHandler } from "../../../src/routing/handlers.js";
 
 describe("Filters", () => {
   it("filters.TEXT matches messages with text and not command", async () => {

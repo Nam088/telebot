@@ -10,6 +10,7 @@ import type {
   MessageEntityType,
   PollType,
   ChatMemberStatus,
+  ChatAction,
 } from "./constants.js";
 
 /**
@@ -929,22 +930,6 @@ export interface EditMessageReplyMarkupOptions {
   inline_message_id?: string;
   reply_markup?: InlineKeyboardMarkup;
 }
-
-/**
- * Type of action to broadcast for `sendChatAction`.
- */
-export type ChatAction =
-  | "typing"
-  | "upload_photo"
-  | "record_video"
-  | "upload_video"
-  | "record_voice"
-  | "upload_voice"
-  | "upload_document"
-  | "choose_sticker"
-  | "find_location"
-  | "record_video_note"
-  | "upload_video_note";
 
 /**
  * Options passed to `sendPhoto` requests.

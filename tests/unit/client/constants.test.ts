@@ -8,7 +8,7 @@ import {
   PollType,
   DiceEmoji,
   UpdateType,
-} from "../../../src/telegram/constants.js";
+} from "../../../src/client/constants.js";
 
 describe("Telegram Constants", () => {
   it("ParseMode contains expected values", () => {

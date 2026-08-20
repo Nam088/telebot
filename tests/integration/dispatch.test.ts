@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { Application } from "../../src/ext/application.js";
-import { CommandHandler, MessageHandler } from "../../src/ext/handlers.js";
-import { filters } from "../../src/ext/filters.js";
-import { Bot } from "../../src/telegram/bot.js";
+import { Application } from "../../src/kernel/app.js";
+import { CommandHandler, MessageHandler } from "../../src/routing/handlers.js";
+import { filters } from "../../src/filters/matchers.js";
+import { Bot } from "../../src/client/bot.js";
 
 describe("Application dispatch integration", () => {
   it("dispatches first match in group, other groups still run", async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MemoryPersistence } from "../../../src/ext/persistence.js";
+import { MemoryPersistence } from "../../../src/storage/memory.js";
 
 describe("MemoryPersistence", () => {
   it("manages user_data correctly", async () => {

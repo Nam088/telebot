@@ -5,6 +5,36 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./kernel": {
+      "types": "./dist/kernel/index.d.ts",
+      "import": "./dist/kernel/index.js"
+    },
+    "./routing": {
+      "types": "./dist/routing/index.d.ts",
+      "import": "./dist/routing/index.js"
+    },
+    "./filters": {
+      "types": "./dist/filters/index.d.ts",
+      "import": "./dist/filters/index.js"
+    },
+    "./storage": {
+      "types": "./dist/storage/index.d.ts",
+      "import": "./dist/storage/index.js"
+    },
+    "./ui": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    }
+  },
   "engines": {
     "node": ">=22"
   },
@@ -25,8 +55,10 @@
   "keywords": [
     "telegram",
     "telegram-bot",
-    "python-telegram-bot",
-    "typescript"
+    "bot",
+    "framework",
+    "typescript",
+    "zero-dependency"
   ],
   "author": "",
   "license": "MIT",
