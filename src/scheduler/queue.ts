@@ -416,7 +416,20 @@ export class JobQueue {
       const cb = this._registeredCallbacks.get(pj.name);
       if (cb) {
         let nextRunMs = pj.nextRun;
-        if (nextRunMs < now) {
+        let rrule: RRule | undefined;
+        let drop = false;
+
+        if (pj.rrule) {
+          rrule = new RRule(pj.rrule, pj.timezone);
+          if (nextRunMs < now) {
+            const nextDate = rrule.after(new Date(now));
+            if (nextDate) {
+              nextRunMs = nextDate.getTime();
+            } else {
+              drop = true;
+            }
+          }
+        } else if (nextRunMs < now) {
           if (pj.interval) {
             // Fast-forward next run
             const elapsed = now - nextRunMs;
@@ -427,15 +440,20 @@ export class JobQueue {
           }
         }
 
-        const job = new Job({
-          name: pj.name,
-          callback: cb,
-          jobQueue: this,
-          nextRunMs,
-          intervalMs: pj.interval,
-          data: pj.data,
-        });
-        this._indexJob(job);
+        if (!drop) {
+          const job = new Job({
+            name: pj.name,
+            callback: cb,
+            jobQueue: this,
+            nextRunMs,
+            intervalMs: pj.interval,
+            rrule,
+            rruleOptions: pj.rrule,
+            timezone: pj.timezone,
+            data: pj.data,
+          });
+          this._indexJob(job);
+        }
       }
     }
   }

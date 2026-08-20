@@ -158,6 +158,12 @@ export class RRule {
       this.options = RRule.parseString(rule);
     } else {
       this.options = { ...rule };
+      if (typeof this.options.until === 'string' || typeof this.options.until === 'number') {
+        this.options.until = new Date(this.options.until);
+      }
+      if (typeof this.options.dtstart === 'string' || typeof this.options.dtstart === 'number') {
+        this.options.dtstart = new Date(this.options.dtstart);
+      }
     }
 
     if (defaultTimezone && !this.options.tzid && !this.options.timezone) {
@@ -260,6 +266,9 @@ export class RRule {
         case "UNTIL":
           options.until = new Date(val);
           break;
+        case "DTSTART":
+          options.dtstart = new Date(val);
+          break;
         case "BYDAY":
         case "BYWEEKDAY":
           options.byweekday = val.split(",").map((d) => d.trim().toUpperCase() as RRuleWeekday);
@@ -291,6 +300,9 @@ export class RRule {
         case "TZID":
         case "TIMEZONE":
           options.tzid = val;
+          break;
+        case "WKST":
+          options.wkst = val.toUpperCase() as RRuleWeekday;
           break;
       }
     }
