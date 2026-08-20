@@ -1,4 +1,4 @@
-import { ApplicationBuilder, CommandHandler, MessageHandler, filters, type Update, type CallbackContext } from "../src/index.js";
+import { Application, CommandHandler, MessageHandler, filters, type Update, type CallbackContext } from "../src/index.js";
 
 async function start(update: Update, context: CallbackContext) {
   const user = update.effective_user;
@@ -28,7 +28,7 @@ async function main() {
     process.exit(1);
   }
 
-  const app = new ApplicationBuilder().token(token).build();
+  const app = new Application().token(token).build();
 
   app.addHandler(new CommandHandler("start", start));
   app.addHandler(new MessageHandler(filters.TEXT.and(filters.COMMAND.not()), echo));

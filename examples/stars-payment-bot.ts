@@ -9,7 +9,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   InlineKeyboard,
   type Update,
@@ -22,7 +22,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 
 // /start command - Show store catalog
 app.addHandler(

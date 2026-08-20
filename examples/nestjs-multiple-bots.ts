@@ -13,7 +13,7 @@ import {
   Update,
   Command,
 } from "../src/nest/index.js";
-import { ApplicationBuilder, type CallbackContext, type Update as TelegramUpdate } from "../src/index.js";
+import { Application, type CallbackContext, type Update as TelegramUpdate } from "../src/index.js";
 
 const adminToken = process.env.ADMIN_BOT_TOKEN || "123456:ADMIN_TOKEN_MOCK";
 const shopToken = process.env.SHOP_BOT_TOKEN || "654321:SHOP_TOKEN_MOCK";
@@ -46,8 +46,8 @@ class ShopBotUpdateService {
 // TelegramModule.forRoot({ botName: "adminBot", token: adminToken }),
 // TelegramModule.forRoot({ botName: "shopBot", token: shopToken }),
 
-const adminApp = new ApplicationBuilder().token(adminToken).build();
-const shopApp = new ApplicationBuilder().token(shopToken).build();
+const adminApp = new Application().token(adminToken).build();
+const shopApp = new Application().token(shopToken).build();
 
 const adminService = new AdminBotUpdateService();
 const shopService = new ShopBotUpdateService();

@@ -49,6 +49,10 @@ export interface BotOptions {
 
 /**
  * Maximum number of attempts (initial request plus retries) for a single {@link BaseBotClient.request} call.
+ *
+ * @remarks
+ * Shared by both `429` and `5xx` handling so that repeated rate-limit responses cannot retry
+ * forever, and cannot silently consume the retry budget meant for genuine server errors.
  */
 const MAX_ATTEMPTS = 4;
 
@@ -153,13 +157,15 @@ export abstract class BaseBotClient {
    * Core request dispatcher to execute any raw Telegram Bot API endpoint.
    *
    * Automatically serializes JSON objects or multipart `FormData` when file buffers / `InputFile` are present.
-   * Handles HTTP 429 rate-limiting with `retry_after` backoff and HTTP 5xx retries.
+   * Handles HTTP 429 rate-limiting (honoring `retry_after`) and HTTP 5xx retries with exponential
+   * backoff (`1s, 2s, 4s`, capped at `30s`), sharing a single 4-attempt budget across both so
+   * that repeated `429`s cannot retry forever or starve genuine `5xx` retries.
    *
    * @typeParam T - The expected return payload type from Telegram.
    * @param method - The Bot API method name (e.g. `"sendMessage"`, `"getMe"`, `"setWebhook"`).
    * @param payload - Key-value parameters corresponding to the API method fields.
    * @returns Resolves with the unwrapped `result` field returned by Telegram.
-   * @throws {@link TelegramApiError} When Telegram returns `ok: false`, HTTP 4xx, or after retry exhaustion on 5xx errors.
+   * @throws {@link TelegramApiError} When Telegram returns `ok: false`, HTTP 4xx, or after retry exhaustion on `429`/`5xx`/network errors.
    *
    * @example
    * ```ts
@@ -171,33 +177,52 @@ export abstract class BaseBotClient {
     const url = `${this.apiRoot}/bot${this.token}/${method}`;
     const { body, headers } = buildRequestBody(payload);
 
+    // getUpdates long-polling passes its wait time (in seconds) as `timeout`; the abort
+    // timeout must comfortably exceed it or a long poll would be mistaken for a hang. Only
+    // extend the timeout when a poll timeout is actually present, so a small configured
+    // requestTimeoutMs still applies as-is to ordinary (non-long-poll) requests.
+    const pollTimeoutMs = typeof payload.timeout === "number" ? payload.timeout * 1000 : 0;
+    const effectiveTimeoutMs =
+      pollTimeoutMs > 0
+        ? Math.max(this.requestTimeoutMs, pollTimeoutMs + LONG_POLL_TIMEOUT_BUFFER_MS)
+        : this.requestTimeoutMs;
+
     let attempt = 0;
     while (true) {
       attempt++;
+      const timeoutController = new AbortController();
+      const timeoutId = setTimeout(() => timeoutController.abort(), effectiveTimeoutMs);
       try {
         const response = await this._fetch(url, {
           method: "POST",
           headers,
           body,
+          signal: timeoutController.signal,
         });
 
         if (response.status === 429) {
-          const json = (await response.json()) as any;
-          const retryAfter = json?.parameters?.retry_after ?? Math.min(30, 2 ** attempt);
+          const json = (await response.json()) as TelegramApiEnvelope<T>;
+          if (attempt >= MAX_ATTEMPTS) {
+            throw new TelegramApiError(
+              json.error_code ?? response.status,
+              json.description ?? "Too Many Requests",
+              json.parameters,
+            );
+          }
+          const retryAfter = json.parameters?.retry_after ?? backoffSeconds(attempt);
           await this.sleep(retryAfter);
           continue;
         }
 
         if (response.status >= 500 && response.status < 600) {
-          if (attempt >= 4) {
+          if (attempt >= MAX_ATTEMPTS) {
             throw new TelegramApiError(response.status, `Server error: ${response.statusText}`);
           }
-          const backoff = Math.min(30, 2 ** attempt);
-          await this.sleep(backoff);
+          await this.sleep(backoffSeconds(attempt));
           continue;
         }
 
-        const data = (await response.json()) as any;
+        const data = (await response.json()) as TelegramApiEnvelope<T>;
         if (!data.ok) {
           throw new TelegramApiError(
             data.error_code ?? response.status,
@@ -211,12 +236,13 @@ export abstract class BaseBotClient {
         if (err instanceof TelegramApiError) {
           throw err;
         }
-        if (attempt >= 4) {
+        if (attempt >= MAX_ATTEMPTS) {
           const rawMessage = err instanceof Error ? err.message : String(err);
           throw new TelegramApiError(0, this.redactToken(rawMessage));
         }
-        const backoff = Math.min(30, 2 ** attempt);
-        await this.sleep(backoff);
+        await this.sleep(backoffSeconds(attempt));
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
   }

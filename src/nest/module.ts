@@ -32,7 +32,7 @@ export class TelegramModule {
     const appProvider = {
       provide: botTokenKey,
       useFactory: () => {
-        return new ApplicationBuilder().token(options.token).build();
+        return new Application(options.token);
       },
     };
 
@@ -59,7 +59,7 @@ export class TelegramModule {
     const appProvider = {
       provide: botTokenKey,
       useFactory: (opts: { token: string }) => {
-        return new ApplicationBuilder().token(opts.token).build();
+        return new Application(opts.token);
       },
       inject: [optionsKey],
     };

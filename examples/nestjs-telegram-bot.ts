@@ -16,7 +16,7 @@ import {
   Hears,
   Action,
 } from "../src/nest/index.js";
-import { ApplicationBuilder, type CallbackContext, type Update as TelegramUpdate } from "../src/index.js";
+import { Application, type CallbackContext, type Update as TelegramUpdate } from "../src/index.js";
 
 const token = process.env.BOT_TOKEN;
 if (!token) {
@@ -55,7 +55,7 @@ class BotUpdateService {
 
 // In a real NestJS app, you import TelegramModule.forRoot({ token: process.env.BOT_TOKEN })
 // Here we simulate the NestJS lifecycle binding:
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 const serviceInstance = new BotUpdateService();
 
 // Bind discovered NestJS providers to the tele-bot engine

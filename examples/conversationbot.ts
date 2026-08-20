@@ -5,7 +5,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   MessageHandler,
   ConversationHandler,
@@ -122,7 +122,7 @@ async function main() {
   // Use persistent JSON storage to survive restarts
   const persistence = new JsonFilePersistence({ filePath: "./data/conversation_state.json" });
 
-  const app = new ApplicationBuilder()
+  const app = new Application()
     .token(token)
     .persistence(persistence)
     .build();

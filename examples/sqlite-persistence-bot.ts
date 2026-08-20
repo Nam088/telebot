@@ -9,7 +9,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   MessageHandler,
   filters,
@@ -29,10 +29,7 @@ const persistence = new SqlitePersistence({
   dbPath: "./bot_state.sqlite",
 });
 
-const app = new ApplicationBuilder()
-  .token(token)
-  .persistence(persistence)
-  .build();
+const app = new Application(token, { persistence });
 
 // /start command - Show persisted stats
 app.addHandler(

@@ -91,7 +91,10 @@ export function buildRequestBody(payload: Record<string, unknown>): {
       } else if (value.data instanceof Blob) {
         formData.append(key, value.data, value.filename);
       } else {
-        const blob = new Blob([value.data as any], {
+        // `Uint8Array`'s DOM type is generic over `ArrayBufferLike` (which includes
+        // `SharedArrayBuffer`), while `BlobPart` requires a concrete `ArrayBuffer`; both are
+        // valid Blob sources at runtime, so this narrows the type rather than escaping to `any`.
+        const blob = new Blob([value.data as BlobPart], {
           type: value.contentType || "application/octet-stream",
         });
         formData.append(key, blob, value.filename);

@@ -6,12 +6,17 @@
 
 import { Bot } from "../client/bot.js";
 import { CallbackContext } from "../kernel/context.js";
-import type { Persistence, PersistedJob } from "../storage/driver.js";
+import type { PersistedJob } from "../storage/driver.js";
 
 /**
  * Signature for job callback functions executed by the {@link JobQueue}.
+ *
+ * @remarks
+ * The `Data` type parameter is not part of the callback's own signature (job data is read
+ * via `context.job?.data`, matching {@link Job.data}); it exists so `JobCallback<Data>` stays
+ * paired with the `Data` used by {@link Job}, {@link JobQueue.runOnce}, and its siblings.
  */
-export type JobCallback<Data = unknown, C extends CallbackContext = CallbackContext> = (
+export type JobCallback<_Data = unknown, C extends CallbackContext = CallbackContext> = (
   context: C,
 ) => Promise<void> | void;
 
