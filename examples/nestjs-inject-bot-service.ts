@@ -17,7 +17,7 @@ import {
 } from "../src/nest/index.js";
 import {
   Application,
-  ApplicationBuilder,
+  Application,
   type CallbackContext,
   type Update as TelegramUpdate,
 } from "../src/index.js";
@@ -61,7 +61,7 @@ class BotUpdateController {
 }
 
 // --- NestJS Lifecycle Simulation ---
-const appInstance = new ApplicationBuilder().token(token).build();
+const appInstance = new Application().token(token).build();
 
 // In NestJS, providers are resolved via DI container:
 // NotificationService receives Application instance via @Inject(getBotToken())

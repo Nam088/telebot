@@ -1,5 +1,5 @@
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   ChatMemberHandler,
   type Update,
@@ -58,7 +58,7 @@ async function main() {
     process.exit(1);
   }
 
-  const app = new ApplicationBuilder().token(token).build();
+  const app = new Application().token(token).build();
 
   app.addHandler(new CommandHandler("start", start));
   app.addHandler(new ChatMemberHandler(handleChatMember, ChatMemberHandler.CHAT_MEMBER));

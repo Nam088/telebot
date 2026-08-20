@@ -4,10 +4,9 @@
  * @packageDocumentation
  */
 
-import { BaseHandler, type HandlerCallback } from "./handlers.js";
+import { BaseHandler } from "./handlers.js";
 import { Update } from "../kernel/update.js";
 import { CallbackContext } from "../kernel/context.js";
-import type { Persistence } from "../storage/driver.js";
 
 /**
  * Key composite configuration for tracking unique conversations.

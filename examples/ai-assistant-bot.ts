@@ -9,7 +9,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   MessageHandler,
   filters,
@@ -23,7 +23,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 
 // /start command
 app.addHandler(

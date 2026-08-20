@@ -627,7 +627,6 @@ export class ChatMemberHandler<
 /**
  * Handler that matches updates based on an arbitrary type predicate function.
  *
- * @typeParam T - Custom update payload type.
  * @typeParam C - Type of the callback context.
  * @typeParam R - Return value type.
  *
@@ -640,7 +639,6 @@ export class ChatMemberHandler<
  * ```
  */
 export class TypeHandler<
-  T = unknown,
   C extends CallbackContext = CallbackContext,
   R = unknown,
 > extends BaseHandler<C, R> {

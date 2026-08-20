@@ -15,6 +15,7 @@ export interface HandlerMetadata {
 
 const HANDLER_META_KEY = Symbol.for("tele_bot:nest_handlers");
 const BOT_NAME_KEY = Symbol.for("tele_bot:nest_bot_name");
+const PARAM_TOKEN_KEY = Symbol.for("tele_bot:nest_param_tokens");
 
 export function getHandlerMetadata(target: any): HandlerMetadata[] {
   if (!target) return [];
@@ -42,13 +43,28 @@ export function Update(botName?: string): ClassDecorator {
 }
 
 /**
+ * Reads the injection tokens recorded by {@link InjectBot} on a constructor.
+ *
+ * @param target - The constructor function to inspect.
+ * @returns A sparse array mapping constructor parameter index to its resolved injection token.
+ */
+export function getParamTokenMetadata(target: any): string[] {
+  return (target && target[PARAM_TOKEN_KEY]) || [];
+}
+
+/**
  * Inject specific Bot or Application instance token in a NestJS constructor.
  *
  * @param botName - Identifier for multi-bot setup.
  */
 export function InjectBot(botName?: string): ParameterDecorator {
-  return (_target: any, _propertyKey: string | symbol | undefined, _parameterIndex: number) => {
-    // Custom parameter decorator marker
+  const token = getBotToken(botName);
+  return (target: any, _propertyKey: string | symbol | undefined, parameterIndex: number) => {
+    const ctor = typeof target === "function" ? target : target.constructor;
+    if (!ctor[PARAM_TOKEN_KEY]) {
+      ctor[PARAM_TOKEN_KEY] = [];
+    }
+    ctor[PARAM_TOKEN_KEY][parameterIndex] = token;
   };
 }
 

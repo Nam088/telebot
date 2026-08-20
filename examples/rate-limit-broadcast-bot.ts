@@ -10,7 +10,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   TelegramApiError,
   type Update,
@@ -23,7 +23,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 
 // In-memory subscriber list
 const subscribers = new Set<number>();

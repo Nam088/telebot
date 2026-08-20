@@ -22,6 +22,26 @@ describe("Application and ApplicationBuilder", () => {
     expect(() => builder.build()).toThrow("Cannot build Application without bot token.");
   });
 
+  it("constructs an Application directly from a bot token string", () => {
+    const app = new Application("TEST_TOKEN");
+
+    expect(app.bot.token).toBe("TEST_TOKEN");
+    expect(app.persistence).toBeInstanceOf(MemoryPersistence);
+  });
+
+  it("constructs an Application from a token string with combined Bot/Application options", () => {
+    const persistence = new MemoryPersistence();
+    const app = new Application("TEST_TOKEN", {
+      apiRoot: "http://localhost:9999",
+      baseDelayMs: 5,
+      persistence,
+    });
+
+    expect(app.bot.token).toBe("TEST_TOKEN");
+    expect(app.bot.apiRoot).toBe("http://localhost:9999");
+    expect(app.persistence).toBe(persistence);
+  });
+
   it("runs polling, drops pending updates and processes updates", async () => {
     let callCount = 0;
     const fakeFetch = vi.fn().mockImplementation(async (url: string) => {

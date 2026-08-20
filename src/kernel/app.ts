@@ -66,9 +66,14 @@ export interface ApplicationOptions {
 /**
  * Main application class responsible for managing handlers, polling loops, webhook servers, and error handling.
  *
+ * @remarks
+ * Construct it directly from a token (optionally with combined {@link Bot}/{@link Application}
+ * options), from an existing {@link Bot} instance, or via the fluent {@link ApplicationBuilder}
+ * when building the configuration up across multiple steps.
+ *
  * @example
  * ```ts
- * const app = new ApplicationBuilder().token("BOT_TOKEN").build();
+ * const app = new Application(process.env.BOT_TOKEN!);
  * app.addHandler(new CommandHandler("start", startCallback));
  * await app.runPolling();
  * ```
@@ -110,15 +115,35 @@ export class Application {
   private persistenceInitialized: boolean = false;
 
   /**
-   * Constructs a new {@link Application} instance.
+   * Constructs a new {@link Application} from a bot token, creating the underlying {@link Bot}
+   * internally.
    *
-   * @param bot - The {@link Bot} client instance.
-   * @param options - Configuration options for the application.
+   * @param token - Telegram bot token received from BotFather.
+   * @param options - Combined {@link Bot} and {@link Application} configuration.
+   *
+   * @example
+   * ```ts
+   * const app = new Application(process.env.BOT_TOKEN!);
+   * ```
    */
-  constructor(bot: Bot, options: ApplicationOptions = {}) {
-    this.bot = bot;
+  constructor(token: string, options?: ApplicationOptions & BotOptions);
+  /**
+   * Constructs a new {@link Application} from an existing {@link Bot} instance.
+   *
+   * @param bot - The {@link Bot} client instance to reuse (e.g. a custom subclass, or one
+   * already configured with a custom `fetch`).
+   * @param options - Configuration options for the application.
+   *
+   * @example
+   * ```ts
+   * const app = new Application(new Bot(process.env.BOT_TOKEN!));
+   * ```
+   */
+  constructor(bot: Bot, options?: ApplicationOptions);
+  constructor(botOrToken: Bot | string, options: ApplicationOptions & BotOptions = {}) {
+    this.bot = typeof botOrToken === "string" ? new Bot(botOrToken, options) : botOrToken;
     this.persistence = options.persistence ?? new MemoryPersistence();
-    this.scheduler = new JobQueue(bot);
+    this.scheduler = new JobQueue(this.bot);
   }
 
   /**

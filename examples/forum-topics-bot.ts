@@ -9,7 +9,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   type Update,
   type CallbackContext,
@@ -21,7 +21,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 
 // /newtopic [name] - Creates a new forum topic in the supergroup
 app.addHandler(

@@ -9,7 +9,7 @@
  */
 
 import {
-  ApplicationBuilder,
+  Application,
   CommandHandler,
   LinearConversation,
   InlineKeyboard,
@@ -23,7 +23,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new ApplicationBuilder().token(token).build();
+const app = new Application().token(token).build();
 
 // In-memory high scores record
 const highScores = new Map<number, { name: string; score: number; gamesWon: number }>();
