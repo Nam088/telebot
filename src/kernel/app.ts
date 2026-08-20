@@ -8,8 +8,9 @@ import { Bot, type BotOptions } from "../client/bot.js";
 import { Update } from "./update.js";
 import type { RawUpdate } from "../client/types.js";
 import { BaseHandler } from "../routing/handlers.js";
+import { ConversationHandler } from "../routing/conversation.js";
 import { CallbackContext } from "./context.js";
-import { type Persistence, MemoryPersistence } from "../storage/memory.js";
+import { type Persistence, MemoryPersistence } from "../storage/index.js";
 
 /**
  * Error handler callback signature.
@@ -63,6 +64,7 @@ export class Application {
 
   private offset: number = 0;
   private abortController?: AbortController;
+  private persistenceInitialized: boolean = false;
 
   /**
    * Constructs a new {@link Application} instance.
@@ -99,12 +101,36 @@ export class Application {
   }
 
   /**
+   * Initializes persistent conversation states from persistence storage.
+   */
+  public async initializePersistence(): Promise<void> {
+    if (this.persistenceInitialized) return;
+
+    const storedConversations = await this.persistence.getConversations();
+    for (const groupHandlers of this.handlers.values()) {
+      for (const handler of groupHandlers) {
+        if (handler instanceof ConversationHandler && handler.persistent) {
+          for (const [key, state] of storedConversations.entries()) {
+            if (!handler.name || key.startsWith(`${handler.name}:`)) {
+              handler.conversations.set(key, state);
+            }
+          }
+        }
+      }
+    }
+
+    this.persistenceInitialized = true;
+  }
+
+  /**
    * Dispatches a single update through registered handler groups and catches errors.
    *
    * @param rawUpdate - The incoming {@link RawUpdate} or wrapped {@link Update} instance.
    * @returns Resolves when update dispatching completes across all handler groups.
    */
   public async processUpdate(rawUpdate: RawUpdate | Update): Promise<void> {
+    await this.initializePersistence();
+
     const update = rawUpdate instanceof Update ? rawUpdate : new Update(rawUpdate, this.bot);
 
     // Resolve context user_data / chat_data / bot_data
@@ -139,6 +165,14 @@ export class Application {
           const match = await handler.checkUpdate(update);
           if (match) {
             await handler.handleUpdate(update, context);
+
+            // Sync persistent ConversationHandler changes
+            if (handler instanceof ConversationHandler && handler.persistent) {
+              for (const [key, state] of handler.conversations.entries()) {
+                await this.persistence.updateConversation(key, state);
+              }
+            }
+
             break; // Stop at first matching handler in this group
           }
         } catch (err: unknown) {
@@ -153,6 +187,21 @@ export class Application {
           }
         }
       }
+    }
+
+    // Auto-save modified state to persistence
+    if (userId !== undefined && userData !== undefined) {
+      await this.persistence.setUserData(userId, userData);
+    }
+    if (chatId !== undefined && chatData !== undefined) {
+      await this.persistence.setChatData(chatId, chatData);
+    }
+    if (botData !== undefined) {
+      await this.persistence.setBotData(botData);
+    }
+
+    if (this.persistence.flush) {
+      await this.persistence.flush();
     }
   }
 
@@ -170,6 +219,8 @@ export class Application {
   } = {}): Promise<void> {
     this.isRunning = true;
     this.abortController = new AbortController();
+
+    await this.initializePersistence();
 
     if (options.drop_pending_updates) {
       const updates = await this.bot.getUpdates({ offset: -1, timeout: 0 });

@@ -121,17 +121,17 @@ Single project (library), per `plan.md`: `src/telegram/`, `src/ext/`, `src/utils
 **Independent Test**: run `dev:conversation`, complete a multi-step flow; with `JsonFilePersistence` configured, restart the process and confirm the conversation resumes (spec.md Edge Cases).
 
 ### Tests for User Story 3
-- [ ] T032 [P] [US3] Unit tests for `CallbackContext.user_data`/`chat_data`/`bot_data` population rules (including the "stays `undefined`, not `{}`, when no chat/user is resolvable" rule from data-model.md) in `tests/unit/kernel/context.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T033 [P] [US3] Unit tests for `ConversationHandler` state transitions (`entry_points` → `states[current]` → `fallbacks`) in `tests/unit/routing/conversation.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T034 [P] [US3] Shared persistence contract test suite (read-your-writes, missing-key defaults, `getJobs`/`setJobs` replace-not-merge — contracts/persistence.md) run against `MemoryPersistence`, `JsonFilePersistence`, `SqlitePersistence` in `tests/unit/storage/persistence.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T035 [US3] Integration test: conversation state survives a simulated process restart with `JsonFilePersistence` in `tests/integration/persistence-restart.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T032 [P] [US3] Unit tests for `CallbackContext.user_data`/`chat_data`/`bot_data` population rules (including the "stays `undefined`, not `{}`, when no chat/user is resolvable" rule from data-model.md) in `tests/unit/kernel/context.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T033 [P] [US3] Unit tests for `ConversationHandler` state transitions (`entry_points` → `states[current]` → `fallbacks`) in `tests/unit/routing/conversation.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T034 [P] [US3] Shared persistence contract test suite (read-your-writes, missing-key defaults, `getJobs`/`setJobs` replace-not-merge — contracts/persistence.md) run against `MemoryPersistence`, `JsonFilePersistence`, `SqlitePersistence` in `tests/unit/storage/persistence.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T035 [US3] Integration test: conversation state survives a simulated process restart with `JsonFilePersistence` in `tests/integration/persistence-restart.test.ts` *(Assignee: Agent / Subagent)*
 
 ### Implementation for User Story 3
-- [ ] T036 [US3] Implement `ConversationHandler` in `src/routing/conversation.ts` (depends on T010, T012) *(Assignee: Agent / Subagent)*
-- [ ] T037 [P] [US3] Implement `JsonFilePersistence` in `src/storage/json.ts` (depends on T012) *(Assignee: Agent / Subagent)*
-- [ ] T038 [P] [US3] Implement `SqlitePersistence` via `node:sqlite` in `src/storage/sqlite.ts` (depends on T012) *(Assignee: Agent / Subagent)*
-- [ ] T039 [US3] Wire `Application` to load/save `user_data`/`chat_data`/`bot_data` through the configured `Persistence` on each dispatch in `src/kernel/app.ts` (depends on T013, T036, T037, T038) *(Assignee: Agent / Subagent)*
-- [ ] T040 [US3] Write `examples/conversationbot.ts` (depends on T036, T039) *(Assignee: Agent / Subagent)*
+- [X] T036 [US3] Implement `ConversationHandler` in `src/routing/conversation.ts` (depends on T010, T012) *(Assignee: Agent / Subagent)*
+- [X] T037 [P] [US3] Implement `JsonFilePersistence` in `src/storage/json.ts` (depends on T012) *(Assignee: Agent / Subagent)*
+- [X] T038 [P] [US3] Implement `SqlitePersistence` via `node:sqlite` in `src/storage/sqlite.ts` (depends on T012) *(Assignee: Agent / Subagent)*
+- [X] T039 [US3] Wire `Application` to load/save `user_data`/`chat_data`/`bot_data` through the configured `Persistence` on each dispatch in `src/kernel/app.ts` (depends on T013, T036, T037, T038) *(Assignee: Agent / Subagent)*
+- [X] T040 [US3] Write `examples/conversationbot.ts` (depends on T036, T039) *(Assignee: Agent / Subagent)*
 
 **Checkpoint**: User Stories 1, 2, AND 3 all work independently.
 
