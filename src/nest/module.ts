@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { Application, ApplicationBuilder } from "../kernel/app.js";
+import { Application } from "../kernel/app.js";
 import { CommandHandler, MessageHandler, CallbackQueryHandler } from "../routing/handlers.js";
 import { filters } from "../filters/matchers.js";
 import { DEFAULT_BOT_NAME, getBotToken, TELEGRAM_BOT_OPTIONS } from "./constants.js";

@@ -5,11 +5,11 @@
  */
 
 import type {
-  InlineKeyboardMarkup,
+  InlineKeyboardButton as RawInlineKeyboardButton,
+  InlineKeyboardMarkup as RawInlineKeyboardMarkup,
   ReplyKeyboardMarkup,
   ReplyKeyboardRemove,
   ForceReply,
-  InlineKeyboardButton,
   KeyboardButton,
   InputMediaPhoto,
   InputMediaVideo,
@@ -17,15 +17,14 @@ import type {
   InputMediaAudio,
   InputMediaDocument,
   InputMedia,
+  CallbackGame,
 } from "../client/types.js";
 import type { InputFile } from "../utils/http.js";
 
 export type {
-  InlineKeyboardMarkup,
   ReplyKeyboardMarkup,
   ReplyKeyboardRemove,
   ForceReply,
-  InlineKeyboardButton,
   KeyboardButton,
   InputMediaPhoto,
   InputMediaVideo,
@@ -35,6 +34,103 @@ export type {
   InputMedia,
   InputFile,
 };
+
+/**
+ * Options for constructing an {@link InlineKeyboardButton}: every {@link InlineKeyboardButton}
+ * field besides `text`, which is passed as the constructor's first argument instead.
+ */
+export type InlineKeyboardButtonOptions = Omit<RawInlineKeyboardButton, "text">;
+
+/**
+ * A single button on an {@link InlineKeyboardMarkup}.
+ *
+ * @remarks
+ * A class-based alternative to the {@link InlineKeyboard} fluent builder, for developers who
+ * prefer constructing keyboards the way python-telegram-bot does: as nested rows of
+ * `InlineKeyboardButton` instances passed to `InlineKeyboardMarkup`. Both styles produce the
+ * same {@link InlineKeyboardMarkup} shape (a plain object literal shaped like
+ * {@link InlineKeyboardButton} works too) and can be freely mixed.
+ *
+ * @example
+ * ```ts
+ * const keyboard = new InlineKeyboardMarkup([
+ *   [
+ *     new InlineKeyboardButton("Option 1", { callback_data: "opt_1" }),
+ *     new InlineKeyboardButton("Option 2", { callback_data: "opt_2" }),
+ *   ],
+ *   [new InlineKeyboardButton("Website", { url: "https://example.com" })],
+ * ]);
+ * ```
+ */
+export class InlineKeyboardButton implements RawInlineKeyboardButton {
+  /** Label text on the button. */
+  public readonly text: string;
+  /** HTTP or tg:// URL to be opened when the button is pressed. */
+  declare public readonly url?: string;
+  /** Data to be sent in a callback query to the bot when the button is pressed (1-64 bytes). */
+  declare public readonly callback_data?: string;
+  /** Description of the Web App that will be launched when the user presses the button. */
+  declare public readonly web_app?: { url: string };
+  /** An HTTPS URL used to automatically authorize the user. */
+  declare public readonly login_url?: unknown;
+  /** If set, pressing the button prompts the user to insert the specified inline query. */
+  declare public readonly switch_inline_query?: string;
+  /** If set, pressing the button inserts the specified inline query in the current chat. */
+  declare public readonly switch_inline_query_current_chat?: string;
+  /** If set, pressing the button prompts the user to select a chat of the specified type. */
+  declare public readonly switch_inline_query_chosen_chat?: unknown;
+  /** Description of the button that copies the specified text to the clipboard. */
+  declare public readonly copy_text?: { text: string };
+  /** Description of the game that will be launched when the user presses the button. */
+  declare public readonly callback_game?: CallbackGame;
+  /** `true` to send a Pay button; must be the first button of the first row. */
+  declare public readonly pay?: boolean;
+
+  /**
+   * Constructs a new {@link InlineKeyboardButton}.
+   *
+   * @param text - Label text on the button.
+   * @param options - Every other {@link InlineKeyboardButton} field, e.g. `callback_data` or `url`.
+   */
+  constructor(text: string, options: InlineKeyboardButtonOptions = {}) {
+    this.text = text;
+    Object.assign(this, options);
+  }
+}
+
+/**
+ * Represents an inline keyboard that appears right next to the message it belongs to.
+ *
+ * @remarks
+ * A class-based alternative to the {@link InlineKeyboard} fluent builder, for developers who
+ * prefer python-telegram-bot's own `InlineKeyboardMarkup(rows)` construction. Both styles
+ * produce the same shape and can be freely mixed.
+ *
+ * @example
+ * ```ts
+ * const markup = new InlineKeyboardMarkup([
+ *   [
+ *     new InlineKeyboardButton("Yes", { callback_data: "yes" }),
+ *     new InlineKeyboardButton("No", { callback_data: "no" }),
+ *   ],
+ * ]);
+ * await bot.sendMessage({ chat_id: 12345, text: "Confirm?", reply_markup: markup });
+ * ```
+ */
+export class InlineKeyboardMarkup implements RawInlineKeyboardMarkup {
+  /** Array of button rows, each an array of {@link InlineKeyboardButton}. */
+  public readonly inline_keyboard: RawInlineKeyboardButton[][];
+
+  /**
+   * Constructs a new {@link InlineKeyboardMarkup}.
+   *
+   * @param inline_keyboard - Rows of buttons, as {@link InlineKeyboardButton} instances or
+   * plain objects shaped like one.
+   */
+  constructor(inline_keyboard: RawInlineKeyboardButton[][]) {
+    this.inline_keyboard = inline_keyboard;
+  }
+}
 
 /**
  * Fluent builder for creating {@link InlineKeyboardMarkup} objects.

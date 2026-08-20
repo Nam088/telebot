@@ -185,6 +185,36 @@ export class JsonFilePersistence implements Persistence {
   }
 
   /**
+   * Deletes user data for the given user ID.
+   *
+   * @param userId - Telegram user ID.
+   */
+  async deleteUserData(userId: number): Promise<void> {
+    delete this.data.userData[String(userId)];
+    this.save();
+  }
+
+  /**
+   * Deletes chat data for the given chat ID.
+   *
+   * @param chatId - Telegram chat ID.
+   */
+  async deleteChatData(chatId: number | string): Promise<void> {
+    delete this.data.chatData[String(chatId)];
+    this.save();
+  }
+
+  /**
+   * Deletes state for a conversation key.
+   *
+   * @param key - Conversation identifier.
+   */
+  async deleteConversation(key: string): Promise<void> {
+    delete this.data.conversations[key];
+    this.save();
+  }
+
+  /**
    * Retrieves persisted jobs.
    *
    * @returns List of persisted jobs.

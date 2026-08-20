@@ -125,6 +125,33 @@ export class MemoryPersistence implements Persistence {
   }
 
   /**
+   * Deletes user data for a specific user ID from memory.
+   *
+   * @param userId - Telegram user ID.
+   */
+  async deleteUserData(userId: number): Promise<void> {
+    this.userData.delete(userId);
+  }
+
+  /**
+   * Deletes chat data for a specific chat ID from memory.
+   *
+   * @param chatId - Telegram chat ID.
+   */
+  async deleteChatData(chatId: number | string): Promise<void> {
+    this.chatData.delete(chatId);
+  }
+
+  /**
+   * Deletes conversation state for the given key from memory.
+   *
+   * @param key - Conversation composite key.
+   */
+  async deleteConversation(key: string): Promise<void> {
+    this.conversations.delete(key);
+  }
+
+  /**
    * Retrieves a copy of scheduled persisted jobs from memory.
    *
    * @returns An array copy of persisted jobs.

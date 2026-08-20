@@ -12,3 +12,9 @@ export * from "./storage/index.js";
 export * from "./scheduler/index.js";
 export * from "./components/index.js";
 export * from "./utils/index.js";
+
+// `components/keyboard.js` exports InlineKeyboardButton/InlineKeyboardMarkup as constructable
+// classes (a python-telegram-bot-style alternative to the InlineKeyboard fluent builder),
+// which are structurally compatible with, and take precedence over, the plain Bot API types
+// of the same name re-exported from `client/index.js`.
+export { InlineKeyboardButton, InlineKeyboardMarkup } from "./components/keyboard.js";
