@@ -44,8 +44,7 @@ jobs:
           npm run typecheck
           npm test
 
-      - name: Run Semantic Release
+      - name: Run Semantic Release (OIDC Trusted Publishing)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
