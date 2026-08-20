@@ -1,0 +1,44 @@
+name: "✨ Feature Request"
+description: "Suggest a new feature or API capability for the tele-bot framework"
+title: "[Feat]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature to make `tele-bot` even better!
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem or Use Case"
+      description: "Is your feature request related to a problem? Please describe clearly."
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed Solution / Desired Behavior"
+      description: "Describe the solution or API design you would like to see."
+      placeholder: "Add support for app.scheduler.runCron(...) or new Telegram 8.0 API method..."
+    validations:
+      required: true
+  - type: textarea
+    id: api_design
+    attributes:
+      label: "Proposed API / TypeScript Snippet (Optional)"
+      description: "How should developers use this feature in TypeScript?"
+      render: typescript
+      placeholder: |
+        app.scheduler.runRRule(async (ctx) => {
+          await ctx.reply("Hello!");
+        }, { ... });
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: "Code of Conduct & Contribution Guidelines"
+      options:
+        - label: "I confirm that this proposal maintains zero required runtime dependencies (only Node.js built-ins)."
+          required: true
+        - label: "I confirm that method names follow `camelCase` and data properties follow `snake_case`."
+          required: true
