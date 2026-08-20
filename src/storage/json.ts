@@ -81,7 +81,9 @@ export class JsonFilePersistence implements Persistence {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2), "utf-8");
+      const tmpPath = `${this.filePath}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
+      fs.writeFileSync(tmpPath, JSON.stringify(this.data, null, 2), "utf-8");
+      fs.renameSync(tmpPath, this.filePath);
     } catch (err) {
       console.error(`Failed to save JSON persistence to ${this.filePath}:`, err);
     }

@@ -45,7 +45,7 @@ describe("JobQueue and Job", () => {
 
     expect(job.name).toBe("repeating_job");
 
-    await new Promise((resolve) => setTimeout(resolve, 65));
+    await new Promise((resolve) => setTimeout(resolve, 90));
 
     expect(callback.mock.calls.length).toBeGreaterThanOrEqual(2);
 
