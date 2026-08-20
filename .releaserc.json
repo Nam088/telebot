@@ -17,6 +17,12 @@
           { "type": "revert", "release": "patch" },
           { "type": "docs", "scope": "README", "release": "patch" },
           { "type": "refactor", "release": "patch" },
+          { "type": "ci", "release": false },
+          { "type": "chore", "release": false },
+          { "type": "build", "release": false },
+          { "type": "style", "release": false },
+          { "type": "test", "release": false },
+          { "scope": "ci", "release": false },
           { "breaking": true, "release": "major" }
         ]
       }
