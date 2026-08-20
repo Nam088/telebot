@@ -2,6 +2,33 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## Installation
+
+```bash
+# npm
+npm install telebot-ts@1.1.0
+
+# yarn
+yarn add telebot-ts@1.1.0
+
+# pnpm
+pnpm add telebot-ts@1.1.0
+
+# bun
+bun add telebot-ts@1.1.0
+```
+
+> Requires **Node.js >= 22**. Zero external runtime dependencies.
+
+---
+
+# [1.1.0](https://github.com/Nam088/telebot-ts/compare/v1.0.0...v1.1.0) (2026-08-20)
+
+
+### Features
+
+* **ci:** add custom release notes plugin that auto-prepends installation section for npm, yarn, pnpm, bun ([27ac2aa](https://github.com/Nam088/telebot-ts/commit/27ac2aa85ee3b011dccf6f2178b1e3f334c9947f))
+
 ## [1.0.1](https://github.com/Nam088/telebot-ts/compare/v1.0.0...v1.0.1) (2026-08-20)
 
 
