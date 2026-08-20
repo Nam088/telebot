@@ -23,7 +23,11 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
 
   it("passport and stories", async () => {
     const { client } = createMock(true);
-    expect(await client.setPassportDataErrors(123, [{ source: "data", type: "passport", message: "err" }])).toBe(true);
+    expect(
+      await client.setPassportDataErrors(123, [
+        { source: "data", type: "passport", message: "err" },
+      ]),
+    ).toBe(true);
     expect(await client.postStory("biz_1", {})).toBe(true);
     expect(await client.editStory("biz_1", 1, {})).toBe(true);
     expect(await client.deleteStory("biz_1", 1)).toBe(true);

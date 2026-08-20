@@ -30,14 +30,12 @@ describe("CallbackContext", () => {
   it("leaves user_data and chat_data undefined when non-resolvable during dispatch", async () => {
     let capturedContext: CallbackContext | undefined;
 
-    const app = new ApplicationBuilder()
-      .token("123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11")
-      .build();
+    const app = new ApplicationBuilder().token("123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11").build();
 
     app.addHandler(
       new CommandHandler("test", (_update, context) => {
         capturedContext = context;
-      })
+      }),
     );
 
     // Update with message that has no 'from' and no 'chat' (edge case/synthetic)
@@ -96,7 +94,11 @@ describe("CallbackContext", () => {
     // Edge case: when update has no chat
     const emptyCtx = new CallbackContext({ bot });
     await expect(emptyCtx.reply("Test")).rejects.toThrow("Cannot call context.reply()");
-    await expect(emptyCtx.replyWithPhoto("url")).rejects.toThrow("Cannot call context.replyWithPhoto()");
-    await expect(emptyCtx.replyWithDocument("url")).rejects.toThrow("Cannot call context.replyWithDocument()");
+    await expect(emptyCtx.replyWithPhoto("url")).rejects.toThrow(
+      "Cannot call context.replyWithPhoto()",
+    );
+    await expect(emptyCtx.replyWithDocument("url")).rejects.toThrow(
+      "Cannot call context.replyWithDocument()",
+    );
   });
 });

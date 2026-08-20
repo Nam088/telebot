@@ -21,9 +21,7 @@ describe("Keyboards", () => {
           { text: "Option 1", callback_data: "opt_1" },
           { text: "Option 2", callback_data: "opt_2" },
         ],
-        [
-          { text: "URL", url: "https://example.com" },
-        ],
+        [{ text: "URL", url: "https://example.com" }],
       ],
     };
 
@@ -56,12 +54,9 @@ describe("Keyboards", () => {
         { text: "Search Chat", switch_inline_query_current_chat: "chat query" },
         { text: "Copy", copy_text: { text: "some text" } },
       ],
-      [
-        { text: "Btn 2", callback_data: "data_2" },
-      ],
+      [{ text: "Btn 2", callback_data: "data_2" }],
     ]);
   });
-
 
   it("ReplyKeyboardMarkup creates valid structure", () => {
     const markup: ReplyKeyboardMarkup = {
@@ -92,17 +87,13 @@ describe("Keyboards", () => {
     expect(markup.resize_keyboard).toBe(true);
     expect(markup.one_time_keyboard).toBe(true);
     expect(markup.keyboard).toEqual([
-      [
-        { text: "Option A" },
-        { text: "Share Location", request_location: true },
-      ],
+      [{ text: "Option A" }, { text: "Share Location", request_location: true }],
       [
         { text: "Share Contact", request_contact: true },
         { text: "Create Poll", request_poll: { type: "quiz" } },
       ],
     ]);
   });
-
 
   it("ReplyKeyboardRemove creates remove_keyboard structure", () => {
     const markup: ReplyKeyboardRemove = {

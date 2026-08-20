@@ -38,7 +38,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * ```
    */
   public async answerCallbackQuery(options: AnswerCallbackQueryOptions): Promise<boolean> {
-    return this.request<boolean>("answerCallbackQuery", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "answerCallbackQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -67,7 +70,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * ```
    */
   public async answerInlineQuery(options: AnswerInlineQueryOptions): Promise<boolean> {
-    return this.request<boolean>("answerInlineQuery", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "answerInlineQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -88,7 +94,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
       disable_notification?: boolean;
       protect_content?: boolean;
       reply_markup?: unknown;
-    } = {}
+    } = {},
   ): Promise<Message> {
     return this.request<Message>("sendGame", {
       chat_id: chatId,
@@ -115,7 +121,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
       chat_id?: number | string;
       message_id?: number;
       inline_message_id?: string;
-    } = {}
+    } = {},
   ): Promise<Message | boolean> {
     return this.request<Message | boolean>("setGameScore", {
       user_id: userId,
@@ -138,7 +144,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
       chat_id?: number | string;
       message_id?: number;
       inline_message_id?: string;
-    } = {}
+    } = {},
   ): Promise<GameHighScore[]> {
     return this.request<GameHighScore[]>("getGameHighScores", {
       user_id: userId,
@@ -154,7 +160,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When reporting errors fails.
    */
-  public async setPassportDataErrors(userId: number, errors: PassportElementError[]): Promise<boolean> {
+  public async setPassportDataErrors(
+    userId: number,
+    errors: PassportElementError[],
+  ): Promise<boolean> {
     return this.request<boolean>("setPassportDataErrors", {
       user_id: userId,
       errors,
@@ -173,7 +182,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
   public async postStory(
     businessConnectionId: string,
     content: unknown,
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
   ): Promise<Story> {
     return this.request<Story>("postStory", {
       business_connection_id: businessConnectionId,
@@ -196,7 +205,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
     businessConnectionId: string,
     storyId: number,
     content: unknown,
-    options: Record<string, unknown> = {}
+    options: Record<string, unknown> = {},
   ): Promise<Story> {
     return this.request<Story>("editStory", {
       business_connection_id: businessConnectionId,
@@ -242,7 +251,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When marking message fails.
    */
-  public async readBusinessMessage(businessConnectionId: string, messageId: number): Promise<boolean> {
+  public async readBusinessMessage(
+    businessConnectionId: string,
+    messageId: number,
+  ): Promise<boolean> {
     return this.request<boolean>("readBusinessMessage", {
       business_connection_id: businessConnectionId,
       message_id: messageId,
@@ -257,7 +269,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When deleting messages fails.
    */
-  public async deleteBusinessMessages(businessConnectionId: string, messageIds: number[]): Promise<boolean> {
+  public async deleteBusinessMessages(
+    businessConnectionId: string,
+    messageIds: number[],
+  ): Promise<boolean> {
     return this.request<boolean>("deleteBusinessMessages", {
       business_connection_id: businessConnectionId,
       message_ids: messageIds,
@@ -365,7 +380,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
   public async setUserEmojiStatus(
     userId: number,
     customEmojiId?: string,
-    options: { emoji_status_expiration_date?: number } = {}
+    options: { emoji_status_expiration_date?: number } = {},
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { user_id: userId, ...options };
     if (customEmojiId !== undefined) payload["custom_emoji_id"] = customEmojiId;
@@ -390,7 +405,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns Object with optional `inline_message_id`.
    * @throws {@link TelegramApiError} When answering web app query fails.
    */
-  public async answerWebAppQuery(webAppQueryId: string, result: unknown): Promise<{ inline_message_id?: string }> {
+  public async answerWebAppQuery(
+    webAppQueryId: string,
+    result: unknown,
+  ): Promise<{ inline_message_id?: string }> {
     return this.request<{ inline_message_id?: string }>("answerWebAppQuery", {
       web_app_query_id: webAppQueryId,
       result,
@@ -404,7 +422,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param result - Result payload to return.
    * @returns Object with optional `inline_message_id`.
    */
-  public async answerGuestQuery(guestQueryId: string, result: unknown): Promise<{ inline_message_id?: string }> {
+  public async answerGuestQuery(
+    guestQueryId: string,
+    result: unknown,
+  ): Promise<{ inline_message_id?: string }> {
     return this.request<{ inline_message_id?: string }>("answerGuestQuery", {
       guest_query_id: guestQueryId,
       result,
@@ -458,7 +479,9 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns Business account gifts.
    */
   public async getBusinessAccountGifts(businessConnectionId: string): Promise<unknown> {
-    return this.request<unknown>("getBusinessAccountGifts", { business_connection_id: businessConnectionId });
+    return this.request<unknown>("getBusinessAccountGifts", {
+      business_connection_id: businessConnectionId,
+    });
   }
 
   /**
@@ -467,7 +490,9 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param businessConnectionId - Unique identifier of the business connection.
    * @returns Object containing the star `amount`.
    */
-  public async getBusinessAccountStarBalance(businessConnectionId: string): Promise<{ amount: number }> {
+  public async getBusinessAccountStarBalance(
+    businessConnectionId: string,
+  ): Promise<{ amount: number }> {
     return this.request<{ amount: number }>("getBusinessAccountStarBalance", {
       business_connection_id: businessConnectionId,
     });
@@ -480,7 +505,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param name - New business name.
    * @returns `true` on success.
    */
-  public async setBusinessAccountName(businessConnectionId: string, name: string): Promise<boolean> {
+  public async setBusinessAccountName(
+    businessConnectionId: string,
+    name: string,
+  ): Promise<boolean> {
     return this.request<boolean>("setBusinessAccountName", {
       business_connection_id: businessConnectionId,
       name,
@@ -494,7 +522,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param username - New username.
    * @returns `true` on success.
    */
-  public async setBusinessAccountUsername(businessConnectionId: string, username?: string): Promise<boolean> {
+  public async setBusinessAccountUsername(
+    businessConnectionId: string,
+    username?: string,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
     if (username !== undefined) payload["username"] = username;
     return this.request<boolean>("setBusinessAccountUsername", payload);
@@ -520,7 +551,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Gift settings parameters.
    * @returns `true` on success.
    */
-  public async setBusinessAccountGiftSettings(businessConnectionId: string, options: Record<string, unknown>): Promise<boolean> {
+  public async setBusinessAccountGiftSettings(
+    businessConnectionId: string,
+    options: Record<string, unknown>,
+  ): Promise<boolean> {
     return this.request<boolean>("setBusinessAccountGiftSettings", {
       business_connection_id: businessConnectionId,
       ...options,
@@ -534,7 +568,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param photo - Profile photo to set.
    * @returns `true` on success.
    */
-  public async setBusinessAccountProfilePhoto(businessConnectionId: string, photo: unknown): Promise<boolean> {
+  public async setBusinessAccountProfilePhoto(
+    businessConnectionId: string,
+    photo: unknown,
+  ): Promise<boolean> {
     return this.request<boolean>("setBusinessAccountProfilePhoto", {
       business_connection_id: businessConnectionId,
       photo,
@@ -561,7 +598,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    */
   public async convertGiftToStars(userId: number, ownedGiftId: string): Promise<boolean> {
-    return this.request<boolean>("convertGiftToStars", { user_id: userId, owned_gift_id: ownedGiftId });
+    return this.request<boolean>("convertGiftToStars", {
+      user_id: userId,
+      owned_gift_id: ownedGiftId,
+    });
   }
 
   /**
@@ -583,7 +623,11 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param newOwnerChatId - Target user or channel chat identifier.
    * @returns `true` on success.
    */
-  public async transferGift(userId: number, ownedGiftId: string, newOwnerChatId: number | string): Promise<boolean> {
+  public async transferGift(
+    userId: number,
+    ownedGiftId: string,
+    newOwnerChatId: number | string,
+  ): Promise<boolean> {
     return this.request<boolean>("transferGift", {
       user_id: userId,
       owned_gift_id: ownedGiftId,
@@ -598,7 +642,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param starCount - Number of stars to transfer.
    * @returns `true` on success.
    */
-  public async transferBusinessAccountStars(businessConnectionId: string, starCount: number): Promise<boolean> {
+  public async transferBusinessAccountStars(
+    businessConnectionId: string,
+    starCount: number,
+  ): Promise<boolean> {
     return this.request<boolean>("transferBusinessAccountStars", {
       business_connection_id: businessConnectionId,
       star_count: starCount,
@@ -622,7 +669,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Updated access options.
    * @returns `true` on success.
    */
-  public async setManagedBotAccessSettings(botId: number, options: Record<string, unknown>): Promise<boolean> {
+  public async setManagedBotAccessSettings(
+    botId: number,
+    options: Record<string, unknown>,
+  ): Promise<boolean> {
     return this.request<boolean>("setManagedBotAccessSettings", { bot_id: botId, ...options });
   }
 
@@ -633,8 +683,14 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Subscription parameters.
    * @returns Created link object.
    */
-  public async createChatSubscriptionInviteLink(chatId: number | string, options: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>("createChatSubscriptionInviteLink", { chat_id: chatId, ...options });
+  public async createChatSubscriptionInviteLink(
+    chatId: number | string,
+    options: Record<string, unknown>,
+  ): Promise<unknown> {
+    return this.request<unknown>("createChatSubscriptionInviteLink", {
+      chat_id: chatId,
+      ...options,
+    });
   }
 
   /**
@@ -645,7 +701,11 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Updated link parameters.
    * @returns Edited link object.
    */
-  public async editChatSubscriptionInviteLink(chatId: number | string, inviteLink: string, options: Record<string, unknown>): Promise<unknown> {
+  public async editChatSubscriptionInviteLink(
+    chatId: number | string,
+    inviteLink: string,
+    options: Record<string, unknown>,
+  ): Promise<unknown> {
     return this.request<unknown>("editChatSubscriptionInviteLink", {
       chat_id: chatId,
       invite_link: inviteLink,
@@ -661,7 +721,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    */
   public async approveSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
-    return this.request<boolean>("approveSuggestedPost", { chat_id: chatId, message_id: messageId });
+    return this.request<boolean>("approveSuggestedPost", {
+      chat_id: chatId,
+      message_id: messageId,
+    });
   }
 
   /**
@@ -672,7 +735,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns `true` on success.
    */
   public async declineSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
-    return this.request<boolean>("declineSuggestedPost", { chat_id: chatId, message_id: messageId });
+    return this.request<boolean>("declineSuggestedPost", {
+      chat_id: chatId,
+      message_id: messageId,
+    });
   }
 
   /**
@@ -692,7 +758,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Query options.
    * @returns List of user gifts.
    */
-  public async getUserGifts(userId: number, options: Record<string, unknown> = {}): Promise<unknown> {
+  public async getUserGifts(
+    userId: number,
+    options: Record<string, unknown> = {},
+  ): Promise<unknown> {
     return this.request<unknown>("getUserGifts", { user_id: userId, ...options });
   }
 
@@ -703,7 +772,10 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Query options.
    * @returns List of chat gifts.
    */
-  public async getChatGifts(chatId: number | string, options: Record<string, unknown> = {}): Promise<unknown> {
+  public async getChatGifts(
+    chatId: number | string,
+    options: Record<string, unknown> = {},
+  ): Promise<unknown> {
     return this.request<unknown>("getChatGifts", { chat_id: chatId, ...options });
   }
 
@@ -734,7 +806,11 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param limit - Maximum items to retrieve.
    * @returns Profile audio objects.
    */
-  public async getUserProfileAudios(userId: number, offset?: number, limit?: number): Promise<unknown> {
+  public async getUserProfileAudios(
+    userId: number,
+    offset?: number,
+    limit?: number,
+  ): Promise<unknown> {
     const payload: Record<string, unknown> = { user_id: userId };
     if (offset !== undefined) payload["offset"] = offset;
     if (limit !== undefined) payload["limit"] = limit;
@@ -749,7 +825,11 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param tag - Tag name to set.
    * @returns `true` on success.
    */
-  public async setChatMemberTag(chatId: number | string, userId: number, tag?: string): Promise<boolean> {
+  public async setChatMemberTag(
+    chatId: number | string,
+    userId: number,
+    tag?: string,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, user_id: userId };
     if (tag !== undefined) payload["tag"] = tag;
     return this.request<boolean>("setChatMemberTag", payload);
@@ -825,7 +905,9 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Ephemeral message edit options.
    * @returns Edited {@link Message} or boolean.
    */
-  public async editEphemeralMessageText(options: Record<string, unknown>): Promise<Message | boolean> {
+  public async editEphemeralMessageText(
+    options: Record<string, unknown>,
+  ): Promise<Message | boolean> {
     return this.request<Message | boolean>("editEphemeralMessageText", options);
   }
 
@@ -836,8 +918,14 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param messageId - Message identifier.
    * @returns `true` on success.
    */
-  public async deleteEphemeralMessage(chatId: number | string, messageId: number): Promise<boolean> {
-    return this.request<boolean>("deleteEphemeralMessage", { chat_id: chatId, message_id: messageId });
+  public async deleteEphemeralMessage(
+    chatId: number | string,
+    messageId: number,
+  ): Promise<boolean> {
+    return this.request<boolean>("deleteEphemeralMessage", {
+      chat_id: chatId,
+      message_id: messageId,
+    });
   }
 
   /**

@@ -19,7 +19,7 @@ import { JobQueue } from "../scheduler/queue.js";
 export type ErrorHandlerCallback = (
   error: Error,
   update?: Update,
-  context?: CallbackContext
+  context?: CallbackContext,
 ) => Promise<void> | void;
 
 /**
@@ -250,12 +250,14 @@ export class Application {
    * @param options - Polling configuration options.
    * @returns Resolves when polling stops.
    */
-  public async runPolling(options: {
-    allowed_updates?: string[];
-    drop_pending_updates?: boolean;
-    poll_interval?: number;
-    timeout?: number;
-  } = {}): Promise<void> {
+  public async runPolling(
+    options: {
+      allowed_updates?: string[];
+      drop_pending_updates?: boolean;
+      poll_interval?: number;
+      timeout?: number;
+    } = {},
+  ): Promise<void> {
     if (this.isRunning) {
       throw new Error("Application is already running. Cannot start polling concurrently.");
     }
@@ -325,13 +327,15 @@ export class Application {
    * });
    * ```
    */
-  public async runWebhook(options: {
-    listen?: string;
-    port?: number;
-    path?: string;
-    secret_token?: string;
-    server?: import("node:http").Server;
-  } = {}): Promise<void> {
+  public async runWebhook(
+    options: {
+      listen?: string;
+      port?: number;
+      path?: string;
+      secret_token?: string;
+      server?: import("node:http").Server;
+    } = {},
+  ): Promise<void> {
     if (this.isRunning) {
       throw new Error("Application is already running. Cannot start webhook concurrently.");
     }
@@ -503,4 +507,3 @@ export class ApplicationBuilder {
     return new Application(bot, this._appOptions);
   }
 }
-

@@ -47,6 +47,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\"",
     "docs": "typedoc",
     "dev:echo": "tsx examples/echobot.ts",
     "dev:keyboard": "tsx examples/inlinekeyboard.ts",
@@ -76,11 +80,19 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "@eslint/js": "10.0.1",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "2.1.9",
+    "eslint": "10.8.1",
+    "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
+    "prettier": "3.9.6",
     "tsx": "^4.19.0",
     "typedoc": "^0.28.0",
     "typescript": "^5.5.0",
+    "typescript-eslint": "8.67.0",
     "vitest": "^2.0.0"
   }
 }

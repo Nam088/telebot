@@ -119,7 +119,7 @@ describe("Application and ApplicationBuilder", () => {
     app.addHandler(
       new CommandHandler("ping", (update) => {
         receivedUpdates.push(update.update_id);
-      })
+      }),
     );
 
     const port = 9876;

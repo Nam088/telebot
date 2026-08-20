@@ -38,7 +38,7 @@ export abstract class ChatMethods extends MessageMethods {
     chatId: number | string,
     userId: number,
     untilDate?: number,
-    revokeMessages?: boolean
+    revokeMessages?: boolean,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, user_id: userId };
     if (untilDate !== undefined) payload["until_date"] = untilDate;
@@ -60,7 +60,11 @@ export abstract class ChatMethods extends MessageMethods {
    * await bot.unbanChatMember(chatId, userId);
    * ```
    */
-  public async unbanChatMember(chatId: number | string, userId: number, onlyIfBanned?: boolean): Promise<boolean> {
+  public async unbanChatMember(
+    chatId: number | string,
+    userId: number,
+    onlyIfBanned?: boolean,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, user_id: userId };
     if (onlyIfBanned !== undefined) payload["only_if_banned"] = onlyIfBanned;
     return this.request<boolean>("unbanChatMember", payload);
@@ -80,7 +84,10 @@ export abstract class ChatMethods extends MessageMethods {
    * ```
    */
   public async banChatSenderChat(chatId: number | string, senderChatId: number): Promise<boolean> {
-    return this.request<boolean>("banChatSenderChat", { chat_id: chatId, sender_chat_id: senderChatId });
+    return this.request<boolean>("banChatSenderChat", {
+      chat_id: chatId,
+      sender_chat_id: senderChatId,
+    });
   }
 
   /**
@@ -96,8 +103,14 @@ export abstract class ChatMethods extends MessageMethods {
    * await bot.unbanChatSenderChat(chatId, channelId);
    * ```
    */
-  public async unbanChatSenderChat(chatId: number | string, senderChatId: number): Promise<boolean> {
-    return this.request<boolean>("unbanChatSenderChat", { chat_id: chatId, sender_chat_id: senderChatId });
+  public async unbanChatSenderChat(
+    chatId: number | string,
+    senderChatId: number,
+  ): Promise<boolean> {
+    return this.request<boolean>("unbanChatSenderChat", {
+      chat_id: chatId,
+      sender_chat_id: senderChatId,
+    });
   }
 
   /**
@@ -123,7 +136,7 @@ export abstract class ChatMethods extends MessageMethods {
     userId: number,
     permissions: ChatPermissions,
     useIndependentChatPermissions?: boolean,
-    untilDate?: number
+    untilDate?: number,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = {
       chat_id: chatId,
@@ -156,7 +169,7 @@ export abstract class ChatMethods extends MessageMethods {
   public async promoteChatMember(
     chatId: number | string,
     userId: number,
-    options: PromoteChatMemberOptions = {}
+    options: PromoteChatMemberOptions = {},
   ): Promise<boolean> {
     return this.request<boolean>("promoteChatMember", {
       chat_id: chatId,
@@ -182,7 +195,7 @@ export abstract class ChatMethods extends MessageMethods {
   public async setChatAdministratorCustomTitle(
     chatId: number | string,
     userId: number,
-    customTitle: string
+    customTitle: string,
   ): Promise<boolean> {
     return this.request<boolean>("setChatAdministratorCustomTitle", {
       chat_id: chatId,
@@ -211,7 +224,7 @@ export abstract class ChatMethods extends MessageMethods {
   public async setChatPermissions(
     chatId: number | string,
     permissions: ChatPermissions,
-    useIndependentChatPermissions?: boolean
+    useIndependentChatPermissions?: boolean,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, permissions };
     if (useIndependentChatPermissions !== undefined)
@@ -254,7 +267,7 @@ export abstract class ChatMethods extends MessageMethods {
    */
   public async createChatInviteLink(
     chatId: number | string,
-    options: CreateChatInviteLinkOptions = {}
+    options: CreateChatInviteLinkOptions = {},
   ): Promise<ChatInviteLink> {
     return this.request<ChatInviteLink>("createChatInviteLink", {
       chat_id: chatId,
@@ -281,7 +294,7 @@ export abstract class ChatMethods extends MessageMethods {
   public async editChatInviteLink(
     chatId: number | string,
     inviteLink: string,
-    options: EditChatInviteLinkOptions = {}
+    options: EditChatInviteLinkOptions = {},
   ): Promise<ChatInviteLink> {
     return this.request<ChatInviteLink>("editChatInviteLink", {
       chat_id: chatId,
@@ -303,7 +316,10 @@ export abstract class ChatMethods extends MessageMethods {
    * await bot.revokeChatInviteLink(chatId, inviteLink);
    * ```
    */
-  public async revokeChatInviteLink(chatId: number | string, inviteLink: string): Promise<ChatInviteLink> {
+  public async revokeChatInviteLink(
+    chatId: number | string,
+    inviteLink: string,
+  ): Promise<ChatInviteLink> {
     return this.request<ChatInviteLink>("revokeChatInviteLink", {
       chat_id: chatId,
       invite_link: inviteLink,
@@ -352,7 +368,10 @@ export abstract class ChatMethods extends MessageMethods {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting chat photo fails.
    */
-  public async setChatPhoto(chatId: number | string, photo: string | import("../../utils/http.js").InputFile): Promise<boolean> {
+  public async setChatPhoto(
+    chatId: number | string,
+    photo: string | import("../../utils/http.js").InputFile,
+  ): Promise<boolean> {
     return this.request<boolean>("setChatPhoto", { chat_id: chatId, photo });
   }
 
@@ -402,7 +421,11 @@ export abstract class ChatMethods extends MessageMethods {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When pinning message fails.
    */
-  public async pinChatMessage(chatId: number | string, messageId: number, disableNotification?: boolean): Promise<boolean> {
+  public async pinChatMessage(
+    chatId: number | string,
+    messageId: number,
+    disableNotification?: boolean,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, message_id: messageId };
     if (disableNotification !== undefined) payload["disable_notification"] = disableNotification;
     return this.request<boolean>("pinChatMessage", payload);
@@ -521,8 +544,14 @@ export abstract class ChatMethods extends MessageMethods {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting sticker set fails.
    */
-  public async setChatStickerSet(chatId: number | string, stickerSetName: string): Promise<boolean> {
-    return this.request<boolean>("setChatStickerSet", { chat_id: chatId, sticker_set_name: stickerSetName });
+  public async setChatStickerSet(
+    chatId: number | string,
+    stickerSetName: string,
+  ): Promise<boolean> {
+    return this.request<boolean>("setChatStickerSet", {
+      chat_id: chatId,
+      sticker_set_name: stickerSetName,
+    });
   }
 
   /**

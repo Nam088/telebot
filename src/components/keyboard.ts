@@ -153,7 +153,10 @@ export class InlineKeyboard {
    * @returns This {@link InlineKeyboard} instance for chaining.
    */
   public row(): this {
-    if (this.rows.length === 0 || (this.rows[this.rows.length - 1] && this.rows[this.rows.length - 1]!.length > 0)) {
+    if (
+      this.rows.length === 0 ||
+      (this.rows[this.rows.length - 1] && this.rows[this.rows.length - 1]!.length > 0)
+    ) {
       this.rows.push([]);
     }
     return this;
@@ -296,7 +299,10 @@ export class ReplyKeyboard {
    * @returns This {@link ReplyKeyboard} instance for chaining.
    */
   public row(): this {
-    if (this.rows.length === 0 || (this.rows[this.rows.length - 1] && this.rows[this.rows.length - 1]!.length > 0)) {
+    if (
+      this.rows.length === 0 ||
+      (this.rows[this.rows.length - 1] && this.rows[this.rows.length - 1]!.length > 0)
+    ) {
       this.rows.push([]);
     }
     return this;

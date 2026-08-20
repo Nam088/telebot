@@ -18,10 +18,10 @@ import type { RawUpdate } from "../client/types.js";
  * @param context - The execution context with bot client and stored state.
  * @returns Resolves with the result returned by the handler callback.
  */
-export type HandlerCallback<
-  C extends CallbackContext = CallbackContext,
-  R = unknown
-> = (update: Update, context: C) => Promise<R> | R;
+export type HandlerCallback<C extends CallbackContext = CallbackContext, R = unknown> = (
+  update: Update,
+  context: C,
+) => Promise<R> | R;
 
 /**
  * Abstract base class for all update handlers.
@@ -29,10 +29,7 @@ export type HandlerCallback<
  * @typeParam C - Type of the callback context.
  * @typeParam R - Return value type.
  */
-export abstract class BaseHandler<
-  C extends CallbackContext = CallbackContext,
-  R = unknown
-> {
+export abstract class BaseHandler<C extends CallbackContext = CallbackContext, R = unknown> {
   /**
    * The underlying callback function to invoke on match.
    */
@@ -82,7 +79,7 @@ export abstract class BaseHandler<
  */
 export class CommandHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * Normalized set of command names that trigger this handler (without `/` or `@botname`).
@@ -102,11 +99,7 @@ export class CommandHandler<
    * @param filters - Optional additional filter criteria.
    * @throws When command is empty or contains only whitespace.
    */
-  constructor(
-    command: string | string[],
-    callback: HandlerCallback<C, R>,
-    filters?: BaseFilter
-  ) {
+  constructor(command: string | string[], callback: HandlerCallback<C, R>, filters?: BaseFilter) {
     super(callback);
     const commandList = Array.isArray(command) ? command : [command];
     if (commandList.length === 0 || commandList.some((c) => !c || c.trim() === "")) {
@@ -178,7 +171,7 @@ export class CommandHandler<
  */
 export class MessageHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * The message filter applied to incoming updates.
@@ -245,7 +238,7 @@ export class MessageHandler<
  */
 export class CallbackQueryHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * Optional pattern or predicate string/regex matching `callback_data`.
@@ -259,8 +252,10 @@ export class CallbackQueryHandler<
    * @param callbackOrPattern2 - Callback function or match pattern.
    */
   constructor(
-    callbackOrPattern: HandlerCallback<C, R> | RegExp | string | ((data: string) => boolean) | null | undefined,
-    callbackOrPattern2?: HandlerCallback<C, R> | RegExp | string | ((data: string) => boolean) | null | undefined
+    callbackOrPattern:
+      HandlerCallback<C, R> | RegExp | string | ((data: string) => boolean) | null | undefined,
+    callbackOrPattern2?:
+      HandlerCallback<C, R> | RegExp | string | ((data: string) => boolean) | null | undefined,
   ) {
     let cb: HandlerCallback<C, R>;
     let pat: RegExp | string | ((data: string) => boolean) | undefined;
@@ -350,7 +345,7 @@ export class CallbackQueryHandler<
  */
 export class InlineQueryHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * Optional pattern or predicate string/regex matching `inline_query.query`.
@@ -364,15 +359,24 @@ export class InlineQueryHandler<
    * @param callbackOrPattern2 - Callback function or string/RegExp match pattern.
    */
   constructor(
-    callbackOrPattern: HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined,
-    callbackOrPattern2?: HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined
+    callbackOrPattern:
+      HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined,
+    callbackOrPattern2?:
+      HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined,
   ) {
     let cb: HandlerCallback<C, R>;
     let pat: RegExp | string | ((query: string) => boolean) | undefined;
 
-    if (typeof callbackOrPattern === "function" && callbackOrPattern.length >= 1 && callbackOrPattern2 === undefined) {
+    if (
+      typeof callbackOrPattern === "function" &&
+      callbackOrPattern.length >= 1 &&
+      callbackOrPattern2 === undefined
+    ) {
       cb = callbackOrPattern as HandlerCallback<C, R>;
-    } else if (typeof callbackOrPattern === "function" && typeof callbackOrPattern2 !== "function") {
+    } else if (
+      typeof callbackOrPattern === "function" &&
+      typeof callbackOrPattern2 !== "function"
+    ) {
       cb = callbackOrPattern as HandlerCallback<C, R>;
       pat = (callbackOrPattern2 as RegExp | string | ((query: string) => boolean)) ?? undefined;
     } else {
@@ -443,7 +447,7 @@ export class InlineQueryHandler<
  */
 export class ChosenInlineResultHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * Optional pattern or predicate string/regex matching `result_id` or `query`.
@@ -457,15 +461,24 @@ export class ChosenInlineResultHandler<
    * @param callbackOrPattern2 - Callback function or string/RegExp match pattern.
    */
   constructor(
-    callbackOrPattern: HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined,
-    callbackOrPattern2?: HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined
+    callbackOrPattern:
+      HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined,
+    callbackOrPattern2?:
+      HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined,
   ) {
     let cb: HandlerCallback<C, R>;
     let pat: RegExp | string | ((resultId: string) => boolean) | undefined;
 
-    if (typeof callbackOrPattern === "function" && callbackOrPattern.length >= 1 && callbackOrPattern2 === undefined) {
+    if (
+      typeof callbackOrPattern === "function" &&
+      callbackOrPattern.length >= 1 &&
+      callbackOrPattern2 === undefined
+    ) {
       cb = callbackOrPattern as HandlerCallback<C, R>;
-    } else if (typeof callbackOrPattern === "function" && typeof callbackOrPattern2 !== "function") {
+    } else if (
+      typeof callbackOrPattern === "function" &&
+      typeof callbackOrPattern2 !== "function"
+    ) {
       cb = callbackOrPattern as HandlerCallback<C, R>;
       pat = (callbackOrPattern2 as RegExp | string | ((resultId: string) => boolean)) ?? undefined;
     } else {
@@ -537,7 +550,7 @@ export class ChosenInlineResultHandler<
  */
 export class PollAnswerHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * Checks whether the update contains a `poll_answer` update.
@@ -565,7 +578,7 @@ export class PollAnswerHandler<
  */
 export class ChatMemberHandler<
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /** Target only member updates of other users (`chat_member`) */
   public static readonly CHAT_MEMBER = 1;
@@ -586,10 +599,7 @@ export class ChatMemberHandler<
    * @param chatMemberTypes - Type filter mask (`CHAT_MEMBER`, `MY_CHAT_MEMBER`, or `ANY`).
    * @defaultValue `ChatMemberHandler.ANY`
    */
-  constructor(
-    callback: HandlerCallback<C, R>,
-    chatMemberTypes: number = ChatMemberHandler.ANY
-  ) {
+  constructor(callback: HandlerCallback<C, R>, chatMemberTypes: number = ChatMemberHandler.ANY) {
     super(callback);
     this.chatMemberTypes = chatMemberTypes;
   }
@@ -629,7 +639,7 @@ export class ChatMemberHandler<
 export class TypeHandler<
   T = unknown,
   C extends CallbackContext = CallbackContext,
-  R = unknown
+  R = unknown,
 > extends BaseHandler<C, R> {
   /**
    * The custom type predicate function.
@@ -644,7 +654,7 @@ export class TypeHandler<
    */
   constructor(
     typePredicate: (update: Update | RawUpdate) => boolean | Promise<boolean>,
-    callback: HandlerCallback<C, R>
+    callback: HandlerCallback<C, R>,
   ) {
     super(callback);
     this.typePredicate = typePredicate;
@@ -660,4 +670,3 @@ export class TypeHandler<
     return Boolean(await this.typePredicate(update));
   }
 }
-

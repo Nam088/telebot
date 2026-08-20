@@ -11,10 +11,9 @@ import type { Persistence, PersistedJob } from "../storage/driver.js";
 /**
  * Signature for job callback functions executed by the {@link JobQueue}.
  */
-export type JobCallback<
-  Data = unknown,
-  C extends CallbackContext = CallbackContext
-> = (context: C) => Promise<void> | void;
+export type JobCallback<Data = unknown, C extends CallbackContext = CallbackContext> = (
+  context: C,
+) => Promise<void> | void;
 
 /**
  * Represents a time specification for daily recurring jobs.
@@ -203,7 +202,7 @@ export class JobQueue {
     data?: Data,
     name?: string,
     chat_id?: number | string,
-    user_id?: number
+    user_id?: number,
   ): Job<Data> {
     const jobName = name ?? `job_once_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     this.registerCallback(jobName, callback);
@@ -243,7 +242,7 @@ export class JobQueue {
     data?: Data,
     name?: string,
     chat_id?: number | string,
-    user_id?: number
+    user_id?: number,
   ): Job<Data> {
     const jobName = name ?? `job_repeat_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     this.registerCallback(jobName, callback);
@@ -290,7 +289,7 @@ export class JobQueue {
     data?: Data,
     name?: string,
     chat_id?: number | string,
-    user_id?: number
+    user_id?: number,
   ): Job<Data> {
     const jobName = name ?? `job_daily_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     this.registerCallback(jobName, callback);

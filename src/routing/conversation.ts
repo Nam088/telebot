@@ -99,9 +99,10 @@ export interface ConversationHandlerOptions<C extends CallbackContext = Callback
  * app.addHandler(convHandler);
  * ```
  */
-export class ConversationHandler<
-  C extends CallbackContext = CallbackContext
-> extends BaseHandler<C, any> {
+export class ConversationHandler<C extends CallbackContext = CallbackContext> extends BaseHandler<
+  C,
+  any
+> {
   /**
    * Special state indicating that the conversation has ended.
    */

@@ -132,9 +132,7 @@ describe.each(factories)("$name Contract Tests", ({ create }) => {
     expect(fetched).toEqual(jobs);
 
     // Replace entirely
-    const newJobs = [
-      { name: "new_job", nextRun: 1700001000000 },
-    ];
+    const newJobs = [{ name: "new_job", nextRun: 1700001000000 }];
     await persistence.setJobs(newJobs);
     expect(await persistence.getJobs()).toEqual(newJobs);
   });

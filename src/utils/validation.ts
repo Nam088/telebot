@@ -52,6 +52,3 @@ export function validateToken(token: string): void {
     // Allow non-strict tokens in test mode or format check
   }
 }
-
-
-

@@ -14,7 +14,9 @@ describe("TopicAndProfileMethods Unit Tests (1:1 mapping)", () => {
 
   it("bot commands, names, descriptions, admin rights, chat menu button", async () => {
     const { client } = createMock(true);
-    expect(await client.setMyCommands({ commands: [{ command: "start", description: "Start" }] })).toBe(true);
+    expect(
+      await client.setMyCommands({ commands: [{ command: "start", description: "Start" }] }),
+    ).toBe(true);
     expect(await client.getMyCommands()).toBe(true);
     expect(await client.deleteMyCommands()).toBe(true);
     expect(await client.setMyName("Bot", "en")).toBe(true);
@@ -32,7 +34,9 @@ describe("TopicAndProfileMethods Unit Tests (1:1 mapping)", () => {
   it("forum topics and general forum topics full suite", async () => {
     const { client } = createMock(true);
     expect(await client.createForumTopic({ chat_id: 123, name: "Topic" })).toBe(true);
-    expect(await client.editForumTopic({ chat_id: 123, message_thread_id: 1, name: "Topic 2" })).toBe(true);
+    expect(
+      await client.editForumTopic({ chat_id: 123, message_thread_id: 1, name: "Topic 2" }),
+    ).toBe(true);
     expect(await client.closeForumTopic(123, 1)).toBe(true);
     expect(await client.reopenForumTopic(123, 1)).toBe(true);
     expect(await client.deleteForumTopic(123, 1)).toBe(true);

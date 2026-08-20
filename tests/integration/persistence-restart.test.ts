@@ -54,10 +54,7 @@ describe("Persistence & Process Restart Integration", () => {
     // --- Process 1: Bot starts, user enters conversation and provides name ---
     {
       const persistence1 = new JsonFilePersistence({ filePath });
-      const app1 = new ApplicationBuilder()
-        .token(token)
-        .persistence(persistence1)
-        .build();
+      const app1 = new ApplicationBuilder().token(token).persistence(persistence1).build();
 
       const convHandler1 = new ConversationHandler({
         name: "test_conv",
@@ -101,19 +98,14 @@ describe("Persistence & Process Restart Integration", () => {
     // --- Process 2: Simulating new process with fresh instances pointing to same file ---
     {
       const persistence2 = new JsonFilePersistence({ filePath });
-      const app2 = new ApplicationBuilder()
-        .token(token)
-        .persistence(persistence2)
-        .build();
+      const app2 = new ApplicationBuilder().token(token).persistence(persistence2).build();
 
       let finishedUserData: any = null;
 
       const convHandler2 = new ConversationHandler({
         name: "test_conv",
         persistent: true,
-        entry_points: [
-          new CommandHandler("start", async () => STATE_NAME),
-        ],
+        entry_points: [new CommandHandler("start", async () => STATE_NAME)],
         states: {
           [STATE_NAME]: [
             new MessageHandler(filters.TEXT.and(filters.COMMAND.not()), async () => STATE_AGE),
@@ -149,10 +141,7 @@ describe("Persistence & Process Restart Integration", () => {
     // --- Process 1 ---
     {
       const persistence1 = new SqlitePersistence({ dbPath });
-      const app1 = new ApplicationBuilder()
-        .token(token)
-        .persistence(persistence1)
-        .build();
+      const app1 = new ApplicationBuilder().token(token).persistence(persistence1).build();
 
       const convHandler1 = new ConversationHandler({
         name: "sql_conv",
@@ -181,19 +170,14 @@ describe("Persistence & Process Restart Integration", () => {
     // --- Process 2 ---
     {
       const persistence2 = new SqlitePersistence({ dbPath });
-      const app2 = new ApplicationBuilder()
-        .token(token)
-        .persistence(persistence2)
-        .build();
+      const app2 = new ApplicationBuilder().token(token).persistence(persistence2).build();
 
       let resultState: any = null;
 
       const convHandler2 = new ConversationHandler({
         name: "sql_conv",
         persistent: true,
-        entry_points: [
-          new CommandHandler("order", async () => STATE_STEP),
-        ],
+        entry_points: [new CommandHandler("order", async () => STATE_STEP)],
         states: {
           [STATE_STEP]: [
             new MessageHandler(filters.TEXT, async (_u, context) => {

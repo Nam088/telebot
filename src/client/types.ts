@@ -66,7 +66,11 @@ export class TelegramApiError extends Error {
    * @param description - The error description string.
    * @param parameters - Optional extra parameter payload from Telegram.
    */
-  constructor(error_code: number, description: string, parameters?: { retry_after?: number; migrate_to_chat_id?: number }) {
+  constructor(
+    error_code: number,
+    description: string,
+    parameters?: { retry_after?: number; migrate_to_chat_id?: number },
+  ) {
     super(`Telegram API Error ${error_code}: ${description}`);
     this.name = "TelegramApiError";
     this.error_code = error_code;
@@ -701,7 +705,12 @@ export interface StoryAreaPosition {
  */
 export type StoryAreaType =
   | { type: "location"; location: Location; address?: unknown }
-  | { type: "suggested_reaction"; reaction_type: ReactionType; is_dark?: boolean; is_flipped?: boolean }
+  | {
+      type: "suggested_reaction";
+      reaction_type: ReactionType;
+      is_dark?: boolean;
+      is_flipped?: boolean;
+    }
   | { type: "link"; url: string }
   | { type: "weather"; temperature_c: number; emoji: string; background_color: number };
 
@@ -892,10 +901,7 @@ export interface ForceReply {
  * Union type representing all supported Telegram reply markup structures.
  */
 export type ReplyMarkup =
-  | InlineKeyboardMarkup
-  | ReplyKeyboardMarkup
-  | ReplyKeyboardRemove
-  | ForceReply;
+  InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply;
 
 /**
  * Represents a Telegram message.
@@ -1407,9 +1413,7 @@ export interface ChatBoostSourceGiveaway {
  * Describes the source of a chat boost.
  */
 export type ChatBoostSource =
-  | ChatBoostSourcePremium
-  | ChatBoostSourceGiftCode
-  | ChatBoostSourceGiveaway;
+  ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
 
 /**
  * Contains information about a boost added to a chat.
@@ -1510,10 +1514,7 @@ export interface ReactionTypePaid {
 /**
  * Union type representing all supported Telegram reaction types.
  */
-export type ReactionType =
-  | ReactionTypeEmoji
-  | ReactionTypeCustomEmoji
-  | ReactionTypePaid;
+export type ReactionType = ReactionTypeEmoji | ReactionTypeCustomEmoji | ReactionTypePaid;
 
 /**
  * Represents a reaction added to a message along with the number of times it was added.
@@ -2163,11 +2164,7 @@ export interface InputMediaDocument {
  * Union of all input media types accepted in `sendMediaGroup`.
  */
 export type InputMedia =
-  | InputMediaPhoto
-  | InputMediaVideo
-  | InputMediaAnimation
-  | InputMediaAudio
-  | InputMediaDocument;
+  InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;
 
 /**
  * Options passed to `sendMediaGroup` requests.
@@ -2730,9 +2727,6 @@ export interface ReplaceStickerInSetOptions {
  * Type alias representing a raw Telegram Update structure.
  */
 export type Update = RawUpdate;
-
-
-
 
 /**
  * Represents a game high score for a user.
