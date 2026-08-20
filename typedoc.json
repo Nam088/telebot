@@ -4,7 +4,7 @@
   "out": "docs",
   "plugin": [],
   "readme": "README.md",
-  "name": "telegram-bot-node",
+  "name": "tele-bot",
   "excludePrivate": true,
   "excludeProtected": false,
   "excludeInternal": true,

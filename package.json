@@ -1,5 +1,5 @@
 {
-  "name": "telegram-bot-node",
+  "name": "tele-bot",
   "version": "1.0.0",
   "description": "Zero-dependency Telegram Bot framework & Python migration for Node.js / TypeScript",
   "type": "module",
