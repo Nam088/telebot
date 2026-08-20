@@ -35,7 +35,26 @@ describe("RRule Complete RFC 5545 Spec & Timezone Tests", () => {
 
     const next = rrule.after(anchor);
     expect(next).not.toBeNull();
-    expect(next?.getUTCHours()).toBe(2); // 9:00 AM VN = 2:00 AM UTC
+    expect(next?.getUTCHours()).toBe(2);
+  });
+
+  it("calculates next occurrence for byyearday and byweekno", () => {
+    const anchor = new Date("2026-01-01T00:00:00Z");
+    const rruleYearday = new RRule({
+      freq: RRule.YEARLY,
+      byyearday: [100],
+      byhour: 12,
+    });
+    const nextYear = rruleYearday.after(anchor);
+    expect(nextYear).not.toBeNull();
+
+    const rruleWeekno = new RRule({
+      freq: RRule.YEARLY,
+      byweekno: [10],
+      byweekday: [RRule.MO],
+    });
+    const nextWeek = rruleWeekno.after(anchor);
+    expect(nextWeek).not.toBeNull();
   });
 
   it("handles weekday filters (e.g. next Monday)", () => {

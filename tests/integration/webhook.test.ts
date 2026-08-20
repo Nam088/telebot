@@ -67,6 +67,29 @@ describe("Webhook Integration Engine Tests", () => {
     expect(commandHandled).toBe(true);
     expect(fakeFetch).toHaveBeenCalled();
 
+    // 4. Test 400 for malformed JSON
+    const res400 = await fetch(`http://localhost:${testPort}/webhook`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-telegram-bot-api-secret-token": secretToken,
+      },
+      body: "not_a_valid_json",
+    });
+    expect(res400.status).toBe(400);
+
+    // 5. Test 413 for payload exceeding MAX_WEBHOOK_BODY_BYTES
+    const oversizedBody = "x".repeat(5 * 1024 * 1024 + 10);
+    const res413 = await fetch(`http://localhost:${testPort}/webhook`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-telegram-bot-api-secret-token": secretToken,
+      },
+      body: oversizedBody,
+    });
+    expect(res413.status).toBe(413);
+
     // Clean stop
     await app.stop();
   });
