@@ -194,6 +194,8 @@ export class JobQueue {
   public errorHandler?: (error: Error, context: CallbackContext) => Promise<void> | void;
 
   private _jobs: Set<Job> = new Set();
+  private _jobsByName: Map<string, Set<Job>> = new Map();
+  private _jobsByChatId: Map<string, Set<Job>> = new Map();
   private _registeredCallbacks: Map<string, JobCallback<any>> = new Map();
 
   /**
@@ -203,6 +205,29 @@ export class JobQueue {
    */
   constructor(bot: Bot) {
     this.bot = bot;
+  }
+
+  private _indexJob(job: Job): void {
+    this._jobs.add(job);
+
+    // Index by name
+    let byName = this._jobsByName.get(job.name);
+    if (!byName) {
+      byName = new Set();
+      this._jobsByName.set(job.name, byName);
+    }
+    byName.add(job);
+
+    // Index by chat_id
+    if (job.chat_id !== undefined) {
+      const chatKey = String(job.chat_id);
+      let byChat = this._jobsByChatId.get(chatKey);
+      if (!byChat) {
+        byChat = new Set();
+        this._jobsByChatId.set(chatKey, byChat);
+      }
+      byChat.add(job);
+    }
   }
 
   /**
@@ -226,6 +251,8 @@ export class JobQueue {
       job.scheduleRemoval();
     }
     this._jobs.clear();
+    this._jobsByName.clear();
+    this._jobsByChatId.clear();
   }
 
   /**
@@ -272,7 +299,7 @@ export class JobQueue {
       user_id,
     });
 
-    this._jobs.add(job);
+    this._indexJob(job);
     return job;
   }
 
@@ -319,21 +346,21 @@ export class JobQueue {
       user_id,
     });
 
-    this._jobs.add(job);
+    this._indexJob(job);
     return job;
   }
 
   /**
-   * Schedules a job to run daily at a specific time of day.
+   * Schedules a job to run daily at a specified time and optional days of the week.
    *
    * @param callback - The async function to execute.
-   * @param time - Time specification (`{ hour, minute, second }`).
-   * @param days - Array of days of week (0=Sunday to 6=Saturday) when the job should run.
-   * @param data - Optional data payload.
+   * @param time - Specific hour, minute, and second of execution.
+   * @param days - Array of weekday numbers (0 = Sunday, 6 = Saturday) when the job runs.
+   * @param data - Optional custom data payload.
    * @param name - Optional job name.
    * @param chat_id - Optional associated chat ID.
    * @param user_id - Optional associated user ID.
-   * @returns The created {@link Job} instance.
+   * @returns The created daily recurring {@link Job} instance.
    */
   public runDaily<Data = unknown>(
     callback: JobCallback<Data>,
@@ -370,7 +397,7 @@ export class JobQueue {
       user_id,
     });
 
-    this._jobs.add(job);
+    this._indexJob(job);
     return job;
   }
 
@@ -390,7 +417,7 @@ export class JobQueue {
   }
 
   /**
-   * Finds all jobs matching a given name.
+   * Finds all jobs matching a given name in O(1) time complexity.
    *
    * @param name - The job identifier name to filter by.
    * @returns Array of matching {@link Job} instances.
@@ -401,11 +428,12 @@ export class JobQueue {
    * ```
    */
   public getJobsByName(name: string): Job[] {
-    return Array.from(this._jobs).filter((j) => j.name === name);
+    const set = this._jobsByName.get(name);
+    return set ? Array.from(set) : [];
   }
 
   /**
-   * Finds all jobs associated with a specific chat ID.
+   * Finds all jobs associated with a specific chat ID in O(1) time complexity.
    *
    * @param chat_id - Telegram chat ID.
    * @returns Array of matching {@link Job} instances.
@@ -416,17 +444,33 @@ export class JobQueue {
    * ```
    */
   public getJobsByChatId(chat_id: number | string): Job[] {
-    return Array.from(this._jobs).filter((j) => j.chat_id === chat_id);
+    const set = this._jobsByChatId.get(String(chat_id));
+    return set ? Array.from(set) : [];
   }
 
   /**
-   * Internal helper to remove a job from tracking.
+   * Internal helper to remove a job from tracking and indexes.
    *
    * @param job - Job instance to remove.
    * @internal
    */
   public _removeJob(job: Job): void {
     this._jobs.delete(job);
+
+    const byName = this._jobsByName.get(job.name);
+    if (byName) {
+      byName.delete(job);
+      if (byName.size === 0) this._jobsByName.delete(job.name);
+    }
+
+    if (job.chat_id !== undefined) {
+      const chatKey = String(job.chat_id);
+      const byChat = this._jobsByChatId.get(chatKey);
+      if (byChat) {
+        byChat.delete(job);
+        if (byChat.size === 0) this._jobsByChatId.delete(chatKey);
+      }
+    }
   }
 
   /**
@@ -479,7 +523,7 @@ export class JobQueue {
           intervalMs: pj.interval,
           data: pj.data,
         });
-        this._jobs.add(job);
+        this._indexJob(job);
       }
     }
   }
