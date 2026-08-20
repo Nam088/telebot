@@ -62,15 +62,7 @@
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\"",
     "commit": "cz",
-    "docs": "typedoc",
-    "dev:echo": "tsx examples/echobot.ts",
-    "dev:keyboard": "tsx examples/inlinekeyboard.ts",
-    "dev:conversation": "tsx examples/conversationbot.ts",
-    "dev:timer": "tsx examples/timerbot.ts",
-    "dev:poll": "tsx examples/pollbot.ts",
-    "dev:chatmember": "tsx examples/chatmemberbot.ts",
-    "dev:deeplink": "tsx examples/deeplinking.ts",
-    "dev:webhook": "tsx examples/webhookbot.ts"
+    "docs": "typedoc"
   },
   "config": {
     "commitizen": {
