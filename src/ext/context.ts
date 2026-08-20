@@ -18,8 +18,8 @@ import type { Update } from "../telegram/update.js";
  * @typeParam BotData - Custom type definition for bot-level persisted state.
  *
  * @remarks
- * Property names mirror `python-telegram-bot` (`context.user_data`, `context.chat_data`, `context.bot_data`,
- * `context.args`, `context.job_queue`) in `snake_case` format.
+ * Context state property names (`context.user_data`, `context.chat_data`, `context.bot_data`,
+ * `context.args`, `context.job_queue`) use consistent `snake_case` naming.
  *
  * @example
  * ```ts

@@ -29,4 +29,8 @@ Every public class, interface, method, type alias, and export must include full 
 - **`@example`**: Practical usage code snippet on every public entry point.
 - **`@throws`**: Document errors (e.g. `@throws {@link TelegramApiError} ...`).
 - **`@defaultValue`**: Document runtime defaults for optional properties/parameters.
-- **`@remarks`**: Highlight behavior details or differences from python-telegram-bot (PTB).
+- **`@remarks`**: Highlight behavior details or architecture design.
+
+## 5. Absolute Privacy & Clean Branding (NO Python / Migration References)
+- **STRICT PROHIBITION**: Do NOT mention Python, `python-telegram-bot`, or "migration from Python" in any public JSDoc/TSDoc comments, user-facing README, `package.json`, generated docs, or exported types.
+- Frame `tele-bot` exclusively as a modern, zero-dependency, native TypeScript Telegram Bot framework for Node.js.

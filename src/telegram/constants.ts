@@ -1,7 +1,7 @@
 /**
  * Telegram Bot API Constants and Enums.
  *
- * Provides strongly-typed constant objects mirroring `python-telegram-bot`'s `telegram.constants`.
+ * Provides strongly-typed constant objects for Telegram Bot API.
  *
  * @packageDocumentation
  */

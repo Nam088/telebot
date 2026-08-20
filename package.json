@@ -1,7 +1,7 @@
 {
   "name": "tele-bot",
   "version": "1.0.0",
-  "description": "Zero-dependency Telegram Bot framework & Python migration for Node.js / TypeScript",
+  "description": "Zero-dependency, type-safe Telegram Bot framework for Node.js and TypeScript",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

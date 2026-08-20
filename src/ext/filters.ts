@@ -13,8 +13,7 @@ import type { MessageEntityType } from "../telegram/constants.js";
  * Base Filter class providing logical combinator methods (`and`, `or`, `not`).
  *
  * @remarks
- * In `python-telegram-bot`, bitwise operators `&`, `|`, `~` are used. In TypeScript,
- * use explicit `.and()`, `.or()`, `.not()` method chaining instead.
+ * Filters can be composed using explicit `.and()`, `.or()`, and `.not()` method chaining.
  *
  * @example
  * ```ts
@@ -371,11 +370,11 @@ const PHONE_NUMBER = createEntityFilter("phone_number");
 const CASHTAG = createEntityFilter("cashtag");
 
 /**
- * Built-in filter collection mirroring `python-telegram-bot`'s `telegram.ext.filters`.
+ * Comprehensive collection of built-in update and message filters.
  *
  * @example
  * ```ts
- * import { filters, MessageHandler } from "telegram-bot-node";
+ * import { filters, MessageHandler } from "tele-bot";
  *
  * // Handles all regular text messages
  * app.addHandler(new MessageHandler(filters.TEXT, echoCallback));
