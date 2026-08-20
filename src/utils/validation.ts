@@ -10,7 +10,7 @@
  *
  * @param value - The value to check.
  * @param name - The name of the parameter/field being validated (for error reporting).
- * @throws {@link TypeError} When the value is not a string or contains only whitespace.
+ * @throws When the value is not a string or contains only whitespace.
  *
  * @example
  * ```ts
@@ -28,7 +28,7 @@ export function assertNonEmptyString(value: unknown, name: string): asserts valu
  *
  * @param value - The value to check.
  * @param name - The name of the parameter/field being validated (for error reporting).
- * @throws {@link TypeError} When the value is not a number or is NaN.
+ * @throws When the value is not a number or is NaN.
  *
  * @example
  * ```ts
@@ -40,4 +40,5 @@ export function assertNumber(value: unknown, name: string): asserts value is num
     throw new TypeError(`${name} must be a valid number`);
   }
 }
+
 

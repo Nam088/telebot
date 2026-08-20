@@ -112,6 +112,9 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
 
   /**
    * Checks whether the incoming update matches an active conversation step or entry trigger.
+   *
+   * @param update - The incoming Telegram update.
+   * @returns `true` if this conversation should process the update, `false` otherwise.
    */
   override async checkUpdate(update: Update): Promise<boolean> {
     const key = this.getKey(update);
@@ -142,7 +145,11 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
   }
 
   /**
-   * Executes the linear conversation step.
+   * Executes or resumes the linear conversation step.
+   *
+   * @param update - The incoming Telegram update.
+   * @param context - Callback context instance.
+   * @returns Resolves when step execution finishes.
    */
   override async handleUpdate(update: Update, context: C): Promise<void> {
     const key = this.getKey(update);

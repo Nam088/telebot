@@ -392,6 +392,16 @@ export class Application {
 
   /**
    * Stops the active polling loop or webhook server, shuts down the scheduler, and flushes persistent state.
+   *
+   * @returns Resolves when all shutdown operations complete.
+   *
+   * @example
+   * ```ts
+   * process.on("SIGINT", async () => {
+   *   await app.stop();
+   *   process.exit(0);
+   * });
+   * ```
    */
   public async stop(): Promise<void> {
     this.isRunning = false;
@@ -413,7 +423,15 @@ export class Application {
 }
 
 /**
- * Fluent builder for creating {@link Application} instances.
+ * Fluent builder for constructing and configuring {@link Application} instances.
+ *
+ * @example
+ * ```ts
+ * const app = new ApplicationBuilder()
+ *   .token(process.env.BOT_TOKEN!)
+ *   .persistence(new SqlitePersistence({ dbPath: "./data/bot.sqlite" }))
+ *   .build();
+ * ```
  */
 export class ApplicationBuilder {
   private _token?: string;
@@ -421,7 +439,10 @@ export class ApplicationBuilder {
   private _appOptions: ApplicationOptions = {};
 
   /**
-   * Sets the Telegram bot token.
+   * Sets the Telegram bot token received from BotFather.
+   *
+   * @param token - The bot token string.
+   * @returns This builder instance for chaining.
    */
   public token(token: string): this {
     this._token = token;
@@ -430,6 +451,9 @@ export class ApplicationBuilder {
 
   /**
    * Configures optional settings for the underlying {@link Bot} client.
+   *
+   * @param options - Bot options (custom fetch, retry limits, apiRoot).
+   * @returns This builder instance for chaining.
    */
   public botOptions(options: BotOptions): this {
     this._botOptions = options;
@@ -438,6 +462,9 @@ export class ApplicationBuilder {
 
   /**
    * Configures the persistence backend for state management.
+   *
+   * @param persistence - A {@link Persistence} implementation instance.
+   * @returns This builder instance for chaining.
    */
   public persistence(persistence: Persistence): this {
     this._appOptions.persistence = persistence;
@@ -445,7 +472,10 @@ export class ApplicationBuilder {
   }
 
   /**
-   * Constructs the configured {@link Application} instance.
+   * Constructs and returns the configured {@link Application} instance.
+   *
+   * @returns The newly created {@link Application}.
+   * @throws When the bot token has not been provided.
    */
   public build(): Application {
     if (!this._token) {
@@ -455,3 +485,4 @@ export class ApplicationBuilder {
     return new Application(bot, this._appOptions);
   }
 }
+

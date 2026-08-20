@@ -323,7 +323,15 @@ export class JobQueue {
   }
 
   /**
-   * Returns all active scheduled jobs.
+   * Returns all active scheduled jobs currently managed by this queue.
+   *
+   * @returns Array of active {@link Job} instances.
+   *
+   * @example
+   * ```ts
+   * const allJobs = app.scheduler.jobs();
+   * console.log(`Active jobs: ${allJobs.length}`);
+   * ```
    */
   public jobs(): Job[] {
     return Array.from(this._jobs);
@@ -331,6 +339,14 @@ export class JobQueue {
 
   /**
    * Finds all jobs matching a given name.
+   *
+   * @param name - The job identifier name to filter by.
+   * @returns Array of matching {@link Job} instances.
+   *
+   * @example
+   * ```ts
+   * const reminderJobs = app.scheduler.getJobsByName("daily_reminder");
+   * ```
    */
   public getJobsByName(name: string): Job[] {
     return Array.from(this._jobs).filter((j) => j.name === name);
@@ -338,6 +354,14 @@ export class JobQueue {
 
   /**
    * Finds all jobs associated with a specific chat ID.
+   *
+   * @param chat_id - Telegram chat ID.
+   * @returns Array of matching {@link Job} instances.
+   *
+   * @example
+   * ```ts
+   * const chatJobs = app.scheduler.getJobsByChatId(123456);
+   * ```
    */
   public getJobsByChatId(chat_id: number | string): Job[] {
     return Array.from(this._jobs).filter((j) => j.chat_id === chat_id);
@@ -345,6 +369,8 @@ export class JobQueue {
 
   /**
    * Internal helper to remove a job from tracking.
+   *
+   * @param job - Job instance to remove.
    * @internal
    */
   public _removeJob(job: Job): void {
@@ -352,7 +378,9 @@ export class JobQueue {
   }
 
   /**
-   * Serializes all active jobs into {@link PersistedJob} descriptors.
+   * Serializes all active jobs into {@link PersistedJob} descriptors for persistence.
+   *
+   * @returns Array of {@link PersistedJob} records.
    */
   public toPersistedJobs(): PersistedJob[] {
     const list: PersistedJob[] = [];
@@ -371,6 +399,8 @@ export class JobQueue {
 
   /**
    * Restores jobs from persistence using registered named callbacks.
+   *
+   * @param persistedList - Array of stored {@link PersistedJob} records.
    */
   public restoreFromPersistedJobs(persistedList: PersistedJob[]): void {
     const now = Date.now();

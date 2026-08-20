@@ -318,12 +318,38 @@ export class CallbackQueryHandler<
   }
 }
 
+/**
+ * Handler for Telegram inline queries triggered when a user types `@bot query` in any chat.
+ *
+ * @typeParam C - Type of the callback context.
+ * @typeParam R - Return value type.
+ *
+ * @example
+ * ```ts
+ * const inlineHandler = new InlineQueryHandler(/^search:(.+)$/, async (update, context) => {
+ *   const query = update.inline_query!.query;
+ *   await context.bot.answerInlineQuery({
+ *     inline_query_id: update.inline_query!.id,
+ *     results: [],
+ *   });
+ * });
+ * ```
+ */
 export class InlineQueryHandler<
   C extends CallbackContext = CallbackContext,
   R = unknown
 > extends BaseHandler<C, R> {
+  /**
+   * Optional pattern or predicate string/regex matching `inline_query.query`.
+   */
   public readonly pattern?: RegExp | string | ((query: string) => boolean);
 
+  /**
+   * Constructs a new {@link InlineQueryHandler}.
+   *
+   * @param callbackOrPattern - Callback function or string/RegExp match pattern.
+   * @param callbackOrPattern2 - Callback function or string/RegExp match pattern.
+   */
   constructor(
     callbackOrPattern: HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined,
     callbackOrPattern2?: HandlerCallback<C, R> | RegExp | string | ((query: string) => boolean) | null | undefined
@@ -345,6 +371,12 @@ export class InlineQueryHandler<
     this.pattern = pat;
   }
 
+  /**
+   * Checks whether the update contains a matching inline query.
+   *
+   * @param update - The update to test.
+   * @returns `true` if inline query matches, `false` otherwise.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     const query = update.inline_query;
     if (!query) return false;
@@ -364,6 +396,13 @@ export class InlineQueryHandler<
     return false;
   }
 
+  /**
+   * Populates `context.matches` if using a RegExp pattern and executes callback.
+   *
+   * @param update - The incoming update.
+   * @param context - Callback context instance.
+   * @returns Result from callback execution.
+   */
   override async handleUpdate(update: Update, context: C): Promise<R> {
     const query = update.inline_query;
     if (query && this.pattern instanceof RegExp) {
@@ -376,12 +415,34 @@ export class InlineQueryHandler<
   }
 }
 
+/**
+ * Handler for tracking results chosen by users from inline queries.
+ *
+ * @typeParam C - Type of the callback context.
+ * @typeParam R - Return value type.
+ *
+ * @example
+ * ```ts
+ * const chosenHandler = new ChosenInlineResultHandler(async (update, context) => {
+ *   console.log("Chosen result ID:", update.chosen_inline_result?.result_id);
+ * });
+ * ```
+ */
 export class ChosenInlineResultHandler<
   C extends CallbackContext = CallbackContext,
   R = unknown
 > extends BaseHandler<C, R> {
+  /**
+   * Optional pattern or predicate string/regex matching `result_id` or `query`.
+   */
   public readonly pattern?: RegExp | string | ((resultId: string) => boolean);
 
+  /**
+   * Constructs a new {@link ChosenInlineResultHandler}.
+   *
+   * @param callbackOrPattern - Callback function or string/RegExp match pattern.
+   * @param callbackOrPattern2 - Callback function or string/RegExp match pattern.
+   */
   constructor(
     callbackOrPattern: HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined,
     callbackOrPattern2?: HandlerCallback<C, R> | RegExp | string | ((resultId: string) => boolean) | null | undefined
@@ -403,6 +464,12 @@ export class ChosenInlineResultHandler<
     this.pattern = pat;
   }
 
+  /**
+   * Checks whether the chosen inline result matches the pattern.
+   *
+   * @param update - The update to test.
+   * @returns `true` if chosen result matches, `false` otherwise.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     const chosen = update.chosen_inline_result;
     if (!chosen) return false;
@@ -422,6 +489,13 @@ export class ChosenInlineResultHandler<
     return false;
   }
 
+  /**
+   * Populates `context.matches` if using a RegExp pattern and executes callback.
+   *
+   * @param update - The incoming update.
+   * @param context - Callback context instance.
+   * @returns Result from callback execution.
+   */
   override async handleUpdate(update: Update, context: C): Promise<R> {
     const chosen = update.chosen_inline_result;
     if (chosen && this.pattern instanceof RegExp) {
@@ -435,25 +509,70 @@ export class ChosenInlineResultHandler<
   }
 }
 
+/**
+ * Handler for user responses to non-anonymous Telegram polls (`poll_answer` updates).
+ *
+ * @typeParam C - Type of the callback context.
+ * @typeParam R - Return value type.
+ *
+ * @example
+ * ```ts
+ * const pollHandler = new PollAnswerHandler(async (update, context) => {
+ *   console.log(`User ${update.poll_answer?.user?.id} voted ${update.poll_answer?.option_ids}`);
+ * });
+ * ```
+ */
 export class PollAnswerHandler<
   C extends CallbackContext = CallbackContext,
   R = unknown
 > extends BaseHandler<C, R> {
+  /**
+   * Checks whether the update contains a `poll_answer` update.
+   *
+   * @param update - The update to test.
+   * @returns `true` if update has `poll_answer`.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     return Boolean(update.poll_answer);
   }
 }
 
+/**
+ * Handler for chat membership changes (`chat_member` and `my_chat_member` updates).
+ *
+ * @typeParam C - Type of the callback context.
+ * @typeParam R - Return value type.
+ *
+ * @example
+ * ```ts
+ * const memberHandler = new ChatMemberHandler(async (update, context) => {
+ *   console.log("Chat member updated:", update.chat_member?.new_chat_member.status);
+ * }, ChatMemberHandler.CHAT_MEMBER);
+ * ```
+ */
 export class ChatMemberHandler<
   C extends CallbackContext = CallbackContext,
   R = unknown
 > extends BaseHandler<C, R> {
+  /** Target only member updates of other users (`chat_member`) */
   public static readonly CHAT_MEMBER = 1;
+  /** Target only updates for the bot itself (`my_chat_member`) */
   public static readonly MY_CHAT_MEMBER = 2;
+  /** Target any chat member update */
   public static readonly ANY = 3;
 
+  /**
+   * Filter mask specifying which chat member updates to handle.
+   */
   public readonly chatMemberTypes: number;
 
+  /**
+   * Constructs a new {@link ChatMemberHandler}.
+   *
+   * @param callback - Function invoked when the update matches.
+   * @param chatMemberTypes - Type filter mask (`CHAT_MEMBER`, `MY_CHAT_MEMBER`, or `ANY`).
+   * @defaultValue `ChatMemberHandler.ANY`
+   */
   constructor(
     callback: HandlerCallback<C, R>,
     chatMemberTypes: number = ChatMemberHandler.ANY
@@ -462,6 +581,12 @@ export class ChatMemberHandler<
     this.chatMemberTypes = chatMemberTypes;
   }
 
+  /**
+   * Checks whether the update matches the requested chat member types.
+   *
+   * @param update - The update to test.
+   * @returns `true` if update matches.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     if (this.chatMemberTypes === ChatMemberHandler.CHAT_MEMBER) {
       return Boolean(update.chat_member);
@@ -473,19 +598,53 @@ export class ChatMemberHandler<
   }
 }
 
+/**
+ * Handler that matches updates based on an arbitrary type predicate function.
+ *
+ * @typeParam T - Custom update payload type.
+ * @typeParam C - Type of the callback context.
+ * @typeParam R - Return value type.
+ *
+ * @example
+ * ```ts
+ * const customTypeHandler = new TypeHandler(
+ *   (update) => Boolean(update.message_reaction),
+ *   async (update, context) => { console.log("Reaction update received!"); }
+ * );
+ * ```
+ */
 export class TypeHandler<
   T = unknown,
   C extends CallbackContext = CallbackContext,
   R = unknown
 > extends BaseHandler<C, R> {
+  /**
+   * The custom type predicate function.
+   */
+  public readonly typePredicate: (update: Update | RawUpdate) => boolean | Promise<boolean>;
+
+  /**
+   * Constructs a new {@link TypeHandler}.
+   *
+   * @param typePredicate - Function that evaluates whether an update matches.
+   * @param callback - Function invoked on match.
+   */
   constructor(
-    public readonly typePredicate: (update: Update | RawUpdate) => boolean | Promise<boolean>,
+    typePredicate: (update: Update | RawUpdate) => boolean | Promise<boolean>,
     callback: HandlerCallback<C, R>
   ) {
     super(callback);
+    this.typePredicate = typePredicate;
   }
 
+  /**
+   * Evaluates the type predicate against the incoming update.
+   *
+   * @param update - Incoming Telegram update.
+   * @returns `true` if the type predicate is satisfied.
+   */
   async checkUpdate(update: Update): Promise<boolean> {
     return Boolean(await this.typePredicate(update));
   }
 }
+
