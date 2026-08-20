@@ -11,6 +11,7 @@ export default defineConfig({
     "scheduler/index": "src/scheduler/index.ts",
     "components/index": "src/components/index.ts",
     "utils/index": "src/utils/index.ts",
+    "nest/index": "src/nest/index.ts",
   },
   format: ["esm"],
   dts: true,

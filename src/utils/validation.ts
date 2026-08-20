@@ -45,10 +45,16 @@ export function assertNumber(value: unknown, name: string): asserts value is num
  * Validates bot token format.
  *
  * @param token - Token string to validate.
+ * @throws When the token is empty, or non-empty but does not match the `<bot_id>:<secret>`
+ * format (e.g. `"123456:ABC-DEF..."`). The literal `"TEST_TOKEN"` is always accepted for
+ * use in tests and examples.
  */
 export function validateToken(token: string): void {
   assertNonEmptyString(token, "token");
-  if (!/^\d+:[A-Za-z0-9_-]+$/.test(token) && token !== "TEST_TOKEN") {
-    // Allow non-strict tokens in test mode or format check
+  if (token === "TEST_TOKEN") return;
+  if (!/^\d+:[A-Za-z0-9_-]+$/.test(token)) {
+    throw new TypeError(
+      `token must match the Telegram bot token format "<bot_id>:<secret>" (e.g. "123456:ABC-DEF...")`,
+    );
   }
 }

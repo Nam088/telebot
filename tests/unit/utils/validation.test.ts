@@ -24,4 +24,9 @@ describe("Validation Utils Unit Tests", () => {
     expect(() => validateToken("TEST_TOKEN")).not.toThrow();
     expect(() => validateToken("")).toThrow(TypeError);
   });
+
+  it("validateToken rejects a non-empty string that does not match the bot token format", () => {
+    expect(() => validateToken("not-a-real-token")).toThrow(TypeError);
+    expect(() => validateToken("123456")).toThrow(TypeError);
+  });
 });

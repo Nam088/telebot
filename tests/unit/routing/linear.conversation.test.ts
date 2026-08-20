@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { LinearConversation } from "../../../src/routing/linear-conversation.js";
+import { LinearConversation } from "../../../src/routing/linear.conversation.js";
 import { Bot } from "../../../src/client/bot.js";
 import { Application } from "../../../src/kernel/app.js";
 import { filters } from "../../../src/filters/matchers.js";

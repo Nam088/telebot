@@ -196,6 +196,32 @@ describe("ConversationHandler", () => {
     expect(await conv.checkUpdate(cb2DiffMsg)).toBe(true); // Matches entry_point because it's new message!
   });
 
+  it("does not cross-contaminate matched handler/key when checkUpdate calls for different updates interleave (race condition)", async () => {
+    const conv = new ConversationHandler({
+      entry_points: [new CommandHandler("start", async () => 1)],
+      states: {},
+      fallbacks: [],
+    });
+
+    const contextA = new CallbackContext({ bot: dummyBot });
+    const contextB = new CallbackContext({ bot: dummyBot });
+
+    // Two independent updates from different chats/users.
+    const updateA = createTextUpdate("/start", 100, 200);
+    const updateB = createTextUpdate("/start", 300, 400);
+
+    // Simulate concurrent dispatch: both checkUpdate calls resolve
+    // before either handleUpdate is invoked.
+    expect(await conv.checkUpdate(updateA)).toBe(true);
+    expect(await conv.checkUpdate(updateB)).toBe(true);
+
+    await conv.handleUpdate(updateA, contextA);
+    await conv.handleUpdate(updateB, contextB);
+
+    expect(conv.conversations.get("100:200")).toBe(1);
+    expect(conv.conversations.get("300:400")).toBe(1);
+  });
+
   it("supports allow_reentry to re-enter conversation", async () => {
     const conv = new ConversationHandler({
       entry_points: [new CommandHandler("start", async () => 1)],
