@@ -83,7 +83,10 @@ class AndFilter extends BaseFilter {
    * @param f1 - First filter operand.
    * @param f2 - Second filter operand.
    */
-  constructor(private f1: BaseFilter, private f2: BaseFilter) {
+  constructor(
+    private f1: BaseFilter,
+    private f2: BaseFilter,
+  ) {
     super();
   }
 
@@ -112,7 +115,10 @@ class OrFilter extends BaseFilter {
    * @param f1 - First filter operand.
    * @param f2 - Second filter operand.
    */
-  constructor(private f1: BaseFilter, private f2: BaseFilter) {
+  constructor(
+    private f1: BaseFilter,
+    private f2: BaseFilter,
+  ) {
     super();
   }
 
@@ -346,10 +352,14 @@ export const ChatTypeFilters = {
   GROUPS: ChatTypeGroups,
 };
 
-const NEW_CHAT_MEMBERS = new MessageFilter((msg) => Boolean(msg.new_chat_members && msg.new_chat_members.length > 0));
+const NEW_CHAT_MEMBERS = new MessageFilter((msg) =>
+  Boolean(msg.new_chat_members && msg.new_chat_members.length > 0),
+);
 const LEFT_CHAT_MEMBER = new MessageFilter((msg) => Boolean(msg.left_chat_member));
 const NEW_CHAT_TITLE = new MessageFilter((msg) => Boolean(msg.new_chat_title));
-const NEW_CHAT_PHOTO = new MessageFilter((msg) => Boolean(msg.new_chat_photo && msg.new_chat_photo.length > 0));
+const NEW_CHAT_PHOTO = new MessageFilter((msg) =>
+  Boolean(msg.new_chat_photo && msg.new_chat_photo.length > 0),
+);
 const DELETE_CHAT_PHOTO = new MessageFilter((msg) => Boolean(msg.delete_chat_photo));
 const GROUP_CHAT_CREATED = new MessageFilter((msg) => Boolean(msg.group_chat_created));
 const SUPERGROUP_CHAT_CREATED = new MessageFilter((msg) => Boolean(msg.supergroup_chat_created));
@@ -357,7 +367,16 @@ const CHANNEL_CHAT_CREATED = new MessageFilter((msg) => Boolean(msg.channel_chat
 const MIGRATE_TO_CHAT_ID = new MessageFilter((msg) => Boolean(msg.migrate_to_chat_id));
 const MIGRATE_FROM_CHAT_ID = new MessageFilter((msg) => Boolean(msg.migrate_from_chat_id));
 const PINNED_MESSAGE = new MessageFilter((msg) => Boolean(msg.pinned_message));
-const StatusUpdateAll = NEW_CHAT_MEMBERS.or(LEFT_CHAT_MEMBER).or(NEW_CHAT_TITLE).or(NEW_CHAT_PHOTO).or(DELETE_CHAT_PHOTO).or(GROUP_CHAT_CREATED).or(SUPERGROUP_CHAT_CREATED).or(CHANNEL_CHAT_CREATED).or(MIGRATE_TO_CHAT_ID).or(MIGRATE_FROM_CHAT_ID).or(PINNED_MESSAGE);
+const StatusUpdateAll = NEW_CHAT_MEMBERS.or(LEFT_CHAT_MEMBER)
+  .or(NEW_CHAT_TITLE)
+  .or(NEW_CHAT_PHOTO)
+  .or(DELETE_CHAT_PHOTO)
+  .or(GROUP_CHAT_CREATED)
+  .or(SUPERGROUP_CHAT_CREATED)
+  .or(CHANNEL_CHAT_CREATED)
+  .or(MIGRATE_TO_CHAT_ID)
+  .or(MIGRATE_FROM_CHAT_ID)
+  .or(PINNED_MESSAGE);
 
 /**
  * Filters for chat service messages and status updates (member joins, title changes, migrations).
@@ -501,4 +520,3 @@ export const filters = {
     return new CustomFilter(fn);
   },
 };
-

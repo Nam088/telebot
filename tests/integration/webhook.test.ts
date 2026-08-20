@@ -18,7 +18,7 @@ describe("Webhook Integration Engine Tests", () => {
       new CommandHandler("hello", async (update, ctx) => {
         commandHandled = true;
         await ctx.reply("Hello from webhook!");
-      })
+      }),
     );
 
     const testPort = 9876;

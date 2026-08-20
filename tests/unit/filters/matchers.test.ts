@@ -193,15 +193,18 @@ describe("Filters", () => {
     const bot = new Bot("TEST_TOKEN");
     const regexFilter = filters.Regex(/^order:(\d+)$/);
 
-    const update = new Update({
-      update_id: 1,
-      message: {
-        message_id: 1,
-        date: 123,
-        chat: { id: 1, type: "private" },
-        text: "order:54321",
+    const update = new Update(
+      {
+        update_id: 1,
+        message: {
+          message_id: 1,
+          date: 123,
+          chat: { id: 1, type: "private" },
+          text: "order:54321",
+        },
       },
-    }, bot);
+      bot,
+    );
 
     expect(await regexFilter.checkUpdate(update)).toBe(true);
 
@@ -236,11 +239,21 @@ describe("Filters", () => {
 
     const matchUpdate = new Update({
       update_id: 1,
-      message: { message_id: 1, date: 123, chat: { id: 1, type: "private" }, text: "a secret message" },
+      message: {
+        message_id: 1,
+        date: 123,
+        chat: { id: 1, type: "private" },
+        text: "a secret message",
+      },
     });
     const noMatchUpdate = new Update({
       update_id: 2,
-      message: { message_id: 2, date: 123, chat: { id: 1, type: "private" }, text: "regular message" },
+      message: {
+        message_id: 2,
+        date: 123,
+        chat: { id: 1, type: "private" },
+        text: "regular message",
+      },
     });
 
     expect(await custom.checkUpdate(matchUpdate)).toBe(true);
@@ -250,20 +263,138 @@ describe("Filters", () => {
   it("media filters match respective media attachments", async () => {
     const baseMsg = { message_id: 1, date: 123, chat: { id: 1, type: "private" as const } };
 
-    expect(await filters.PHOTO.checkUpdate(new Update({ update_id: 1, message: { ...baseMsg, photo: [{ file_id: "1", file_unique_id: "1", width: 1, height: 1 }] } }))).toBe(true);
-    expect(await filters.DOCUMENT.checkUpdate(new Update({ update_id: 2, message: { ...baseMsg, document: { file_id: "1", file_unique_id: "1" } } }))).toBe(true);
-    expect(await filters.AUDIO.checkUpdate(new Update({ update_id: 3, message: { ...baseMsg, audio: { file_id: "1", file_unique_id: "1", duration: 10 } } }))).toBe(true);
-    expect(await filters.VIDEO.checkUpdate(new Update({ update_id: 4, message: { ...baseMsg, video: { file_id: "1", file_unique_id: "1", width: 1, height: 1, duration: 1 } } }))).toBe(true);
-    expect(await filters.VOICE.checkUpdate(new Update({ update_id: 5, message: { ...baseMsg, voice: { file_id: "1", file_unique_id: "1", duration: 1 } } }))).toBe(true);
-    expect(await filters.VIDEO_NOTE.checkUpdate(new Update({ update_id: 6, message: { ...baseMsg, video_note: { file_id: "1", file_unique_id: "1", length: 1, duration: 1 } } }))).toBe(true);
-    expect(await filters.ANIMATION.checkUpdate(new Update({ update_id: 7, message: { ...baseMsg, animation: { file_id: "1", file_unique_id: "1", width: 1, height: 1, duration: 1 } } }))).toBe(true);
-    expect(await filters.CONTACT.checkUpdate(new Update({ update_id: 8, message: { ...baseMsg, contact: { phone_number: "123", first_name: "A" } } }))).toBe(true);
-    expect(await filters.LOCATION.checkUpdate(new Update({ update_id: 9, message: { ...baseMsg, location: { latitude: 1, longitude: 2 } } }))).toBe(true);
-    expect(await filters.VENUE.checkUpdate(new Update({ update_id: 10, message: { ...baseMsg, venue: { location: { latitude: 1, longitude: 2 }, title: "T", address: "A" } } }))).toBe(true);
-    expect(await filters.POLL.checkUpdate(new Update({ update_id: 11, message: { ...baseMsg, poll: { id: "p1", question: "Q", options: [], total_voter_count: 0, is_closed: false, is_anonymous: true, type: "regular", allows_multiple_answers: false } } }))).toBe(true);
-    expect(await filters.DICE.checkUpdate(new Update({ update_id: 12, message: { ...baseMsg, dice: { emoji: "🎲", value: 6 } } }))).toBe(true);
-    expect(await filters.REPLY.checkUpdate(new Update({ update_id: 13, message: { ...baseMsg, reply_to_message: baseMsg } }))).toBe(true);
-    expect(await filters.FORWARDED.checkUpdate(new Update({ update_id: 14, message: { ...baseMsg, forward_origin: { type: "user", date: 123 } } }))).toBe(true);
+    expect(
+      await filters.PHOTO.checkUpdate(
+        new Update({
+          update_id: 1,
+          message: {
+            ...baseMsg,
+            photo: [{ file_id: "1", file_unique_id: "1", width: 1, height: 1 }],
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.DOCUMENT.checkUpdate(
+        new Update({
+          update_id: 2,
+          message: { ...baseMsg, document: { file_id: "1", file_unique_id: "1" } },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.AUDIO.checkUpdate(
+        new Update({
+          update_id: 3,
+          message: { ...baseMsg, audio: { file_id: "1", file_unique_id: "1", duration: 10 } },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.VIDEO.checkUpdate(
+        new Update({
+          update_id: 4,
+          message: {
+            ...baseMsg,
+            video: { file_id: "1", file_unique_id: "1", width: 1, height: 1, duration: 1 },
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.VOICE.checkUpdate(
+        new Update({
+          update_id: 5,
+          message: { ...baseMsg, voice: { file_id: "1", file_unique_id: "1", duration: 1 } },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.VIDEO_NOTE.checkUpdate(
+        new Update({
+          update_id: 6,
+          message: {
+            ...baseMsg,
+            video_note: { file_id: "1", file_unique_id: "1", length: 1, duration: 1 },
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.ANIMATION.checkUpdate(
+        new Update({
+          update_id: 7,
+          message: {
+            ...baseMsg,
+            animation: { file_id: "1", file_unique_id: "1", width: 1, height: 1, duration: 1 },
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.CONTACT.checkUpdate(
+        new Update({
+          update_id: 8,
+          message: { ...baseMsg, contact: { phone_number: "123", first_name: "A" } },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.LOCATION.checkUpdate(
+        new Update({
+          update_id: 9,
+          message: { ...baseMsg, location: { latitude: 1, longitude: 2 } },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.VENUE.checkUpdate(
+        new Update({
+          update_id: 10,
+          message: {
+            ...baseMsg,
+            venue: { location: { latitude: 1, longitude: 2 }, title: "T", address: "A" },
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.POLL.checkUpdate(
+        new Update({
+          update_id: 11,
+          message: {
+            ...baseMsg,
+            poll: {
+              id: "p1",
+              question: "Q",
+              options: [],
+              total_voter_count: 0,
+              is_closed: false,
+              is_anonymous: true,
+              type: "regular",
+              allows_multiple_answers: false,
+            },
+          },
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.DICE.checkUpdate(
+        new Update({ update_id: 12, message: { ...baseMsg, dice: { emoji: "🎲", value: 6 } } }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.REPLY.checkUpdate(
+        new Update({ update_id: 13, message: { ...baseMsg, reply_to_message: baseMsg } }),
+      ),
+    ).toBe(true);
+    expect(
+      await filters.FORWARDED.checkUpdate(
+        new Update({
+          update_id: 14,
+          message: { ...baseMsg, forward_origin: { type: "user", date: 123 } },
+        }),
+      ),
+    ).toBe(true);
   });
 });
-

@@ -61,7 +61,13 @@ describe("JobQueue and Job", () => {
     // Daily job with immediate target time today or tomorrow
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
-    const job = jobQueue.runDaily(callback, { hour: now.getHours(), minute: now.getMinutes(), second: now.getSeconds() }, [0, 1, 2, 3, 4, 5, 6], undefined, "daily_job");
+    const job = jobQueue.runDaily(
+      callback,
+      { hour: now.getHours(), minute: now.getMinutes(), second: now.getSeconds() },
+      [0, 1, 2, 3, 4, 5, 6],
+      undefined,
+      "daily_job",
+    );
 
     expect(job.name).toBe("daily_job");
     expect(jobQueue.getJobsByName("daily_job")).toContain(job);
@@ -161,7 +167,13 @@ describe("JobQueue and Job", () => {
 
     // Schedule for an hour in the past today -> must roll over to tomorrow
     const pastHour = (now.getHours() - 1 + 24) % 24;
-    const dailyJob = jobQueue.runDaily(cb, { hour: pastHour, minute: 0, second: 0 }, [0, 1, 2, 3, 4, 5, 6], undefined, "past_hour_job");
+    const dailyJob = jobQueue.runDaily(
+      cb,
+      { hour: pastHour, minute: 0, second: 0 },
+      [0, 1, 2, 3, 4, 5, 6],
+      undefined,
+      "past_hour_job",
+    );
 
     expect(dailyJob.next_t).toBeGreaterThan(Date.now());
   });

@@ -14,23 +14,29 @@ describe("PaymentMethods Unit Tests (1:1 mapping)", () => {
 
   it("sendInvoice, createInvoiceLink, answerShippingQuery, answerPreCheckoutQuery", async () => {
     const { client } = createMock(true);
-    expect(await client.sendInvoice({
-      chat_id: 123,
-      title: "T",
-      description: "D",
-      payload: "P",
-      currency: "USD",
-      prices: [{ label: "item", amount: 100 }],
-    })).toBe(true);
-    expect(await client.createInvoiceLink({
-      title: "T",
-      description: "D",
-      payload: "P",
-      currency: "USD",
-      prices: [{ label: "item", amount: 100 }],
-    })).toBe(true);
+    expect(
+      await client.sendInvoice({
+        chat_id: 123,
+        title: "T",
+        description: "D",
+        payload: "P",
+        currency: "USD",
+        prices: [{ label: "item", amount: 100 }],
+      }),
+    ).toBe(true);
+    expect(
+      await client.createInvoiceLink({
+        title: "T",
+        description: "D",
+        payload: "P",
+        currency: "USD",
+        prices: [{ label: "item", amount: 100 }],
+      }),
+    ).toBe(true);
     expect(await client.answerShippingQuery({ shipping_query_id: "q1", ok: true })).toBe(true);
-    expect(await client.answerPreCheckoutQuery({ pre_checkout_query_id: "pq1", ok: true })).toBe(true);
+    expect(await client.answerPreCheckoutQuery({ pre_checkout_query_id: "pq1", ok: true })).toBe(
+      true,
+    );
   });
 
   it("refundStarPayment, getStarTransactions, editUserStarSubscription, getMyStarBalance", async () => {

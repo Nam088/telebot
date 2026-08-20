@@ -71,7 +71,10 @@ export interface ConversationControl {
  * app.addHandler(survey);
  * ```
  */
-export class LinearConversation<C extends CallbackContext = CallbackContext> extends BaseHandler<C, void> {
+export class LinearConversation<C extends CallbackContext = CallbackContext> extends BaseHandler<
+  C,
+  void
+> {
   private readonly fn: (conversation: ConversationControl, context: C) => Promise<void>;
   private readonly entryCommand?: string;
   private readonly entryFilter?: BaseFilter;
@@ -96,7 +99,7 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
       entry_filter?: BaseFilter;
       per_chat?: boolean;
       per_user?: boolean;
-    } = {}
+    } = {},
   ) {
     super(async () => {});
     this.fn = fn;

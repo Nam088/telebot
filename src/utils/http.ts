@@ -91,7 +91,9 @@ export function buildRequestBody(payload: Record<string, unknown>): {
       } else if (value.data instanceof Blob) {
         formData.append(key, value.data, value.filename);
       } else {
-        const blob = new Blob([value.data as any], { type: value.contentType || "application/octet-stream" });
+        const blob = new Blob([value.data as any], {
+          type: value.contentType || "application/octet-stream",
+        });
         formData.append(key, blob, value.filename);
       }
     } else if (typeof value === "object") {
@@ -103,4 +105,3 @@ export function buildRequestBody(payload: Record<string, unknown>): {
 
   return { body: formData };
 }
-

@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { assertNonEmptyString, assertNumber, validateToken } from "../../../src/utils/validation.js";
+import {
+  assertNonEmptyString,
+  assertNumber,
+  validateToken,
+} from "../../../src/utils/validation.js";
 
 describe("Validation Utils Unit Tests", () => {
   it("assertNonEmptyString validates string content", () => {

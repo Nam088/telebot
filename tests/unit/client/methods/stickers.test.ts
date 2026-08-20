@@ -22,12 +22,32 @@ describe("StickerMethods Unit Tests (1:1 mapping)", () => {
 
   it("createNewStickerSet, addStickerToSet, setStickerPositionInSet, deleteStickerFromSet, deleteStickerSet, replaceStickerInSet", async () => {
     const { client } = createMock(true);
-    expect(await client.createNewStickerSet({ user_id: 123, name: "p_by_bot", title: "P", stickers: [] })).toBe(true);
-    expect(await client.addStickerToSet({ user_id: 123, name: "p_by_bot", sticker: { sticker: "s", format: "static", emoji_list: ["⭐"] } })).toBe(true);
+    expect(
+      await client.createNewStickerSet({
+        user_id: 123,
+        name: "p_by_bot",
+        title: "P",
+        stickers: [],
+      }),
+    ).toBe(true);
+    expect(
+      await client.addStickerToSet({
+        user_id: 123,
+        name: "p_by_bot",
+        sticker: { sticker: "s", format: "static", emoji_list: ["⭐"] },
+      }),
+    ).toBe(true);
     expect(await client.setStickerPositionInSet("s_1", 0)).toBe(true);
     expect(await client.deleteStickerFromSet("s_1")).toBe(true);
     expect(await client.deleteStickerSet("p_by_bot")).toBe(true);
-    expect(await client.replaceStickerInSet({ user_id: 123, name: "p", old_sticker: "s1", sticker: { sticker: "s2", format: "static", emoji_list: ["⭐"] } })).toBe(true);
+    expect(
+      await client.replaceStickerInSet({
+        user_id: 123,
+        name: "p",
+        old_sticker: "s1",
+        sticker: { sticker: "s2", format: "static", emoji_list: ["⭐"] },
+      }),
+    ).toBe(true);
   });
 
   it("setStickerSetThumbnail, setCustomEmojiStickerSetThumbnail, setStickerSetTitle, setStickerEmojiList, setStickerKeywords, setStickerMaskPosition", async () => {
@@ -37,6 +57,13 @@ describe("StickerMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.setStickerSetTitle("p", "New Title")).toBe(true);
     expect(await client.setStickerEmojiList("s_1", ["⭐", "🔥"])).toBe(true);
     expect(await client.setStickerKeywords("s_1", ["space"])).toBe(true);
-    expect(await client.setStickerMaskPosition("s_1", { point: "eyes", x_shift: 0, y_shift: 0, scale: 1 })).toBe(true);
+    expect(
+      await client.setStickerMaskPosition("s_1", {
+        point: "eyes",
+        x_shift: 0,
+        y_shift: 0,
+        scale: 1,
+      }),
+    ).toBe(true);
   });
 });

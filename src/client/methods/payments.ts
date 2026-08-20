@@ -82,7 +82,10 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```
    */
   public async answerShippingQuery(options: AnswerShippingQueryOptions): Promise<boolean> {
-    return this.request<boolean>("answerShippingQuery", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "answerShippingQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -101,7 +104,10 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```
    */
   public async answerPreCheckoutQuery(options: AnswerPreCheckoutQueryOptions): Promise<boolean> {
-    return this.request<boolean>("answerPreCheckoutQuery", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "answerPreCheckoutQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -117,7 +123,10 @@ export abstract class PaymentMethods extends StickerMethods {
    * await bot.refundStarPayment(123456, "tx_charge_123");
    * ```
    */
-  public async refundStarPayment(userId: number, telegramPaymentChargeId: string): Promise<boolean> {
+  public async refundStarPayment(
+    userId: number,
+    telegramPaymentChargeId: string,
+  ): Promise<boolean> {
     return this.request<boolean>("refundStarPayment", {
       user_id: userId,
       telegram_payment_charge_id: telegramPaymentChargeId,
@@ -162,7 +171,7 @@ export abstract class PaymentMethods extends StickerMethods {
   public async editUserStarSubscription(
     userId: number,
     telegramPaymentChargeId: string,
-    isCanceled: boolean
+    isCanceled: boolean,
   ): Promise<boolean> {
     return this.request<boolean>("editUserStarSubscription", {
       user_id: userId,

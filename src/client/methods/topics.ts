@@ -55,13 +55,15 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * console.log(commands);
    * ```
    */
-  public async getMyCommands(options: {
-    scope?: BotCommandScope;
-    language_code?: string;
-  } = {}): Promise<BotCommand[]> {
+  public async getMyCommands(
+    options: {
+      scope?: BotCommandScope;
+      language_code?: string;
+    } = {},
+  ): Promise<BotCommand[]> {
     return this.request<BotCommand[]>(
       "getMyCommands",
-      options as unknown as Record<string, unknown>
+      options as unknown as Record<string, unknown>,
     );
   }
 
@@ -77,10 +79,12 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * await bot.deleteMyCommands();
    * ```
    */
-  public async deleteMyCommands(options: {
-    scope?: BotCommandScope;
-    language_code?: string;
-  } = {}): Promise<boolean> {
+  public async deleteMyCommands(
+    options: {
+      scope?: BotCommandScope;
+      language_code?: string;
+    } = {},
+  ): Promise<boolean> {
     return this.request<boolean>("deleteMyCommands", options as unknown as Record<string, unknown>);
   }
 
@@ -175,7 +179,10 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * await bot.setMyShortDescription("Fast and powerful Telegram Bot", "en");
    * ```
    */
-  public async setMyShortDescription(shortDescription?: string, languageCode?: string): Promise<boolean> {
+  public async setMyShortDescription(
+    shortDescription?: string,
+    languageCode?: string,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = {};
     if (shortDescription !== undefined) payload["short_description"] = shortDescription;
     if (languageCode !== undefined) payload["language_code"] = languageCode;
@@ -225,7 +232,7 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    */
   public async setMyDefaultAdministratorRights(
     rights?: ChatAdministratorRights,
-    forChannels?: boolean
+    forChannels?: boolean,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = {};
     if (rights !== undefined) payload["rights"] = rights;
@@ -246,7 +253,9 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * console.log(rights);
    * ```
    */
-  public async getMyDefaultAdministratorRights(forChannels?: boolean): Promise<ChatAdministratorRights> {
+  public async getMyDefaultAdministratorRights(
+    forChannels?: boolean,
+  ): Promise<ChatAdministratorRights> {
     const payload: Record<string, unknown> = {};
     if (forChannels !== undefined) payload["for_channels"] = forChannels;
     return this.request<ChatAdministratorRights>("getMyDefaultAdministratorRights", payload);
@@ -269,7 +278,10 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * });
    * ```
    */
-  public async setChatMenuButton(chatId?: number | string, menuButton?: MenuButton): Promise<boolean> {
+  public async setChatMenuButton(
+    chatId?: number | string,
+    menuButton?: MenuButton,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = {};
     if (chatId !== undefined) payload["chat_id"] = chatId;
     if (menuButton !== undefined) payload["menu_button"] = menuButton;
@@ -318,7 +330,10 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
     icon_color?: number;
     icon_custom_emoji_id?: string;
   }): Promise<ForumTopic> {
-    return this.request<ForumTopic>("createForumTopic", options as unknown as Record<string, unknown>);
+    return this.request<ForumTopic>(
+      "createForumTopic",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -360,7 +375,10 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * ```
    */
   public async closeForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
-    return this.request<boolean>("closeForumTopic", { chat_id: chatId, message_thread_id: messageThreadId });
+    return this.request<boolean>("closeForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
   }
 
   /**
@@ -376,8 +394,14 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * await bot.reopenForumTopic(-1001234567890, 42);
    * ```
    */
-  public async reopenForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
-    return this.request<boolean>("reopenForumTopic", { chat_id: chatId, message_thread_id: messageThreadId });
+  public async reopenForumTopic(
+    chatId: number | string,
+    messageThreadId: number,
+  ): Promise<boolean> {
+    return this.request<boolean>("reopenForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
   }
 
   /**
@@ -393,8 +417,14 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * await bot.deleteForumTopic(-1001234567890, 42);
    * ```
    */
-  public async deleteForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
-    return this.request<boolean>("deleteForumTopic", { chat_id: chatId, message_thread_id: messageThreadId });
+  public async deleteForumTopic(
+    chatId: number | string,
+    messageThreadId: number,
+  ): Promise<boolean> {
+    return this.request<boolean>("deleteForumTopic", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
   }
 
   /**
@@ -410,8 +440,14 @@ export abstract class TopicAndProfileMethods extends PaymentMethods {
    * await bot.unpinAllForumTopicMessages(-1001234567890, 42);
    * ```
    */
-  public async unpinAllForumTopicMessages(chatId: number | string, messageThreadId: number): Promise<boolean> {
-    return this.request<boolean>("unpinAllForumTopicMessages", { chat_id: chatId, message_thread_id: messageThreadId });
+  public async unpinAllForumTopicMessages(
+    chatId: number | string,
+    messageThreadId: number,
+  ): Promise<boolean> {
+    return this.request<boolean>("unpinAllForumTopicMessages", {
+      chat_id: chatId,
+      message_thread_id: messageThreadId,
+    });
   }
 
   /**

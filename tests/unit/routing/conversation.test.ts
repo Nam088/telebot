@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { ConversationHandler } from "../../../src/routing/conversation.js";
-import { CommandHandler, MessageHandler, CallbackQueryHandler } from "../../../src/routing/handlers.js";
+import {
+  CommandHandler,
+  MessageHandler,
+  CallbackQueryHandler,
+} from "../../../src/routing/handlers.js";
 import { filters } from "../../../src/filters/matchers.js";
 import { Update } from "../../../src/kernel/update.js";
 import { CallbackContext } from "../../../src/kernel/context.js";
@@ -142,7 +146,12 @@ describe("ConversationHandler", () => {
     const innerConv = new ConversationHandler({
       entry_points: [new CommandHandler("sub", async () => 10)],
       states: {
-        10: [new MessageHandler(filters.TEXT.and(filters.COMMAND.not()), async () => ConversationHandler.END)],
+        10: [
+          new MessageHandler(
+            filters.TEXT.and(filters.COMMAND.not()),
+            async () => ConversationHandler.END,
+          ),
+        ],
       },
       fallbacks: [],
       map_to_parent: {

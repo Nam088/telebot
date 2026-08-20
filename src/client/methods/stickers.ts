@@ -91,7 +91,7 @@ export abstract class StickerMethods extends ChatMethods {
   public async uploadStickerFile(
     userId: number,
     sticker: string | InputFile,
-    stickerFormat: "static" | "animated" | "video"
+    stickerFormat: "static" | "animated" | "video",
   ): Promise<File> {
     return this.request<File>("uploadStickerFile", {
       user_id: userId,
@@ -119,7 +119,10 @@ export abstract class StickerMethods extends ChatMethods {
    * ```
    */
   public async createNewStickerSet(options: CreateNewStickerSetOptions): Promise<boolean> {
-    return this.request<boolean>("createNewStickerSet", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "createNewStickerSet",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -175,7 +178,10 @@ export abstract class StickerMethods extends ChatMethods {
    * @throws {@link TelegramApiError} When replacing sticker fails.
    */
   public async replaceStickerInSet(options: ReplaceStickerInSetOptions): Promise<boolean> {
-    return this.request<boolean>("replaceStickerInSet", options as unknown as Record<string, unknown>);
+    return this.request<boolean>(
+      "replaceStickerInSet",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -192,7 +198,7 @@ export abstract class StickerMethods extends ChatMethods {
     name: string,
     userId: number,
     format: "static" | "animated" | "video",
-    thumbnail?: string | InputFile
+    thumbnail?: string | InputFile,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { name, user_id: userId, format };
     if (thumbnail !== undefined) payload["thumbnail"] = thumbnail;
@@ -207,7 +213,10 @@ export abstract class StickerMethods extends ChatMethods {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting thumbnail fails.
    */
-  public async setCustomEmojiStickerSetThumbnail(name: string, customEmojiId?: string): Promise<boolean> {
+  public async setCustomEmojiStickerSetThumbnail(
+    name: string,
+    customEmojiId?: string,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { name };
     if (customEmojiId !== undefined) payload["custom_emoji_id"] = customEmojiId;
     return this.request<boolean>("setCustomEmojiStickerSetThumbnail", payload);
@@ -259,7 +268,10 @@ export abstract class StickerMethods extends ChatMethods {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting mask position fails.
    */
-  public async setStickerMaskPosition(sticker: string, maskPosition?: MaskPosition): Promise<boolean> {
+  public async setStickerMaskPosition(
+    sticker: string,
+    maskPosition?: MaskPosition,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { sticker };
     if (maskPosition !== undefined) payload["mask_position"] = maskPosition;
     return this.request<boolean>("setStickerMaskPosition", payload);

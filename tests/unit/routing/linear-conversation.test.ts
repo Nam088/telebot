@@ -28,7 +28,7 @@ describe("LinearConversation", () => {
       },
       {
         entry_command: "survey",
-      }
+      },
     );
 
     app.addHandler(conv);
@@ -102,7 +102,7 @@ describe("LinearConversation", () => {
       },
       {
         entry_command: "start",
-      }
+      },
     );
 
     app.addHandler(conv);

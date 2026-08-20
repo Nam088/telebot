@@ -183,7 +183,10 @@ export abstract class MessageMethods extends BaseBotClient {
     protect_content?: boolean;
     message_thread_id?: number;
   }): Promise<Array<{ message_id: number }>> {
-    return this.request<Array<{ message_id: number }>>("forwardMessages", options as unknown as Record<string, unknown>);
+    return this.request<Array<{ message_id: number }>>(
+      "forwardMessages",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -215,7 +218,10 @@ export abstract class MessageMethods extends BaseBotClient {
     reply_markup?: unknown;
     message_thread_id?: number;
   }): Promise<{ message_id: number }> {
-    return this.request<{ message_id: number }>("copyMessage", options as unknown as Record<string, unknown>);
+    return this.request<{ message_id: number }>(
+      "copyMessage",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -243,7 +249,10 @@ export abstract class MessageMethods extends BaseBotClient {
     remove_caption?: boolean;
     message_thread_id?: number;
   }): Promise<Array<{ message_id: number }>> {
-    return this.request<Array<{ message_id: number }>>("copyMessages", options as unknown as Record<string, unknown>);
+    return this.request<Array<{ message_id: number }>>(
+      "copyMessages",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -443,8 +452,13 @@ export abstract class MessageMethods extends BaseBotClient {
    * });
    * ```
    */
-  public async editMessageLiveLocation(options: EditMessageLiveLocationOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageLiveLocation", options as unknown as Record<string, unknown>);
+  public async editMessageLiveLocation(
+    options: EditMessageLiveLocationOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editMessageLiveLocation",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -462,8 +476,13 @@ export abstract class MessageMethods extends BaseBotClient {
    * });
    * ```
    */
-  public async stopMessageLiveLocation(options: StopMessageLiveLocationOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("stopMessageLiveLocation", options as unknown as Record<string, unknown>);
+  public async stopMessageLiveLocation(
+    options: StopMessageLiveLocationOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "stopMessageLiveLocation",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -544,7 +563,11 @@ export abstract class MessageMethods extends BaseBotClient {
    * console.log(`Total voters: ${poll.total_voter_count}`);
    * ```
    */
-  public async stopPoll(chatId: number | string, messageId: number, options: StopPollOptions = {}): Promise<Poll> {
+  public async stopPoll(
+    chatId: number | string,
+    messageId: number,
+    options: StopPollOptions = {},
+  ): Promise<Poll> {
     return this.request<Poll>("stopPoll", {
       chat_id: chatId,
       message_id: messageId,
@@ -602,7 +625,10 @@ export abstract class MessageMethods extends BaseBotClient {
    * ```
    */
   public async editMessageText(options: EditMessageTextOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageText", options as unknown as Record<string, unknown>);
+    return this.request<Message | boolean>(
+      "editMessageText",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -622,7 +648,10 @@ export abstract class MessageMethods extends BaseBotClient {
    * ```
    */
   public async editMessageCaption(options: EditMessageCaptionOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageCaption", options as unknown as Record<string, unknown>);
+    return this.request<Message | boolean>(
+      "editMessageCaption",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -642,7 +671,10 @@ export abstract class MessageMethods extends BaseBotClient {
    * ```
    */
   public async editMessageMedia(options: EditMessageMediaOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageMedia", options as unknown as Record<string, unknown>);
+    return this.request<Message | boolean>(
+      "editMessageMedia",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -661,8 +693,13 @@ export abstract class MessageMethods extends BaseBotClient {
    * });
    * ```
    */
-  public async editMessageReplyMarkup(options: EditMessageReplyMarkupOptions): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageReplyMarkup", options as unknown as Record<string, unknown>);
+  public async editMessageReplyMarkup(
+    options: EditMessageReplyMarkupOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editMessageReplyMarkup",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -686,7 +723,9 @@ export abstract class MessageMethods extends BaseBotClient {
     if (typeof options.reaction === "string") {
       reactionPayload = [{ type: "emoji", emoji: options.reaction }];
     } else if (Array.isArray(options.reaction)) {
-      reactionPayload = options.reaction.map((r) => (typeof r === "string" ? { type: "emoji", emoji: r } : r));
+      reactionPayload = options.reaction.map((r) =>
+        typeof r === "string" ? { type: "emoji", emoji: r } : r,
+      );
     } else if (options.reaction && typeof options.reaction === "object") {
       reactionPayload = [options.reaction];
     }
@@ -712,8 +751,17 @@ export abstract class MessageMethods extends BaseBotClient {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When clearing reaction fails.
    */
-  public async deleteMessageReaction(chatId: number | string, messageId: number, isBig?: boolean): Promise<boolean> {
-    return this.setMessageReaction({ chat_id: chatId, message_id: messageId, reaction: [], is_big: isBig });
+  public async deleteMessageReaction(
+    chatId: number | string,
+    messageId: number,
+    isBig?: boolean,
+  ): Promise<boolean> {
+    return this.setMessageReaction({
+      chat_id: chatId,
+      message_id: messageId,
+      reaction: [],
+      is_big: isBig,
+    });
   }
 
   /**
@@ -724,7 +772,10 @@ export abstract class MessageMethods extends BaseBotClient {
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When clearing reactions fails.
    */
-  public async deleteAllMessageReactions(chatId: number | string, messageId: number): Promise<boolean> {
+  public async deleteAllMessageReactions(
+    chatId: number | string,
+    messageId: number,
+  ): Promise<boolean> {
     return this.setMessageReaction({ chat_id: chatId, message_id: messageId, reaction: [] });
   }
 
@@ -743,7 +794,11 @@ export abstract class MessageMethods extends BaseBotClient {
    * console.log(`User has ${photos.total_count} total photos`);
    * ```
    */
-  public async getUserProfilePhotos(userId: number, offset?: number, limit?: number): Promise<UserProfilePhotos> {
+  public async getUserProfilePhotos(
+    userId: number,
+    offset?: number,
+    limit?: number,
+  ): Promise<UserProfilePhotos> {
     const payload: Record<string, unknown> = { user_id: userId };
     if (offset !== undefined) payload["offset"] = offset;
     if (limit !== undefined) payload["limit"] = limit;
@@ -878,10 +933,12 @@ export abstract class MessageMethods extends BaseBotClient {
    * @param limit - Maximum messages to return.
    * @returns Array of {@link Message} objects.
    */
-  public async getUserPersonalChatMessages(chatId: number | string, limit?: number): Promise<Message[]> {
+  public async getUserPersonalChatMessages(
+    chatId: number | string,
+    limit?: number,
+  ): Promise<Message[]> {
     const payload: Record<string, unknown> = { chat_id: chatId };
     if (limit !== undefined) payload["limit"] = limit;
     return this.request<Message[]>("getUserPersonalChatMessages", payload);
   }
 }
-

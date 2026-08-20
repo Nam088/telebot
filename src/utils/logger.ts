@@ -67,7 +67,10 @@ export class Logger implements ILogger {
     if (this.customLogger) {
       this.customLogger.debug(message, ...args);
     } else {
-      console.debug(`${this.formatTime()} \x1b[36mDEBUG\x1b[0m ${this.prefix}: ${message}`, ...args);
+      console.debug(
+        `${this.formatTime()} \x1b[36mDEBUG\x1b[0m ${this.prefix}: ${message}`,
+        ...args,
+      );
     }
   }
 
@@ -94,7 +97,10 @@ export class Logger implements ILogger {
     if (this.customLogger) {
       this.customLogger.error(message, ...args);
     } else {
-      console.error(`${this.formatTime()} \x1b[31mERROR\x1b[0m ${this.prefix}: ${message}`, ...args);
+      console.error(
+        `${this.formatTime()} \x1b[31mERROR\x1b[0m ${this.prefix}: ${message}`,
+        ...args,
+      );
     }
   }
 }

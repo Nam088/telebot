@@ -148,7 +148,7 @@ export abstract class BaseBotClient {
           throw new TelegramApiError(
             data.error_code ?? response.status,
             data.description ?? "Unknown error",
-            data.parameters
+            data.parameters,
           );
         }
 

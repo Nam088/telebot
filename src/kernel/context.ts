@@ -170,7 +170,7 @@ export class CallbackContext<
    */
   public async reply(
     text: string,
-    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text"> = {}
+    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text"> = {},
   ): Promise<import("../client/types.js").Message> {
     const chatId = this.update?.effective_chat?.id;
     if (!chatId) {
@@ -192,7 +192,7 @@ export class CallbackContext<
    */
   public async replyWithPhoto(
     photo: string | import("../utils/http.js").InputFile,
-    options: Omit<import("../client/types.js").SendPhotoOptions, "chat_id" | "photo"> = {}
+    options: Omit<import("../client/types.js").SendPhotoOptions, "chat_id" | "photo"> = {},
   ): Promise<import("../client/types.js").Message> {
     const chatId = this.update?.effective_chat?.id;
     if (!chatId) {
@@ -214,7 +214,7 @@ export class CallbackContext<
    */
   public async replyWithDocument(
     document: string | import("../utils/http.js").InputFile,
-    options: Omit<import("../client/types.js").SendDocumentOptions, "chat_id" | "document"> = {}
+    options: Omit<import("../client/types.js").SendDocumentOptions, "chat_id" | "document"> = {},
   ): Promise<import("../client/types.js").Message> {
     const chatId = this.update?.effective_chat?.id;
     if (!chatId) {
