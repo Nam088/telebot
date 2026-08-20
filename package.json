@@ -73,14 +73,38 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "keywords": [
     "telegram",
     "telegram-bot",
+    "telegram-bot-api",
+    "telegram-bot-framework",
+    "telegram-api",
     "bot",
-    "framework",
+    "bot-framework",
+    "telegram-stars",
+    "telegram-payments",
+    "telegram-mini-app",
+    "tma",
+    "rrule",
+    "rrule-scheduler",
+    "cron",
+    "scheduler",
     "typescript",
-    "zero-dependency"
+    "zero-dependency",
+    "native-fetch",
+    "sqlite-persistence",
+    "conversation-handler",
+    "nestjs-telegram",
+    "fast",
+    "lightweight"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tele-bot/tele-bot.git"
+  },
+  "homepage": "https://tele-bot.github.io/tele-bot/",
+  "bugs": {
+    "url": "https://github.com/tele-bot/tele-bot/issues"
+  },
   "author": "",
   "license": "MIT",
   "peerDependencies": {
