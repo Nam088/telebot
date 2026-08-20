@@ -15,7 +15,7 @@ Your objective is to implement **[Phase / Feature / Task IDs, e.g., Phase 4: Use
 - **Examples / Documentation**: `[e.g., examples/inlinekeyboard.ts, docs/]`
 
 ### 🔍 RESEARCH & GROUND TRUTH (ZERO-HALLUCINATION)
-- Proactively call `context7` MCP tools (`resolve-library-id` and `query-docs`) and refer to official API specifications (e.g., Telegram Bot API 8.0+) to verify parameters, payloads, and return types.
+- Proactively call `context7` MCP tools (`resolve-library-id` and `query-docs`) and refer to official API specifications (e.g., Telegram Bot API) to verify parameters, payloads, and return types.
 - **NEVER GUESS OR ASSUME** outdated signatures or deprecated behavior. Verify against official ground truth before writing code.
 
 ### 📐 TECHNICAL CONSTRAINTS & CODING RULES

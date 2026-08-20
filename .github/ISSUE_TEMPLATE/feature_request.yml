@@ -20,7 +20,7 @@ body:
     attributes:
       label: "Proposed Solution / Desired Behavior"
       description: "Describe the solution or API design you would like to see."
-      placeholder: "Add support for app.scheduler.runCron(...) or new Telegram 8.0 API method..."
+      placeholder: "Add support for app.scheduler.runCron(...) or new Telegram Bot API method..."
     validations:
       required: true
   - type: textarea
