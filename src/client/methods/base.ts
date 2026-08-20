@@ -32,6 +32,54 @@ export interface BotOptions {
    * Primarily customized in test suites for fast execution.
    */
   baseDelayMs?: number;
+
+  /**
+   * Per-request abort timeout in milliseconds. If a request (e.g. a hung connection) takes
+   * longer than this, it is aborted and treated as a retryable network error.
+   *
+   * @remarks
+   * For long-polling `getUpdates` calls, the effective timeout is automatically extended to
+   * cover the requested long-poll `timeout` (in seconds) plus a buffer, so a large poll
+   * timeout is never mistaken for a hang.
+   *
+   * @defaultValue `30000`
+   */
+  requestTimeoutMs?: number;
+}
+
+/**
+ * Maximum number of attempts (initial request plus retries) for a single {@link BaseBotClient.request} call.
+ */
+const MAX_ATTEMPTS = 4;
+
+/**
+ * Extra time, in milliseconds, added on top of a `getUpdates` long-poll `timeout` (converted
+ * to milliseconds) when computing the effective per-request abort timeout.
+ */
+const LONG_POLL_TIMEOUT_BUFFER_MS = 5000;
+
+/**
+ * Shape of the raw JSON envelope returned by every Telegram Bot API endpoint.
+ */
+interface TelegramApiEnvelope<T> {
+  ok: boolean;
+  result?: T;
+  error_code?: number;
+  description?: string;
+  parameters?: {
+    retry_after?: number;
+    migrate_to_chat_id?: number;
+  };
+}
+
+/**
+ * Computes the exponential backoff delay, in seconds, for a given attempt number.
+ *
+ * @param attempt - The 1-indexed attempt number that just failed.
+ * @returns Delay in seconds, following a `1, 2, 4, 8, ...` sequence capped at 30.
+ */
+function backoffSeconds(attempt: number): number {
+  return Math.min(30, 2 ** (attempt - 1));
 }
 
 /**
@@ -63,6 +111,11 @@ export abstract class BaseBotClient {
   protected readonly baseDelayMs?: number;
 
   /**
+   * Default per-request abort timeout in milliseconds.
+   */
+  protected readonly requestTimeoutMs: number;
+
+  /**
    * Constructs a new {@link BaseBotClient}.
    *
    * @param token - Telegram bot token received from BotFather. Must follow format `<bot_id>:<secret_token>`.
@@ -75,6 +128,7 @@ export abstract class BaseBotClient {
     this.apiRoot = options.apiRoot ?? "https://api.telegram.org";
     this._fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
     this.baseDelayMs = options.baseDelayMs;
+    this.requestTimeoutMs = options.requestTimeoutMs ?? 30_000;
   }
 
   /**

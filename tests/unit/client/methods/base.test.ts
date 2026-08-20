@@ -89,4 +89,65 @@ describe("BaseBotClient Core HTTP Engine", () => {
     expect(caught).toBeInstanceOf(TelegramApiError);
     expect((caught as TelegramApiError).message).not.toContain(token);
   });
+
+  it("caps retries on repeated 429 responses instead of retrying forever", async () => {
+    let callCount = 0;
+    const fakeFetch = vi.fn().mockImplementation(async () => {
+      callCount++;
+      return {
+        status: 429,
+        json: async () => ({
+          ok: false,
+          error_code: 429,
+          description: "Too Many Requests",
+          parameters: { retry_after: 0 },
+        }),
+      };
+    });
+
+    const client = new ConcreteBotClient("TEST_TOKEN", { fetch: fakeFetch, baseDelayMs: 1 });
+    await expect(client.request("test")).rejects.toThrow(TelegramApiError);
+    expect(callCount).toBe(4);
+  }, 2000);
+
+  it("uses a 1s, 2s, 4s exponential backoff sequence for retryable errors", async () => {
+    const fakeFetch = vi.fn().mockImplementation(async () => ({
+      status: 502,
+      statusText: "Bad Gateway",
+      json: async () => ({ ok: false, error_code: 502 }),
+    }));
+
+    const client = new ConcreteBotClient("TEST_TOKEN", { fetch: fakeFetch, baseDelayMs: 0 });
+    const sleepSpy = vi.spyOn(client, "sleep").mockResolvedValue();
+
+    await expect(client.request("test")).rejects.toThrow(TelegramApiError);
+    expect(sleepSpy.mock.calls.map((args) => args[0])).toEqual([1, 2, 4]);
+  });
+
+  it("aborts a hung request past requestTimeoutMs and retries", async () => {
+    let callCount = 0;
+    const fakeFetch = vi.fn().mockImplementation((_url: string, init?: RequestInit) => {
+      callCount++;
+      return new Promise((resolve, reject) => {
+        if (callCount === 1) {
+          // Simulate a hung connection: never resolves on its own, only on abort.
+          init?.signal?.addEventListener("abort", () => {
+            reject(new DOMException("The operation was aborted.", "AbortError"));
+          });
+          return;
+        }
+        resolve({ status: 200, json: async () => ({ ok: true, result: true }) });
+      });
+    });
+
+    const client = new ConcreteBotClient("TEST_TOKEN", {
+      fetch: fakeFetch,
+      baseDelayMs: 1,
+      requestTimeoutMs: 20,
+    });
+
+    const result = await client.request<boolean>("test");
+    expect(result).toBe(true);
+    expect(callCount).toBe(2);
+  }, 2000);
 });
