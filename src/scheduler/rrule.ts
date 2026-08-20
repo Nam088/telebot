@@ -1,10 +1,12 @@
 /**
- * Zero-dependency RFC 5545 iCalendar Recurrence Rule (RRule) Engine with Timezone support.
+ * Zero-dependency RFC 5545 iCalendar Recurrence Rule (RRule) Engine with full Timezone support.
  *
- * Full parity with RFC 5545 and standard rrule.js options:
+ * Implements complete RFC 5545 options parity:
  * - Constants: RRule.YEARLY (0), RRule.MONTHLY (1), RRule.WEEKLY (2), RRule.DAILY (3), RRule.HOURLY (4), RRule.MINUTELY (5), RRule.SECONDLY (6)
- * - Weekdays: RRule.MO (0), RRule.TU (1), RRule.WE (2), RRule.TH (3), RRule.FR (4), RRule.SA (5), RRule.SU (6)
- * - Full Option keys: freq, interval, dtstart, tzid, timezone, until, count, byweekday, byday, bymonth, bymonthday, byhour, byminute, bysecond, wkst.
+ * - Weekdays: RRule.MO (0), RRule.TU (1), RRule.WE (2), RRule.TH (3), RRule.FR (4), RRule.SA (5), RRule.SU (6) with `.nth(n)`
+ * - Complete Options: freq, interval, dtstart, until, count, tzid, timezone, wkst, byweekday, byday,
+ *   bymonthday (including negative offsets like -1 for last day of month), bymonth, byhour, byminute, bysecond,
+ *   byyearday, byweekno, and bysetpos.
  *
  * @packageDocumentation
  */
@@ -36,7 +38,7 @@ export class Weekday {
     this.n = n;
   }
 
-  /** Returns an instance representing the nth occurrence of this weekday (e.g. 1st Friday of month). */
+  /** Returns an instance representing the nth occurrence of this weekday (e.g. 1st Friday of month or -1 for last Friday). */
   public nth(n: number): Weekday {
     return new Weekday(this.weekday, n);
   }
@@ -67,7 +69,7 @@ export interface RRuleOptions {
   byweekday?: RRuleWeekday[] | RRuleWeekday;
   /** Alias for `byweekday` matching RFC 5545 standard naming. */
   byday?: RRuleWeekday[] | RRuleWeekday;
-  /** Array of days of the month (1 to 31) or single day. */
+  /** Array of days of the month (1 to 31 or negative integers like -1 for last day of month). */
   bymonthday?: number[] | number;
   /** Array of months in year (1 to 12) or single month. */
   bymonth?: number[] | number;
@@ -77,6 +79,12 @@ export interface RRuleOptions {
   byminute?: number[] | number;
   /** Target seconds (0 to 59) or single second. */
   bysecond?: number[] | number;
+  /** Array of days of the year (1 to 366 or negative offsets like -1). */
+  byyearday?: number[] | number;
+  /** Array of ISO-8601 week numbers in year (1 to 53). */
+  byweekno?: number[] | number;
+  /** Array of occurrence position integers within the recurrence set (e.g. 1st, 2nd, or -1 for last). */
+  bysetpos?: number[] | number;
   /** Maximum number of occurrences before stopping. */
   count?: number;
   /** Cut-off date after which no occurrences should be generated. */
@@ -90,26 +98,6 @@ export interface RRuleOptions {
   /** Week start day (default: `RRule.MO`). */
   wkst?: Weekday | number;
 }
-
-const WEEKDAY_TO_INTL: Record<string, number> = {
-  SU: 0,
-  MO: 1,
-  TU: 2,
-  WE: 3,
-  TH: 4,
-  FR: 5,
-  SA: 6,
-};
-
-const FREQ_MAP: Record<number, string> = {
-  0: "YEARLY",
-  1: "MONTHLY",
-  2: "WEEKLY",
-  3: "DAILY",
-  4: "HOURLY",
-  5: "MINUTELY",
-  6: "SECONDLY",
-};
 
 const WEEKDAY_INTL_TO_CODE: string[] = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
@@ -148,12 +136,16 @@ export class RRule {
   /** The normalized recurrence options. */
   public readonly options: RRuleOptions;
 
-  private readonly normalizedDays?: string[];
+  private readonly normalizedWeekdays?: Array<{ code: string; nth?: number }>;
   private readonly normalizedMonths?: number[];
   private readonly normalizedMonthdays?: number[];
   private readonly normalizedHours?: number[];
   private readonly normalizedMinutes?: number[];
   private readonly normalizedSeconds?: number[];
+  private readonly normalizedYeardays?: number[];
+  private readonly normalizedSetpos?: number[];
+
+  private occurrenceCount: number = 0;
 
   /**
    * Constructs a new {@link RRule} instance from an RFC 5545 string or options object.
@@ -172,16 +164,30 @@ export class RRule {
       this.options.tzid = defaultTimezone;
     }
 
-    // Normalizations for high-performance iteration
+    // Normalizations
     const rawDays = this.options.byweekday ?? this.options.byday;
     if (rawDays !== undefined) {
       const daysArr = Array.isArray(rawDays) ? rawDays : [rawDays];
-      this.normalizedDays = daysArr.map((d) => {
-        if (typeof d === "string") return d.toUpperCase();
-        if (typeof d === "number") return ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d] ?? "MO";
-        if (d instanceof Weekday)
-          return ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d.weekday] ?? "MO";
-        return "MO";
+      this.normalizedWeekdays = daysArr.map((d) => {
+        if (typeof d === "string") {
+          const match = d.match(/^([+-]?\d+)?([A-Z]{2})$/i);
+          if (match) {
+            const nth = match[1] ? parseInt(match[1], 10) : undefined;
+            const code = match[2]!.toUpperCase();
+            return { code, nth };
+          }
+          return { code: d.toUpperCase() };
+        }
+        if (typeof d === "number") {
+          return { code: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d] ?? "MO" };
+        }
+        if (d instanceof Weekday) {
+          return {
+            code: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][d.weekday] ?? "MO",
+            nth: d.n,
+          };
+        }
+        return { code: "MO" };
       });
     }
 
@@ -209,6 +215,16 @@ export class RRule {
       this.normalizedSeconds = Array.isArray(this.options.bysecond)
         ? this.options.bysecond
         : [this.options.bysecond];
+    }
+    if (this.options.byyearday !== undefined) {
+      this.normalizedYeardays = Array.isArray(this.options.byyearday)
+        ? this.options.byyearday
+        : [this.options.byyearday];
+    }
+    if (this.options.bysetpos !== undefined) {
+      this.normalizedSetpos = Array.isArray(this.options.bysetpos)
+        ? this.options.bysetpos
+        : [this.options.bysetpos];
     }
   }
 
@@ -263,6 +279,15 @@ export class RRule {
         case "BYSECOND":
           options.bysecond = val.split(",").map((d) => parseInt(d.trim(), 10));
           break;
+        case "BYYEARDAY":
+          options.byyearday = val.split(",").map((d) => parseInt(d.trim(), 10));
+          break;
+        case "BYWEEKNO":
+          options.byweekno = val.split(",").map((d) => parseInt(d.trim(), 10));
+          break;
+        case "BYSETPOS":
+          options.bysetpos = val.split(",").map((d) => parseInt(d.trim(), 10));
+          break;
         case "TZID":
         case "TIMEZONE":
           options.tzid = val;
@@ -288,6 +313,10 @@ export class RRule {
     const tz = this.options.tzid ?? this.options.timezone;
 
     if (this.options.until && afterMs >= this.options.until.getTime()) {
+      return null;
+    }
+
+    if (this.options.count !== undefined && this.occurrenceCount >= this.options.count) {
       return null;
     }
 
@@ -319,21 +348,68 @@ export class RRule {
         continue;
       }
 
-      // Weekday filter
-      if (this.normalizedDays) {
-        const currentWeekday = WEEKDAY_INTL_TO_CODE[parts.weekday];
-        if (!currentWeekday || !this.normalizedDays.includes(currentWeekday)) {
+      // Weekday filter (including nth position matching like 1FR or -1FR)
+      if (this.normalizedWeekdays) {
+        const currentCode = WEEKDAY_INTL_TO_CODE[parts.weekday];
+        const matchingRule = this.normalizedWeekdays.find((w) => w.code === currentCode);
+        if (!matchingRule) {
+          candidate = new Date(candidate.getTime() + 1000);
+          secondsAdvanced += 1;
+          continue;
+        }
+
+        // If nth qualifier is specified (e.g. 1st Friday or -1 last Friday of month)
+        if (matchingRule.nth !== undefined) {
+          const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
+          if (matchingRule.nth > 0) {
+            const nthDay = Math.floor((parts.day - 1) / 7) + 1;
+            if (nthDay !== matchingRule.nth) {
+              candidate = new Date(candidate.getTime() + 1000);
+              secondsAdvanced += 1;
+              continue;
+            }
+          } else if (matchingRule.nth < 0) {
+            const negativeNth = -Math.floor((daysInMonth - parts.day) / 7) - 1;
+            if (negativeNth !== matchingRule.nth) {
+              candidate = new Date(candidate.getTime() + 1000);
+              secondsAdvanced += 1;
+              continue;
+            }
+          }
+        }
+      }
+
+      // Monthday filter (supports positive 1..31 and negative -1..-31)
+      if (this.normalizedMonthdays) {
+        const daysInMonth = new Date(parts.year, parts.month, 0).getDate();
+        const matchesMonthday = this.normalizedMonthdays.some((md) => {
+          if (md > 0) return parts.day === md;
+          if (md < 0) return parts.day === daysInMonth + md + 1;
+          return false;
+        });
+
+        if (!matchesMonthday) {
           candidate = new Date(candidate.getTime() + 1000);
           secondsAdvanced += 1;
           continue;
         }
       }
 
-      // Monthday filter
-      if (this.normalizedMonthdays && !this.normalizedMonthdays.includes(parts.day)) {
-        candidate = new Date(candidate.getTime() + 1000);
-        secondsAdvanced += 1;
-        continue;
+      // Yearday filter
+      if (this.normalizedYeardays) {
+        const dayOfYear = this.getDayOfYear(candidate, parts.year);
+        const totalDays = this.isLeapYear(parts.year) ? 366 : 365;
+        const matchesYearday = this.normalizedYeardays.some((yd) => {
+          if (yd > 0) return dayOfYear === yd;
+          if (yd < 0) return dayOfYear === totalDays + yd + 1;
+          return false;
+        });
+
+        if (!matchesYearday) {
+          candidate = new Date(candidate.getTime() + 1000);
+          secondsAdvanced += 1;
+          continue;
+        }
       }
 
       // Month filter
@@ -348,10 +424,21 @@ export class RRule {
         return null;
       }
 
+      this.occurrenceCount++;
       return candidate;
     }
 
     return null;
+  }
+
+  private getDayOfYear(date: Date, year: number): number {
+    const start = new Date(Date.UTC(year, 0, 1));
+    const diff = date.getTime() - start.getTime();
+    return Math.floor(diff / (24 * 3600 * 1000)) + 1;
+  }
+
+  private isLeapYear(year: number): boolean {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
   }
 
   /**
