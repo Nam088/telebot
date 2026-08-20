@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { TelegramModule, Update, Command, Hears, Action, InjectBot, getParamTokenMetadata } from "../../../src/nest/index.js";
+import {
+  TelegramModule,
+  Update,
+  Command,
+  Hears,
+  Action,
+  InjectBot,
+  getParamTokenMetadata,
+} from "../../../src/nest/index.js";
 import { Application } from "../../../src/kernel/app.js";
 import { Bot } from "../../../src/client/bot.js";
 
