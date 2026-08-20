@@ -1,12 +1,12 @@
 name: "Feature Request"
-description: "Suggest a new feature or API capability for the tele-bot framework"
+description: "Suggest a new feature or API capability for the telebot-ts framework"
 title: "[Feat]: "
 labels: ["enhancement", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for suggesting a feature to make tele-bot even better!
+        Thank you for suggesting a feature to make telebot-ts even better!
   - type: textarea
     id: problem
     attributes:

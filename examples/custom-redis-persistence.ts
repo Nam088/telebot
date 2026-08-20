@@ -86,7 +86,7 @@ export class RedisPersistence implements Persistence {
   }
 }
 
-// --- 2. Attach Custom RedisPersistence to tele-bot Application ---
+// --- 2. Attach Custom RedisPersistence to telebot-ts Application ---
 const token = process.env.BOT_TOKEN || "123456:MOCK_TOKEN";
 const redisPersistence = new RedisPersistence();
 

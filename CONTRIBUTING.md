@@ -1,6 +1,6 @@
-# Contributing to tele-bot
+# Contributing to telebot-ts
 
-Thank you for your interest in contributing to `tele-bot`! This document outlines the guidelines, architecture rules, and automated release workflow for the project.
+Thank you for your interest in contributing to `telebot-ts`! This document outlines the guidelines, architecture rules, and automated release workflow for the project.
 
 ---
 

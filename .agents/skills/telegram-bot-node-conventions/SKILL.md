@@ -1,12 +1,12 @@
 ---
 name: telegram-bot-node-conventions
-description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or TypeDoc docstrings to the tele-bot framework. Use whenever creating, modifying, or reviewing code in the repository.
+description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or TypeDoc docstrings to the telebot-ts framework. Use whenever creating, modifying, or reviewing code in the repository.
 ---
 
 # Telegram Bot Node Conventions & Feature Development Workflow
 
 ## 1. Overview
-`tele-bot` is a zero-required-dependency, TypeScript-first Telegram Bot framework for Node.js.
+`telebot-ts` is a zero-required-dependency, TypeScript-first Telegram Bot framework for Node.js.
 When adding new methods, features, handlers, or drivers, agents must strictly follow the architectural patterns, naming conventions, zero-dependency policy, TDD workflow, and TypeDoc documentation standards described below.
 
 ---
