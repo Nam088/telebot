@@ -1,0 +1,44 @@
+name: Publish Beta Release to npm
+
+on:
+  push:
+    tags:
+      - "v*-beta.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "npm dist-tag (e.g. beta, next)"
+        required: true
+        default: "beta"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-beta:
+    name: Publish Beta Package (Trusted Publishing)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Quality Gates
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm run build
+          npm test
+          npm run docs
+
+      - name: Publish to npm under beta tag via OIDC
+        run: npm publish --provenance --access public --tag ${{ github.event.inputs.tag || 'beta' }}
