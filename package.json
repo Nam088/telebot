@@ -100,11 +100,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tele-bot/tele-bot.git"
+    "url": "https://github.com/nam088/tele-bot.git"
   },
-  "homepage": "https://tele-bot.github.io/tele-bot/",
+  "homepage": "https://nam088.github.io/tele-bot/",
   "bugs": {
-    "url": "https://github.com/tele-bot/tele-bot/issues"
+    "url": "https://github.com/nam088/tele-bot/issues"
   },
   "author": "",
   "license": "MIT",
