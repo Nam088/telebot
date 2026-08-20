@@ -23,6 +23,10 @@
           { "type": "style", "release": false },
           { "type": "test", "release": false },
           { "scope": "ci", "release": false },
+          { "scope": "deps", "release": false },
+          { "scope": "devDeps", "release": false },
+          { "scope": "dev-deps", "release": false },
+          { "scope": "security", "release": false },
           { "breaking": true, "release": "major" }
         ]
       }
