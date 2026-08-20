@@ -2,7 +2,7 @@
  * Custom Prisma ORM Persistence Driver Example.
  *
  * Demonstrates integrating popular ORMs (like Prisma, Drizzle, TypeORM)
- * with tele-bot persistence to store bot state in existing production databases.
+ * with telebot-ts persistence to store bot state in existing production databases.
  *
  * Usage:
  * BOT_TOKEN="your_token_here" npx tsx examples/custom-prisma-persistence.ts

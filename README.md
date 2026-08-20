@@ -1,8 +1,8 @@
-# tele-bot
+# telebot-ts
 
 > A modern, zero-dependency, high-performance, and type-safe Telegram Bot framework for Node.js and TypeScript.
 
-[![npm version](https://img.shields.io/npm/v/tele-bot.svg)](https://www.npmjs.com/package/tele-bot)
+[![npm version](https://img.shields.io/npm/v/telebot-ts.svg)](https://www.npmjs.com/package/telebot-ts)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
 [![Coverage](https://img.shields.io/badge/Coverage-95.39%25-brightgreen.svg)]()
@@ -13,14 +13,14 @@
 
 ## Overview
 
-`tele-bot` is built from the ground up for modern Node.js environments (v22+). It offers complete coverage of the Telegram Bot API with zero required external runtime dependencies, leveraging native platform features such as `globalThis.fetch`, `node:sqlite`, and `node:http`.
+`telebot-ts` is built from the ground up for modern Node.js environments (v22+). It offers complete coverage of the Telegram Bot API with zero required external runtime dependencies, leveraging native platform features such as `globalThis.fetch`, `node:sqlite`, and `node:http`.
 
 ### Highlights
 
 - **Zero Required Runtime Dependencies**: Runs entirely on native Node.js built-ins.
 - **Full API Parity**: Comprehensive coverage of all Bot API methods, including Telegram Stars, Paid Media, Webhooks, Stories, Business Accounts, and Star Gifts.
 - **End-to-End Type Safety**: 100% strict TypeScript types and IntelliSense autocompletion across all payloads and parameters.
-- **Domain-Driven Architecture**: Subpath exports for optimal tree-shaking (`tele-bot/client`, `tele-bot/kernel`, `tele-bot/routing`, `tele-bot/filters`, `tele-bot/storage`, `tele-bot/scheduler`, `tele-bot/ui`).
+- **Domain-Driven Architecture**: Subpath exports for optimal tree-shaking (`telebot-ts/client`, `telebot-ts/kernel`, `telebot-ts/routing`, `telebot-ts/filters`, `telebot-ts/storage`, `telebot-ts/scheduler`, `telebot-ts/ui`).
 - **Flexible State Management**: Supports sequential wizard flows (`LinearConversation`), finite state machines (`ConversationHandler`), and persistent storage drivers (Memory, JSON file, SQLite).
 - **Production-Ready Webhooks**: Built-in HTTP webhook server with automatic secret token verification and custom server integration.
 - **Reliable Networking**: Automatic exponential backoff for rate limits (`429 Too Many Requests`) and server errors (`5xx`).
@@ -37,7 +37,7 @@
 ## Installation
 
 ```bash
-npm install tele-bot
+npm install telebot-ts
 ```
 
 ---
@@ -54,7 +54,7 @@ import {
   filters,
   type Update,
   type CallbackContext,
-} from "tele-bot";
+} from "telebot-ts";
 
 const app = new ApplicationBuilder()
   .token(process.env.BOT_TOKEN!)
@@ -66,7 +66,7 @@ app.addHandler(
     const name = update.effective_user?.first_name ?? "friend";
     await context.bot.sendMessage({
       chat_id: update.effective_chat!.id,
-      text: `Hello ${name}! Welcome to tele-bot.`,
+      text: `Hello ${name}! Welcome to telebot-ts.`,
     });
   })
 );
@@ -89,17 +89,17 @@ await app.runPolling({ drop_pending_updates: true });
 
 ## Architecture & Subpath Exports
 
-`tele-bot` is structured as modular subpaths, allowing you to import only what you need:
+`telebot-ts` is structured as modular subpaths, allowing you to import only what you need:
 
 ```typescript
-import { Application, ApplicationBuilder } from "tele-bot";          // Core framework
-import { Bot, TelegramApiError } from "tele-bot/client";             // Low-level Bot API client
-import { CommandHandler, MessageHandler } from "tele-bot/routing";   // Update handlers
-import { filters } from "tele-bot/filters";                          // Update and message filters
-import { SqlitePersistence, JsonFilePersistence } from "tele-bot/storage"; // State storage
-import { JobQueue } from "tele-bot/scheduler";                       // Background job runner
-import { InlineKeyboard, ReplyKeyboard } from "tele-bot/ui";         // Keyboard layout builders
-import { logger } from "tele-bot/utils";                             // Structured logging
+import { Application, ApplicationBuilder } from "telebot-ts";          // Core framework
+import { Bot, TelegramApiError } from "telebot-ts/client";             // Low-level Bot API client
+import { CommandHandler, MessageHandler } from "telebot-ts/routing";   // Update handlers
+import { filters } from "telebot-ts/filters";                          // Update and message filters
+import { SqlitePersistence, JsonFilePersistence } from "telebot-ts/storage"; // State storage
+import { JobQueue } from "telebot-ts/scheduler";                       // Background job runner
+import { InlineKeyboard, ReplyKeyboard } from "telebot-ts/ui";         // Keyboard layout builders
+import { logger } from "telebot-ts/utils";                             // Structured logging
 ```
 
 ---
@@ -111,7 +111,7 @@ import { logger } from "tele-bot/utils";                             // Structur
 Write step-by-step interactive dialogs sequentially in an `async/await` handler without managing complex state transitions:
 
 ```typescript
-import { LinearConversation } from "tele-bot";
+import { LinearConversation } from "telebot-ts";
 
 const onboarding = new LinearConversation(async (control) => {
   await control.reply("What is your username?");
@@ -135,7 +135,7 @@ app.addHandler(onboarding.createHandler("/register"));
 For branching workflows with explicit states, fallbacks, and persistence across restarts:
 
 ```typescript
-import { ConversationHandler, CommandHandler, MessageHandler, filters } from "tele-bot";
+import { ConversationHandler, CommandHandler, MessageHandler, filters } from "telebot-ts";
 
 const STATE_NAME = 1;
 const STATE_PHOTO = 2;
@@ -199,7 +199,7 @@ app.addHandler(profileHandler);
 Preserve user session data, conversation progress, and bot metadata across application restarts:
 
 ```typescript
-import { ApplicationBuilder, SqlitePersistence } from "tele-bot";
+import { ApplicationBuilder, SqlitePersistence } from "telebot-ts";
 
 // Native SQLite storage powered by Node.js built-in node:sqlite
 const persistence = new SqlitePersistence({
@@ -246,7 +246,7 @@ app.addHandler(
 Construct clean inline and reply keyboards with a chainable builder API:
 
 ```typescript
-import { InlineKeyboard, ReplyKeyboard } from "tele-bot";
+import { InlineKeyboard, ReplyKeyboard } from "telebot-ts";
 
 // Inline Keyboard markup
 const inlineMenu = new InlineKeyboard()
@@ -300,7 +300,7 @@ await app.runWebhook({
 Send files seamlessly using File IDs, remote URLs, or in-memory binary buffers:
 
 ```typescript
-import { InputFile } from "tele-bot";
+import { InputFile } from "telebot-ts";
 import * as fs from "node:fs/promises";
 
 // Upload buffer directly
@@ -319,7 +319,7 @@ await bot.sendDocument({
 Integrated zero-dependency structured logger with support for external logging libraries (Pino, Winston):
 
 ```typescript
-import { logger } from "tele-bot";
+import { logger } from "telebot-ts";
 
 // Adjust logging verbosity
 logger.setLevel("debug");
@@ -368,4 +368,4 @@ npm run docs
 
 ## License
 
-MIT License (c) 2026 tele-bot contributors.
+MIT License (c) 2026 telebot-ts contributors.

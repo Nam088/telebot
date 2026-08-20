@@ -1,12 +1,12 @@
 name: "Bug Report"
-description: "Report a bug or unexpected behavior in tele-bot"
+description: "Report a bug or unexpected behavior in telebot-ts"
 title: "[Bug]: "
 labels: ["bug", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to report a bug in tele-bot!
+        Thank you for taking the time to report a bug in telebot-ts!
   - type: textarea
     id: description
     attributes:
@@ -22,7 +22,7 @@ body:
       description: "Please provide a minimal, self-contained code snippet to reproduce the issue."
       render: typescript
       placeholder: |
-        import { Application } from "tele-bot";
+        import { Application } from "telebot-ts";
         const app = new Application("123456:TOKEN");
         // Steps to trigger the bug...
     validations:
@@ -39,7 +39,7 @@ body:
     id: environment
     attributes:
       label: "Environment Details"
-      description: "Node.js version, OS, tele-bot version."
-      placeholder: "Node.js v22.12.0, macOS Sequoia, tele-bot v1.0.0"
+      description: "Node.js version, OS, telebot-ts version."
+      placeholder: "Node.js v22.12.0, macOS Sequoia, telebot-ts v1.0.0"
     validations:
       required: true

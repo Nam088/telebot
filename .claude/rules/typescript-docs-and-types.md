@@ -33,4 +33,4 @@ Every public class, interface, method, type alias, and export must include full 
 
 ## 5. Absolute Privacy & Clean Branding (NO Python / Migration References)
 - **STRICT PROHIBITION**: Do NOT mention Python, `python-telegram-bot`, or "migration from Python" in any public JSDoc/TSDoc comments, user-facing README, `package.json`, generated docs, or exported types.
-- Frame `tele-bot` exclusively as a modern, zero-dependency, native TypeScript Telegram Bot framework for Node.js.
+- Frame `telebot-ts` exclusively as a modern, zero-dependency, native TypeScript Telegram Bot framework for Node.js.

@@ -1,7 +1,7 @@
 /**
  * NestJS Telegram Bot Integration Example.
  *
- * Demonstrates using `tele-bot/nest` to build Telegram Bots within a NestJS application
+ * Demonstrates using `telebot-ts/nest` to build Telegram Bots within a NestJS application
  * using standard `@Update()`, `@Command()`, `@Hears()`, and `@Action()` decorators
  * with ZERO runtime dependencies (no `@nestjs/core` required in package dependencies).
  *
@@ -58,7 +58,7 @@ class BotUpdateService {
 const app = new Application().token(token).build();
 const serviceInstance = new BotUpdateService();
 
-// Bind discovered NestJS providers to the tele-bot engine
+// Bind discovered NestJS providers to the telebot-ts engine
 TelegramModule.bindHandlers(app, [serviceInstance]);
 
 console.log("NestJS Telegram Bot is running in polling mode...");

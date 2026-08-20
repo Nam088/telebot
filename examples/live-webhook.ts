@@ -46,7 +46,7 @@ app.addHandler(
 
     console.log(`[Webhook Triggered] /ping received. Latency: ${diff}ms`);
     await ctx.reply(
-      `<b>Pong!</b>\n\nLatency: ~${diff}ms\nEngine: tele-bot (Node.js native)\nMode: Webhook (Secret Token verified)`,
+      `<b>Pong!</b>\n\nLatency: ~${diff}ms\nEngine: telebot-ts (Node.js native)\nMode: Webhook (Secret Token verified)`,
       { parse_mode: "HTML" }
     );
   })
@@ -63,10 +63,10 @@ app.addHandler(
       {
         type: "article",
         id: "1",
-        title: `Search: "${query || "tele-bot framework"}"`,
+        title: `Search: "${query || "telebot-ts framework"}"`,
         description: "Send search card to chat",
         input_message_content: {
-          message_text: `<b>Search Result:</b>\n\nKeyword: <code>${query || "tele-bot"}</code>\nEngine: tele-bot Native TypeScript`,
+          message_text: `<b>Search Result:</b>\n\nKeyword: <code>${query || "telebot-ts"}</code>\nEngine: telebot-ts Native TypeScript`,
           parse_mode: "HTML",
         },
       },
@@ -76,7 +76,7 @@ app.addHandler(
         title: "Documentation",
         description: "Zero-dependency TypeScript Telegram Bot Engine",
         input_message_content: {
-          message_text: "<b>tele-bot Documentation:</b>\n\n- Zero Runtime Dependencies\n- Native Node.js 22+ (SQLite, Fetch)\n- Strict Type Safety",
+          message_text: "<b>telebot-ts Documentation:</b>\n\n- Zero Runtime Dependencies\n- Native Node.js 22+ (SQLite, Fetch)\n- Strict Type Safety",
           parse_mode: "HTML",
         },
       },

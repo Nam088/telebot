@@ -23,7 +23,7 @@ jobs:
         id: release
         with:
           release-type: node
-          package-name: tele-bot
+          package-name: telebot-ts
 
       - name: Checkout repository
         if: ${{ steps.release.outputs.release_created }}
