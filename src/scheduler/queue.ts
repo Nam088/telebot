@@ -300,6 +300,8 @@ export class JobQueue {
       jobQueue: this,
       nextRunMs: nextDate.getTime(),
       rrule,
+      rruleOptions: options.rrule,
+      timezone: options.timezone,
       data: options.data,
       chat_id: options.chat_id,
       user_id: options.user_id,
@@ -394,6 +396,8 @@ export class JobQueue {
           name: job.name,
           nextRun: job.next_t,
           interval: job.intervalMs,
+          rrule: job.rruleOptions,
+          timezone: job.timezone,
           data: job.data,
         });
       }
