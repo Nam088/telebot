@@ -800,6 +800,67 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
   }
 
   /**
+   * Sends a structured rich formatted message (Bot API 10.1+).
+   *
+   * @param options - Rich message options including `chat_id` and `rich_message`.
+   * @returns The sent {@link Message}.
+   */
+  public async sendRichMessage(options: Record<string, unknown>): Promise<Message> {
+    return this.request<Message>("sendRichMessage", options);
+  }
+
+  /**
+   * Streams a draft of a rich formatted message (Bot API 10.1+).
+   *
+   * @param options - Rich message draft options.
+   * @returns `true` on success.
+   */
+  public async sendRichMessageDraft(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("sendRichMessageDraft", options);
+  }
+
+  /**
+   * Edits an ephemeral message text (Bot API 10.2+).
+   *
+   * @param options - Ephemeral message edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageText(options: Record<string, unknown>): Promise<Message | boolean> {
+    return this.request<Message | boolean>("editEphemeralMessageText", options);
+  }
+
+  /**
+   * Deletes an ephemeral message (Bot API 10.2+).
+   *
+   * @param chatId - Chat identifier.
+   * @param messageId - Message identifier.
+   * @returns `true` on success.
+   */
+  public async deleteEphemeralMessage(chatId: number | string, messageId: number): Promise<boolean> {
+    return this.request<boolean>("deleteEphemeralMessage", { chat_id: chatId, message_id: messageId });
+  }
+
+  /**
+   * Answers a chat join request query from a user (Bot API 10.1+).
+   *
+   * @param options - Query response options.
+   * @returns `true` on success.
+   */
+  public async answerChatJoinRequestQuery(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("answerChatJoinRequestQuery", options);
+  }
+
+  /**
+   * Sends a Web App for a chat join request (Bot API 10.1+).
+   *
+   * @param options - Join request Web App options.
+   * @returns `true` on success.
+   */
+  public async sendChatJoinRequestWebApp(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("sendChatJoinRequestWebApp", options);
+  }
+
+  /**
    * General-purpose raw API method executor.
    *
    * @typeParam T - Expected result payload type.
