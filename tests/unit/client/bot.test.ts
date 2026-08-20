@@ -839,4 +839,458 @@ describe("Bot API stickers and custom emoji methods", () => {
   });
 });
 
+describe("Bot API Payments and Telegram Stars methods", () => {
+  const createMockBot = (result: unknown) => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result }),
+    });
+    return { bot: new Bot("TEST_TOKEN", { fetch: fakeFetch }), fakeFetch };
+  };
+
+  it("sendInvoice sends invoice request and returns Message", async () => {
+    const expectedMsg = {
+      message_id: 200,
+      chat: { id: 123456, type: "private" },
+      invoice: {
+        title: "Product A",
+        description: "Test product",
+        start_parameter: "prod_a",
+        currency: "USD",
+        total_amount: 1000,
+      },
+    };
+    const { bot, fakeFetch } = createMockBot(expectedMsg);
+
+    const res = await bot.sendInvoice({
+      chat_id: 123456,
+      title: "Product A",
+      description: "Test product",
+      payload: "payload_123",
+      currency: "USD",
+      prices: [{ label: "Base", amount: 1000 }],
+      start_parameter: "prod_a",
+    });
+
+    expect(res).toEqual(expectedMsg);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    expect(fakeFetch.mock.calls[0][0]).toContain("/sendInvoice");
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      chat_id: 123456,
+      title: "Product A",
+      description: "Test product",
+      payload: "payload_123",
+      currency: "USD",
+      prices: [{ label: "Base", amount: 1000 }],
+      start_parameter: "prod_a",
+    });
+  });
+
+  it("createInvoiceLink generates invoice link string", async () => {
+    const expectedLink = "https://t.me/$invoice_link_123";
+    const { bot, fakeFetch } = createMockBot(expectedLink);
+
+    const res = await bot.createInvoiceLink({
+      title: "Donation",
+      description: "Support project",
+      payload: "don_1",
+      currency: "XTR",
+      prices: [{ label: "Stars", amount: 50 }],
+    });
+
+    expect(res).toBe(expectedLink);
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    expect(fakeFetch.mock.calls[0][0]).toContain("/createInvoiceLink");
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      title: "Donation",
+      description: "Support project",
+      payload: "don_1",
+      currency: "XTR",
+      prices: [{ label: "Stars", amount: 50 }],
+    });
+  });
+
+  it("answerShippingQuery handles success and error cases", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.answerShippingQuery({
+      shipping_query_id: "sq_1",
+      ok: true,
+      shipping_options: [
+        { id: "std", title: "Standard", prices: [{ label: "Post", amount: 200 }] },
+      ],
+    });
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      shipping_query_id: "sq_1",
+      ok: true,
+      shipping_options: [
+        { id: "std", title: "Standard", prices: [{ label: "Post", amount: 200 }] },
+      ],
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.answerShippingQuery({
+      shipping_query_id: "sq_2",
+      ok: false,
+      error_message: "Cannot ship to location",
+    });
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      shipping_query_id: "sq_2",
+      ok: false,
+      error_message: "Cannot ship to location",
+    });
+  });
+
+  it("answerPreCheckoutQuery handles success and error cases", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const res1 = await bot1.answerPreCheckoutQuery({
+      pre_checkout_query_id: "pcq_1",
+      ok: true,
+    });
+    expect(res1).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      pre_checkout_query_id: "pcq_1",
+      ok: true,
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const res2 = await bot2.answerPreCheckoutQuery({
+      pre_checkout_query_id: "pcq_2",
+      ok: false,
+      error_message: "Item out of stock",
+    });
+    expect(res2).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      pre_checkout_query_id: "pcq_2",
+      ok: false,
+      error_message: "Item out of stock",
+    });
+  });
+
+  it("refundStarPayment sends refund request", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+    const res = await bot.refundStarPayment(123456, "tx_charge_123");
+    expect(res).toBe(true);
+    expect(fakeFetch.mock.calls[0][0]).toContain("/refundStarPayment");
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      user_id: 123456,
+      telegram_payment_charge_id: "tx_charge_123",
+    });
+  });
+
+  it("getStarTransactions retrieves list of transactions", async () => {
+    const expectedTxs = {
+      transactions: [
+        {
+          id: "tx_1",
+          amount: 50,
+          nanostar_amount: 0,
+          date: 1700000000,
+        },
+      ],
+    };
+    const { bot, fakeFetch } = createMockBot(expectedTxs);
+    const res = await bot.getStarTransactions(10, 20);
+    expect(res).toEqual(expectedTxs);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({ offset: 10, limit: 20 });
+  });
+
+  it("editUserStarSubscription modifies user subscription status", async () => {
+    const { bot, fakeFetch } = createMockBot(true);
+    const res = await bot.editUserStarSubscription(123456, "sub_charge_1", true);
+    expect(res).toBe(true);
+    const body = JSON.parse(fakeFetch.mock.calls[0][1].body);
+    expect(body).toEqual({
+      user_id: 123456,
+      telegram_payment_charge_id: "sub_charge_1",
+      is_canceled: true,
+    });
+  });
+
+  it("getMyStarBalance retrieves StarAmount", async () => {
+    const expectedBalance = { amount: 1500, nanostar_amount: 500000000 };
+    const { bot, fakeFetch } = createMockBot(expectedBalance);
+    const res = await bot.getMyStarBalance();
+    expect(res).toEqual(expectedBalance);
+    expect(fakeFetch.mock.calls[0][0]).toContain("/getMyStarBalance");
+  });
+});
+
+describe("Bot API Profile, Admin Rights, Menu Button and Topics methods", () => {
+  const createMockBot = (result: unknown) => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result }),
+    });
+    return { bot: new Bot("TEST_TOKEN", { fetch: fakeFetch }), fakeFetch };
+  };
+
+  it("setMyName and getMyName", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setMyName("SuperBot", "en");
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ name: "SuperBot", language_code: "en" });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot({ name: "SuperBot" });
+    const getRes = await bot2.getMyName("en");
+    expect(getRes).toEqual({ name: "SuperBot" });
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ language_code: "en" });
+  });
+
+  it("setMyDescription and getMyDescription", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setMyDescription("Bot description", "en");
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ description: "Bot description", language_code: "en" });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot({ description: "Bot description" });
+    const getRes = await bot2.getMyDescription("en");
+    expect(getRes).toEqual({ description: "Bot description" });
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ language_code: "en" });
+  });
+
+  it("setMyShortDescription and getMyShortDescription", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setMyShortDescription("Short desc", "en");
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ short_description: "Short desc", language_code: "en" });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot({ short_description: "Short desc" });
+    const getRes = await bot2.getMyShortDescription("en");
+    expect(getRes).toEqual({ short_description: "Short desc" });
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ language_code: "en" });
+  });
+
+  it("setMyDefaultAdministratorRights and getMyDefaultAdministratorRights", async () => {
+    const rights = {
+      is_anonymous: false,
+      can_manage_chat: true,
+      can_delete_messages: true,
+      can_manage_video_chats: false,
+      can_restrict_members: true,
+      can_promote_members: false,
+      can_change_info: true,
+      can_invite_users: true,
+    };
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setMyDefaultAdministratorRights(rights, true);
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ rights, for_channels: true });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(rights);
+    const getRes = await bot2.getMyDefaultAdministratorRights(true);
+    expect(getRes).toEqual(rights);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ for_channels: true });
+  });
+
+  it("setChatMenuButton and getChatMenuButton", async () => {
+    const menuBtn = {
+      type: "web_app" as const,
+      text: "App",
+      web_app: { url: "https://example.com" },
+    };
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setChatMenuButton(123456, menuBtn);
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({ chat_id: 123456, menu_button: menuBtn });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(menuBtn);
+    const getRes = await bot2.getChatMenuButton(123456);
+    expect(getRes).toEqual(menuBtn);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({ chat_id: 123456 });
+  });
+
+  it("createForumTopic, editForumTopic, close/reopen/delete/unpin topic messages", async () => {
+    const expectedTopic = {
+      message_thread_id: 42,
+      name: "Discussion",
+      icon_color: 0x6FB9F0,
+      icon_custom_emoji_id: "emoji_custom_1",
+    };
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(expectedTopic);
+    const createRes = await bot1.createForumTopic({
+      chat_id: -100123456,
+      name: "Discussion",
+      icon_color: 0x6FB9F0,
+      icon_custom_emoji_id: "emoji_custom_1",
+    });
+    expect(createRes).toEqual(expectedTopic);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      chat_id: -100123456,
+      name: "Discussion",
+      icon_color: 0x6FB9F0,
+      icon_custom_emoji_id: "emoji_custom_1",
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(true);
+    const editRes = await bot2.editForumTopic({
+      chat_id: -100123456,
+      message_thread_id: 42,
+      name: "New Discussion Name",
+      icon_custom_emoji_id: "emoji_custom_2",
+    });
+    expect(editRes).toBe(true);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      chat_id: -100123456,
+      message_thread_id: 42,
+      name: "New Discussion Name",
+      icon_custom_emoji_id: "emoji_custom_2",
+    });
+
+    const { bot: bot3 } = createMockBot(true);
+    expect(await bot3.closeForumTopic(-100123456, 42)).toBe(true);
+    expect(await bot3.reopenForumTopic(-100123456, 42)).toBe(true);
+    expect(await bot3.deleteForumTopic(-100123456, 42)).toBe(true);
+    expect(await bot3.unpinAllForumTopicMessages(-100123456, 42)).toBe(true);
+  });
+
+  it("general forum topic management methods", async () => {
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const editGenRes = await bot1.editGeneralForumTopic(-100123456, "General Discussion");
+    expect(editGenRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      chat_id: -100123456,
+      name: "General Discussion",
+    });
+
+    const { bot: bot2 } = createMockBot(true);
+    expect(await bot2.closeGeneralForumTopic(-100123456)).toBe(true);
+    expect(await bot2.reopenGeneralForumTopic(-100123456)).toBe(true);
+    expect(await bot2.hideGeneralForumTopic(-100123456)).toBe(true);
+    expect(await bot2.unhideGeneralForumTopic(-100123456)).toBe(true);
+    expect(await bot2.unpinAllGeneralForumTopicMessages(-100123456)).toBe(true);
+  });
+
+  it("setMyCommands, getMyCommands, deleteMyCommands with scopes", async () => {
+    const commands = [{ command: "start", description: "Start the bot" }];
+    const scope = { type: "all_private_chats" as const };
+
+    const { bot: bot1, fakeFetch: fetch1 } = createMockBot(true);
+    const setRes = await bot1.setMyCommands({
+      commands,
+      scope,
+      language_code: "en",
+    });
+    expect(setRes).toBe(true);
+    const body1 = JSON.parse(fetch1.mock.calls[0][1].body);
+    expect(body1).toEqual({
+      commands,
+      scope,
+      language_code: "en",
+    });
+
+    const { bot: bot2, fakeFetch: fetch2 } = createMockBot(commands);
+    const getRes = await bot2.getMyCommands({
+      scope,
+      language_code: "en",
+    });
+    expect(getRes).toEqual(commands);
+    const body2 = JSON.parse(fetch2.mock.calls[0][1].body);
+    expect(body2).toEqual({
+      scope,
+      language_code: "en",
+    });
+
+    const { bot: bot3, fakeFetch: fetch3 } = createMockBot(true);
+    const delRes = await bot3.deleteMyCommands({
+      scope,
+      language_code: "en",
+    });
+    expect(delRes).toBe(true);
+    const body3 = JSON.parse(fetch3.mock.calls[0][1].body);
+    expect(body3).toEqual({
+      scope,
+      language_code: "en",
+    });
+  });
+});
+
+describe("Bot API Games, Passport, Stories, Business, and Gift methods", () => {
+  const createMockBot = (result: unknown) => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result }),
+    });
+    return { bot: new Bot("TEST_TOKEN", { fetch: fakeFetch }), fakeFetch };
+  };
+
+  it("sendGame, setGameScore, and getGameHighScores", async () => {
+    const { bot: bot1 } = createMockBot({ message_id: 50, game: { title: "Math Game" } });
+    expect(await bot1.sendGame(123456, "math_game")).toBeDefined();
+
+    const { bot: bot2 } = createMockBot(true);
+    expect(await bot2.setGameScore(123456, 100, { chat_id: 123456, message_id: 50 })).toBe(true);
+
+    const { bot: bot3 } = createMockBot([{ position: 1, user: { id: 123456, is_bot: false, first_name: "John" }, score: 100 }]);
+    const scores = await bot3.getGameHighScores(123456, { chat_id: 123456, message_id: 50 });
+    expect(scores).toHaveLength(1);
+  });
+
+  it("setPassportDataErrors, postStory, editStory, deleteStory", async () => {
+    const { bot: bot1 } = createMockBot(true);
+    expect(await bot1.setPassportDataErrors(123456, [{ source: "data", type: "passport", message: "Invalid" }])).toBe(true);
+
+    const { bot: bot2 } = createMockBot({ chat: { id: 123, type: "private" }, id: 1 });
+    expect(await bot2.postStory("biz_1", {})).toBeDefined();
+
+    const { bot: bot3 } = createMockBot({ chat: { id: 123, type: "private" }, id: 1 });
+    expect(await bot3.editStory("biz_1", 1, {})).toBeDefined();
+
+    const { bot: bot4 } = createMockBot(true);
+    expect(await bot4.deleteStory("biz_1", 1)).toBe(true);
+  });
+
+  it("getBusinessConnection, readBusinessMessage, deleteBusinessMessages", async () => {
+    const { bot: bot1 } = createMockBot({ id: "biz_1", user: { id: 123, is_bot: false, first_name: "Biz" }, user_chat_id: 123, date: 1700000000, can_reply: true, is_enabled: true });
+    expect(await bot1.getBusinessConnection("biz_1")).toBeDefined();
+
+    const { bot: bot2 } = createMockBot(true);
+    expect(await bot2.readBusinessMessage("biz_1", 101)).toBe(true);
+
+    const { bot: bot3 } = createMockBot(true);
+    expect(await bot3.deleteBusinessMessages("biz_1", [101, 102])).toBe(true);
+  });
+
+  it("gifts, verification, chat boosts, and emoji status", async () => {
+    const { bot: bot1 } = createMockBot({ gifts: [] });
+    expect(await bot1.getAvailableGifts()).toEqual({ gifts: [] });
+
+    const { bot: bot2 } = createMockBot(true);
+    expect(await bot2.sendGift({ user_id: 123456, gift_id: "g_1" })).toBe(true);
+
+    const { bot: bot3 } = createMockBot(true);
+    expect(await bot3.verifyChat(123456, "Verified")).toBe(true);
+    expect(await bot3.verifyUser(123456, "Verified user")).toBe(true);
+    expect(await bot3.removeChatVerification(123456)).toBe(true);
+    expect(await bot3.removeUserVerification(123456)).toBe(true);
+
+    const { bot: bot4 } = createMockBot({ boosts: [] });
+    expect(await bot4.getUserChatBoosts(123456, 123456)).toEqual({ boosts: [] });
+
+    const { bot: bot5 } = createMockBot(true);
+    expect(await bot5.setUserEmojiStatus(123456, "emoji_1")).toBe(true);
+  });
+});
 
