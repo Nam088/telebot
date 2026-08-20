@@ -33,30 +33,33 @@ export interface TimeOfDay {
 }
 
 /**
+ * Maximum delay supported by Node.js 32-bit signed integer `setTimeout` (~24.85 days).
+ */
+const MAX_TIMEOUT_MS = 2_147_483_647;
+
+/**
  * Represents an individual scheduled task managed by {@link JobQueue}.
  *
  * @typeParam Data - Type of custom data payload attached to this job.
  */
 export class Job<Data = unknown> {
-  /** Unique name identifier for the job. */
+  /** The unique name of the scheduled job. */
   public readonly name: string;
-  /** Custom serializable payload passed to callback. */
+  /** The callback function to execute. */
+  public readonly callback: JobCallback<Data>;
+  /** Optional custom data payload passed to the job callback. */
   public readonly data?: Data;
-  /** Associated chat ID where this job belongs. */
+  /** Optional Telegram chat ID associated with this job. */
   public readonly chat_id?: number | string;
-  /** Associated user ID where this job belongs. */
+  /** Optional Telegram user ID associated with this job. */
   public readonly user_id?: number;
-  /** Callback function to execute. */
-  public callback: JobCallback<Data>;
-
-  /** Whether the job is enabled to run. */
+  /** Whether the job is enabled for execution. When `false`, the timer fires but the callback is skipped. */
   public enabled: boolean = true;
-  /** Whether the job has been removed and should not execute. */
+  /** Whether the job has been removed or canceled. */
   public removed: boolean = false;
-
-  /** Interval in milliseconds if repeating, or undefined for one-off jobs. */
+  /** Interval in milliseconds between runs (for repeating jobs). */
   public readonly intervalMs?: number;
-  /** Target timestamp (epoch ms) of the next scheduled run. */
+  /** Epoch timestamp in milliseconds when the job is next scheduled to execute. */
   public next_t: number;
 
   private _timer?: NodeJS.Timeout;
@@ -87,13 +90,32 @@ export class Job<Data = unknown> {
     this._schedule();
   }
 
-  private _schedule(): void {
+  /**
+   * Internal scheduler that handles long delays > 24.8 days safely by chunking.
+   *
+   * @internal
+   */
+  public _schedule(): void {
     if (this.removed || !this._jobQueue.isRunning) return;
 
-    const delay = Math.max(0, this.next_t - Date.now());
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = undefined;
+    }
+
+    const totalDelay = Math.max(0, this.next_t - Date.now());
+
+    // If delay exceeds Node's 32-bit signed int max (24.8 days), wait MAX_TIMEOUT_MS and re-evaluate
+    if (totalDelay > MAX_TIMEOUT_MS) {
+      this._timer = setTimeout(() => {
+        this._schedule();
+      }, MAX_TIMEOUT_MS);
+      return;
+    }
+
     this._timer = setTimeout(() => {
       this._execute();
-    }, delay);
+    }, totalDelay);
   }
 
   private async _execute(): Promise<void> {
@@ -108,13 +130,32 @@ export class Job<Data = unknown> {
 
       try {
         await this.callback(context);
-      } catch (err) {
-        console.error(`Error in job "${this.name}":`, err);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        if (this._jobQueue.errorHandler) {
+          try {
+            await this._jobQueue.errorHandler(error, context);
+          } catch (ehErr) {
+            console.error(
+              `Error in Application errorHandler while processing job "${this.name}":`,
+              ehErr,
+            );
+          }
+        } else {
+          console.error(`Error in job "${this.name}":`, error);
+        }
       }
     }
 
     if (this.intervalMs !== undefined && !this.removed) {
-      this.next_t = Date.now() + this.intervalMs;
+      // Drift compensation: calculate next target run based on previous next_t
+      const now = Date.now();
+      let nextTarget = this.next_t + this.intervalMs;
+      if (nextTarget <= now) {
+        const missedSteps = Math.ceil((now - nextTarget) / this.intervalMs);
+        nextTarget += missedSteps * this.intervalMs;
+      }
+      this.next_t = nextTarget;
       this._schedule();
     } else {
       this.scheduleRemoval();
@@ -149,6 +190,8 @@ export class JobQueue {
   public readonly bot: Bot;
   /** Whether the job queue is currently active. */
   public isRunning: boolean = false;
+  /** Optional centralized error handler callback delegate. */
+  public errorHandler?: (error: Error, context: CallbackContext) => Promise<void> | void;
 
   private _jobs: Set<Job> = new Set();
   private _registeredCallbacks: Map<string, JobCallback<any>> = new Map();
@@ -167,6 +210,11 @@ export class JobQueue {
    */
   public start(): void {
     this.isRunning = true;
+    for (const job of this._jobs) {
+      if (!job.removed) {
+        job._schedule();
+      }
+    }
   }
 
   /**

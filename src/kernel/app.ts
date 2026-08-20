@@ -144,6 +144,17 @@ export class Application {
     this.bot = typeof botOrToken === "string" ? new Bot(botOrToken, options) : botOrToken;
     this.persistence = options.persistence ?? new MemoryPersistence();
     this.scheduler = new JobQueue(this.bot);
+    this.scheduler.errorHandler = async (error, context) => {
+      context.error = error;
+      for (const errHandler of this.errorHandlers) {
+        try {
+          await errHandler(error, context.update ?? ({} as any), context);
+        } catch (ehErr) {
+          console.error("Error in error handler:", ehErr);
+        }
+      }
+      context.error = undefined;
+    };
   }
 
   /**
