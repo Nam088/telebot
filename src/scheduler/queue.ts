@@ -7,6 +7,7 @@
 import { Bot } from "../client/bot.js";
 import { CallbackContext } from "../kernel/context.js";
 import type { PersistedJob } from "../storage/driver.js";
+import { RRule, type RRuleOptions } from "./rrule.js";
 
 /**
  * Signature for job callback functions executed by the {@link JobQueue}.
@@ -30,6 +31,24 @@ export interface TimeOfDay {
   minute?: number;
   /** Second (0-59) */
   second?: number;
+}
+
+/**
+ * Options for configuring an RFC 5545 RRule scheduled job.
+ */
+export interface RunRRuleOptions<Data = unknown> {
+  /** Standard RFC 5545 RRule string (e.g. `"FREQ=WEEKLY;BYDAY=MO,WE,FR;BYHOUR=9"`) or structured options. */
+  rrule: string | RRuleOptions;
+  /** Optional IANA timezone identifier (e.g. `"Asia/Ho_Chi_Minh"`). */
+  timezone?: string;
+  /** Optional custom data payload passed to the callback. */
+  data?: Data;
+  /** Optional job name identifier. */
+  name?: string;
+  /** Optional associated Telegram chat ID. */
+  chat_id?: number | string;
+  /** Optional associated Telegram user ID. */
+  user_id?: number;
 }
 
 /**
@@ -59,6 +78,8 @@ export class Job<Data = unknown> {
   public removed: boolean = false;
   /** Interval in milliseconds between runs (for repeating jobs). */
   public readonly intervalMs?: number;
+  /** Optional RFC 5545 recurrence rule engine instance. */
+  public readonly rrule?: RRule;
   /** Epoch timestamp in milliseconds when the job is next scheduled to execute. */
   public next_t: number;
 
@@ -74,6 +95,7 @@ export class Job<Data = unknown> {
     jobQueue: JobQueue;
     nextRunMs: number;
     intervalMs?: number;
+    rrule?: RRule;
     data?: Data;
     chat_id?: number | string;
     user_id?: number;
@@ -83,6 +105,7 @@ export class Job<Data = unknown> {
     this._jobQueue = options.jobQueue;
     this.next_t = options.nextRunMs;
     this.intervalMs = options.intervalMs;
+    this.rrule = options.rrule;
     this.data = options.data;
     this.chat_id = options.chat_id;
     this.user_id = options.user_id;
@@ -147,7 +170,15 @@ export class Job<Data = unknown> {
       }
     }
 
-    if (this.intervalMs !== undefined && !this.removed) {
+    if (this.rrule && !this.removed) {
+      const nextDate = this.rrule.after(new Date(this.next_t));
+      if (nextDate) {
+        this.next_t = nextDate.getTime();
+        this._schedule();
+      } else {
+        this.scheduleRemoval();
+      }
+    } else if (this.intervalMs !== undefined && !this.removed) {
       // Drift compensation: calculate next target run based on previous next_t
       const now = Date.now();
       let nextTarget = this.next_t + this.intervalMs;
@@ -395,6 +426,56 @@ export class JobQueue {
       data,
       chat_id,
       user_id,
+    });
+
+    this._indexJob(job);
+    return job;
+  }
+
+  /**
+   * Schedules a job using an RFC 5545 Recurrence Rule (RRule) with full Timezone support.
+   *
+   * @param callback - The async function to execute.
+   * @param options - Configuration options specifying `rrule`, `timezone`, `data`, and job metadata.
+   * @returns The created recurring {@link Job} instance, or `null` if the rule cannot generate future occurrences.
+   *
+   * @example
+   * ```ts
+   * // Run every Monday, Wednesday, Friday at 9:00 AM in Vietnam timezone:
+   * app.scheduler.runRRule(
+   *   async (context) => {
+   *     await context.bot.sendMessage({ chat_id: 123456, text: "Morning team update!" });
+   *   },
+   *   {
+   *     rrule: "FREQ=WEEKLY;BYDAY=MO,WE,FR;BYHOUR=9;BYMINUTE=0",
+   *     timezone: "Asia/Ho_Chi_Minh",
+   *   }
+   * );
+   * ```
+   */
+  public runRRule<Data = unknown>(
+    callback: JobCallback<Data>,
+    options: RunRRuleOptions<Data>,
+  ): Job<Data> | null {
+    const jobName =
+      options.name ?? `job_rrule_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    this.registerCallback(jobName, callback);
+
+    const rrule = new RRule(options.rrule, options.timezone);
+    const nextDate = rrule.after(new Date());
+    if (!nextDate) {
+      return null;
+    }
+
+    const job = new Job<Data>({
+      name: jobName,
+      callback,
+      jobQueue: this,
+      nextRunMs: nextDate.getTime(),
+      rrule,
+      data: options.data,
+      chat_id: options.chat_id,
+      user_id: options.user_id,
     });
 
     this._indexJob(job);

@@ -148,7 +148,7 @@ export class Application {
       context.error = error;
       for (const errHandler of this.errorHandlers) {
         try {
-          await errHandler(error, context.update ?? ({} as any), context);
+          await errHandler(error, context.update, context);
         } catch (ehErr) {
           console.error("Error in error handler:", ehErr);
         }
