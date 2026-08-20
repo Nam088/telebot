@@ -20,6 +20,14 @@ export interface PersistedJob {
    */
   interval?: number;
   /**
+   * Optional RFC 5545 RRule string or options.
+   */
+  rrule?: string | import("../scheduler/rrule.js").RRuleOptions;
+  /**
+   * Optional timezone.
+   */
+  timezone?: string;
+  /**
    * Optional serializable custom payload passed to the job callback.
    */
   data?: unknown;
