@@ -1,4 +1,4 @@
-name: "🐛 Bug Report"
+name: "Bug Report"
 description: "Report a bug or unexpected behavior in tele-bot"
 title: "[Bug]: "
 labels: ["bug", "needs-triage"]
@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for taking the time to report a bug in `tele-bot`!
+        Thank you for taking the time to report a bug in tele-bot!
   - type: textarea
     id: description
     attributes:
@@ -18,7 +18,7 @@ body:
   - type: textarea
     id: reproduction
     attributes:
-      label: "Minimal Reproduction Steps & Code"
+      label: "Minimal Reproduction Steps and Code"
       description: "Please provide a minimal, self-contained code snippet to reproduce the issue."
       render: typescript
       placeholder: |
