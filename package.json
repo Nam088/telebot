@@ -73,6 +73,7 @@
       "path": "cz-conventional-changelog"
     }
   },
+  "keywords": [
     "telegram",
     "telegram-bot",
     "telegram-bot-api",

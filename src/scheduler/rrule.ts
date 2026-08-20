@@ -28,6 +28,8 @@ export type FrequencyType = (typeof Frequency)[keyof typeof Frequency];
 
 /**
  * Weekday representation with RFC 5545 nth occurrence support.
+ * Note: Numeric weekday values use 0 = MO (Monday) through 6 = SU (Sunday) per RFC 5545 / ISO 8601,
+ * distinct from JavaScript's `Date.prototype.getDay()` (where 0 is Sunday).
  */
 export class Weekday {
   public readonly weekday: number;
@@ -54,7 +56,11 @@ export class Weekday {
 export type RRuleFrequency =
   "SECONDLY" | "MINUTELY" | "HOURLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY" | FrequencyType;
 
-/** Weekday abbreviation identifiers. */
+/**
+ * Weekday abbreviation identifiers or numbers (0=MO to 6=SU).
+ * Note: Numeric weekday values use 0 = MO (Monday) through 6 = SU (Sunday) per RFC 5545 / ISO 8601,
+ * distinct from JavaScript's `Date.prototype.getDay()` (where 0 is Sunday).
+ */
 export type RRuleWeekday = "SU" | "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | number | Weekday;
 
 /**
@@ -65,7 +71,10 @@ export interface RRuleOptions {
   freq: RRuleFrequency;
   /** Interval between occurrences (default: `1`). */
   interval?: number;
-  /** Array of target weekdays or single weekday (e.g. `[RRule.MO, RRule.FR]`, `["MO", "FR"]`, `[0, 4]`). */
+  /**
+   * Array of target weekdays or single weekday (e.g. `[RRule.MO, RRule.FR]`, `["MO", "FR"]`, `[0, 4]`).
+   * Note: Numeric weekday values use 0 = MO (Monday) through 6 = SU (Sunday) per RFC 5545 / ISO 8601.
+   */
   byweekday?: RRuleWeekday[] | RRuleWeekday;
   /** Alias for `byweekday` matching RFC 5545 standard naming. */
   byday?: RRuleWeekday[] | RRuleWeekday;
@@ -96,7 +105,7 @@ export interface RRuleOptions {
   /** Starting anchor date for the recurrence series. */
   dtstart?: Date;
   /** Week start day (default: `RRule.MO`). */
-  wkst?: Weekday | number;
+  wkst?: RRuleWeekday;
 }
 
 const WEEKDAY_INTL_TO_CODE: string[] = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
@@ -158,10 +167,10 @@ export class RRule {
       this.options = RRule.parseString(rule);
     } else {
       this.options = { ...rule };
-      if (typeof this.options.until === 'string' || typeof this.options.until === 'number') {
+      if (typeof this.options.until === "string" || typeof this.options.until === "number") {
         this.options.until = new Date(this.options.until);
       }
-      if (typeof this.options.dtstart === 'string' || typeof this.options.dtstart === 'number') {
+      if (typeof this.options.dtstart === "string" || typeof this.options.dtstart === "number") {
         this.options.dtstart = new Date(this.options.dtstart);
       }
     }
@@ -321,7 +330,12 @@ export class RRule {
    * @returns Next execution Date, or `null` if series is exhausted.
    */
   public after(afterDate: Date = new Date()): Date | null {
-    const afterMs = afterDate.getTime();
+    let afterMs = afterDate.getTime();
+    const startMs = this.options.dtstart ? this.options.dtstart.getTime() : Date.now();
+    if (afterMs < startMs) {
+      afterMs = startMs - 1000;
+    }
+
     const tz = this.options.tzid ?? this.options.timezone;
 
     if (this.options.until && afterMs >= this.options.until.getTime()) {
@@ -333,11 +347,83 @@ export class RRule {
     }
 
     let candidate = new Date(afterMs + 1000);
-    const maxSeconds = 366 * 24 * 3600; // Look up to 1 year ahead
+    const maxSeconds = 366 * 24 * 3600 * 5; // Look up to 5 years ahead
     let secondsAdvanced = 0;
+
+    const interval = this.options.interval || 1;
+    const freq =
+      typeof this.options.freq === "string"
+        ? Frequency[this.options.freq as keyof typeof Frequency]
+        : this.options.freq;
+    const dtstartZoned = this.getZonedParts(new Date(startMs), tz);
 
     while (secondsAdvanced < maxSeconds) {
       const parts = this.getZonedParts(candidate, tz);
+
+      // Interval filter
+      if (interval > 1) {
+        if (freq === Frequency.YEARLY) {
+          if (Math.abs(parts.year - dtstartZoned.year) % interval !== 0) {
+            candidate = new Date(candidate.getTime() + 24 * 3600 * 1000);
+            secondsAdvanced += 24 * 3600;
+            continue;
+          }
+        } else if (freq === Frequency.MONTHLY) {
+          const monthDiff =
+            (parts.year - dtstartZoned.year) * 12 + (parts.month - dtstartZoned.month);
+          if (Math.abs(monthDiff) % interval !== 0) {
+            candidate = new Date(candidate.getTime() + 24 * 3600 * 1000);
+            secondsAdvanced += 24 * 3600;
+            continue;
+          }
+        } else if (freq === Frequency.WEEKLY) {
+          const wkstVal =
+            typeof this.options.wkst === "number"
+              ? this.options.wkst
+              : typeof this.options.wkst === "object"
+                ? (this.options.wkst as Weekday).weekday
+                : typeof this.options.wkst === "string"
+                  ? WEEKDAY_INTL_TO_CODE.indexOf(this.options.wkst)
+                  : 0;
+
+          const dtStartTarget = new Date(
+            Date.UTC(dtstartZoned.year, dtstartZoned.month - 1, dtstartZoned.day),
+          );
+          const candTarget = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+
+          // adjust to week start
+          const dtStartDay = (dtStartTarget.getUTCDay() + 6) % 7; // 0=MO
+          const candDay = (candTarget.getUTCDay() + 6) % 7;
+
+          // distance to start of week
+          const dtStartWeekStart = new Date(
+            dtStartTarget.getTime() - ((dtStartDay - wkstVal + 7) % 7) * 86400000,
+          );
+          const candWeekStart = new Date(
+            candTarget.getTime() - ((candDay - wkstVal + 7) % 7) * 86400000,
+          );
+
+          const weekDiff = Math.round(
+            (candWeekStart.getTime() - dtStartWeekStart.getTime()) / (7 * 86400000),
+          );
+          if (Math.abs(weekDiff) % interval !== 0) {
+            candidate = new Date(candidate.getTime() + 24 * 3600 * 1000);
+            secondsAdvanced += 24 * 3600;
+            continue;
+          }
+        } else if (freq === Frequency.DAILY) {
+          const dtStartTarget = new Date(
+            Date.UTC(dtstartZoned.year, dtstartZoned.month - 1, dtstartZoned.day),
+          );
+          const candTarget = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+          const dayDiff = Math.round((candTarget.getTime() - dtStartTarget.getTime()) / 86400000);
+          if (Math.abs(dayDiff) % interval !== 0) {
+            candidate = new Date(candidate.getTime() + 24 * 3600 * 1000);
+            secondsAdvanced += 24 * 3600;
+            continue;
+          }
+        }
+      }
 
       // 1. Second filter: Step 1 second
       if (this.normalizedSeconds && !this.normalizedSeconds.includes(parts.second)) {
@@ -431,6 +517,83 @@ export class RRule {
       }
 
       // Match found!
+
+      // If BYSETPOS is used, we need to collect all matches for the period and pick the nth.
+      // But we are in a lazy evaluation loop. So we can't just return it.
+      // Wait, a shortcut for BYSETPOS=-1 or 1 in MONTHLY:
+      if (this.normalizedSetpos) {
+        // Find all matches for the current period (Month or Year depending on FREQ)
+        // This is a naive but correct approach for simple queries.
+        const periodMatches: Date[] = [];
+        const pCandidate = new Date(
+          freq === Frequency.YEARLY
+            ? Date.UTC(parts.year, 0, 1)
+            : Date.UTC(parts.year, parts.month - 1, 1),
+        );
+        const endPeriod = new Date(
+          freq === Frequency.YEARLY
+            ? Date.UTC(parts.year + 1, 0, 1)
+            : Date.UTC(parts.year, parts.month, 1),
+        );
+
+        while (pCandidate < endPeriod) {
+          const pParts = this.getZonedParts(pCandidate, tz);
+          let match = true;
+          if (this.normalizedWeekdays) {
+            const currentCode = WEEKDAY_INTL_TO_CODE[pParts.weekday];
+            if (!this.normalizedWeekdays.find((w) => w.code === currentCode)) {
+              match = false;
+            }
+          }
+          if (this.normalizedMonthdays && match) {
+            const daysInMonth = new Date(pParts.year, pParts.month, 0).getDate();
+            if (
+              !this.normalizedMonthdays.some((md) =>
+                md > 0 ? pParts.day === md : pParts.day === daysInMonth + md + 1,
+              )
+            ) {
+              match = false;
+            }
+          }
+          if (match) {
+            // Add exact time matching
+            const cDate = new Date(pCandidate);
+            cDate.setUTCHours(parts.hour, parts.minute, parts.second, 0);
+            periodMatches.push(cDate);
+          }
+          pCandidate.setUTCDate(pCandidate.getUTCDate() + 1);
+        }
+
+        // sort just in case
+        periodMatches.sort((a, b) => a.getTime() - b.getTime());
+
+        // Filter by setpos
+        const selectedMatches: Date[] = [];
+        for (const pos of this.normalizedSetpos) {
+          if (pos > 0 && pos <= periodMatches.length) {
+            selectedMatches.push(periodMatches[pos - 1]!);
+          } else if (pos < 0 && Math.abs(pos) <= periodMatches.length) {
+            selectedMatches.push(periodMatches[periodMatches.length + pos]!);
+          }
+        }
+
+        selectedMatches.sort((a, b) => a.getTime() - b.getTime());
+
+        const validMatch = selectedMatches.find((m) => m.getTime() > afterMs);
+        if (validMatch) {
+          if (this.options.until && validMatch.getTime() > this.options.until.getTime()) {
+            return null;
+          }
+          this.occurrenceCount++;
+          return validMatch;
+        } else {
+          // move to next period
+          candidate = new Date(endPeriod.getTime() + 1000);
+          secondsAdvanced += (endPeriod.getTime() - candidate.getTime()) / 1000;
+          continue;
+        }
+      }
+
       if (this.options.until && candidate.getTime() > this.options.until.getTime()) {
         return null;
       }

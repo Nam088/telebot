@@ -22,7 +22,7 @@ export abstract class BaseHandler<C extends CallbackContext = CallbackContext, R
     this.callback = callback;
   }
 
-    /**
+  /**
    * Checks if the incoming update should be handled by this handler.
    *
    * @param update - The Telegram update to process.

@@ -143,4 +143,54 @@ describe("RRule Complete RFC 5545 Spec & Timezone Tests", () => {
 
     queue.stop();
   });
+
+  it("respects INTERVAL=2 for DAILY occurrences", () => {
+    // start is Aug 20 (Thur). Next should be Aug 22 (Sat), skipping Aug 21
+    const dtstart = new Date("2026-08-20T10:00:00Z");
+    const rrule = new RRule({
+      freq: RRule.DAILY,
+      interval: 2,
+      dtstart,
+      byhour: 10,
+      byminute: 0,
+      bysecond: 0,
+    });
+
+    const next = rrule.after(dtstart);
+    expect(next).not.toBeNull();
+    expect(next?.getUTCDate()).toBe(22);
+  });
+
+  it("respects INTERVAL=2 for MONTHLY occurrences", () => {
+    // start is Aug 20. Next month should be skipped (Sep), so next run is Oct 20.
+    const dtstart = new Date("2026-08-20T10:00:00Z");
+    const rrule = new RRule({
+      freq: RRule.MONTHLY,
+      interval: 2,
+      dtstart,
+      bymonthday: 20,
+      byhour: 10,
+      byminute: 0,
+      bysecond: 0,
+    });
+
+    const next = rrule.after(dtstart);
+    expect(next).not.toBeNull();
+    expect(next?.getUTCMonth()).toBe(9); // 9 is October (0-indexed in JS)
+    expect(next?.getUTCDate()).toBe(20);
+  });
+
+  it("respects BYSETPOS=-1 for last matching occurrence in period", () => {
+    // Last weekday of the month
+    // Aug 2026: last weekday is Monday Aug 31
+    const anchor = new Date("2026-08-15T00:00:00Z");
+    const rrule = new RRule(
+      "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;BYHOUR=10;BYMINUTE=0;BYSECOND=0",
+    );
+
+    const next = rrule.after(anchor);
+    expect(next).not.toBeNull();
+    expect(next?.getUTCDate()).toBe(31);
+    expect(next?.getUTCDay()).toBe(1); // Monday
+  });
 });

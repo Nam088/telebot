@@ -199,4 +199,61 @@ describe("Persistence & Process Restart Integration", () => {
       });
     }
   });
+
+  it("survives process restart for RRule scheduled jobs and computes its next recurrence", async () => {
+    const filePath = path.join(tempDir, "rrule_jobs.json");
+    let executionCount = 0;
+
+    // --- Process 1: Schedule the RRule job ---
+    {
+      const persistence1 = new JsonFilePersistence({ filePath });
+      const app1 = new ApplicationBuilder().token(token).persistence(persistence1).build();
+
+      const rruleOptions = {
+        freq: "DAILY",
+        byminute: 0,
+        bysecond: 0,
+      } as const;
+
+      app1.scheduler.runRRule(
+        async () => {
+          executionCount++;
+        },
+        {
+          rrule: rruleOptions,
+          name: "daily_job",
+          timezone: "UTC",
+        },
+      );
+
+      // trigger flush/save
+      await app1.stop();
+    }
+
+    // --- Process 2: Restore jobs, verify it is reloaded and next_t is set correctly ---
+    {
+      const persistence2 = new JsonFilePersistence({ filePath });
+      const app2 = new ApplicationBuilder().token(token).persistence(persistence2).build();
+
+      let jobExecuted = false;
+      app2.scheduler.registerCallback("daily_job", async () => {
+        jobExecuted = true;
+      });
+
+      // App initialization will restore jobs from persistence
+      await app2.initializePersistence();
+
+      const jobs = app2.scheduler.jobs();
+      expect(jobs.length).toBe(1);
+
+      const restoredJob = jobs[0]!;
+      expect(restoredJob.name).toBe("daily_job");
+      expect(restoredJob.rrule).toBeDefined();
+      expect(restoredJob.rruleOptions).toBeDefined();
+      expect(restoredJob.timezone).toBe("UTC");
+
+      // Verify the next_t is strictly in the future relative to the last evaluation
+      expect(restoredJob.next_t).toBeGreaterThan(Date.now() - 10000);
+    }
+  });
 });
