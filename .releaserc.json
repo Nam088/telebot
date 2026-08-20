@@ -23,9 +23,7 @@
     ],
     [
       "@semantic-release/release-notes-generator",
-      {
-        "preset": "angular"
-      }
+      { "preset": "angular" }
     ],
     [
       "@semantic-release/changelog",
@@ -36,16 +34,11 @@
     ],
     [
       "@semantic-release/exec",
-      {
-        "prepareCmd": "npm run build && npm run docs"
-      }
+      { "prepareCmd": "npm run build && npm run docs" }
     ],
     [
       "@semantic-release/npm",
-      {
-        "npmPublish": true,
-        "pkgRoot": "."
-      }
+      { "npmPublish": true, "pkgRoot": "." }
     ],
     [
       "@semantic-release/git",
@@ -54,13 +47,6 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    [
-      "@semantic-release/github",
-      {
-        "assets": [
-          { "path": "dist/**", "label": "Compiled Distribution Bundle" }
-        ]
-      }
-    ]
+    "@semantic-release/github"
   ]
 }
