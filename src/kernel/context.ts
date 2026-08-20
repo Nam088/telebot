@@ -6,7 +6,8 @@
 
 import type { Bot } from "../client/bot.js";
 import type { Update } from "./update.js";
-import type { JobQueue, Job } from "../scheduler/queue.js";
+import type { JobQueue } from "../scheduler/queue.js";
+import type { Job } from "../scheduler/job.js";
 
 /**
  * Context object passed to handler callbacks, error handlers, and job callbacks.

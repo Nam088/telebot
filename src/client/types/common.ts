@@ -1,0 +1,449 @@
+import type {
+  ChatType,
+  ParseMode,
+  MessageEntityType,
+  PollType,
+  ChatMemberStatus,
+  ChatAction,
+} from "../constants.js";
+import type { InputFile } from "../../utils/http.js";
+import type {
+  BusinessIntro,
+  BusinessLocation,
+  BusinessOpeningHours,
+  StoryArea,
+  Story,
+  CallbackQuery,
+  InlineQuery,
+  ChosenInlineResult,
+  ChatBoostUpdated,
+  ChatBoostRemoved,
+  BusinessConnection,
+  BusinessMessagesDeleted,
+  InlineQueryResult,
+} from "./business.js";
+import type { ChatPermissions, ChatLocation, ChatMemberUpdated, ChatJoinRequest } from "./chats.js";
+import type {
+  MessageEntity,
+  PhotoSize,
+  Poll,
+  PollAnswer,
+  Message,
+  MessageReactionUpdated,
+  MessageReactionCountUpdated,
+  ReactionType,
+} from "./messages.js";
+import type { ShippingQuery, PreCheckoutQuery } from "./payments.js";
+
+export interface User {
+  /** Unique identifier for this user or bot. */
+  id: number;
+  /** True, if this user is a bot. */
+  is_bot: boolean;
+  /** User's or bot's first name. */
+  first_name: string;
+  /** User's or bot's last name. */
+  last_name?: string;
+  /** User's or bot's username without leading '@'. */
+  username?: string;
+  /** IETF language tag of the user's language (e.g. 'en', 'vi'). */
+  language_code?: string;
+  /** True, if this user is a Telegram Premium user. */
+  is_premium?: boolean;
+  /** True, if this user added the bot to the attachment menu. */
+  added_to_attachment_menu?: boolean;
+  /** True, if the bot can be invited to groups. Returned only in getMe. */
+  can_join_groups?: boolean;
+  /** True, if privacy mode is disabled for the bot in groups. Returned only in getMe. */
+  can_read_all_group_messages?: boolean;
+  /** True, if the bot supports inline queries. Returned only in getMe. */
+  supports_inline_queries?: boolean;
+  /** True, if the bot can be connected to a Telegram Business account. Returned only in getMe. */
+  can_connect_to_business?: boolean;
+  /** True, if the bot has a main Web App. Returned only in getMe. */
+  has_main_web_app?: boolean;
+}
+
+export interface Birthdate {
+  /** Day of the user's birth; 1-31. */
+  day: number;
+  /** Month of the user's birth; 1-12. */
+  month: number;
+  /** Year of the user's birth. */
+  year?: number;
+}
+
+export interface Chat {
+  /** Unique identifier for this chat (integer or channel username string). */
+  id: number | string;
+  /** Type of the chat, can be 'private', 'group', 'supergroup', or 'channel'. */
+  type: ChatType;
+  /** Title, for supergroups, channels and group chats. */
+  title?: string;
+  /** Username, for private chats, supergroups and channels if available. */
+  username?: string;
+  /** First name of the other party in a private chat. */
+  first_name?: string;
+  /** Last name of the other party in a private chat. */
+  last_name?: string;
+  /** True, if the supergroup chat is a forum (has topics enabled). */
+  is_forum?: boolean;
+  /** Chat photo. */
+  photo?: ChatPhoto;
+  /** If non-empty, the list of all active chat usernames. */
+  active_usernames?: string[];
+  /** For private chats, the date of birth of the user. */
+  birthdate?: Birthdate;
+  /** For private chats with business accounts, the intro of the business. */
+  business_intro?: BusinessIntro;
+  /** For private chats with business accounts, the location of the business. */
+  business_location?: BusinessLocation;
+  /** For private chats with business accounts, the opening hours of the business. */
+  business_opening_hours?: BusinessOpeningHours;
+  /** For private chats, the personal channel of the user. */
+  personal_chat?: Chat;
+  /** List of available reactions allowed in the chat. */
+  available_reactions?: unknown[];
+  /** Identifier of the accent color for the chat name and backgrounds. */
+  accent_color_id?: number;
+  /** Custom emoji identifier of emoji chosen for chat background. */
+  background_custom_emoji_id?: string;
+  /** Identifier of the accent color for the chat's profile. */
+  profile_accent_color_id?: number;
+  /** Custom emoji identifier of emoji chosen for chat profile background. */
+  profile_background_custom_emoji_id?: string;
+  /** Custom emoji identifier of the emoji status. */
+  emoji_status_custom_emoji_id?: string;
+  /** Expiration date of the emoji status of the chat partner in Unix time. */
+  emoji_status_expiration_date?: number;
+  /** Bio of the other party in a private chat. */
+  bio?: string;
+  /** True, if privacy settings of the other party in the private chat forbid forwarding messages. */
+  has_private_forwards?: boolean;
+  /** True, if the privacy settings of the other party restrict sending voice and video notes. */
+  has_restricted_voice_and_video_messages?: boolean;
+  /** True, if users need to join the supergroup before they can send messages. */
+  join_to_send_messages?: boolean;
+  /** True, if all new members must be approved by chat administrators. */
+  join_by_request?: boolean;
+  /** Description, for groups, supergroups and channel chats. */
+  description?: string;
+  /** Primary invite link, for groups, supergroups and channel chats. */
+  invite_link?: string;
+  /** The most recent pinned message (by sending date) in the chat. */
+  pinned_message?: Message;
+  /** Default chat member permissions, for groups and supergroups. */
+  permissions?: ChatPermissions;
+  /** For supergroups, the minimum allowed interval between messages in seconds. */
+  slow_mode_delay?: number;
+  /** For supergroups, the minimum number of boosts needed to bypass slow mode. */
+  unrestrict_boost_count?: number;
+  /** Time in seconds after which messages are automatically deleted in the chat. */
+  message_auto_delete_time?: number;
+  /** True, if aggressive anti-spam checks are enabled in the supergroup. */
+  has_aggressive_anti_spam_enabled?: boolean;
+  /** True, if non-administrators can only see the list of bot administrators in the chat. */
+  has_hidden_members?: boolean;
+  /** True, if messages from the chat can't be forwarded to other chats. */
+  has_protected_content?: boolean;
+  /** True, if new chat members will see historical messages. */
+  has_visible_history?: boolean;
+  /** For supergroups, name of the group sticker set. */
+  sticker_set_name?: string;
+  /** True, if the bot can change the group sticker set. */
+  can_set_sticker_set?: boolean;
+  /** For supergroups, name of the custom emoji sticker set. */
+  custom_emoji_sticker_set_name?: string;
+  /** Unique identifier for the linked discussion chat for channels. */
+  linked_chat_id?: number;
+  /** For supergroups, the location to which the supergroup is connected. */
+  location?: ChatLocation;
+}
+
+export interface ChatPhoto {
+  /** File identifier of small (160x160) chat photo. */
+  small_file_id: string;
+  /** Unique file identifier of small (160x160) chat photo. */
+  small_file_unique_id: string;
+  /** File identifier of big (640x640) chat photo. */
+  big_file_id: string;
+  /** Unique file identifier of big (640x640) chat photo. */
+  big_file_unique_id: string;
+}
+
+export interface Location {
+  /** Latitude as defined by sender. */
+  latitude: number;
+  /** Longitude as defined by sender. */
+  longitude: number;
+  /** The radius of uncertainty for the location, measured in meters; 0-1500. */
+  horizontal_accuracy?: number;
+  /** Time relative to the message sending date, during which the location can be updated; in seconds. */
+  live_period?: number;
+  /** The direction in which user is moving, in degrees; 1-360. */
+  heading?: number;
+  /** The maximum distance for proximity alerts about approaching another chat member, in meters. */
+  proximity_alert_radius?: number;
+}
+
+export interface PostStoryOptions {
+  /** Period after which the story is moved to the archive, in seconds; must be one of 6 * 3600, 12 * 3600, 24 * 3600, or 48 * 3600. */
+  active_period?: number;
+  /** Identifier of the target chat to pin the story in. */
+  pinned_peer_id?: number;
+  /** Story caption, 0-1024 characters. */
+  caption?: string;
+  /** Mode for parsing entities in the story caption. */
+  parse_mode?: ParseMode | string;
+  /** List of special entities that appear in the story caption. */
+  caption_entities?: MessageEntity[];
+  /** List of story areas to add to the story. */
+  areas?: StoryArea[];
+  /** Pass True if the content of the story must be protected from forwarding and saving. */
+  protect_content?: boolean;
+}
+
+export interface EditStoryOptions {
+  /** Story caption, 0-1024 characters. */
+  caption?: string;
+  /** Mode for parsing entities in the story caption. */
+  parse_mode?: ParseMode | string;
+  /** List of special entities that appear in the story caption. */
+  caption_entities?: MessageEntity[];
+  /** List of story areas to add to the story. */
+  areas?: StoryArea[];
+}
+
+export interface UserProfilePhotos {
+  /** Total number of profile pictures the target user has. */
+  total_count: number;
+  /** Requested profile pictures (in up to 4 sizes each). */
+  photos: PhotoSize[][];
+}
+
+export interface File {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file, which is supposed to be the same over time and for different bots. */
+  file_unique_id: string;
+  /** File size in bytes. */
+  file_size?: number;
+  /** File path. Use https://api.telegram.org/file/bot<token>/<file_path> to get the file. */
+  file_path?: string;
+}
+
+export interface WebhookInfo {
+  /** HTTPS URL to which Telegram sends updates. If empty, webhook is not set up. */
+  url: string;
+  /** True, if a custom certificate was provided for webhook certificate checks. */
+  has_custom_certificate: boolean;
+  /** Number of updates awaiting delivery. */
+  pending_update_count: number;
+  /** Currently used IP address for webhook connections. */
+  ip_address?: string;
+  /** Unix time for the most recent error that happened when trying to deliver an update via webhook. */
+  last_error_date?: number;
+  /** Error message in human-readable format for the most recent error. */
+  last_error_message?: string;
+  /** Unix time of the most recent error that happened when trying to synchronize available updates with Telegram datacenters. */
+  last_synchronization_error_date?: number;
+  /** The maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery. */
+  max_connections?: number;
+  /** A list of update types the bot is subscribed to. Defaults to all update types except chat_member. */
+  allowed_updates?: string[];
+}
+
+export interface RawUpdate {
+  /** The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. */
+  update_id: number;
+  /** New incoming message of any kind - text, photo, sticker, etc. */
+  message?: Message;
+  /** New version of a message that is known to the bot and was edited. */
+  edited_message?: Message;
+  /** New incoming channel post of any kind - text, photo, sticker, etc. */
+  channel_post?: Message;
+  /** New version of a channel post that is known to the bot and was edited. */
+  edited_channel_post?: Message;
+  /** The bot was connected to or disconnected from a business account, or a user edited an existing connection with the bot. */
+  business_connection?: BusinessConnection;
+  /** New message from a connected business account. */
+  business_message?: Message;
+  /** New version of a message from a connected business account. */
+  edited_business_message?: Message;
+  /** Messages were deleted from a connected business account. */
+  deleted_business_messages?: BusinessMessagesDeleted;
+  /** A reaction to a message was changed by a user. */
+  message_reaction?: MessageReactionUpdated;
+  /** Reactions to a message with anonymous reactions were changed. */
+  message_reaction_count?: MessageReactionCountUpdated;
+  /** New incoming inline query. */
+  inline_query?: InlineQuery;
+  /** The result of an inline query that was chosen by a user and sent to their chat partner. */
+  chosen_inline_result?: ChosenInlineResult;
+  /** New incoming callback query. */
+  callback_query?: CallbackQuery;
+  /** New incoming shipping query. Only for invoices with flexible prices. */
+  shipping_query?: ShippingQuery;
+  /** New incoming pre-checkout query. Contains full information about checkout. */
+  pre_checkout_query?: PreCheckoutQuery;
+  /** New poll state. Bots receive only updates about stopped polls and polls, which are sent by the bot. */
+  poll?: Poll;
+  /** A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself. */
+  poll_answer?: PollAnswer;
+  /** The bot's chat member status was updated in a chat. */
+  my_chat_member?: ChatMemberUpdated;
+  /** A chat member's status was updated in a chat. */
+  chat_member?: ChatMemberUpdated;
+  /** A request to join the chat has been sent. */
+  chat_join_request?: ChatJoinRequest;
+  /** A chat boost was added or changed. */
+  chat_boost?: ChatBoostUpdated;
+  /** A boost was removed from a chat. */
+  removed_chat_boost?: ChatBoostRemoved;
+}
+
+export interface ApiResponse<T = unknown> {
+  /** True, if the request was successful. */
+  ok: boolean;
+  /** Result payload if the request succeeded. */
+  result?: T;
+  /** Numeric error code if the request was unsuccessful. */
+  error_code?: number;
+  /** Human-readable explanation of why the request was unsuccessful. */
+  description?: string;
+  /** Additional parameters which can help to automatically handle the error. */
+  parameters?: {
+    /** Number of seconds to wait before repeating the request. */
+    retry_after?: number;
+    /** The group has been migrated to a supergroup with this identifier. */
+    migrate_to_chat_id?: number;
+  };
+}
+
+export interface GetUpdatesOptions {
+  /** Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. */
+  offset?: number;
+  /** Limits the number of updates to be retrieved. Values between 1-100 are accepted. Defaults to 100. */
+  limit?: number;
+  /** Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive for short polling. */
+  timeout?: number;
+  /** A list of the update types you want your bot to receive. */
+  allowed_updates?: string[];
+}
+
+export interface AnswerCallbackQueryOptions {
+  /** Unique identifier for the query to be answered. */
+  callback_query_id: string;
+  /** Text of the notification. If not specified, nothing will be shown to the user, 0-200 characters. */
+  text?: string;
+  /** If True, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false. */
+  show_alert?: boolean;
+  /** URL that will be opened by the user's client. */
+  url?: string;
+  /** The maximum amount of time in seconds that the result of the callback query may be cached client-side. Defaults to 0. */
+  cache_time?: number;
+}
+
+export interface AnswerInlineQueryOptions {
+  /** Unique identifier for the answered query. */
+  inline_query_id: string;
+  /** An array of results for the inline query. */
+  results: InlineQueryResult[];
+  /** The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300. */
+  cache_time?: number;
+  /** Pass True if results may be cached on the server side only for the user that sent the query. */
+  is_personal?: boolean;
+  /** Pass the offset that a client should send in the next query with the same text to receive more results. */
+  next_offset?: string;
+  /** An object describing a button to be shown above inline query results. */
+  button?: unknown;
+}
+
+export interface SetWebhookOptions {
+  /** HTTPS URL to send updates to. Use an empty string to remove webhook integration. */
+  url: string;
+  /** Upload your public key certificate so that the root certificate in use can be checked. */
+  certificate?: unknown;
+  /** The fixed IP address which will be used to send webhook requests. */
+  ip_address?: string;
+  /** The maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery, 1-100. Defaults to 40. */
+  max_connections?: number;
+  /** A list of the update types you want your bot to receive. */
+  allowed_updates?: string[];
+  /** Pass True to drop all pending updates. */
+  drop_pending_updates?: boolean;
+  /** A secret token to be sent in a header 'X-Telegram-Bot-Api-Secret-Token' in every webhook request, 1-256 characters. */
+  secret_token?: string;
+}
+
+export interface SetMessageReactionOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Identifier of the target message. */
+  message_id: number;
+  /** List of reaction types to set on the message. */
+  reaction?: (ReactionType | string)[] | ReactionType | string;
+  /** Pass True to set the reaction with a big animation. */
+  is_big?: boolean;
+}
+
+export interface EditEphemeralMessageTextOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Identifier of the message to edit. */
+  message_id: number;
+  /** New text of the ephemeral message. */
+  text: string;
+  /** Mode for parsing entities in the message text. */
+  parse_mode?: string;
+  /** Additional interface options. */
+  reply_markup?: unknown;
+}
+
+export type Update = RawUpdate;
+
+export class TelegramApiError extends Error {
+  /**
+   * Telegram Bot API numeric error code (e.g. `400`, `401`, `403`, `429`).
+   */
+  public readonly error_code: number;
+
+  /**
+   * Human-readable description of the error returned by Telegram.
+   */
+  public readonly description: string;
+
+  /**
+   * Optional extra response parameters returned by Telegram (e.g. rate limit retry or chat migration info).
+   */
+  public readonly parameters?: {
+    /**
+     * Number of seconds to wait before repeating the request.
+     */
+    retry_after?: number;
+    /**
+     * The group has been migrated to a supergroup with this identifier.
+     */
+    migrate_to_chat_id?: number;
+  };
+
+  /**
+   * Constructs a new {@link TelegramApiError}.
+   *
+   * @param error_code - The numeric error code from the Telegram response.
+   * @param description - The error description string.
+   * @param parameters - Optional extra parameter payload from Telegram.
+   */
+  constructor(
+    error_code: number,
+    description: string,
+    parameters?: { retry_after?: number; migrate_to_chat_id?: number },
+  ) {
+    super(`Telegram API Error ${error_code}: ${description}`);
+    this.name = "TelegramApiError";
+    this.error_code = error_code;
+    this.description = description;
+    this.parameters = parameters;
+    Object.setPrototypeOf(this, TelegramApiError.prototype);
+  }
+}
