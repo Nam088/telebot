@@ -42,14 +42,14 @@ export class CallbackContext<
   public readonly bot: Bot;
 
   /**
-   * Optional job queue instance for scheduling future background tasks.
+   * Background task scheduler and timer engine.
    */
-  public job_queue?: JobQueue;
+  public scheduler?: JobQueue;
 
   /**
-   * The current background job being executed (when invoked from the JobQueue).
+   * The current background task/job being executed (when invoked from the scheduler).
    */
-  public job?: Job;
+  public task?: Job;
 
   /**
    * Positional arguments parsed from a command message.
@@ -59,17 +59,17 @@ export class CallbackContext<
   /**
    * Per-user persistent or memory storage object.
    */
-  public user_data?: UserData;
+  public userData?: UserData;
 
   /**
    * Per-chat persistent or memory storage object.
    */
-  public chat_data?: ChatData;
+  public chatData?: ChatData;
 
   /**
    * Global bot-level persistent or memory storage object.
    */
-  public bot_data?: BotData;
+  public botData?: BotData;
 
   /**
    * The caught exception / error when invoked inside an error handler.
@@ -86,6 +86,42 @@ export class CallbackContext<
    */
   public readonly update?: Update;
 
+  // Compatibility aliases
+  get job_queue(): JobQueue | undefined {
+    return this.scheduler;
+  }
+  set job_queue(val: JobQueue | undefined) {
+    this.scheduler = val;
+  }
+
+  get job(): Job | undefined {
+    return this.task;
+  }
+  set job(val: Job | undefined) {
+    this.task = val;
+  }
+
+  get user_data(): UserData | undefined {
+    return this.userData;
+  }
+  set user_data(val: UserData | undefined) {
+    this.userData = val;
+  }
+
+  get chat_data(): ChatData | undefined {
+    return this.chatData;
+  }
+  set chat_data(val: ChatData | undefined) {
+    this.chatData = val;
+  }
+
+  get bot_data(): BotData | undefined {
+    return this.botData;
+  }
+  set bot_data(val: BotData | undefined) {
+    this.botData = val;
+  }
+
   /**
    * Creates a new {@link CallbackContext} instance.
    *
@@ -93,23 +129,28 @@ export class CallbackContext<
    */
   constructor(options: {
     bot: Bot;
+    scheduler?: JobQueue;
     job_queue?: JobQueue;
+    task?: Job;
     job?: Job;
     args?: string[];
+    userData?: UserData;
     user_data?: UserData;
+    chatData?: ChatData;
     chat_data?: ChatData;
+    botData?: BotData;
     bot_data?: BotData;
     error?: Error;
     matches?: RegExpMatchArray[];
     update?: Update;
   }) {
     this.bot = options.bot;
-    this.job_queue = options.job_queue;
-    this.job = options.job;
+    this.scheduler = options.scheduler ?? options.job_queue;
+    this.task = options.task ?? options.job;
     this.args = options.args;
-    this.user_data = options.user_data;
-    this.chat_data = options.chat_data;
-    this.bot_data = options.bot_data;
+    this.userData = options.userData ?? options.user_data;
+    this.chatData = options.chatData ?? options.chat_data;
+    this.botData = options.botData ?? options.bot_data;
     this.error = options.error;
     this.matches = options.matches;
     this.update = options.update;

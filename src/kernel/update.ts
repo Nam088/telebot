@@ -102,7 +102,7 @@ export class Update implements RawUpdate {
   /**
    * The user that sent the message or triggered the update, resolved across update types.
    */
-  get effective_user(): User | undefined {
+  get effectiveUser(): User | undefined {
     if (this.message?.from) return this.message.from;
     if (this.edited_message?.from) return this.edited_message.from;
     if (this.callback_query?.from) return this.callback_query.from;
@@ -122,9 +122,16 @@ export class Update implements RawUpdate {
   }
 
   /**
+   * Compatibility alias for {@link Update.effectiveUser}.
+   */
+  get effective_user(): User | undefined {
+    return this.effectiveUser;
+  }
+
+  /**
    * The chat that this update belongs to.
    */
-  get effective_chat(): Chat | undefined {
+  get effectiveChat(): Chat | undefined {
     if (this.message?.chat) return this.message.chat;
     if (this.edited_message?.chat) return this.edited_message.chat;
     if (this.channel_post?.chat) return this.channel_post.chat;
@@ -145,9 +152,16 @@ export class Update implements RawUpdate {
   }
 
   /**
+   * Compatibility alias for {@link Update.effectiveChat}.
+   */
+  get effective_chat(): Chat | undefined {
+    return this.effectiveChat;
+  }
+
+  /**
    * The message contained in this update.
    */
-  get effective_message(): Message | undefined {
+  get effectiveMessage(): Message | undefined {
     return (
       this.message ??
       this.edited_message ??
@@ -160,14 +174,28 @@ export class Update implements RawUpdate {
   }
 
   /**
+   * Compatibility alias for {@link Update.effectiveMessage}.
+   */
+  get effective_message(): Message | undefined {
+    return this.effectiveMessage;
+  }
+
+  /**
    * The sender of the message (either a {@link User} or a {@link Chat} channel sender).
    */
-  get effective_sender(): User | Chat | undefined {
-    const msg = this.effective_message;
+  get effectiveSender(): User | Chat | undefined {
+    const msg = this.effectiveMessage;
     if (msg) {
       if (msg.from) return msg.from;
       if (msg.sender_chat) return msg.sender_chat;
     }
-    return this.effective_user;
+    return this.effectiveUser;
+  }
+
+  /**
+   * Compatibility alias for {@link Update.effectiveSender}.
+   */
+  get effective_sender(): User | Chat | undefined {
+    return this.effectiveSender;
   }
 }

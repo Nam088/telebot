@@ -58,7 +58,14 @@ export class Application {
   /**
    * Background task scheduler and timer engine.
    */
-  public readonly job_queue: JobQueue;
+  public readonly scheduler: JobQueue;
+
+  /**
+   * Compatibility alias for {@link Application.scheduler}.
+   */
+  get job_queue(): JobQueue {
+    return this.scheduler;
+  }
 
   private readonly handlers: Map<number, BaseHandler[]> = new Map();
   private readonly errorHandlers: ErrorHandlerCallback[] = [];
@@ -81,7 +88,7 @@ export class Application {
   constructor(bot: Bot, options: ApplicationOptions = {}) {
     this.bot = bot;
     this.persistence = options.persistence ?? new MemoryPersistence();
-    this.job_queue = new JobQueue(bot);
+    this.scheduler = new JobQueue(bot);
   }
 
   /**
@@ -231,6 +238,10 @@ export class Application {
     poll_interval?: number;
     timeout?: number;
   } = {}): Promise<void> {
+    if (this.isRunning) {
+      throw new Error("Application is already running. Cannot start polling concurrently.");
+    }
+
     this.isRunning = true;
     this.abortController = new AbortController();
 
@@ -281,13 +292,119 @@ export class Application {
   }
 
   /**
-   * Stops the active polling loop, shuts down the job queue, and aborts pending network requests.
+   * Starts a webhook HTTP server to receive updates pushed directly by Telegram.
+   *
+   * @param options - Webhook server configuration options.
+   * @throws If the application is already running in polling or webhook mode.
+   *
+   * @example
+   * ```ts
+   * await app.runWebhook({
+   *   listen: "0.0.0.0",
+   *   port: 8443,
+   *   path: "/telegram-webhook",
+   *   secret_token: "super-secret-token",
+   * });
+   * ```
+   */
+  public async runWebhook(options: {
+    listen?: string;
+    port?: number;
+    path?: string;
+    secret_token?: string;
+    server?: import("node:http").Server;
+  } = {}): Promise<void> {
+    if (this.isRunning) {
+      throw new Error("Application is already running. Cannot start webhook concurrently.");
+    }
+
+    this.isRunning = true;
+    await this.initializePersistence();
+    this.scheduler.start();
+
+    const { createServer } = await import("node:http");
+    const listenHost = options.listen ?? "0.0.0.0";
+    const listenPort = options.port ?? 8080;
+    const webhookPath = options.path ?? "/";
+    const secretToken = options.secret_token;
+
+    const server = options.server ?? createServer();
+
+    server.on("request", async (req, res) => {
+      const url = new URL(req.url ?? "/", `http://${req.headers.host || "localhost"}`);
+      if (req.method !== "POST" || url.pathname !== webhookPath) {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("Not Found");
+        return;
+      }
+
+      // Validate secret_token header if configured
+      if (secretToken) {
+        const receivedToken = req.headers["x-telegram-bot-api-secret-token"];
+        if (receivedToken !== secretToken) {
+          res.writeHead(401, { "Content-Type": "text/plain" });
+          res.end("Unauthorized");
+          return;
+        }
+      }
+
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk;
+      });
+
+      req.on("end", async () => {
+        try {
+          const rawUpdate = JSON.parse(body);
+          res.writeHead(200, { "Content-Type": "text/plain" });
+          res.end("OK");
+
+          await this.processUpdate(rawUpdate);
+        } catch (err: unknown) {
+          const error = err instanceof Error ? err : new Error(String(err));
+          for (const errHandler of this.errorHandlers) {
+            try {
+              await errHandler(error);
+            } catch (ehErr) {
+              console.error("Error in webhook error handler:", ehErr);
+            }
+          }
+          if (!res.headersSent) {
+            res.writeHead(400, { "Content-Type": "text/plain" });
+            res.end("Bad Request");
+          }
+        }
+      });
+    });
+
+    if (!options.server) {
+      await new Promise<void>((resolve) => {
+        server.listen(listenPort, listenHost, () => {
+          resolve();
+        });
+      });
+    }
+
+    this.webhookServer = server;
+  }
+
+  private webhookServer?: import("node:http").Server;
+
+  /**
+   * Stops the active polling loop or webhook server, shuts down the scheduler, and flushes persistent state.
    */
   public async stop(): Promise<void> {
     this.isRunning = false;
     this.abortController?.abort();
 
-    // Persist active jobs before stopping job queue
+    if (this.webhookServer) {
+      await new Promise<void>((resolve) => {
+        this.webhookServer?.close(() => resolve());
+      });
+      this.webhookServer = undefined;
+    }
+
+    // Persist active jobs before stopping scheduler
     const persistedJobs = this.job_queue.toPersistedJobs();
     await this.persistence.setJobs(persistedJobs);
 

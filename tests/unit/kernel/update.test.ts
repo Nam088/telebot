@@ -14,9 +14,13 @@ describe("Update wrapper", () => {
       },
     });
 
+    expect(update.effectiveUser?.id).toBe(456);
     expect(update.effective_user?.id).toBe(456);
+    expect(update.effectiveChat?.id).toBe(123);
     expect(update.effective_chat?.id).toBe(123);
+    expect(update.effectiveMessage?.text).toBe("Hi");
     expect(update.effective_message?.text).toBe("Hi");
+    expect(update.effectiveSender?.id).toBe(456);
     expect(update.effective_sender?.id).toBe(456);
   });
 

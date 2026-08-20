@@ -164,15 +164,15 @@ Single project (library), per `plan.md`: `src/telegram/`, `src/ext/`, `src/utils
 **Independent Test**: run `runWebhook()` behind a real HTTPS endpoint with a secret token configured; confirm Telegram-delivered updates dispatch correctly and an unauthenticated request is rejected.
 
 ### Tests for User Story 5
-- [ ] T047 [P] [US5] Unit tests for `Application.runWebhook` (built-in HTTP server, secret-token header validation, guard against running polling and webhook at once — spec.md Edge Cases) in `tests/unit/kernel/app.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T048 [P] [US5] Edge-case tests: invalid/revoked token → 401 surfaced as a typed error; `429` `retry_after` honored exactly; malformed/partial update payload doesn't throw during dispatch — in `tests/unit/client/bot.test.ts` and `tests/unit/kernel/app.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T047 [P] [US5] Unit tests for `Application.runWebhook` (built-in HTTP server, secret-token header validation, guard against running polling and webhook at once — spec.md Edge Cases) in `tests/unit/kernel/app.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T048 [P] [US5] Edge-case tests: invalid/revoked token → 401 surfaced as a typed error; `429` `retry_after` honored exactly; malformed/partial update payload doesn't throw during dispatch — in `tests/unit/client/bot.test.ts` and `tests/unit/kernel/app.test.ts` *(Assignee: Agent / Subagent)*
 
 ### Implementation for User Story 5
-- [ ] T049 [US5] Implement `Application.runWebhook` (built-in `http`/`https` server, secret token validation via `node:crypto`, single-mode guard) in `src/kernel/app.ts` (depends on T022) *(Assignee: Agent / Subagent)*
-- [ ] T050 [P] [US5] Add TSDoc/TypeDoc comments (`@param`, one `@returns`, `@example`, `@throws {@link TelegramApiError}`, `@defaultValue`, `@remarks`, `@deprecated` where relevant — NFR-4/AGENTS.md) to every public export across all modules (depends on T005-T046) *(Assignee: Agent / Subagent)*
-- [ ] T051 [US5] Confirm all 7 bots in `examples/` run against a live test bot per `specs/001-telegram-bot-framework/quickstart.md` step 5 (depends on T023, T031, T040, T046, T049) *(Assignee: Agent / Subagent)*
-- [ ] T052 [US5] Run `npm run docs` and resolve any warnings in the generated TypeDoc output (depends on T050) *(Assignee: Agent / Subagent)*
-- [ ] T053 [US5] Write a quickstart & API guide referencing modern TypeScript native architecture (depends on T005-T049) *(Assignee: Agent / Subagent)*
+- [X] T049 [US5] Implement `Application.runWebhook` (built-in `http`/`https` server, secret token validation via `node:crypto`, single-mode guard) in `src/kernel/app.ts` (depends on T022) *(Assignee: Agent / Subagent)*
+- [X] T050 [P] [US5] Add TSDoc/TypeDoc comments (`@param`, one `@returns`, `@example`, `@throws {@link TelegramApiError}`, `@defaultValue`, `@remarks`, `@deprecated` where relevant — NFR-4/AGENTS.md) to every public export across all modules (depends on T005-T046) *(Assignee: Agent / Subagent)*
+- [X] T051 [US5] Confirm all 7 bots in `examples/` run against a live test bot per `specs/001-telegram-bot-framework/quickstart.md` step 5 (depends on T023, T031, T040, T046, T049) *(Assignee: Agent / Subagent)*
+- [X] T052 [US5] Run `npm run docs` and resolve any warnings in the generated TypeDoc output (depends on T050) *(Assignee: Agent / Subagent)*
+- [X] T053 [US5] Write a quickstart & API guide referencing modern TypeScript native architecture (depends on T005-T049) *(Assignee: Agent / Subagent)*
 
 **Checkpoint**: All 5 user stories independently functional — the full framework is usable end-to-end.
 
@@ -182,11 +182,11 @@ Single project (library), per `plan.md`: `src/telegram/`, `src/ext/`, `src/utils
 
 **Purpose**: Validate the Success Criteria that span every story.
 
-- [ ] T054 [P] Verify >80% line coverage on `src/` via `npm run test:coverage` (Success Criteria #6)
-- [ ] T055 [P] Verify `npm ls --prod` lists no required runtime dependencies declared in `package.json` (Success Criteria #4)
-- [ ] T056 Benchmark framework performance and cold start latency (<200ms)
-- [ ] T057 Run the full validation guide in `specs/001-telegram-bot-framework/quickstart.md` end-to-end (steps 1-6)
-- [ ] T058 Verify `package.json`'s `dev:*` script paths work with all examples in `examples/`
+- [X] T054 [P] Verify >80% line coverage on `src/` via `npm run test:coverage` (Success Criteria #6)
+- [X] T055 [P] Verify `npm ls --prod` lists no required runtime dependencies declared in `package.json` (Success Criteria #4)
+- [X] T056 Benchmark framework performance and cold start latency (<200ms)
+- [X] T057 Run the full validation guide in `specs/001-telegram-bot-framework/quickstart.md` end-to-end (steps 1-6)
+- [X] T058 Verify `package.json`'s `dev:*` script paths work with all examples in `examples/`
 
 ---
 

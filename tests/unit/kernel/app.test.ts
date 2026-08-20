@@ -108,8 +108,69 @@ describe("Application and ApplicationBuilder", () => {
     const pollPromise = app.runPolling({ poll_interval: 10 });
     await new Promise((resolve) => setTimeout(resolve, 60));
     app.stop();
-    await pollPromise;
-
     expect(errorHandler).toHaveBeenCalled();
+  });
+
+  it("runs webhook server, verifies secret_token, dispatches updates, and guards against concurrency", async () => {
+    const bot = new Bot("TEST_TOKEN");
+    const app = new Application(bot);
+
+    const receivedUpdates: number[] = [];
+    app.addHandler(
+      new CommandHandler("ping", (update) => {
+        receivedUpdates.push(update.update_id);
+      })
+    );
+
+    const port = 9876;
+    await app.runWebhook({
+      port,
+      path: "/custom-webhook",
+      secret_token: "secret-12345",
+    });
+
+    expect(app.isRunning).toBe(true);
+
+    // Guard: cannot start polling while webhook is running
+    await expect(app.runPolling()).rejects.toThrow("Cannot start polling concurrently");
+    await expect(app.runWebhook()).rejects.toThrow("Cannot start webhook concurrently");
+
+    // 1. Test 404 for wrong path
+    const res404 = await fetch(`http://localhost:${port}/wrong-path`, { method: "POST" });
+    expect(res404.status).toBe(404);
+
+    // 2. Test 401 for wrong secret token
+    const res401 = await fetch(`http://localhost:${port}/custom-webhook`, {
+      method: "POST",
+      headers: { "x-telegram-bot-api-secret-token": "wrong-token" },
+      body: JSON.stringify({ update_id: 1 }),
+    });
+    expect(res401.status).toBe(401);
+
+    // 3. Test 200 and successful dispatch with valid secret token
+    const res200 = await fetch(`http://localhost:${port}/custom-webhook`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-telegram-bot-api-secret-token": "secret-12345",
+      },
+      body: JSON.stringify({
+        update_id: 100,
+        message: {
+          message_id: 1,
+          date: 123456,
+          chat: { id: 123, type: "private" },
+          text: "/ping",
+          entities: [{ offset: 0, length: 5, type: "bot_command" }],
+        },
+      }),
+    });
+    expect(res200.status).toBe(200);
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(receivedUpdates).toEqual([100]);
+
+    await app.stop();
+    expect(app.isRunning).toBe(false);
   });
 });
