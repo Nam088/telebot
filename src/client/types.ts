@@ -96,6 +96,60 @@ export interface User {
 }
 
 /**
+ * Describes the birthdate of a user.
+ */
+export interface Birthdate {
+  /** Day of the user's birth; 1-31. */
+  day: number;
+  /** Month of the user's birth; 1-12. */
+  month: number;
+  /** Year of the user's birth. */
+  year?: number;
+}
+
+/**
+ * Describes the intro message of a business.
+ */
+export interface BusinessIntro {
+  /** Title of the intro message. */
+  title?: string;
+  /** Text of the intro message. */
+  message?: string;
+  /** Sticker of the intro message. */
+  sticker?: Sticker;
+}
+
+/**
+ * Describes the location of a business.
+ */
+export interface BusinessLocation {
+  /** Address of the business. */
+  address: string;
+  /** Location of the business. */
+  location?: Location;
+}
+
+/**
+ * Describes the opening hours interval of a business.
+ */
+export interface BusinessOpeningHoursInterval {
+  /** The minute's sequence number in a week (0-10079) when the business opens in UTC+0. */
+  opening_minute: number;
+  /** The minute's sequence number in a week (1-10080) when the business closes in UTC+0. */
+  closing_minute: number;
+}
+
+/**
+ * Describes the opening hours of a business.
+ */
+export interface BusinessOpeningHours {
+  /** Unique name of the time zone. */
+  time_zone_name: string;
+  /** List of time intervals during which the business is open. */
+  opening_hours: BusinessOpeningHoursInterval[];
+}
+
+/**
  * Represents a Telegram chat (private conversation, group, supergroup, or channel).
  */
 export interface Chat {
@@ -108,10 +162,10 @@ export interface Chat {
   is_forum?: boolean;
   photo?: ChatPhoto;
   active_usernames?: string[];
-  birthdate?: unknown;
-  business_intro?: unknown;
-  business_location?: unknown;
-  business_opening_hours?: unknown;
+  birthdate?: Birthdate;
+  business_intro?: BusinessIntro;
+  business_location?: BusinessLocation;
+  business_opening_hours?: BusinessOpeningHours;
   personal_chat?: Chat;
   available_reactions?: unknown[];
   accent_color_id?: number;
@@ -393,14 +447,14 @@ export interface ExternalReplyInfo {
   document?: Document;
   photo?: PhotoSize[];
   sticker?: Sticker;
-  story?: unknown;
+  story?: Story;
   video?: Video;
   video_note?: VideoNote;
   voice?: Voice;
   has_media_spoiler?: boolean;
   contact?: Contact;
   dice?: Dice;
-  game?: unknown;
+  game?: Game;
   giveaway?: unknown;
   giveaway_winners?: unknown;
   invoice?: unknown;
@@ -420,11 +474,117 @@ export interface TextQuote {
 }
 
 /**
+ * Describes the position of a story area.
+ */
+export interface StoryAreaPosition {
+  /** The abscissa of the rectangle's center, as a percentage of the story width. */
+  x_percentage: number;
+  /** The ordinate of the rectangle's center, as a percentage of the story height. */
+  y_percentage: number;
+  /** The width of the rectangle, as a percentage of the story width. */
+  width_percentage: number;
+  /** The height of the rectangle, as a percentage of the story height. */
+  height_percentage: number;
+  /** Clockwise rotation angle of the rectangle, in degrees; 0-360. */
+  rotation_angle: number;
+  /** The radius of the rectangle corner rounding, as a percentage of the story width. */
+  corner_radius_percentage: number;
+}
+
+/**
+ * Describes the type of a story area.
+ */
+export type StoryAreaType =
+  | { type: "location"; location: Location; address?: unknown }
+  | { type: "suggested_reaction"; reaction_type: ReactionType; is_dark?: boolean; is_flipped?: boolean }
+  | { type: "link"; url: string }
+  | { type: "weather"; temperature_c: number; emoji: string; background_color: number };
+
+/**
+ * Describes a clickable or interactive area on a story.
+ */
+export interface StoryArea {
+  /** Position of the story area. */
+  position: StoryAreaPosition;
+  /** Type of the story area. */
+  type: StoryAreaType;
+}
+
+/**
  * Represents a Telegram story.
  */
 export interface Story {
+  /** Chat that posted the story. */
   chat: Chat;
+  /** Unique identifier of the story in the chat. */
   id: number;
+}
+
+/**
+ * Content of a story to be posted or edited using a photo.
+ */
+export interface InputStoryContentPhoto {
+  /** Type of the content, must be photo. */
+  type: "photo";
+  /** File to send. Pass a file_id, HTTP URL, or upload via InputFile. */
+  photo: string | InputFile;
+}
+
+/**
+ * Content of a story to be posted or edited using a video.
+ */
+export interface InputStoryContentVideo {
+  /** Type of the content, must be video. */
+  type: "video";
+  /** File to send. Pass a file_id, HTTP URL, or upload via InputFile. */
+  video: string | InputFile;
+  /** Precise duration of the video in seconds. */
+  duration?: number;
+  /** Cover image for the video. */
+  cover?: string | InputFile;
+  /** Timestamp in seconds from which the video will play. */
+  timestamp?: number;
+  /** Pass True if the video has no sound and should be looped. */
+  is_animation?: boolean;
+}
+
+/**
+ * Union of story content inputs.
+ */
+export type InputStoryContent = InputStoryContentPhoto | InputStoryContentVideo;
+
+/**
+ * Options passed to `postStory` requests.
+ */
+export interface PostStoryOptions {
+  /** Period after which the story is moved to the archive, in seconds; must be one of 6 * 3600, 12 * 3600, 24 * 3600, or 48 * 3600. */
+  active_period?: number;
+  /** Identifier of the target chat to pin the story in. */
+  pinned_peer_id?: number;
+  /** Story caption, 0-1024 characters. */
+  caption?: string;
+  /** Mode for parsing entities in the story caption. */
+  parse_mode?: ParseMode | string;
+  /** List of special entities that appear in the story caption. */
+  caption_entities?: MessageEntity[];
+  /** List of story areas to add to the story. */
+  areas?: StoryArea[];
+  /** Pass True if the content of the story must be protected from forwarding and saving. */
+  protect_content?: boolean;
+}
+
+/**
+ * Options passed to `editStory` requests.
+ */
+export interface EditStoryOptions {
+  /** Story caption, 0-1024 characters. */
+  caption?: string;
+  /** Mode for parsing entities in the story caption. */
+  parse_mode?: ParseMode | string;
+  /** List of special entities that appear in the story caption. */
+  caption_entities?: MessageEntity[];
+  /** List of story areas to add to the story. */
+  areas?: StoryArea[];
 }
 
 /**
@@ -440,7 +600,7 @@ export interface InlineKeyboardButton {
   switch_inline_query_current_chat?: string;
   switch_inline_query_chosen_chat?: unknown;
   copy_text?: { text: string };
-  callback_game?: unknown;
+  callback_game?: CallbackGame;
   pay?: boolean;
 }
 
@@ -546,7 +706,7 @@ export interface Message {
   has_media_spoiler?: boolean;
   contact?: Contact;
   dice?: Dice;
-  game?: unknown;
+  game?: Game;
   poll?: Poll;
   venue?: Venue;
   location?: Location;
@@ -569,9 +729,9 @@ export interface Message {
   chat_shared?: unknown;
   connected_website?: string;
   write_access_allowed?: unknown;
-  passport_data?: unknown;
+  passport_data?: PassportData;
   proximity_alert_triggered?: unknown;
-  boost_added?: unknown;
+  boost_added?: ChatBoostAdded;
   chat_background_set?: unknown;
   forum_topic_created?: unknown;
   forum_topic_edited?: unknown;
@@ -808,11 +968,68 @@ export interface ChatJoinRequest {
 }
 
 /**
+ * Describes a service message about a user boosting a chat.
+ */
+export interface ChatBoostAdded {
+  /** Number of boosts added by the user. */
+  boost_count: number;
+}
+
+/**
+ * Represents a chat boost source from Premium subscription.
+ */
+export interface ChatBoostSourcePremium {
+  source: "premium";
+  user: User;
+}
+
+/**
+ * Represents a chat boost source from a gift code.
+ */
+export interface ChatBoostSourceGiftCode {
+  source: "gift_code";
+  user: User;
+}
+
+/**
+ * Represents a chat boost source from a giveaway.
+ */
+export interface ChatBoostSourceGiveaway {
+  source: "giveaway";
+  giveaway_message_id: number;
+  user?: User;
+  prize_star_count?: number;
+  is_unclaimed?: boolean;
+}
+
+/**
+ * Describes the source of a chat boost.
+ */
+export type ChatBoostSource =
+  | ChatBoostSourcePremium
+  | ChatBoostSourceGiftCode
+  | ChatBoostSourceGiveaway;
+
+/**
+ * Contains information about a boost added to a chat.
+ */
+export interface ChatBoost {
+  /** Unique identifier of the boost. */
+  boost_id: string;
+  /** Point in time (Unix timestamp) when the chat was boosted. */
+  add_date: number;
+  /** Point in time (Unix timestamp) when the boost will automatically expire. */
+  expiration_date: number;
+  /** Source of the added boost. */
+  source: ChatBoostSource;
+}
+
+/**
  * Represents a boost added to a chat.
  */
 export interface ChatBoostUpdated {
   chat: Chat;
-  boost: unknown;
+  boost: ChatBoost;
 }
 
 /**
@@ -822,7 +1039,7 @@ export interface ChatBoostRemoved {
   chat: Chat;
   boost_id: string;
   remove_date: number;
-  source: unknown;
+  source: ChatBoostSource;
 }
 
 /**
@@ -1983,4 +2200,91 @@ export interface BotCommand {
   command: string;
   /** Description of the command; 1-256 characters. */
   description: string;
+}
+
+/**
+ * A placeholder, currently holds no information. Use BotFather to set up your game.
+ */
+export interface CallbackGame {
+  [key: string]: unknown;
+}
+
+/**
+ * Represents a game.
+ */
+export interface Game {
+  /** Title of the game. */
+  title: string;
+  /** Description of the game. */
+  description: string;
+  /** Photo that will be displayed in the game message in chats. */
+  photo: PhotoSize[];
+  /** Brief description of the game or high scores. */
+  text?: string;
+  /** Special entities that appear in text. */
+  text_entities?: MessageEntity[];
+  /** Animation that will be displayed in the game message in chats. */
+  animation?: Animation;
+}
+
+/**
+ * Describes Telegram Passport data shared with the bot.
+ */
+export interface PassportData {
+  /** Array with information about documents and other Telegram Passport elements. */
+  data: EncryptedPassportElement[];
+  /** Encrypted credentials required to decrypt the data. */
+  credentials: EncryptedCredentials;
+}
+
+/**
+ * Describes an encrypted Telegram Passport element.
+ */
+export interface EncryptedPassportElement {
+  /** Element type. */
+  type: string;
+  /** Base64-encoded element hash for verification. */
+  hash: string;
+  /** Base64-encoded encrypted data. */
+  data?: string;
+  /** User's verified phone number. */
+  phone_number?: string;
+  /** User's verified email address. */
+  email?: string;
+  /** Array of encrypted files. */
+  files?: PassportFile[];
+  /** Encrypted file with the front side of the document. */
+  front_side?: PassportFile;
+  /** Encrypted file with the reverse side of the document. */
+  reverse_side?: PassportFile;
+  /** Encrypted file with the selfie of the user holding a document. */
+  selfie?: PassportFile;
+  /** Array of encrypted files with translated versions of documents. */
+  translation?: PassportFile[];
+}
+
+/**
+ * Represents a file uploaded to Telegram Passport.
+ */
+export interface PassportFile {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file. */
+  file_unique_id: string;
+  /** File size in bytes. */
+  file_size: number;
+  /** Unix time when the file was uploaded. */
+  file_date: number;
+}
+
+/**
+ * Represents encrypted credentials required for decrypting Telegram Passport data.
+ */
+export interface EncryptedCredentials {
+  /** Base64-encoded encrypted JSON-serialized data. */
+  data: string;
+  /** Base64-encoded data hash for verification. */
+  hash: string;
+  /** Base64-encoded secret hash for verification. */
+  secret: string;
 }
