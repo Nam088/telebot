@@ -144,14 +144,14 @@ Single project (library), per `plan.md`: `src/telegram/`, `src/ext/`, `src/utils
 **Independent Test**: run `dev:timer`, confirm a scheduled job fires at the expected time.
 
 ### Tests for User Story 4
-- [ ] T041 [P] [US4] Unit tests for `JobQueue.runOnce`/`runRepeating` scheduling and `Job.remove()` in `tests/unit/scheduler/queue.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T042 [P] [US4] Unit test for `PersistedJob` round-tripping through `Persistence.getJobs`/`setJobs` (`callback` re-attached by `name` on reload, per data-model.md) in `tests/unit/storage/persistence.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T041 [P] [US4] Unit tests for `JobQueue.runOnce`/`runRepeating` scheduling and `Job.remove()` in `tests/unit/scheduler/queue.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T042 [P] [US4] Unit test for `PersistedJob` round-tripping through `Persistence.getJobs`/`setJobs` (`callback` re-attached by `name` on reload, per data-model.md) in `tests/unit/storage/persistence.test.ts` *(Assignee: Agent / Subagent)*
 
 ### Implementation for User Story 4
-- [ ] T043 [US4] Implement `Job`, `JobQueue`, `PersistedJob` in `src/scheduler/queue.ts` (depends on T011) *(Assignee: Agent / Subagent)*
-- [ ] T044 [US4] Wire `job_queue`/`job` onto `Application`/`CallbackContext` in `src/kernel/app.ts`, `src/kernel/context.ts` (depends on T043, T013) *(Assignee: Agent / Subagent)*
-- [ ] T045 [US4] Persist and reload jobs via `Persistence.getJobs`/`setJobs` on `Application` start/stop in `src/kernel/app.ts` (depends on T043, T012) *(Assignee: Agent / Subagent)*
-- [ ] T046 [US4] Write `examples/timerbot.ts` (depends on T043, T044, T045) *(Assignee: Agent / Subagent)*
+- [X] T043 [US4] Implement `Job`, `JobQueue`, `PersistedJob` in `src/scheduler/queue.ts` (depends on T011) *(Assignee: Agent / Subagent)*
+- [X] T044 [US4] Wire `job_queue`/`job` onto `Application`/`CallbackContext` in `src/kernel/app.ts`, `src/kernel/context.ts` (depends on T043, T013) *(Assignee: Agent / Subagent)*
+- [X] T045 [US4] Persist and reload jobs via `Persistence.getJobs`/`setJobs` on `Application` start/stop in `src/kernel/app.ts` (depends on T043, T012) *(Assignee: Agent / Subagent)*
+- [X] T046 [US4] Write `examples/timerbot.ts` (depends on T043, T044, T045) *(Assignee: Agent / Subagent)*
 
 **Checkpoint**: User Stories 1-4 all work independently.
 

@@ -30,6 +30,10 @@
       "types": "./dist/storage/index.d.ts",
       "import": "./dist/storage/index.js"
     },
+    "./scheduler": {
+      "types": "./dist/scheduler/index.d.ts",
+      "import": "./dist/scheduler/index.js"
+    },
     "./ui": {
       "types": "./dist/components/index.d.ts",
       "import": "./dist/components/index.js"

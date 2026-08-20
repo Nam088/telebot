@@ -9,5 +9,6 @@ export * from "./kernel/index.js";
 export * from "./routing/index.js";
 export * from "./filters/index.js";
 export * from "./storage/index.js";
+export * from "./scheduler/index.js";
 export * from "./components/index.js";
 export * from "./utils/index.js";

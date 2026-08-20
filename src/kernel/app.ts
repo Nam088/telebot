@@ -11,6 +11,7 @@ import { BaseHandler } from "../routing/handlers.js";
 import { ConversationHandler } from "../routing/conversation.js";
 import { CallbackContext } from "./context.js";
 import { type Persistence, MemoryPersistence } from "../storage/index.js";
+import { JobQueue } from "../scheduler/queue.js";
 
 /**
  * Error handler callback signature.
@@ -54,6 +55,11 @@ export class Application {
    */
   public readonly persistence: Persistence;
 
+  /**
+   * Background task scheduler and timer engine.
+   */
+  public readonly job_queue: JobQueue;
+
   private readonly handlers: Map<number, BaseHandler[]> = new Map();
   private readonly errorHandlers: ErrorHandlerCallback[] = [];
 
@@ -75,6 +81,7 @@ export class Application {
   constructor(bot: Bot, options: ApplicationOptions = {}) {
     this.bot = bot;
     this.persistence = options.persistence ?? new MemoryPersistence();
+    this.job_queue = new JobQueue(bot);
   }
 
   /**
@@ -119,6 +126,12 @@ export class Application {
       }
     }
 
+    // Restore persisted background jobs
+    const storedJobs = await this.persistence.getJobs();
+    if (storedJobs.length > 0) {
+      this.job_queue.restoreFromPersistedJobs(storedJobs);
+    }
+
     this.persistenceInitialized = true;
   }
 
@@ -150,6 +163,7 @@ export class Application {
 
     const context = new CallbackContext({
       bot: this.bot,
+      job_queue: this.job_queue,
       user_data: userData,
       chat_data: chatData,
       bot_data: botData,
@@ -222,6 +236,8 @@ export class Application {
 
     await this.initializePersistence();
 
+    this.job_queue.start();
+
     if (options.drop_pending_updates) {
       const updates = await this.bot.getUpdates({ offset: -1, timeout: 0 });
       if (updates.length > 0) {
@@ -265,11 +281,17 @@ export class Application {
   }
 
   /**
-   * Stops the active polling loop and aborts pending network requests.
+   * Stops the active polling loop, shuts down the job queue, and aborts pending network requests.
    */
-  public stop(): void {
+  public async stop(): Promise<void> {
     this.isRunning = false;
     this.abortController?.abort();
+
+    // Persist active jobs before stopping job queue
+    const persistedJobs = this.job_queue.toPersistedJobs();
+    await this.persistence.setJobs(persistedJobs);
+
+    this.job_queue.stop();
   }
 }
 

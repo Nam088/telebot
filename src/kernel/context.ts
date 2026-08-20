@@ -6,6 +6,7 @@
 
 import type { Bot } from "../client/bot.js";
 import type { Update } from "./update.js";
+import type { JobQueue, Job } from "../scheduler/queue.js";
 
 /**
  * Context object passed to handler callbacks, error handlers, and job callbacks.
@@ -43,12 +44,12 @@ export class CallbackContext<
   /**
    * Optional job queue instance for scheduling future background tasks.
    */
-  public job_queue?: unknown;
+  public job_queue?: JobQueue;
 
   /**
    * The current background job being executed (when invoked from the JobQueue).
    */
-  public job?: unknown;
+  public job?: Job;
 
   /**
    * Positional arguments parsed from a command message.
@@ -92,8 +93,8 @@ export class CallbackContext<
    */
   constructor(options: {
     bot: Bot;
-    job_queue?: unknown;
-    job?: unknown;
+    job_queue?: JobQueue;
+    job?: Job;
     args?: string[];
     user_data?: UserData;
     chat_data?: ChatData;
