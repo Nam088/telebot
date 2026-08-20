@@ -202,24 +202,36 @@ export class MessageHandler<
   }
 
   /**
-   * Populates `context.matches` if using a RegExp filter and executes callback.
+   * Populates `context.matches` if using a RegExp filter (or compound filter containing one) and executes callback.
    *
    * @param update - The incoming update.
    * @param context - Callback context instance.
    * @returns Result from callback execution.
    */
   override async handleUpdate(update: Update, context: C): Promise<R> {
-    if (this.filters instanceof RegexFilter) {
-      const msg = update.effective_message;
-      const text = msg?.text ?? msg?.caption;
-      if (text) {
-        const matches = text.match(this.filters.pattern);
+    const msg = update.effective_message;
+    const text = msg?.text ?? msg?.caption;
+    if (text) {
+      const regexFilter = this.findRegexFilter(this.filters);
+      if (regexFilter) {
+        const matches = text.match(regexFilter.pattern);
         if (matches) {
           context.matches = [matches];
         }
       }
     }
     return super.handleUpdate(update, context);
+  }
+
+  private findRegexFilter(filter: BaseFilter): RegexFilter | null {
+    if (filter instanceof RegexFilter) {
+      return filter;
+    }
+    if ("f1" in filter && "f2" in filter) {
+      const compound = filter as unknown as { f1: BaseFilter; f2: BaseFilter };
+      return this.findRegexFilter(compound.f1) ?? this.findRegexFilter(compound.f2);
+    }
+    return null;
   }
 }
 
