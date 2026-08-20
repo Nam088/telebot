@@ -8,13 +8,15 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
+  id-token: write # Bắt buộc cho NPM OIDC Trusted Publisher & Provenance
 
 jobs:
   release-please:
+    name: Run Google Release Please
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v4
+      - name: Run Release Please Action
+        uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: node
@@ -24,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
 
-      - name: Setup Node.js 22.x
+      - name: Setup Node.js 22.x with NPM OIDC Registry
         uses: actions/setup-node@v4
         with:
           node-version: "22.x"
@@ -35,7 +37,7 @@ jobs:
         run: npm ci
         if: ${{ steps.release.outputs.release_created }}
 
-      - name: Run Full Quality Gate Tests
+      - name: Run Full Quality Gates (Format, Lint, Build, Tests, Docs)
         run: |
           npm run format:check
           npm run lint
@@ -44,8 +46,7 @@ jobs:
           npm run docs
         if: ${{ steps.release.outputs.release_created }}
 
-      - name: Publish to NPM
+      # Publish lên NPM hoàn toàn không cần secret token - sử dụng NPM OIDC Trusted Publisher & Provenance
+      - name: Publish to NPM via OIDC Trusted Publishing
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: ${{ steps.release.outputs.release_created }}
