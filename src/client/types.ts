@@ -562,9 +562,9 @@ export interface Message {
   migrate_to_chat_id?: number;
   migrate_from_chat_id?: number;
   pinned_message?: Message;
-  invoice?: unknown;
-  successful_payment?: unknown;
-  refunded_payment?: unknown;
+  invoice?: Invoice;
+  successful_payment?: SuccessfulPayment;
+  refunded_payment?: RefundedPayment;
   users_shared?: unknown;
   chat_shared?: unknown;
   connected_website?: string;
@@ -628,13 +628,101 @@ export interface ChosenInlineResult {
 }
 
 /**
+ * Represents basic information about an invoice.
+ */
+export interface Invoice {
+  /** Product name. */
+  title: string;
+  /** Product description. */
+  description: string;
+  /** Unique bot deep-linking parameter. */
+  start_parameter: string;
+  /** Three-letter ISO 4217 currency code or "XTR" for Telegram Stars. */
+  currency: string;
+  /** Total price in the smallest units of the currency. */
+  total_amount: number;
+}
+
+/**
+ * Represents information about an order.
+ */
+export interface OrderInfo {
+  /** User name. */
+  name?: string;
+  /** User's phone number. */
+  phone_number?: string;
+  /** User's email. */
+  email?: string;
+  /** User's shipping address. */
+  shipping_address?: ShippingAddress;
+}
+
+/**
+ * Represents a shipping address.
+ */
+export interface ShippingAddress {
+  /** Two-letter ISO 3166-1 alpha-2 country code. */
+  country_code: string;
+  /** State, if applicable. */
+  state?: string;
+  /** City. */
+  city: string;
+  /** First line for the address. */
+  street_line1: string;
+  /** Second line for the address. */
+  street_line2?: string;
+  /** Address post code. */
+  post_code: string;
+}
+
+/**
+ * Contains basic information about a successful payment.
+ */
+export interface SuccessfulPayment {
+  /** Three-letter ISO 4217 currency code or "XTR". */
+  currency: string;
+  /** Total price in the smallest units of the currency. */
+  total_amount: number;
+  /** Bot specified invoice payload. */
+  invoice_payload: string;
+  /** Identifier of the shipping option chosen by the user. */
+  shipping_option_id?: string;
+  /** Order info provided by the user. */
+  order_info?: OrderInfo;
+  /** Telegram payment identifier. */
+  telegram_payment_charge_id: string;
+  /** Provider payment identifier. */
+  provider_payment_charge_id: string;
+  /** True, if the payment is a recurring subscription. */
+  is_recurring?: boolean;
+  /** True, if the payment is the first payment for a subscription. */
+  is_first_recurring?: boolean;
+}
+
+/**
+ * Contains basic information about a refunded payment.
+ */
+export interface RefundedPayment {
+  /** Three-letter ISO 4217 currency code or "XTR". */
+  currency: string;
+  /** Total refunded price in the smallest units of the currency. */
+  total_amount: number;
+  /** Bot specified invoice payload. */
+  invoice_payload: string;
+  /** Telegram payment identifier. */
+  telegram_payment_charge_id: string;
+  /** Provider payment identifier. */
+  provider_payment_charge_id?: string;
+}
+
+/**
  * Contains information about an incoming shipping query.
  */
 export interface ShippingQuery {
   id: string;
   from: User;
   invoice_payload: string;
-  shipping_address: unknown;
+  shipping_address: ShippingAddress;
 }
 
 /**
@@ -647,7 +735,7 @@ export interface PreCheckoutQuery {
   total_amount: number;
   invoice_payload: string;
   shipping_option_id?: string;
-  order_info?: unknown;
+  order_info?: OrderInfo;
 }
 
 /**
@@ -1758,9 +1846,20 @@ export interface AnswerPreCheckoutQueryOptions {
 }
 
 /**
+ * Describes the number of Telegram Stars.
+ */
+export interface StarAmount {
+  /** The integer number of Telegram Stars. */
+  amount: number;
+  /** The number of 1/1000000000 shares of Telegram Stars. */
+  nanostar_amount?: number;
+}
+
+/**
  * Contains a list of Telegram Star transactions.
  */
 export interface StarTransactions {
+  /** List of transactions. */
   transactions: StarTransaction[];
 }
 
@@ -1768,11 +1867,17 @@ export interface StarTransactions {
  * Describes a Telegram Star transaction.
  */
 export interface StarTransaction {
+  /** Unique identifier of the transaction. */
   id: string;
+  /** Number of Telegram Stars transferred. */
   amount: number;
+  /** The number of 1/1000000000 shares of Telegram Stars transferred. */
   nanostar_amount?: number;
+  /** Date the transaction took place in Unix time. */
   date: number;
+  /** Source of the transaction. */
   source?: unknown;
+  /** Receiver of the transaction. */
   receiver?: unknown;
 }
 
@@ -1780,20 +1885,35 @@ export interface StarTransaction {
  * Represents the rights of an administrator in a chat.
  */
 export interface ChatAdministratorRights {
+  /** True, if the user's presence in the chat is hidden. */
   is_anonymous: boolean;
+  /** True, if the administrator can access the chat event log, get boost list, see hidden members, etc. */
   can_manage_chat: boolean;
+  /** True, if the administrator can delete messages of other users. */
   can_delete_messages: boolean;
+  /** True, if the administrator can manage video chats. */
   can_manage_video_chats: boolean;
+  /** True, if the administrator can restrict, ban or unban chat members. */
   can_restrict_members: boolean;
+  /** True, if the administrator can add new administrators with a subset of their own privileges. */
   can_promote_members: boolean;
+  /** True, if the user is allowed to change the chat title, photo and other settings. */
   can_change_info: boolean;
+  /** True, if the user is allowed to invite new users to the chat. */
   can_invite_users: boolean;
+  /** True, if the administrator can post stories to the chat. */
   can_post_stories?: boolean;
+  /** True, if the administrator can edit stories posted by other users. */
   can_edit_stories?: boolean;
+  /** True, if the administrator can delete stories posted by other users. */
   can_delete_stories?: boolean;
+  /** True, if the administrator can post messages in the channel, or access channel statistics. */
   can_post_messages?: boolean;
+  /** True, if the administrator can edit messages of other users. */
   can_edit_messages?: boolean;
+  /** True, if the user is allowed to pin messages. */
   can_pin_messages?: boolean;
+  /** True, if the user is allowed to create, rename, close, and reopen forum topics. */
   can_manage_topics?: boolean;
 }
 
@@ -1806,9 +1926,22 @@ export type MenuButton =
   | { type: "web_app"; text: string; web_app: { url: string } };
 
 /**
+ * Represents the scope to which bot commands are applied.
+ */
+export type BotCommandScope =
+  | { type: "default" }
+  | { type: "all_private_chats" }
+  | { type: "all_group_chats" }
+  | { type: "all_chat_administrators" }
+  | { type: "chat"; chat_id: number | string }
+  | { type: "chat_administrators"; chat_id: number | string }
+  | { type: "chat_member"; chat_id: number | string; user_id: number };
+
+/**
  * Represents the bot's name.
  */
 export interface BotName {
+  /** The bot's name. */
   name: string;
 }
 
@@ -1816,6 +1949,7 @@ export interface BotName {
  * Represents the bot's description.
  */
 export interface BotDescription {
+  /** The bot's description. */
   description: string;
 }
 
@@ -1823,5 +1957,30 @@ export interface BotDescription {
  * Represents the bot's short description.
  */
 export interface BotShortDescription {
+  /** The bot's short description. */
   short_description: string;
+}
+
+/**
+ * Represents a forum topic.
+ */
+export interface ForumTopic {
+  /** Unique identifier of the forum topic. */
+  message_thread_id: number;
+  /** Name of the topic. */
+  name: string;
+  /** Color of the topic icon in RGB format. */
+  icon_color: number;
+  /** Unique identifier of the custom emoji shown as the topic icon. */
+  icon_custom_emoji_id?: string;
+}
+
+/**
+ * Represents a bot command.
+ */
+export interface BotCommand {
+  /** Text of the command; 1-32 characters. Can contain only lowercase English letters, digits and underscores. */
+  command: string;
+  /** Description of the command; 1-256 characters. */
+  description: string;
 }

@@ -101,8 +101,35 @@ export type {
   CreateNewStickerSetOptions,
   AddStickerToSetOptions,
   ReplaceStickerInSetOptions,
+  Gifts,
+  Gift,
+  MenuButton,
+  GameHighScore,
+  ChatAdministratorRights,
+  BotDescription,
+  BotName,
+  BotShortDescription,
+  BotCommand,
+  BotCommandScope,
+  ForumTopic,
+  StarTransactions,
+  StarTransaction,
+  StarAmount,
+  UserChatBoosts,
+  AnswerPreCheckoutQueryOptions,
+  AnswerShippingQueryOptions,
+  SendInvoiceOptions,
+  Invoice,
+  SuccessfulPayment,
+  RefundedPayment,
+  OrderInfo,
+  ShippingAddress,
+  LabeledPrice,
+  ShippingOption,
+  PassportElementError,
 } from "./types.js";
 export { TelegramApiError } from "./types.js";
+export { BaseBotClient } from "./methods/base.js";
 export * from "./constants.js";
 export * from "./bot.js";
 
