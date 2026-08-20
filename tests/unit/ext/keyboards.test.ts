@@ -36,6 +36,11 @@ describe("Keyboards", () => {
     const keyboard = new InlineKeyboard()
       .text("Btn 1", "data_1")
       .url("Website", "https://example.com")
+      .webApp("App", "https://webapp.example.com")
+      .row()
+      .switchInlineQuery("Search", "query")
+      .switchInlineQueryCurrentChat("Search Chat", "chat query")
+      .copyText("Copy", "some text")
       .row()
       .text("Btn 2", "data_2");
 
@@ -44,12 +49,19 @@ describe("Keyboards", () => {
       [
         { text: "Btn 1", callback_data: "data_1" },
         { text: "Website", url: "https://example.com" },
+        { text: "App", web_app: { url: "https://webapp.example.com" } },
+      ],
+      [
+        { text: "Search", switch_inline_query: "query" },
+        { text: "Search Chat", switch_inline_query_current_chat: "chat query" },
+        { text: "Copy", copy_text: { text: "some text" } },
       ],
       [
         { text: "Btn 2", callback_data: "data_2" },
       ],
     ]);
   });
+
 
   it("ReplyKeyboardMarkup creates valid structure", () => {
     const markup: ReplyKeyboardMarkup = {
@@ -73,7 +85,8 @@ describe("Keyboards", () => {
       .text("Option A")
       .requestLocation("Share Location")
       .row()
-      .requestContact("Share Contact");
+      .requestContact("Share Contact")
+      .requestPoll("Create Poll", "quiz");
 
     const markup = keyboard.build();
     expect(markup.resize_keyboard).toBe(true);
@@ -85,9 +98,11 @@ describe("Keyboards", () => {
       ],
       [
         { text: "Share Contact", request_contact: true },
+        { text: "Create Poll", request_poll: { type: "quiz" } },
       ],
     ]);
   });
+
 
   it("ReplyKeyboardRemove creates remove_keyboard structure", () => {
     const markup: ReplyKeyboardRemove = {

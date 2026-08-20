@@ -98,16 +98,17 @@ Single project (library), per `plan.md`: `src/telegram/`, `src/ext/`, `src/utils
 **Independent Test**: run `dev:keyboard`, `dev:poll`, `dev:chatmember`, `dev:deeplink`; tap an inline button, vote in a poll, join/leave a chat, open a deep link — each produces the expected handler call.
 
 ### Tests for User Story 2
-- [ ] T024 [P] [US2] Unit tests for `CallbackQueryHandler`, `InlineQueryHandler`, `ChosenInlineResultHandler`, `PollAnswerHandler`, `ChatMemberHandler`, `TypeHandler` in `tests/unit/ext/handlers.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T025 [P] [US2] Unit tests for the remaining filter constants, `ChatType`/`StatusUpdate` namespaces, and `Regex`/`Custom` factories (including `context.matches` population) in `tests/unit/ext/filters.test.ts` *(Assignee: Agent / Subagent)*
-- [ ] T026 [P] [US2] Unit tests for keyboards and `InputMedia*` builders in `tests/unit/ext/keyboards.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T024 [P] [US2] Unit tests for `CallbackQueryHandler`, `InlineQueryHandler`, `ChosenInlineResultHandler`, `PollAnswerHandler`, `ChatMemberHandler`, `TypeHandler` in `tests/unit/ext/handlers.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T025 [P] [US2] Unit tests for the remaining filter constants, `ChatType`/`StatusUpdate` namespaces, and `Regex`/`Custom` factories (including `context.matches` population) in `tests/unit/ext/filters.test.ts` *(Assignee: Agent / Subagent)*
+- [X] T026 [P] [US2] Unit tests for keyboards and `InputMedia*` builders in `tests/unit/ext/keyboards.test.ts` *(Assignee: Agent / Subagent)*
 
 ### Implementation for User Story 2
-- [ ] T027 [P] [US2] Implement `CallbackQueryHandler`, `InlineQueryHandler`, `ChosenInlineResultHandler`, `PollAnswerHandler`, `ChatMemberHandler`, `TypeHandler` in `src/ext/handlers.ts` (depends on T010) *(Assignee: Agent / Subagent)*
-- [ ] T028 [P] [US2] Implement the remaining filters, `filters.ChatType.*`, `filters.StatusUpdate.*`, `filters.Regex(...)`, `filters.Custom(...)` in `src/ext/filters.ts` (depends on T020) *(Assignee: Agent / Subagent)*
-- [ ] T029 [P] [US2] Implement `ReplyKeyboardMarkup`, `InlineKeyboardMarkup`, `ReplyKeyboardRemove`, `ForceReply`, `InputFile`, `InputMediaPhoto/Video/Animation/Audio/Document` in `src/ext/keyboards.ts` (depends on T008) *(Assignee: Agent / Subagent)*
-- [ ] T030 [US2] Implement the remaining Bot API methods (`send*` media methods, `answerCallbackQuery`, `editMessageText`, `answerInlineQuery`, chat-admin methods) in `src/telegram/bot.ts` (depends on T006, T008) *(Assignee: Agent / Subagent)*
-- [ ] T031 [P] [US2] Write `examples/inlinekeyboard.ts`, `examples/pollbot.ts`, `examples/chatmemberbot.ts`, `examples/deeplinking.ts` (depends on T027, T028, T029, T030) *(Assignee: Agent / Subagent)*
+- [X] T027 [P] [US2] Implement `CallbackQueryHandler`, `InlineQueryHandler`, `ChosenInlineResultHandler`, `PollAnswerHandler`, `ChatMemberHandler`, `TypeHandler` in `src/ext/handlers.ts` (depends on T010) *(Assignee: Agent / Subagent)*
+- [X] T028 [P] [US2] Implement the remaining filters, `filters.ChatType.*`, `filters.StatusUpdate.*`, `filters.Regex(...)`, `filters.Custom(...)` in `src/ext/filters.ts` (depends on T020) *(Assignee: Agent / Subagent)*
+- [X] T029 [P] [US2] Implement `ReplyKeyboardMarkup`, `InlineKeyboardMarkup`, `ReplyKeyboardRemove`, `ForceReply`, `InputFile`, `InputMediaPhoto/Video/Animation/Audio/Document` in `src/ext/keyboards.ts` (depends on T008) *(Assignee: Agent / Subagent)*
+- [X] T030 [US2] Implement the remaining Bot API methods (`send*` media methods, `answerCallbackQuery`, `editMessageText`, `answerInlineQuery`, chat-admin methods) in `src/telegram/bot.ts` (depends on T006, T008) *(Assignee: Agent / Subagent)*
+- [X] T031 [P] [US2] Write `examples/inlinekeyboard.ts`, `examples/pollbot.ts`, `examples/chatmemberbot.ts`, `examples/deeplinking.ts` (depends on T027, T028, T029, T030) *(Assignee: Agent / Subagent)*
+
 
 **Checkpoint**: User Stories 1 AND 2 both work independently.
 
