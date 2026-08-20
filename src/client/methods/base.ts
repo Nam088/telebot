@@ -9,31 +9,65 @@ import { buildRequestBody } from "../../utils/http.js";
 import { validateToken } from "../../utils/validation.js";
 
 /**
- * Options for initializing a {@link BaseBotClient}.
+ * Options for initializing a {@link BaseBotClient} or {@link Bot}.
  */
 export interface BotOptions {
-  /** Custom base API endpoint URL (e.g. for local Bot API server). */
+  /**
+   * Custom base API endpoint URL (e.g. `http://localhost:8081` for a local Telegram Bot API server).
+   *
+   * @defaultValue `"https://api.telegram.org"`
+   */
   apiRoot?: string;
-  /** Custom fetch implementation for deterministic testing or proxy tunneling. */
+
+  /**
+   * Custom fetch implementation for deterministic testing, custom agents, or proxy tunneling.
+   *
+   * @defaultValue `globalThis.fetch`
+   */
   fetch?: typeof globalThis.fetch;
-  /** Base delay in milliseconds for retries (used in unit tests). */
+
+  /**
+   * Base delay in milliseconds used for exponential backoff during rate-limiting or server retries.
+   *
+   * Primarily customized in test suites for fast execution.
+   */
   baseDelayMs?: number;
 }
 
 /**
- * Core HTTP dispatcher and credential manager for Bot API operations.
+ * Core HTTP dispatcher and credential manager for all Telegram Bot API operations.
+ *
+ * Implements automated rate-limit backoff (HTTP 429 `retry_after`), exponential backoff
+ * for server errors (HTTP 5xx), payload serialization (JSON or multipart `FormData`),
+ * and uniform error unwrapping into {@link TelegramApiError}.
  */
 export abstract class BaseBotClient {
+  /**
+   * Secret Telegram Bot API token received from BotFather.
+   */
   public readonly token: string;
+
+  /**
+   * Base endpoint URL of the Telegram Bot API server.
+   */
   public readonly apiRoot: string;
+
+  /**
+   * Internal fetch adapter instance used for HTTP dispatch.
+   */
   protected readonly _fetch: typeof globalThis.fetch;
+
+  /**
+   * Optional base delay in milliseconds used for retry calculations.
+   */
   protected readonly baseDelayMs?: number;
 
   /**
    * Constructs a new {@link BaseBotClient}.
    *
-   * @param token - Telegram bot token received from BotFather.
-   * @param options - Configuration options for the bot client.
+   * @param token - Telegram bot token received from BotFather. Must follow format `<bot_id>:<secret_token>`.
+   * @param options - Configuration options for the client including custom fetch or local API server URL.
+   * @throws {@link TypeError} When the token is empty or invalid.
    */
   constructor(token: string, options: BotOptions = {}) {
     validateToken(token);
@@ -44,9 +78,17 @@ export abstract class BaseBotClient {
   }
 
   /**
-   * Helper utility to pause execution for a given number of seconds.
+   * Helper utility to pause asynchronous execution for a given number of seconds.
    *
-   * @param seconds - Duration in seconds to sleep.
+   * Used internally during retry delays and rate-limit backoff.
+   *
+   * @param seconds - Duration in seconds to pause execution.
+   * @returns Promise that resolves once the specified duration elapses.
+   *
+   * @example
+   * ```ts
+   * await bot.sleep(2); // Pauses execution for 2 seconds
+   * ```
    */
   public async sleep(seconds: number): Promise<void> {
     const ms = this.baseDelayMs !== undefined ? this.baseDelayMs : seconds * 1000;
@@ -54,13 +96,22 @@ export abstract class BaseBotClient {
   }
 
   /**
-   * Core request dispatcher to call any raw Telegram Bot API endpoint.
+   * Core request dispatcher to execute any raw Telegram Bot API endpoint.
    *
-   * @typeParam T - The expected result payload type.
-   * @param method - The API method name (e.g. `"sendMessage"`).
-   * @param payload - Key-value map of parameters.
-   * @returns Resolves with the unwrapped `result` field.
-   * @throws {@link TelegramApiError} On non-200 or API errors.
+   * Automatically serializes JSON objects or multipart `FormData` when file buffers / `InputFile` are present.
+   * Handles HTTP 429 rate-limiting with `retry_after` backoff and HTTP 5xx retries.
+   *
+   * @typeParam T - The expected return payload type from Telegram.
+   * @param method - The Bot API method name (e.g. `"sendMessage"`, `"getMe"`, `"setWebhook"`).
+   * @param payload - Key-value parameters corresponding to the API method fields.
+   * @returns Resolves with the unwrapped `result` field returned by Telegram.
+   * @throws {@link TelegramApiError} When Telegram returns `ok: false`, HTTP 4xx, or after retry exhaustion on 5xx errors.
+   *
+   * @example
+   * ```ts
+   * const user = await bot.request<User>("getMe");
+   * console.log(`Bot username: @${user.username}`);
+   * ```
    */
   public async request<T>(method: string, payload: Record<string, unknown> = {}): Promise<T> {
     const url = `${this.apiRoot}/bot${this.token}/${method}`;
