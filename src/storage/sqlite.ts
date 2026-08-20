@@ -63,6 +63,9 @@ export class SqlitePersistence implements Persistence {
 
   private initTables(): void {
     this.db.exec(`
+      PRAGMA journal_mode = WAL;
+      PRAGMA synchronous = NORMAL;
+
       CREATE TABLE IF NOT EXISTS user_data (
         user_id INTEGER PRIMARY KEY,
         data TEXT NOT NULL
