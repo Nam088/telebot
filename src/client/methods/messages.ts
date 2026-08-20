@@ -256,4 +256,31 @@ export abstract class MessageMethods extends BaseBotClient {
   public async getWebhookInfo(): Promise<WebhookInfo> {
     return this.request<WebhookInfo>("getWebhookInfo");
   }
+
+  public async sendMessageDraft(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("sendMessageDraft", options);
+  }
+
+  public async sendChecklist(options: Record<string, unknown>): Promise<Message> {
+    return this.request<Message>("sendChecklist", options);
+  }
+
+  public async editMessageChecklist(options: Record<string, unknown>): Promise<Message | boolean> {
+    return this.request<Message | boolean>("editMessageChecklist", options);
+  }
+
+  public async sendPaidMedia(options: Record<string, unknown>): Promise<Message> {
+    return this.request<Message>("sendPaidMedia", options);
+  }
+
+  public async sendLivePhoto(options: Record<string, unknown>): Promise<Message> {
+    return this.request<Message>("sendLivePhoto", options);
+  }
+
+  public async getUserPersonalChatMessages(chatId: number | string, limit?: number): Promise<Message[]> {
+    const payload: Record<string, unknown> = { chat_id: chatId };
+    if (limit !== undefined) payload["limit"] = limit;
+    return this.request<Message[]>("getUserPersonalChatMessages", payload);
+  }
 }
+

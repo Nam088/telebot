@@ -186,4 +186,195 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
     if (customEmojiId !== undefined) payload["custom_emoji_id"] = customEmojiId;
     return this.request<boolean>("setUserEmojiStatus", payload);
   }
+
+  public async savePreparedInlineMessage(options: Record<string, unknown>): Promise<unknown> {
+    return this.request<unknown>("savePreparedInlineMessage", options);
+  }
+
+  public async answerWebAppQuery(webAppQueryId: string, result: unknown): Promise<{ inline_message_id?: string }> {
+    return this.request<{ inline_message_id?: string }>("answerWebAppQuery", {
+      web_app_query_id: webAppQueryId,
+      result,
+    });
+  }
+
+  public async answerGuestQuery(guestQueryId: string, result: unknown): Promise<{ inline_message_id?: string }> {
+    return this.request<{ inline_message_id?: string }>("answerGuestQuery", {
+      guest_query_id: guestQueryId,
+      result,
+    });
+  }
+
+  public async logOut(): Promise<boolean> {
+    return this.request<boolean>("logOut");
+  }
+
+  public async close(): Promise<boolean> {
+    return this.request<boolean>("close");
+  }
+
+  public async getForumTopicIconStickers(): Promise<unknown[]> {
+    return this.request<unknown[]>("getForumTopicIconStickers");
+  }
+
+  public async giftPremiumSubscription(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("giftPremiumSubscription", options);
+  }
+
+  public async getBusinessAccountGifts(businessConnectionId: string): Promise<unknown> {
+    return this.request<unknown>("getBusinessAccountGifts", { business_connection_id: businessConnectionId });
+  }
+
+  public async getBusinessAccountStarBalance(businessConnectionId: string): Promise<{ amount: number }> {
+    return this.request<{ amount: number }>("getBusinessAccountStarBalance", {
+      business_connection_id: businessConnectionId,
+    });
+  }
+
+  public async setBusinessAccountName(businessConnectionId: string, name: string): Promise<boolean> {
+    return this.request<boolean>("setBusinessAccountName", {
+      business_connection_id: businessConnectionId,
+      name,
+    });
+  }
+
+  public async setBusinessAccountUsername(businessConnectionId: string, username?: string): Promise<boolean> {
+    const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
+    if (username !== undefined) payload["username"] = username;
+    return this.request<boolean>("setBusinessAccountUsername", payload);
+  }
+
+  public async setBusinessAccountBio(businessConnectionId: string, bio?: string): Promise<boolean> {
+    const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
+    if (bio !== undefined) payload["bio"] = bio;
+    return this.request<boolean>("setBusinessAccountBio", payload);
+  }
+
+  public async setBusinessAccountGiftSettings(businessConnectionId: string, options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("setBusinessAccountGiftSettings", {
+      business_connection_id: businessConnectionId,
+      ...options,
+    });
+  }
+
+  public async setBusinessAccountProfilePhoto(businessConnectionId: string, photo: unknown): Promise<boolean> {
+    return this.request<boolean>("setBusinessAccountProfilePhoto", {
+      business_connection_id: businessConnectionId,
+      photo,
+    });
+  }
+
+  public async removeBusinessAccountProfilePhoto(businessConnectionId: string): Promise<boolean> {
+    return this.request<boolean>("removeBusinessAccountProfilePhoto", {
+      business_connection_id: businessConnectionId,
+    });
+  }
+
+  public async convertGiftToStars(userId: number, ownedGiftId: string): Promise<boolean> {
+    return this.request<boolean>("convertGiftToStars", { user_id: userId, owned_gift_id: ownedGiftId });
+  }
+
+  public async upgradeGift(userId: number, ownedGiftId: string): Promise<boolean> {
+    return this.request<boolean>("upgradeGift", { user_id: userId, owned_gift_id: ownedGiftId });
+  }
+
+  public async transferGift(userId: number, ownedGiftId: string, newOwnerChatId: number | string): Promise<boolean> {
+    return this.request<boolean>("transferGift", {
+      user_id: userId,
+      owned_gift_id: ownedGiftId,
+      new_owner_chat_id: newOwnerChatId,
+    });
+  }
+
+  public async transferBusinessAccountStars(businessConnectionId: string, starCount: number): Promise<boolean> {
+    return this.request<boolean>("transferBusinessAccountStars", {
+      business_connection_id: businessConnectionId,
+      star_count: starCount,
+    });
+  }
+
+  public async getManagedBotAccessSettings(botId: number): Promise<unknown> {
+    return this.request<unknown>("getManagedBotAccessSettings", { bot_id: botId });
+  }
+
+  public async setManagedBotAccessSettings(botId: number, options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("setManagedBotAccessSettings", { bot_id: botId, ...options });
+  }
+
+  public async createChatSubscriptionInviteLink(chatId: number | string, options: Record<string, unknown>): Promise<unknown> {
+    return this.request<unknown>("createChatSubscriptionInviteLink", { chat_id: chatId, ...options });
+  }
+
+  public async editChatSubscriptionInviteLink(chatId: number | string, inviteLink: string, options: Record<string, unknown>): Promise<unknown> {
+    return this.request<unknown>("editChatSubscriptionInviteLink", {
+      chat_id: chatId,
+      invite_link: inviteLink,
+      ...options,
+    });
+  }
+
+  public async approveSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
+    return this.request<boolean>("approveSuggestedPost", { chat_id: chatId, message_id: messageId });
+  }
+
+  public async declineSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
+    return this.request<boolean>("declineSuggestedPost", { chat_id: chatId, message_id: messageId });
+  }
+
+  public async repostStory(options: Record<string, unknown>): Promise<unknown> {
+    return this.request<unknown>("repostStory", options);
+  }
+
+  public async getUserGifts(userId: number, options: Record<string, unknown> = {}): Promise<unknown> {
+    return this.request<unknown>("getUserGifts", { user_id: userId, ...options });
+  }
+
+  public async getChatGifts(chatId: number | string, options: Record<string, unknown> = {}): Promise<unknown> {
+    return this.request<unknown>("getChatGifts", { chat_id: chatId, ...options });
+  }
+
+  public async setMyProfilePhoto(photo: unknown): Promise<boolean> {
+    return this.request<boolean>("setMyProfilePhoto", { photo });
+  }
+
+  public async removeMyProfilePhoto(): Promise<boolean> {
+    return this.request<boolean>("removeMyProfilePhoto");
+  }
+
+  public async getUserProfileAudios(userId: number, offset?: number, limit?: number): Promise<unknown> {
+    const payload: Record<string, unknown> = { user_id: userId };
+    if (offset !== undefined) payload["offset"] = offset;
+    if (limit !== undefined) payload["limit"] = limit;
+    return this.request<unknown>("getUserProfileAudios", payload);
+  }
+
+  public async setChatMemberTag(chatId: number | string, userId: number, tag?: string): Promise<boolean> {
+    const payload: Record<string, unknown> = { chat_id: chatId, user_id: userId };
+    if (tag !== undefined) payload["tag"] = tag;
+    return this.request<boolean>("setChatMemberTag", payload);
+  }
+
+  public async getManagedBotToken(botId: number): Promise<{ token: string }> {
+    return this.request<{ token: string }>("getManagedBotToken", { bot_id: botId });
+  }
+
+  public async replaceManagedBotToken(botId: number): Promise<{ token: string }> {
+    return this.request<{ token: string }>("replaceManagedBotToken", { bot_id: botId });
+  }
+
+  public async savePreparedKeyboardButton(options: Record<string, unknown>): Promise<unknown> {
+    return this.request<unknown>("savePreparedKeyboardButton", options);
+  }
+
+  public async initialize(): Promise<void> {
+    await this.getMe();
+  }
+
+  public async shutdown(): Promise<void> {
+    // Graceful client shutdown
+  }
+
+  public async doApiRequest<T>(method: string, payload: Record<string, unknown> = {}): Promise<T> {
+    return this.request<T>(method, payload);
+  }
 }
