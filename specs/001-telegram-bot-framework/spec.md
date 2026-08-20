@@ -134,36 +134,49 @@ The Performance Targets table in `technical-context.md` is the single source of 
 ## Project Structure
 
 ```
-telegram-bot-node/
+tele-bot/
 ├── src/
-│   ├── index.ts                    # Main exports
-│   ├── telegram/
-│   │   ├── index.ts                # Re-exports types
-│   │   ├── types.ts                # All Telegram API interfaces
-│   │   ├── bot.ts                  # Bot HTTP client
-│   │   └── update.ts               # Update class wrapper
-│   ├── ext/
-│   │   ├── index.ts                # Re-exports extensions
-│   │   ├── application.ts          # Application, ApplicationBuilder
-│   │   ├── context.ts              # CallbackContext, ContextTypes
-│   │   ├── handlers.ts             # All handler classes
-│   │   ├── filters.ts              # Filter system
-│   │   ├── conversation.handler.ts # ConversationHandler
-│   │   ├── job.queue.ts            # JobQueue, Job
-│   │   ├── persistence.ts          # Persistence interface + implementations
-│   │   └── keyboards.ts            # Keyboard builders
-│   └── utils/
-│       ├── http.ts                 # HTTP helpers
-│       └── validation.ts           # Internal validation helpers
-├── examples/
+│   ├── index.ts                    # Main unified exports
+│   ├── client/                     # Telegram Bot API 8.0+ client & transport
+│   │   ├── index.ts
+│   │   ├── types.ts                # Strict API type definitions & errors
+│   │   ├── constants.ts            # Enums and constants (ParseMode, ChatType, etc.)
+│   │   └── bot.ts                  # Bot HTTP client with auto-backoff
+│   ├── kernel/                     # Core runtime engine
+│   │   ├── index.ts
+│   │   ├── app.ts                  # Application & ApplicationBuilder runtime
+│   │   ├── context.ts              # CallbackContext execution context
+│   │   └── update.ts               # Lazy-resolved Update wrapper
+│   ├── routing/                    # Handler & routing engine
+│   │   ├── index.ts
+│   │   ├── handlers.ts             # CommandHandler, MessageHandler, CallbackQueryHandler...
+│   │   └── conversation.ts         # Stateful ConversationHandler (FSM)
+│   ├── filters/                    # Composable filter system
+│   │   ├── index.ts
+│   │   └── matchers.ts             # Matcher rules (.and, .or, .not)
+│   ├── storage/                    # Pluggable persistence drivers
+│   │   ├── index.ts
+│   │   ├── driver.ts               # Persistence interface
+│   │   ├── memory.ts               # MemoryPersistence
+│   │   ├── json.ts                 # JsonFilePersistence
+│   │   └── sqlite.ts               # SqlitePersistence (node:sqlite)
+│   ├── scheduler/                  # Job queue & background tasks
+│   │   ├── index.ts
+│   │   └── queue.ts                # JobQueue & Job
+│   ├── components/                 # UI & interactive builders
+│   │   ├── index.ts
+│   │   └── keyboard.ts             # InlineKeyboard & ReplyKeyboard builders
+│   └── utils/                      # Low-level helpers
+│       ├── http.ts                 # Multipart/form-data builder
+│       └── validation.ts           # Runtime assertion guards
+├── examples/                       # Runnable bot examples
 │   ├── echobot.ts
-│   ├── conversationbot.ts
 │   ├── inlinekeyboard.ts
-│   ├── timerbot.ts
+│   ├── conversationbot.ts
 │   ├── pollbot.ts
 │   ├── chatmemberbot.ts
 │   └── deeplinking.ts
-├── tests/
+├── tests/                          # Vitest test suite mirroring src/
 │   ├── unit/
 │   └── integration/
 ├── package.json

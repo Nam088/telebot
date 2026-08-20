@@ -59,29 +59,43 @@ specs/001-telegram-bot-framework/
 
 ```text
 src/
-├── index.ts                    # Main exports
-├── telegram/                   # Layer 1: Telegram API types & HTTP client
+├── index.ts                    # Main unified exports
+├── client/                     # Telegram Bot API 8.0+ client & transport
 │   ├── index.ts
-│   ├── types.ts                # User, Chat, Message, Update, CallbackQuery, ...
-│   ├── bot.ts                  # Bot HTTP client (fetch wrapper, retry/backoff)
-│   └── update.ts                # Update wrapper with convenience getters
-├── ext/                         # Layer 2: framework extensions (PTB parity)
+│   ├── types.ts                # Strict API type definitions & errors
+│   ├── constants.ts            # Enums and constants (ParseMode, ChatType, etc.)
+│   └── bot.ts                  # Bot HTTP client with auto-backoff
+├── kernel/                     # Core runtime engine
 │   ├── index.ts
-│   ├── application.ts          # Application, ApplicationBuilder, runPolling/runWebhook
-│   ├── context.ts              # CallbackContext, ContextTypes
-│   ├── handlers.ts             # CommandHandler, MessageHandler, ConversationHandler, ...
-│   ├── filters.ts              # Filter system (TEXT, COMMAND, ChatType, combinators)
-│   ├── conversation.handler.ts
-│   ├── job.queue.ts            # JobQueue, Job, PersistedJob
-│   ├── persistence.ts          # Persistence interface + Memory/JsonFile/Sqlite impls
-│   └── keyboards.ts            # ReplyKeyboardMarkup, InlineKeyboardMarkup, InputMedia*
-└── utils/                       # Layer 3: internal helpers
-    ├── http.ts                 # multipart/form-data, fetch helpers
-    └── validation.ts           # minimal internal validation
+│   ├── app.ts                  # Application & ApplicationBuilder runtime
+│   ├── context.ts              # CallbackContext execution context
+│   └── update.ts               # Lazy-resolved Update wrapper
+├── routing/                    # Handler & routing engine
+│   ├── index.ts
+│   ├── handlers.ts             # CommandHandler, MessageHandler, CallbackQueryHandler...
+│   └── conversation.ts         # Stateful ConversationHandler (FSM)
+├── filters/                    # Composable filter system
+│   ├── index.ts
+│   └── matchers.ts             # Matcher rules (.and, .or, .not)
+├── storage/                    # Pluggable persistence drivers
+│   ├── index.ts
+│   ├── driver.ts               # Persistence interface
+│   ├── memory.ts               # MemoryPersistence
+│   ├── json.ts                 # JsonFilePersistence
+│   └── sqlite.ts               # SqlitePersistence (node:sqlite)
+├── scheduler/                  # Job queue & background tasks
+│   ├── index.ts
+│   └── queue.ts                # JobQueue & Job
+├── components/                 # UI & interactive builders
+│   ├── index.ts
+│   └── keyboard.ts             # InlineKeyboard & ReplyKeyboard builders
+└── utils/                      # Low-level helpers
+    ├── http.ts                 # Multipart/form-data builder
+    └── validation.ts           # Runtime assertion guards
 
 examples/                        # 7 runnable bots, one per major feature (NFR-4)
 tests/
-├── unit/                        # mirrors src/ (e.g. tests/unit/ext/handlers.test.ts)
+├── unit/                        # mirrors src/ (e.g. tests/unit/routing/handlers.test.ts)
 └── integration/                 # cross-module flows (Application → handler → context)
 ```
 
