@@ -1,23 +1,36 @@
 # tele-bot
 
-> A modern, zero-dependency, type-safe Telegram Bot framework for Node.js and TypeScript.
+> A modern, zero-dependency, high-performance, and type-safe Telegram Bot framework for Node.js and TypeScript.
 
+[![npm version](https://img.shields.io/npm/v/tele-bot.svg)](https://www.npmjs.com/package/tele-bot)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
-[![Coverage](https://img.shields.io/badge/Coverage-92.3%25-brightgreen.svg)]()
+[![Coverage](https://img.shields.io/badge/Coverage-95.39%25-brightgreen.svg)]()
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)]()
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
-## Highlights
+## Overview
 
-- **Zero Required Runtime Dependencies**: Built strictly on modern Node.js 22+ built-ins (`globalThis.fetch`, `node:sqlite`, `node:http`, `node:crypto`).
-- **End-to-End Type Safety**: 100% TypeScript coverage under strict mode (`strict: true`, `noUncheckedIndexedAccess: true`).
-- **Domain-Driven Micro-Kernel Architecture**: Subpath exports for tree-shaking (`tele-bot/client`, `tele-bot/kernel`, `tele-bot/routing`, `tele-bot/filters`, `tele-bot/storage`, `tele-bot/scheduler`, `tele-bot/ui`).
-- **Stateful Dialogs & FSM**: Supports both traditional FSM (`ConversationHandler`) and modern sequential async dialogs (`LinearConversation`).
-- **Native Task Scheduling**: Built-in background job scheduler (`runOnce`, `runRepeating`, `runDaily`) with restart state recovery.
-- **Plug-and-Play Storage**: In-memory, atomic JSON file store, and high-performance native SQLite driver (`node:sqlite`).
-- **Dual Deployment Modes**: Seamlessly switch between Long Polling and production HTTP Webhook Server with `secret_token` verification.
+`tele-bot` is built from the ground up for modern Node.js environments (v22+). It offers complete coverage of the Telegram Bot API with zero required external runtime dependencies, leveraging native platform features such as `globalThis.fetch`, `node:sqlite`, and `node:http`.
+
+### Highlights
+
+- **Zero Required Runtime Dependencies**: Runs entirely on native Node.js built-ins.
+- **Full API Parity**: Comprehensive coverage of all Bot API methods, including Telegram Stars, Paid Media, Webhooks, Stories, Business Accounts, and Star Gifts.
+- **End-to-End Type Safety**: 100% strict TypeScript types and IntelliSense autocompletion across all payloads and parameters.
+- **Domain-Driven Architecture**: Subpath exports for optimal tree-shaking (`tele-bot/client`, `tele-bot/kernel`, `tele-bot/routing`, `tele-bot/filters`, `tele-bot/storage`, `tele-bot/scheduler`, `tele-bot/ui`).
+- **Flexible State Management**: Supports sequential wizard flows (`LinearConversation`), finite state machines (`ConversationHandler`), and persistent storage drivers (Memory, JSON file, SQLite).
+- **Production-Ready Webhooks**: Built-in HTTP webhook server with automatic secret token verification and custom server integration.
+- **Reliable Networking**: Automatic exponential backoff for rate limits (`429 Too Many Requests`) and server errors (`5xx`).
+
+---
+
+## Requirements
+
+- Node.js version **22.0.0** or higher
+- TypeScript **5.0+** (optional, recommended for type safety)
 
 ---
 
@@ -26,8 +39,6 @@
 ```bash
 npm install tele-bot
 ```
-
-*Requires Node.js version 22.0.0 or higher.*
 
 ---
 
@@ -50,21 +61,25 @@ const app = new ApplicationBuilder()
   .build();
 
 // Handle /start command
-app.addHandler(new CommandHandler("start", async (update: Update, context: CallbackContext) => {
-  const name = update.effective_user?.first_name ?? "friend";
-  await context.bot.sendMessage({
-    chat_id: update.effective_chat!.id,
-    text: `Hello ${name}! Welcome to tele-bot.`,
-  });
-}));
+app.addHandler(
+  new CommandHandler("start", async (update: Update, context: CallbackContext) => {
+    const name = update.effective_user?.first_name ?? "friend";
+    await context.bot.sendMessage({
+      chat_id: update.effective_chat!.id,
+      text: `Hello ${name}! Welcome to tele-bot.`,
+    });
+  })
+);
 
-// Echo non-command text messages
-app.addHandler(new MessageHandler(filters.TEXT.and(filters.COMMAND.not()), async (update, context) => {
-  await context.bot.sendMessage({
-    chat_id: update.effective_chat!.id,
-    text: update.effective_message!.text!,
-  });
-}));
+// Echo text messages
+app.addHandler(
+  new MessageHandler(filters.TEXT.and(filters.COMMAND.not()), async (update, context) => {
+    await context.bot.sendMessage({
+      chat_id: update.effective_chat!.id,
+      text: update.effective_message!.text!,
+    });
+  })
+);
 
 // Start polling
 await app.runPolling({ drop_pending_updates: true });
@@ -72,25 +87,42 @@ await app.runPolling({ drop_pending_updates: true });
 
 ---
 
-## Core Features & Architecture
+## Architecture & Subpath Exports
 
-### 1. Modern Linear Conversations (`LinearConversation`)
+`tele-bot` is structured as modular subpaths, allowing you to import only what you need:
 
-Write intuitive multi-step conversation scripts sequentially in a single `async/await` function without managing messy state machines:
+```typescript
+import { Application, ApplicationBuilder } from "tele-bot";          // Core framework
+import { Bot, TelegramApiError } from "tele-bot/client";             // Low-level Bot API client
+import { CommandHandler, MessageHandler } from "tele-bot/routing";   // Update handlers
+import { filters } from "tele-bot/filters";                          // Update and message filters
+import { SqlitePersistence, JsonFilePersistence } from "tele-bot/storage"; // State storage
+import { JobQueue } from "tele-bot/scheduler";                       // Background job runner
+import { InlineKeyboard, ReplyKeyboard } from "tele-bot/ui";         // Keyboard layout builders
+import { logger } from "tele-bot/utils";                             // Structured logging
+```
+
+---
+
+## Core Capabilities
+
+### 1. Sequential Linear Conversations
+
+Write step-by-step interactive dialogs sequentially in an `async/await` handler without managing complex state transitions:
 
 ```typescript
 import { LinearConversation } from "tele-bot";
 
 const onboarding = new LinearConversation(async (control) => {
-  await control.reply("What is your name?");
-  const nameUpdate = await control.wait();
-  const name = nameUpdate.effective_message?.text ?? "Anonymous";
+  await control.reply("What is your username?");
+  const usernameUpdate = await control.wait();
+  const username = usernameUpdate.effective_message?.text ?? "Guest";
 
-  await control.reply(`Nice to meet you, ${name}! What is your favorite programming language?`);
-  const langUpdate = await control.wait();
-  const lang = langUpdate.effective_message?.text ?? "TypeScript";
+  await control.reply(`Welcome, ${username}! What is your preferred contact email?`);
+  const emailUpdate = await control.wait();
+  const email = emailUpdate.effective_message?.text ?? "Not provided";
 
-  await control.reply(`Great! Registration complete for ${name} (${lang}).`);
+  await control.reply(`Registration complete for ${username} (${email}).`);
 });
 
 app.addHandler(onboarding.createHandler("/register"));
@@ -100,121 +132,240 @@ app.addHandler(onboarding.createHandler("/register"));
 
 ### 2. Finite State Machine (`ConversationHandler`)
 
-For complex branching workflows with fallback commands, timeout handlers, and persistent states across server restarts:
+For branching workflows with explicit states, fallbacks, and persistence across restarts:
 
 ```typescript
 import { ConversationHandler, CommandHandler, MessageHandler, filters } from "tele-bot";
 
-const GENDER = 1;
-const PHOTO = 2;
-const LOCATION = 3;
+const STATE_NAME = 1;
+const STATE_PHOTO = 2;
 
-const convHandler = new ConversationHandler({
-  entry_points: [new CommandHandler("start", startCallback)],
+const profileHandler = new ConversationHandler({
+  entry_points: [
+    new CommandHandler("profile", async (update, context) => {
+      await context.bot.sendMessage({
+        chat_id: update.effective_chat!.id,
+        text: "Please send your profile name:",
+      });
+      return STATE_NAME;
+    }),
+  ],
   states: {
-    [GENDER]: [new MessageHandler(filters.Regex(/^(Boy|Girl|Other)$/), genderCallback)],
-    [PHOTO]: [
-      new MessageHandler(filters.PHOTO, photoCallback),
-      new CommandHandler("skip", skipPhotoCallback),
+    [STATE_NAME]: [
+      new MessageHandler(filters.TEXT, async (update, context) => {
+        context.user_data.name = update.effective_message!.text;
+        await context.bot.sendMessage({
+          chat_id: update.effective_chat!.id,
+          text: "Now please upload your profile picture (or /skip):",
+        });
+        return STATE_PHOTO;
+      }),
     ],
-    [LOCATION]: [new MessageHandler(filters.LOCATION, locationCallback)],
+    [STATE_PHOTO]: [
+      new MessageHandler(filters.PHOTO, async (update, context) => {
+        await context.bot.sendMessage({
+          chat_id: update.effective_chat!.id,
+          text: `Profile setup complete for ${context.user_data.name}!`,
+        });
+        return ConversationHandler.END;
+      }),
+      new CommandHandler("skip", async (update, context) => {
+        await context.bot.sendMessage({
+          chat_id: update.effective_chat!.id,
+          text: `Profile saved without photo.`,
+        });
+        return ConversationHandler.END;
+      }),
+    ],
   },
-  fallbacks: [new CommandHandler("cancel", cancelCallback)],
+  fallbacks: [
+    new CommandHandler("cancel", async (update, context) => {
+      await context.bot.sendMessage({
+        chat_id: update.effective_chat!.id,
+        text: "Profile setup canceled.",
+      });
+      return ConversationHandler.END;
+    }),
+  ],
 });
 
-app.addHandler(convHandler);
+app.addHandler(profileHandler);
 ```
 
 ---
 
-### 3. Background Job Scheduler (`JobQueue`)
+### 3. State Persistence (Memory, JSON, SQLite)
 
-Execute delayed one-shot jobs, repeating interval tasks, or scheduled daily notifications:
+Preserve user session data, conversation progress, and bot metadata across application restarts:
 
 ```typescript
-app.addHandler(new CommandHandler("remindme", async (update, context) => {
-  const chatId = update.effective_chat!.id;
+import { ApplicationBuilder, SqlitePersistence } from "tele-bot";
 
-  // Run a one-shot background job in 60 seconds
-  context.job_queue?.runOnce(async (jobCtx) => {
-    await jobCtx.bot.sendMessage({
+// Native SQLite storage powered by Node.js built-in node:sqlite
+const persistence = new SqlitePersistence({
+  dbPath: "./data/bot_state.sqlite",
+});
+
+const app = new ApplicationBuilder()
+  .token(process.env.BOT_TOKEN!)
+  .persistence(persistence)
+  .build();
+```
+
+---
+
+### 4. Background Job Scheduling (`JobQueue`)
+
+Schedule delayed timers, recurring interval jobs, or scheduled daily tasks:
+
+```typescript
+app.addHandler(
+  new CommandHandler("remind", async (update, context) => {
+    const chatId = update.effective_chat!.id;
+
+    // Run a one-shot task in 60 seconds
+    context.job_queue?.runOnce(async (jobContext) => {
+      await jobContext.bot.sendMessage({
+        chat_id: chatId,
+        text: "Your 60-second reminder is due.",
+      });
+    }, 60);
+
+    await context.bot.sendMessage({
       chat_id: chatId,
-      text: "Ding! Your 60-second reminder is up!",
+      text: "Reminder scheduled for 60 seconds from now.",
     });
-  }, 60);
-
-  await context.bot.sendMessage({
-    chat_id: chatId,
-    text: "Reminder set for 60 seconds from now.",
-  });
-}));
+  })
+);
 ```
 
 ---
 
-### 4. Interactive Keyboards & UI Builders
+### 5. Fluent Keyboard Builders
 
-Easily create inline button grids and custom reply keyboards:
+Construct clean inline and reply keyboards with a chainable builder API:
 
 ```typescript
-import { InlineKeyboard } from "tele-bot";
+import { InlineKeyboard, ReplyKeyboard } from "tele-bot";
 
-const keyboard = new InlineKeyboard()
-  .text("Like", "like_click")
-  .text("Dislike", "dislike_click")
+// Inline Keyboard markup
+const inlineMenu = new InlineKeyboard()
+  .text("Confirm", "action_confirm")
+  .text("Cancel", "action_cancel")
   .row()
-  .url("Official Website", "https://telegram.org");
+  .url("Documentation", "https://core.telegram.org/bots/api");
+
+// Reply Keyboard markup
+const replyMenu = new ReplyKeyboard()
+  .text("Profile")
+  .text("Settings")
+  .row()
+  .requestContact("Share Contact")
+  .requestLocation("Share Location")
+  .resized()
+  .oneTime();
 
 await bot.sendMessage({
   chat_id: 123456,
-  text: "How do you rate this framework?",
-  reply_markup: keyboard,
+  text: "Choose an option:",
+  reply_markup: inlineMenu,
 });
 ```
 
 ---
 
-### 5. Production Webhook Server
+### 6. Production Webhook Server
 
-Run behind reverse proxies (Nginx, Cloudflare, AWS ALB) with cryptographic secret token validation:
+Deploy on any cloud provider or serverless container behind reverse proxies (Nginx, Cloudflare, AWS ALB) with cryptographic secret token validation:
 
 ```typescript
 const app = new ApplicationBuilder()
   .token(process.env.BOT_TOKEN!)
   .build();
 
-// Register your handlers...
-
+// Start native HTTP webhook listener
 await app.runWebhook({
   listen: "0.0.0.0",
   port: 8443,
   path: "/telegram-webhook",
   secret_token: process.env.WEBHOOK_SECRET,
+  allowed_updates: ["message", "callback_query", "inline_query"],
 });
 ```
 
 ---
 
-## Testing & Verification
+### 7. File Uploads & Buffers
+
+Send files seamlessly using File IDs, remote URLs, or in-memory binary buffers:
+
+```typescript
+import { InputFile } from "tele-bot";
+import * as fs from "node:fs/promises";
+
+// Upload buffer directly
+const buffer = await fs.readFile("./report.pdf");
+await bot.sendDocument({
+  chat_id: 123456,
+  document: new InputFile(buffer, "Monthly_Report.pdf"),
+  caption: "Generated report attached.",
+});
+```
+
+---
+
+### 8. Pluggable Structured Logging
+
+Integrated zero-dependency structured logger with support for external logging libraries (Pino, Winston):
+
+```typescript
+import { logger } from "tele-bot";
+
+// Adjust logging verbosity
+logger.setLevel("debug");
+
+// Integrate with custom Pino logger
+// import pino from "pino";
+// const customLogger = pino();
+// logger.setLogger(customLogger);
+```
+
+---
+
+## Development & Testing
 
 ```bash
-# Run full unit & integration test suite
+# Compile TypeScript to ESM and declaration files
+npm run build
+
+# Run TypeCheck without emitting files
+npm run typecheck
+
+# Run test suite
 npm test
 
-# Run tests with code coverage report (>92% line coverage)
+# Run tests with code coverage analysis
 npm run test:coverage
+
+# Lint source code and tests
+npm run lint
+
+# Format codebase with Prettier
+npm run format
 
 # Generate TypeDoc API documentation
 npm run docs
 ```
 
-## Design Conventions
+---
 
-- **Verbs / Methods you call (`()`)** -> `camelCase`: `bot.sendMessage()`, `app.runPolling()`, `app.addHandler()`, `jobQueue.runOnce()`.
-- **Nouns / Properties / Telegram Schema** -> `snake_case`: `context.user_data`, `context.chat_data`, `context.job_queue`, `update.effective_user`, `chat_id`, `message_id`.
+## Conventions
+
+- **Methods (functions you invoke)**: `camelCase` (e.g. `bot.sendMessage()`, `app.runPolling()`, `app.addHandler()`).
+- **Data properties (payload fields & context state)**: `snake_case` (e.g. `context.user_data`, `context.chat_data`, `update.effective_user`, `chat_id`, `message_id`).
 
 ---
 
 ## License
 
-MIT (c) 2026 tele-bot contributors
+MIT License (c) 2026 tele-bot contributors.
