@@ -195,9 +195,10 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
     (async () => {
       try {
         await this.fn(conversationControl, context);
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.activeFlows.delete(key);
-        if (err?.message !== "__CONVERSATION_EXIT__") {
+        const message = err instanceof Error ? err.message : undefined;
+        if (message !== "__CONVERSATION_EXIT__") {
           console.error("Error in LinearConversation:", err);
         }
       }

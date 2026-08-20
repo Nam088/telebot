@@ -197,6 +197,37 @@ describe("CallbackQueryHandler", () => {
     expect(await handler.checkUpdate(update)).toBe(true);
   });
 
+  it("does not swap callback and pattern based on function arity in the (callback, pattern) order", async () => {
+    const seenData: string[] = [];
+    const callback = vi.fn((update: Update) => {
+      seenData.push(update.callback_query?.data ?? "");
+    });
+    // Predicate intentionally ignores its `data` parameter (arity 0) — an edge case the
+    // old arity-based heuristic misread as "this must be the callback".
+    const alwaysMatch = () => true;
+    const handler = new CallbackQueryHandler(callback, alwaysMatch);
+
+    const update = new Update(
+      {
+        update_id: 1,
+        callback_query: {
+          id: "cb_1",
+          from: { id: 123, is_bot: false, first_name: "Alice" },
+          chat_instance: "inst1",
+          data: "item:123",
+        },
+      },
+      bot,
+    );
+
+    expect(await handler.checkUpdate(update)).toBe(true);
+
+    const context = new CallbackContext({ bot });
+    await handler.handleUpdate(update, context);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(seenData).toEqual(["item:123"]);
+  });
+
   it("returns false if update does not have callback_query", async () => {
     const handler = new CallbackQueryHandler(vi.fn());
     const update = new Update({

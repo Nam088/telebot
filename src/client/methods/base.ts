@@ -158,11 +158,27 @@ export abstract class BaseBotClient {
           throw err;
         }
         if (attempt >= 4) {
-          throw new TelegramApiError(0, err instanceof Error ? err.message : String(err));
+          const rawMessage = err instanceof Error ? err.message : String(err);
+          throw new TelegramApiError(0, this.redactToken(rawMessage));
         }
         const backoff = Math.min(30, 2 ** attempt);
         await this.sleep(backoff);
       }
     }
+  }
+
+  /**
+   * Removes any occurrence of the bot token from a string.
+   *
+   * @remarks
+   * Request errors (e.g. from a failed `fetch`) can echo back the request URL, which embeds
+   * the bot token. Redacting it here prevents the token from reaching {@link TelegramApiError}
+   * and, transitively, any logs or error handlers that print the error message.
+   *
+   * @param message - The raw message to redact.
+   * @returns `message` with every occurrence of the bot token replaced by `[REDACTED]`.
+   */
+  private redactToken(message: string): string {
+    return message.split(this.token).join("[REDACTED]");
   }
 }

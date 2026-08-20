@@ -248,8 +248,15 @@ export class CallbackQueryHandler<
   /**
    * Creates a new {@link CallbackQueryHandler}.
    *
-   * @param callbackOrPattern - Callback function or match pattern.
-   * @param callbackOrPattern2 - Callback function or match pattern.
+   * @remarks
+   * When only the callback is given, pass it alone. When a pattern is also given, the
+   * callback must be the first argument and the pattern (string, RegExp, or predicate
+   * function) the second, e.g. `new CallbackQueryHandler(callback, /^btn_/)`.
+   *
+   * @param callbackOrPattern - The callback function, or (when `callbackOrPattern2` is the
+   * callback) a string/RegExp pattern matched against `callback_data`.
+   * @param callbackOrPattern2 - The pattern (string, RegExp, or predicate function) matched
+   * against `callback_data`, or (when `callbackOrPattern` is the pattern) the callback.
    */
   constructor(
     callbackOrPattern:
@@ -260,22 +267,18 @@ export class CallbackQueryHandler<
     let cb: HandlerCallback<C, R>;
     let pat: RegExp | string | ((data: string) => boolean) | undefined;
 
-    if (typeof callbackOrPattern === "function" && typeof callbackOrPattern2 === "function") {
-      if (callbackOrPattern.length >= 2 || callbackOrPattern2.length === 1) {
-        cb = callbackOrPattern as HandlerCallback<C, R>;
-        pat = callbackOrPattern2 as (data: string) => boolean;
-      } else {
-        cb = callbackOrPattern2 as HandlerCallback<C, R>;
-        pat = callbackOrPattern as (data: string) => boolean;
-      }
-    } else if (typeof callbackOrPattern === "function" && callbackOrPattern2 === undefined) {
+    // Disambiguate by argument position and type, never by function arity: arity is not
+    // a reliable signal (a callback that idiomatically ignores its `context` parameter has
+    // the same arity as a one-argument predicate). If the first argument is a function, it
+    // is always the callback and the second argument (if any) is the pattern, whether that
+    // pattern is itself a predicate function, a RegExp, or a string. Otherwise the first
+    // argument is a RegExp/string pattern and the second argument is the callback.
+    if (typeof callbackOrPattern === "function") {
       cb = callbackOrPattern as HandlerCallback<C, R>;
-    } else if (typeof callbackOrPattern === "function" && callbackOrPattern2 !== undefined) {
-      cb = callbackOrPattern as HandlerCallback<C, R>;
-      pat = callbackOrPattern2 as RegExp | string | ((data: string) => boolean);
+      pat = (callbackOrPattern2 as (data: string) => boolean) ?? undefined;
     } else {
       cb = callbackOrPattern2 as HandlerCallback<C, R>;
-      pat = callbackOrPattern as RegExp | string | ((data: string) => boolean);
+      pat = (callbackOrPattern as RegExp | string) ?? undefined;
     }
 
     super(cb);

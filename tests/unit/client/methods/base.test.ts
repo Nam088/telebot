@@ -71,4 +71,22 @@ describe("BaseBotClient Core HTTP Engine", () => {
     await expect(client.request("test")).rejects.toThrow(TelegramApiError);
     expect(callCount).toBe(4);
   });
+
+  it("redacts the bot token from error messages when the underlying fetch throws", async () => {
+    const token = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11";
+    const fakeFetch = vi
+      .fn()
+      .mockRejectedValue(new Error(`request to https://api.telegram.org/bot${token}/getMe failed`));
+    const client = new ConcreteBotClient(token, { fetch: fakeFetch, baseDelayMs: 1 });
+
+    let caught: unknown;
+    try {
+      await client.request("getMe");
+    } catch (err) {
+      caught = err;
+    }
+
+    expect(caught).toBeInstanceOf(TelegramApiError);
+    expect((caught as TelegramApiError).message).not.toContain(token);
+  });
 });

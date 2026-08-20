@@ -168,8 +168,16 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
    */
   public readonly conversations: Map<string, number | string> = new Map();
 
-  private matchedHandler?: BaseHandler<C, any>;
-  private matchedKey?: string;
+  /**
+   * Per-update match state, keyed by the update instance rather than shared instance
+   * fields, so that concurrently in-flight updates (e.g. two webhook requests dispatched
+   * before either reaches {@link ConversationHandler.handleUpdate}) cannot clobber each
+   * other's matched handler/key.
+   */
+  private readonly matchState = new WeakMap<
+    Update,
+    { handler: BaseHandler<C, any>; key: string }
+  >();
 
   /**
    * Creates a new {@link ConversationHandler} instance.
@@ -240,8 +248,7 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
       // Not in conversation: check entry_points
       for (const handler of this.entry_points) {
         if (await handler.checkUpdate(update)) {
-          this.matchedHandler = handler;
-          this.matchedKey = key;
+          this.matchState.set(update, { handler, key });
           return true;
         }
       }
@@ -253,8 +260,7 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
     if (this.allow_reentry) {
       for (const handler of this.entry_points) {
         if (await handler.checkUpdate(update)) {
-          this.matchedHandler = handler;
-          this.matchedKey = key;
+          this.matchState.set(update, { handler, key });
           return true;
         }
       }
@@ -264,8 +270,7 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
     const stateHandlers = this.states.get(currentState) ?? [];
     for (const handler of stateHandlers) {
       if (await handler.checkUpdate(update)) {
-        this.matchedHandler = handler;
-        this.matchedKey = key;
+        this.matchState.set(update, { handler, key });
         return true;
       }
     }
@@ -273,8 +278,7 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
     // Check fallbacks
     for (const handler of this.fallbacks) {
       if (await handler.checkUpdate(update)) {
-        this.matchedHandler = handler;
-        this.matchedKey = key;
+        this.matchState.set(update, { handler, key });
         return true;
       }
     }
@@ -287,19 +291,17 @@ export class ConversationHandler<C extends CallbackContext = CallbackContext> ex
    *
    * @param update - Incoming Telegram update.
    * @param context - Callback context for this update.
-   * @returns The next state or result from the matched handler callback.
+   * @returns The next state (or {@link ConversationHandler.END}/{@link ConversationHandler.TIMEOUT}) returned by the matched handler callback.
    */
-  async handleUpdate(update: Update, context: C): Promise<any> {
-    if (!this.matchedHandler || !this.matchedKey) {
+  async handleUpdate(update: Update, context: C): Promise<number | string | undefined> {
+    const match = this.matchState.get(update);
+    if (!match) {
       return;
     }
+    this.matchState.delete(update);
 
-    const handler = this.matchedHandler;
-    const key = this.matchedKey;
-    this.matchedHandler = undefined;
-    this.matchedKey = undefined;
-
-    const nextState = await handler.handleUpdate(update, context);
+    const { handler, key } = match;
+    const nextState = (await handler.handleUpdate(update, context)) as number | string | undefined;
 
     if (nextState === ConversationHandler.END) {
       this.conversations.delete(key);
