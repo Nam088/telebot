@@ -970,4 +970,49 @@ export class Bot {
   public async getWebhookInfo(): Promise<WebhookInfo> {
     return this.request<WebhookInfo>("getWebhookInfo");
   }
+
+  // --- 100% snake_case Method Aliases ---
+  public readonly get_me = this.getMe.bind(this);
+  public readonly send_message = this.sendMessage.bind(this);
+  public readonly get_updates = this.getUpdates.bind(this);
+  public readonly send_photo = this.sendPhoto.bind(this);
+  public readonly send_audio = this.sendAudio.bind(this);
+  public readonly send_document = this.sendDocument.bind(this);
+  public readonly send_video = this.sendVideo.bind(this);
+  public readonly send_animation = this.sendAnimation.bind(this);
+  public readonly send_voice = this.sendVoice.bind(this);
+  public readonly send_video_note = this.sendVideoNote.bind(this);
+  public readonly send_media_group = this.sendMediaGroup.bind(this);
+  public readonly send_location = this.sendLocation.bind(this);
+  public readonly send_venue = this.sendVenue.bind(this);
+  public readonly send_contact = this.sendContact.bind(this);
+  public readonly send_poll = this.sendPoll.bind(this);
+  public readonly send_dice = this.sendDice.bind(this);
+  public readonly send_chat_action = this.sendChatAction.bind(this);
+  public readonly edit_message_text = this.editMessageText.bind(this);
+  public readonly edit_message_caption = this.editMessageCaption.bind(this);
+  public readonly edit_message_reply_markup = this.editMessageReplyMarkup.bind(this);
+  public readonly delete_message = this.deleteMessage.bind(this);
+  public readonly answer_callback_query = this.answerCallbackQuery.bind(this);
+  public readonly answer_inline_query = this.answerInlineQuery.bind(this);
+  public readonly ban_chat_member = this.banChatMember.bind(this);
+  public readonly unban_chat_member = this.unbanChatMember.bind(this);
+  public readonly restrict_chat_member = this.restrictChatMember.bind(this);
+  public readonly promote_chat_member = this.promoteChatMember.bind(this);
+  public readonly set_chat_administrator_custom_title = this.setChatAdministratorCustomTitle.bind(this);
+  public readonly set_chat_permissions = this.setChatPermissions.bind(this);
+  public readonly export_chat_invite_link = this.exportChatInviteLink.bind(this);
+  public readonly create_chat_invite_link = this.createChatInviteLink.bind(this);
+  public readonly get_chat = this.getChat.bind(this);
+  public readonly get_chat_administrators = this.getChatAdministrators.bind(this);
+  public readonly get_chat_member_count = this.getChatMemberCount.bind(this);
+  public readonly get_chat_member = this.getChatMember.bind(this);
+  public readonly leave_chat = this.leaveChat.bind(this);
+  public readonly pin_chat_message = this.pinChatMessage.bind(this);
+  public readonly unpin_chat_message = this.unpinChatMessage.bind(this);
+  public readonly get_user_profile_photos = this.getUserProfilePhotos.bind(this);
+  public readonly get_file = this.getFile.bind(this);
+  public readonly set_webhook = this.setWebhook.bind(this);
+  public readonly delete_webhook = this.deleteWebhook.bind(this);
+  public readonly get_webhook_info = this.getWebhookInfo.bind(this);
 }

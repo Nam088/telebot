@@ -410,6 +410,14 @@ export class Application {
 
     this.job_queue.stop();
   }
+
+  // --- 100% snake_case Method Aliases ---
+  public readonly add_handler = this.addHandler.bind(this);
+  public readonly add_error_handler = this.addErrorHandler.bind(this);
+  public readonly process_update = this.processUpdate.bind(this);
+  public readonly run_polling = this.runPolling.bind(this);
+  public readonly run_webhook = this.runWebhook.bind(this);
+  public readonly initialize_persistence = this.initializePersistence.bind(this);
 }
 
 /**

@@ -135,6 +135,9 @@ export class Job<Data = unknown> {
   public remove(): void {
     this.scheduleRemoval();
   }
+
+  // --- snake_case Aliases ---
+  public readonly schedule_removal = this.scheduleRemoval.bind(this);
 }
 
 /**
@@ -401,4 +404,12 @@ export class JobQueue {
       }
     }
   }
+
+  // --- 100% snake_case Method Aliases ---
+  public readonly run_once = this.runOnce.bind(this);
+  public readonly run_repeating = this.runRepeating.bind(this);
+  public readonly run_daily = this.runDaily.bind(this);
+  public readonly get_jobs_by_name = this.getJobsByName.bind(this);
+  public readonly get_jobs_by_chat_id = this.getJobsByChatId.bind(this);
+  public readonly register_callback = this.registerCallback.bind(this);
 }
