@@ -7,3 +7,6 @@ python-telegram-bot/
 *.log
 .env*
 
+
+# CodeGraph generated index (SQLite db, daemon socket/pid)
+.codegraph/
