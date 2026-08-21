@@ -8,8 +8,18 @@ import { type Server } from "node:http";
 import { Bot, type BotOptions } from "../client/bot.js";
 import { Update } from "./update.js";
 import type { RawUpdate } from "../client/types.js";
-import { BaseHandler } from "../routing/handlers.js";
+import {
+  BaseHandler,
+  CommandHandler,
+  MessageHandler,
+  CallbackQueryHandler,
+  TypeHandler,
+  type HandlerCallback,
+} from "../routing/handlers.js";
+import { filters } from "../filters/matchers.js";
+import type { BaseFilter } from "../filters/base.js";
 import { ConversationHandler } from "../routing/conversation.js";
+
 import { CallbackContext } from "./context.js";
 import { type Persistence, MemoryPersistence } from "../storage/index.js";
 import { JobQueue } from "../scheduler/queue.js";
@@ -143,6 +153,137 @@ export class Application {
    */
   public use(...middlewares: MiddlewareFn[]): this {
     this.middlewares.push(...middlewares);
+    return this;
+  }
+
+  /**
+   * Registers a command handler shortcut (e.g. `/start`, `/help`).
+   *
+   * @param command - Command name (without leading `/`) or array of command names.
+   * @param callback - Callback function invoked when matching command is received.
+   * @param group - Handler priority group (default: `0`).
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.command("start", async (update, context) => {
+   *   await context.reply("Welcome to our bot!");
+   * });
+   * ```
+   */
+  public command(
+    command: string | string[],
+    callback: HandlerCallback,
+    group: number = 0,
+  ): this {
+    this.addHandler(new CommandHandler(command, callback), group);
+    return this;
+  }
+
+  /**
+   * Registers a text pattern listener shortcut matching text strings or regular expressions.
+   *
+   * @param pattern - String text or RegExp pattern to match in incoming text messages.
+   * @param callback - Callback function invoked when pattern matches.
+   * @param group - Handler priority group (default: `0`).
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.hears(/order ([0-9]+)/i, async (update, context) => {
+   *   const orderId = context.matches?.[0]?.[1];
+   *   await context.reply(`Checking order ${orderId}...`);
+   * });
+   * ```
+   */
+  public hears(
+    pattern: string | RegExp | (string | RegExp)[],
+    callback: HandlerCallback,
+    group: number = 0,
+  ): this {
+    const patterns = Array.isArray(pattern) ? pattern : [pattern];
+    const regexFilter = filters.Regex(
+      new RegExp(
+        patterns
+          .map((p) =>
+            typeof p === "string" ? p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : p.source,
+          )
+          .join("|"),
+        typeof patterns[0] === "object" ? patterns[0].flags : undefined,
+      ),
+    );
+    this.addHandler(new MessageHandler(regexFilter, callback), group);
+    return this;
+  }
+
+  /**
+   * Registers an inline callback query button listener shortcut.
+   *
+   * @param pattern - Callback data string, RegExp pattern, or boolean (match all).
+   * @param callback - Callback function invoked when matching button is tapped.
+   * @param group - Handler priority group (default: `0`).
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.callbackQuery("buy_item", async (update, context) => {
+   *   await context.answerCallbackQuery({ text: "Item added to cart!" });
+   * });
+   * ```
+   */
+  public callbackQuery(
+    pattern: string | RegExp | ((data: string) => boolean) | (string | RegExp)[] | boolean,
+    callback: HandlerCallback,
+    group: number = 0,
+  ): this {
+    let resolvedPattern: string | RegExp | ((data: string) => boolean) | undefined;
+    if (typeof pattern === "boolean") {
+      resolvedPattern = undefined;
+    } else if (Array.isArray(pattern)) {
+      resolvedPattern = (data: string) =>
+        pattern.some((p) => (typeof p === "string" ? p === data : p.test(data)));
+    } else {
+      resolvedPattern = pattern;
+    }
+
+    this.addHandler(new CallbackQueryHandler(callback, resolvedPattern), group);
+    return this;
+  }
+
+  /**
+   * Registers a message filter or update type listener shortcut.
+   *
+   * @param filterOrType - A {@link BaseFilter}, update property key string (e.g. `'message'`, `'inline_query'`), or custom predicate function.
+   * @param callback - Callback function invoked when update matches.
+   * @param group - Handler priority group (default: `0`).
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.on(filters.PHOTO, async (update, context) => {
+   *   await context.reply("Thanks for the photo!");
+   * });
+   * ```
+   */
+  public on(
+    filterOrType: BaseFilter | string | ((update: Update | RawUpdate) => boolean | Promise<boolean>),
+    callback: HandlerCallback,
+    group: number = 0,
+  ): this {
+    if (typeof filterOrType === "function") {
+      this.addHandler(new TypeHandler(filterOrType, callback), group);
+
+    } else if (typeof filterOrType === "string") {
+      this.addHandler(
+        new TypeHandler(
+          (u) => Boolean((u as unknown as Record<string, unknown>)[filterOrType]),
+          callback,
+        ),
+        group,
+      );
+    } else {
+      this.addHandler(new MessageHandler(filterOrType, callback), group);
+    }
     return this;
   }
 

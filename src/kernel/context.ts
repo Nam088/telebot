@@ -227,4 +227,135 @@ export class CallbackContext<
       ...options,
     });
   }
+
+  /**
+   * Convenience shortcut to send an HTML-formatted message to the current chat.
+   *
+   * @param htmlText - HTML string content.
+   * @param options - Additional message options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithHTML(
+    htmlText: string,
+    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text" | "parse_mode"> = {},
+  ): Promise<import("../client/types.js").Message> {
+    return this.reply(htmlText, { ...options, parse_mode: "HTML" });
+  }
+
+  /**
+   * Convenience shortcut to send a MarkdownV2-formatted message to the current chat.
+   *
+   * @param markdownText - MarkdownV2 string content.
+   * @param options - Additional message options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithMarkdown(
+    markdownText: string,
+    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text" | "parse_mode"> = {},
+  ): Promise<import("../client/types.js").Message> {
+    return this.reply(markdownText, { ...options, parse_mode: "MarkdownV2" });
+  }
+
+  /**
+   * Convenience shortcut to send a video to the current chat.
+   *
+   * @param video - File ID, URL, or {@link InputFile}.
+   * @param options - Additional video options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithVideo(
+    video: string | import("../utils/http.js").InputFile,
+    options: Omit<import("../client/types.js").SendVideoOptions, "chat_id" | "video"> = {},
+  ): Promise<import("../client/types.js").Message> {
+    const chatId = this.update?.effective_chat?.id;
+    if (!chatId) {
+      throw new Error("Cannot call context.replyWithVideo() when update has no effective_chat.");
+    }
+    return this.bot.sendVideo({
+      chat_id: chatId,
+      video,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to send an audio file to the current chat.
+   *
+   * @param audio - File ID, URL, or {@link InputFile}.
+   * @param options - Additional audio options.
+   * @returns The sent {@link Message}.
+   */
+  public async replyWithAudio(
+    audio: string | import("../utils/http.js").InputFile,
+    options: Omit<import("../client/types.js").SendAudioOptions, "chat_id" | "audio"> = {},
+  ): Promise<import("../client/types.js").Message> {
+    const chatId = this.update?.effective_chat?.id;
+    if (!chatId) {
+      throw new Error("Cannot call context.replyWithAudio() when update has no effective_chat.");
+    }
+    return this.bot.sendAudio({
+      chat_id: chatId,
+      audio,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to answer the active callback query.
+   *
+   * @param options - Additional answer options (e.g. text notification, alert).
+   * @returns `true` on success.
+   */
+  public async answerCallbackQuery(
+    options: Omit<import("../client/types.js").AnswerCallbackQueryOptions, "callback_query_id"> = {},
+  ): Promise<boolean> {
+    const callbackQueryId = this.update?.callback_query?.id;
+    if (!callbackQueryId) {
+      throw new Error("Cannot call context.answerCallbackQuery() when update has no callback_query.");
+    }
+    return this.bot.answerCallbackQuery({
+      callback_query_id: callbackQueryId,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to edit the text of the current message.
+   *
+   * @param text - New message text.
+   * @param options - Additional text editing options.
+   * @returns The edited {@link Message} or `true`.
+   */
+  public async editMessageText(
+    text: string,
+    options: Omit<import("../client/types.js").EditMessageTextOptions, "chat_id" | "message_id" | "text"> = {},
+  ): Promise<import("../client/types.js").Message | boolean> {
+    const chatId = this.update?.effective_chat?.id;
+    const messageId = this.update?.effective_message?.message_id;
+    if (!chatId || !messageId) {
+      throw new Error("Cannot call context.editMessageText() without effective_chat and effective_message.");
+    }
+    return this.bot.editMessageText({
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+      ...options,
+    });
+  }
+
+  /**
+   * Convenience shortcut to delete a message in the current chat.
+   *
+   * @param messageId - Identifier of the message to delete (defaults to current `effective_message`).
+   * @returns `true` on success.
+   */
+  public async deleteMessage(messageId?: number): Promise<boolean> {
+    const chatId = this.update?.effective_chat?.id;
+    const targetMessageId = messageId ?? this.update?.effective_message?.message_id;
+    if (!chatId || !targetMessageId) {
+      throw new Error("Cannot call context.deleteMessage() without effective_chat and effective_message.");
+    }
+    return this.bot.deleteMessage(chatId, targetMessageId);
+  }
 }
+
