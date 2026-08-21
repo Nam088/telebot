@@ -28,6 +28,32 @@ All notable changes to `telebot-ts` will be documented in this file.
 
 * **polling:** make update dispatch non-blocking and parallelize menu callback responses ([ae8de25](https://github.com/Nam088/telebot-ts/commit/ae8de25974b922e33ffcb8153fdcf84db2c44f0a))
 
+# [1.1.0](https://github.com/Nam088/telebot-ts/compare/v1.0.0...v1.1.0) (2026-08-21)
+
+
+### Bug Fixes
+
+* **ci:** use success lifecycle hook for post-release notes update ([ecb8b62](https://github.com/Nam088/telebot-ts/commit/ecb8b6242536bbe31671653e2c61533f188509ec))
+* **menu:** enhance dynamic label evaluation and attach ctx.menu.update helper ([1014f78](https://github.com/Nam088/telebot-ts/commit/1014f78cc49e47ab99557ea1781f54a53f65f446))
+
+
+### Features
+
+* **client:** implement Telegram 8.x methods, text formatting utilities, and customizable pagination keyboard ([06fb68f](https://github.com/Nam088/telebot-ts/commit/06fb68f516b3cb85c3189027695b8710d7fdd6e7))
+* **components:** add fluent type-safe InlineQueryResultBuilder and search bot example ([6a5f6b6](https://github.com/Nam088/telebot-ts/commit/6a5f6b61168713dd845044551b99cc6ae7f3576e))
+* **core:** add WebApp HMAC validation, Telegram 8.x handlers, NestJS decorators, and linear conversation timeout ([7809dc6](https://github.com/Nam088/telebot-ts/commit/7809dc690e6ab2772a2e27a15a992d512543173a))
+* **core:** implement AutoRetry flood control engine, interactive nested Menu system, and linear AsyncConversation ([cf721e2](https://github.com/Nam088/telebot-ts/commit/cf721e200556a8fcae2fa1cff20dc9a21f561db6))
+* **ecosystem:** add framework webhook adapters, app middleware pipeline, rate limiting, and ReplyKeyboard v8 builder methods ([3915180](https://github.com/Nam088/telebot-ts/commit/391518028efa26bb7d1d7121330d5918fecc05c5))
+* **examples:** add live interactive group test bot ([8442a72](https://github.com/Nam088/telebot-ts/commit/8442a7263a0a68b56d02928908f2e01ef1f1cfe6))
+* **examples:** update live group test bot with Menu, AsyncConversation, and Pagination ([d67ad07](https://github.com/Nam088/telebot-ts/commit/d67ad07d8ee227d74d60e1aac4d0be9c157a12da))
+* **kernel:** add intuitive Express-style shorthands (command, hears, callbackQuery, on) and rich reply helpers ([75493ee](https://github.com/Nam088/telebot-ts/commit/75493eeb7be25e2b9af1e7486b8b1b7f40f9d6da))
+* **utils:** add generic session middleware with MemorySessionStorage and extensible SessionStorage adapter ([0a12a53](https://github.com/Nam088/telebot-ts/commit/0a12a53138c8e66fa8795a500935fc2e1187ccc7))
+
+
+### Performance Improvements
+
+* **polling:** make update dispatch non-blocking and parallelize menu callback responses ([ae8de25](https://github.com/Nam088/telebot-ts/commit/ae8de25974b922e33ffcb8153fdcf84db2c44f0a))
+
 # 1.0.0 (2026-08-20)
 
 
