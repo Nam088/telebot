@@ -11,8 +11,6 @@ import type {
   PassportElementError,
   Story,
   BusinessConnection,
-  Gifts,
-  UserChatBoosts,
   AnswerCallbackQueryOptions,
   AnswerInlineQueryOptions,
 } from "../types.js";
@@ -280,95 +278,6 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
   }
 
   /**
-   * Returns the list of gifts that can be sent by the bot to users.
-   *
-   * @returns A {@link Gifts} object containing the available gifts.
-   * @throws {@link TelegramApiError} When retrieving gifts fails.
-   */
-  public async getAvailableGifts(): Promise<Gifts> {
-    return this.request<Gifts>("getAvailableGifts");
-  }
-
-  /**
-   * Sends a gift to the given user.
-   *
-   * @param options - Options including `user_id`, `gift_id`, and optional message `text`.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When sending gift fails.
-   */
-  public async sendGift(options: {
-    user_id: number;
-    gift_id: string;
-    pay_for_upgrade?: boolean;
-    text?: string;
-    text_parse_mode?: string;
-  }): Promise<boolean> {
-    return this.request<boolean>("sendGift", options as unknown as Record<string, unknown>);
-  }
-
-  /**
-   * Verifies a chat on behalf of the organization which owns the bot.
-   *
-   * @param chatId - Unique identifier for the target chat.
-   * @param customDescription - Custom description for the verification status.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When verification fails.
-   */
-  public async verifyChat(chatId: number | string, customDescription?: string): Promise<boolean> {
-    const payload: Record<string, unknown> = { chat_id: chatId };
-    if (customDescription !== undefined) payload["custom_description"] = customDescription;
-    return this.request<boolean>("verifyChat", payload);
-  }
-
-  /**
-   * Verifies a user on behalf of the organization which owns the bot.
-   *
-   * @param userId - Unique identifier of the target user.
-   * @param customDescription - Custom description for the verification status.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When verification fails.
-   */
-  public async verifyUser(userId: number, customDescription?: string): Promise<boolean> {
-    const payload: Record<string, unknown> = { user_id: userId };
-    if (customDescription !== undefined) payload["custom_description"] = customDescription;
-    return this.request<boolean>("verifyUser", payload);
-  }
-
-  /**
-   * Removes verification from a chat that was previously verified by the bot.
-   *
-   * @param chatId - Unique identifier for the target chat.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When removing verification fails.
-   */
-  public async removeChatVerification(chatId: number | string): Promise<boolean> {
-    return this.request<boolean>("removeChatVerification", { chat_id: chatId });
-  }
-
-  /**
-   * Removes verification from a user that was previously verified by the bot.
-   *
-   * @param userId - Unique identifier of the target user.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When removing verification fails.
-   */
-  public async removeUserVerification(userId: number): Promise<boolean> {
-    return this.request<boolean>("removeUserVerification", { user_id: userId });
-  }
-
-  /**
-   * Retrieves the list of boosts added to a chat by a user.
-   *
-   * @param chatId - Unique identifier for the target chat.
-   * @param userId - Unique identifier of the target user.
-   * @returns A {@link UserChatBoosts} object.
-   * @throws {@link TelegramApiError} When retrieving boosts fails.
-   */
-  public async getUserChatBoosts(chatId: number | string, userId: number): Promise<UserChatBoosts> {
-    return this.request<UserChatBoosts>("getUserChatBoosts", { chat_id: chatId, user_id: userId });
-  }
-
-  /**
    * Changes the emoji status for a given user that granted permission to the bot.
    *
    * @param userId - Unique identifier of the target user.
@@ -385,16 +294,6 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
     const payload: Record<string, unknown> = { user_id: userId, ...options };
     if (customEmojiId !== undefined) payload["custom_emoji_id"] = customEmojiId;
     return this.request<boolean>("setUserEmojiStatus", payload);
-  }
-
-  /**
-   * Saves a prepared inline message for sending by a user via a Mini App.
-   *
-   * @param options - Prepared inline message options.
-   * @returns Prepared message info.
-   */
-  public async savePreparedInlineMessage(options: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>("savePreparedInlineMessage", options);
   }
 
   /**

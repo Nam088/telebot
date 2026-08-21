@@ -54,7 +54,17 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
 
   it("all additional Telegram 8.0+ ecosystem methods", async () => {
     const { client } = createMock(true);
-    expect(await client.savePreparedInlineMessage({ user_id: 123 })).toBe(true);
+    expect(
+      await client.savePreparedInlineMessage({
+        user_id: 123,
+        result: {
+          type: "article",
+          id: "1",
+          title: "T",
+          input_message_content: { message_text: "M" },
+        },
+      }),
+    ).toBe(true);
     expect(await client.answerWebAppQuery("q1", {})).toBe(true);
     expect(await client.answerGuestQuery("g1", {})).toBe(true);
     expect(await client.logOut()).toBe(true);

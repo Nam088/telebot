@@ -212,6 +212,11 @@ export abstract class StickerMethods extends ChatMethods {
    * @param customEmojiId - Custom emoji identifier of a sticker from the set.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting thumbnail fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setCustomEmojiStickerSetThumbnail("custom_emojis", "5368324170671202286");
+   * ```
    */
   public async setCustomEmojiStickerSetThumbnail(
     name: string,
@@ -229,6 +234,11 @@ export abstract class StickerMethods extends ChatMethods {
    * @param title - Sticker set title, 1-64 characters.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting title fails.
+   *
+   * @example
+   * ```ts
+   * await bot.setStickerSetTitle("my_pack", "My Awesome Sticker Pack");
+   * ```
    */
   public async setStickerSetTitle(name: string, title: string): Promise<boolean> {
     return this.request<boolean>("setStickerSetTitle", { name, title });

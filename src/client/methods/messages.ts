@@ -38,6 +38,11 @@ import type {
   SetMessageReactionOptions,
   SetWebhookOptions,
   Poll,
+  MessageId,
+  ForwardMessagesOptions,
+  CopyMessagesOptions,
+  PreparedInlineMessage,
+  SavePreparedInlineMessageOptions,
 } from "../types.js";
 import type { ParseMode } from "../constants.js";
 
@@ -162,9 +167,9 @@ export abstract class MessageMethods extends BaseBotClient {
   /**
    * Forwards multiple messages of any kind in batch.
    *
-   * @param options - Forward batch options with `message_ids` array.
-   * @returns Array of objects with `message_id` of the forwarded messages.
-   * @throws {@link TelegramApiError} When forwarding fails.
+   * @param options - Forward batch options including `chat_id`, `from_chat_id`, and `message_ids`.
+   * @returns Array of {@link MessageId} objects containing the identifiers of forwarded messages.
+   * @throws {@link TelegramApiError} When batch forwarding fails.
    *
    * @example
    * ```ts
@@ -173,17 +178,11 @@ export abstract class MessageMethods extends BaseBotClient {
    *   from_chat_id: sourceChatId,
    *   message_ids: [100, 101],
    * });
+   * console.log(`Forwarded ${sent.length} messages`);
    * ```
    */
-  public async forwardMessages(options: {
-    chat_id: number | string;
-    from_chat_id: number | string;
-    message_ids: number[];
-    disable_notification?: boolean;
-    protect_content?: boolean;
-    message_thread_id?: number;
-  }): Promise<Array<{ message_id: number }>> {
-    return this.request<Array<{ message_id: number }>>(
+  public async forwardMessages(options: ForwardMessagesOptions): Promise<MessageId[]> {
+    return this.request<MessageId[]>(
       "forwardMessages",
       options as unknown as Record<string, unknown>,
     );
@@ -227,8 +226,8 @@ export abstract class MessageMethods extends BaseBotClient {
   /**
    * Copies multiple messages of any kind in batch.
    *
-   * @param options - Batch copy options.
-   * @returns Array of objects containing `message_id` of each copied message.
+   * @param options - Batch copy options including `chat_id`, `from_chat_id`, and `message_ids`.
+   * @returns Array of {@link MessageId} objects containing the identifiers of copied messages.
    * @throws {@link TelegramApiError} When batch copying fails.
    *
    * @example
@@ -237,19 +236,13 @@ export abstract class MessageMethods extends BaseBotClient {
    *   chat_id: targetChatId,
    *   from_chat_id: sourceChatId,
    *   message_ids: [100, 101],
+   *   remove_caption: true,
    * });
+   * console.log(`Copied ${copies.length} messages`);
    * ```
    */
-  public async copyMessages(options: {
-    chat_id: number | string;
-    from_chat_id: number | string;
-    message_ids: number[];
-    disable_notification?: boolean;
-    protect_content?: boolean;
-    remove_caption?: boolean;
-    message_thread_id?: number;
-  }): Promise<Array<{ message_id: number }>> {
-    return this.request<Array<{ message_id: number }>>(
+  public async copyMessages(options: CopyMessagesOptions): Promise<MessageId[]> {
+    return this.request<MessageId[]>(
       "copyMessages",
       options as unknown as Record<string, unknown>,
     );
@@ -941,4 +934,37 @@ export abstract class MessageMethods extends BaseBotClient {
     if (limit !== undefined) payload["limit"] = limit;
     return this.request<Message[]>("getUserPersonalChatMessages", payload);
   }
+
+  /**
+   * Stores a message that can be sent by a user of a Mini App.
+   *
+   * @param options - Prepared inline message options including `user_id` and `result`.
+   * @returns A {@link PreparedInlineMessage} object containing the `id` and `expiration_date`.
+   * @throws {@link TelegramApiError} When saving the prepared message fails.
+   *
+   * @example
+   * ```ts
+   * const prepared = await bot.savePreparedInlineMessage({
+   *   user_id: 123456,
+   *   result: {
+   *     type: "article",
+   *     id: "art_1",
+   *     title: "Shareable Result",
+   *     input_message_content: { message_text: "Shared via Mini App!" },
+   *   },
+   *   allow_user_chats: true,
+   *   allow_group_chats: true,
+   * });
+   * console.log(`Prepared message ID: ${prepared.id}`);
+   * ```
+   */
+  public async savePreparedInlineMessage(
+    options: SavePreparedInlineMessageOptions,
+  ): Promise<PreparedInlineMessage> {
+    return this.request<PreparedInlineMessage>(
+      "savePreparedInlineMessage",
+      options as unknown as Record<string, unknown>,
+    );
+  }
 }
+

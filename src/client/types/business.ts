@@ -240,29 +240,6 @@ export interface PassportElementError {
   message: string;
 }
 
-export interface Gifts {
-  /** The list of gifts. */
-  gifts: Gift[];
-}
-
-export interface Gift {
-  /** Unique identifier of the gift. */
-  id: string;
-  /** The sticker representing the gift. */
-  sticker: Sticker;
-  /** Number of Telegram Stars that must be paid to send the sticker. */
-  star_count: number;
-  /** The total number of the gifts of this type that can be sent; for limited gifts only. */
-  total_count?: number;
-  /** The number of remaining gifts of this type that can be sent; for limited gifts only. */
-  remaining_count?: number;
-}
-
-export interface UserChatBoosts {
-  /** The list of boosts added to the chat by the user. */
-  boosts: unknown[];
-}
-
 export interface CallbackGame {
   [key: string]: unknown;
 }

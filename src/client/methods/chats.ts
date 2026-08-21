@@ -13,6 +13,7 @@ import type {
   PromoteChatMemberOptions,
   CreateChatInviteLinkOptions,
   EditChatInviteLinkOptions,
+  UserChatBoosts,
 } from "../types.js";
 
 /**
@@ -564,4 +565,93 @@ export abstract class ChatMethods extends MessageMethods {
   public async deleteChatStickerSet(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("deleteChatStickerSet", { chat_id: chatId });
   }
+
+  /**
+   * Verifies a user on behalf of the organization which owns the bot.
+   *
+   * @param userId - Unique identifier of the target user.
+   * @param customDescription - Custom description for the verification status; 0-70 characters.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When verification fails.
+   *
+   * @example
+   * ```ts
+   * await bot.verifyUser(123456, "Official Staff");
+   * ```
+   */
+  public async verifyUser(userId: number, customDescription?: string): Promise<boolean> {
+    const payload: Record<string, unknown> = { user_id: userId };
+    if (customDescription !== undefined) payload["custom_description"] = customDescription;
+    return this.request<boolean>("verifyUser", payload);
+  }
+
+  /**
+   * Verifies a chat on behalf of the organization which owns the bot.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param customDescription - Custom description for the verification status; 0-70 characters.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When verification fails.
+   *
+   * @example
+   * ```ts
+   * await bot.verifyChat(chatId, "Verified Community");
+   * ```
+   */
+  public async verifyChat(chatId: number | string, customDescription?: string): Promise<boolean> {
+    const payload: Record<string, unknown> = { chat_id: chatId };
+    if (customDescription !== undefined) payload["custom_description"] = customDescription;
+    return this.request<boolean>("verifyChat", payload);
+  }
+
+  /**
+   * Removes verification from a user that was previously verified by the bot.
+   *
+   * @param userId - Unique identifier of the target user.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When removing verification fails.
+   *
+   * @example
+   * ```ts
+   * await bot.removeUserVerification(123456);
+   * ```
+   */
+  public async removeUserVerification(userId: number): Promise<boolean> {
+    return this.request<boolean>("removeUserVerification", { user_id: userId });
+  }
+
+  /**
+   * Removes verification from a chat that was previously verified by the bot.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When removing verification fails.
+   *
+   * @example
+   * ```ts
+   * await bot.removeChatVerification(chatId);
+   * ```
+   */
+  public async removeChatVerification(chatId: number | string): Promise<boolean> {
+    return this.request<boolean>("removeChatVerification", { chat_id: chatId });
+  }
+
+  /**
+   * Retrieves the list of boosts added to a chat by a user.
+   *
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param userId - Unique identifier of the target user.
+   * @returns A {@link UserChatBoosts} object containing the list of boosts.
+   * @throws {@link TelegramApiError} When retrieving boosts fails.
+   *
+   * @example
+   * ```ts
+   * const boosts = await bot.getUserChatBoosts(chatId, 123456);
+   * console.log(`Total boosts: ${boosts.boosts.length}`);
+   * ```
+   */
+  public async getUserChatBoosts(chatId: number | string, userId: number): Promise<UserChatBoosts> {
+    return this.request<UserChatBoosts>("getUserChatBoosts", { chat_id: chatId, user_id: userId });
+  }
 }
+

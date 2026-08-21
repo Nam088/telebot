@@ -8,6 +8,7 @@ import type {
 } from "../constants.js";
 import type { InputFile } from "../../utils/http.js";
 import type { User, Chat, Location } from "./common.js";
+import type { ChatBoost } from "./business.js";
 
 export interface ChatPermissions {
   /** True, if the user is allowed to send text messages, contacts, locations and venues. */
@@ -236,3 +237,9 @@ export interface ChatAdministratorRights {
   /** True, if the user is allowed to create, rename, close, and reopen forum topics. */
   can_manage_topics?: boolean;
 }
+
+export interface UserChatBoosts {
+  /** The list of boosts added to the chat by the user. */
+  boosts: ChatBoost[];
+}
+

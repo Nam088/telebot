@@ -8,7 +8,7 @@ import type {
 } from "../constants.js";
 import type { InputFile } from "../../utils/http.js";
 import type { User, Chat, Location, File } from "./common.js";
-import type { Story, ChatBoostAdded, CallbackGame, Game, PassportData } from "./business.js";
+import type { Story, ChatBoostAdded, CallbackGame, Game, PassportData, InlineQueryResult } from "./business.js";
 import type { Invoice, SuccessfulPayment, RefundedPayment } from "./payments.js";
 import type { Sticker } from "./stickers.js";
 
@@ -1284,3 +1284,63 @@ export type ReactionType = ReactionTypeEmoji | ReactionTypeCustomEmoji | Reactio
 
 export type InputMedia =
   InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;
+
+export interface MessageId {
+  /** Unique message identifier. */
+  message_id: number;
+}
+
+export interface ForwardMessagesOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Unique identifier for the chat where the original messages were sent. */
+  from_chat_id: number | string;
+  /** Identifiers of 1-100 messages in the chat from_chat_id to forward. */
+  message_ids: number[];
+  /** Sends the messages silently. Users will receive a notification with no sound. */
+  disable_notification?: boolean;
+  /** Unique identifier for the target message thread (topic) of the forum. */
+  message_thread_id?: number;
+  /** Protects the contents of the forwarded messages from forwarding and saving. */
+  protect_content?: boolean;
+}
+
+export interface CopyMessagesOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Unique identifier for the chat where the original messages were sent. */
+  from_chat_id: number | string;
+  /** Identifiers of 1-100 messages in the chat from_chat_id to copy. */
+  message_ids: number[];
+  /** Sends the messages silently. Users will receive a notification with no sound. */
+  disable_notification?: boolean;
+  /** Unique identifier for the target message thread (topic) of the forum. */
+  message_thread_id?: number;
+  /** Protects the contents of the sent messages from forwarding and saving. */
+  protect_content?: boolean;
+  /** Pass True to copy the messages without their captions. */
+  remove_caption?: boolean;
+}
+
+export interface PreparedInlineMessage {
+  /** Unique identifier of the prepared message. */
+  id: string;
+  /** Expiration date of the prepared message, in Unix time. Expired prepared messages can no longer be used. */
+  expiration_date: number;
+}
+
+export interface SavePreparedInlineMessageOptions {
+  /** Unique identifier of the target user that can use the prepared message. */
+  user_id: number;
+  /** An object describing the message to be sent. */
+  result: InlineQueryResult;
+  /** Pass True if the message can be sent to private chats with users. */
+  allow_user_chats?: boolean;
+  /** Pass True if the message can be sent to private chats with bots. */
+  allow_bot_chats?: boolean;
+  /** Pass True if the message can be sent to group and supergroup chats. */
+  allow_group_chats?: boolean;
+  /** Pass True if the message can be sent to channel chats. */
+  allow_channel_chats?: boolean;
+}
+

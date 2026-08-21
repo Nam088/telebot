@@ -51,4 +51,17 @@ describe("ChatMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.setChatStickerSet(123, "pack")).toBe(true);
     expect(await client.deleteChatStickerSet(123)).toBe(true);
   });
+
+  it("verifyUser, verifyChat, removeUserVerification, removeChatVerification, getUserChatBoosts", async () => {
+    const { client } = createMock(true);
+    expect(await client.verifyUser(123, "Custom user desc")).toBe(true);
+    expect(await client.verifyChat(456, "Custom chat desc")).toBe(true);
+    expect(await client.removeUserVerification(123)).toBe(true);
+    expect(await client.removeChatVerification(456)).toBe(true);
+
+    const mockBoosts = { boosts: [] };
+    const { client: boostClient } = createMock(mockBoosts);
+    expect(await boostClient.getUserChatBoosts(456, 123)).toEqual(mockBoosts);
+  });
 });
+

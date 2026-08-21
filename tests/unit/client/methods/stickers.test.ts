@@ -54,6 +54,7 @@ describe("StickerMethods Unit Tests (1:1 mapping)", () => {
     const { client } = createMock(true);
     expect(await client.setStickerSetThumbnail("p", 123, "static", "thumb")).toBe(true);
     expect(await client.setCustomEmojiStickerSetThumbnail("p", "emoji_id")).toBe(true);
+    expect(await client.setCustomEmojiStickerSetThumbnail("p")).toBe(true);
     expect(await client.setStickerSetTitle("p", "New Title")).toBe(true);
     expect(await client.setStickerEmojiList("s_1", ["⭐", "🔥"])).toBe(true);
     expect(await client.setStickerKeywords("s_1", ["space"])).toBe(true);

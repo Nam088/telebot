@@ -153,6 +153,12 @@ export type {
   InputStoryContent,
   InputStoryContentPhoto,
   InputStoryContentVideo,
+  MessageId,
+  ForwardMessagesOptions,
+  CopyMessagesOptions,
+  PreparedInlineMessage,
+  SavePreparedInlineMessageOptions,
+  SendGiftOptions,
 } from "./types.js";
 export { TelegramApiError } from "./types.js";
 export { BaseBotClient } from "./methods/base.js";

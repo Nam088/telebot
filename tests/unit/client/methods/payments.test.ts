@@ -46,4 +46,41 @@ describe("PaymentMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.editUserStarSubscription(123, "charge_1", true)).toBe(true);
     expect(await client.getMyStarBalance()).toBe(true);
   });
+
+  it("getAvailableGifts, sendGift", async () => {
+    const mockGifts = {
+      gifts: [
+        {
+          id: "gift_1",
+          sticker: {
+            file_id: "s1",
+            file_unique_id: "su1",
+            type: "regular" as const,
+            width: 512,
+            height: 512,
+            is_animated: false,
+            is_video: false,
+          },
+          star_count: 50,
+          total_count: 1000,
+          remaining_count: 500,
+          upgrade_star_count: 25,
+        },
+      ],
+    };
+    const { client } = createMock(mockGifts);
+    expect(await client.getAvailableGifts()).toEqual(mockGifts);
+
+    const { client: sendClient } = createMock(true);
+    expect(
+      await sendClient.sendGift({
+        user_id: 12345,
+        gift_id: "gift_1",
+        pay_for_upgrade: true,
+        text: "Here is your gift!",
+        text_parse_mode: "HTML",
+        text_entities: [],
+      }),
+    ).toBe(true);
+  });
 });

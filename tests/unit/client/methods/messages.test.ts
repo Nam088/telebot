@@ -22,19 +22,54 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
   });
 
   it("forwardMessage, forwardMessages, copyMessage, copyMessages", async () => {
-    const { client } = createMock({ message_id: 1 });
-    expect(await client.forwardMessage({ chat_id: 1, from_chat_id: 2, message_id: 3 })).toEqual({
-      message_id: 1,
+    const { client } = createMock([{ message_id: 101 }, { message_id: 102 }]);
+    expect(await client.forwardMessage({ chat_id: 1, from_chat_id: 2, message_id: 3 })).toEqual([
+      { message_id: 101 },
+      { message_id: 102 },
+    ]);
+    const forwardBatch = await client.forwardMessages({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10, 11],
+      disable_notification: true,
+      message_thread_id: 42,
+      protect_content: true,
     });
-    expect(await client.forwardMessages({ chat_id: 1, from_chat_id: 2, message_ids: [3] })).toEqual(
-      { message_id: 1 },
-    );
-    expect(await client.copyMessage({ chat_id: 1, from_chat_id: 2, message_id: 3 })).toEqual({
-      message_id: 1,
+    expect(forwardBatch).toEqual([{ message_id: 101 }, { message_id: 102 }]);
+
+    expect(await client.copyMessage({ chat_id: 1, from_chat_id: 2, message_id: 3 })).toEqual([
+      { message_id: 101 },
+      { message_id: 102 },
+    ]);
+    const copyBatch = await client.copyMessages({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10, 11],
+      disable_notification: true,
+      message_thread_id: 42,
+      protect_content: true,
+      remove_caption: true,
     });
-    expect(await client.copyMessages({ chat_id: 1, from_chat_id: 2, message_ids: [3] })).toEqual({
-      message_id: 1,
+    expect(copyBatch).toEqual([{ message_id: 101 }, { message_id: 102 }]);
+  });
+
+  it("savePreparedInlineMessage", async () => {
+    const expected = { id: "prep_123", expiration_date: 1720000000 };
+    const { client } = createMock(expected);
+    const result = await client.savePreparedInlineMessage({
+      user_id: 12345,
+      result: {
+        type: "article",
+        id: "a1",
+        title: "Test",
+        input_message_content: { message_text: "Text" },
+      },
+      allow_user_chats: true,
+      allow_bot_chats: true,
+      allow_group_chats: true,
+      allow_channel_chats: true,
     });
+    expect(result).toEqual(expected);
   });
 
   it("sendPhoto, sendAudio, sendDocument, sendVideo, sendAnimation, sendVoice, sendVideoNote, sendMediaGroup", async () => {

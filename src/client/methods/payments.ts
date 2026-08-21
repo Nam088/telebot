@@ -12,6 +12,8 @@ import type {
   AnswerPreCheckoutQueryOptions,
   StarTransactions,
   StarAmount,
+  Gifts,
+  SendGiftOptions,
 } from "../types.js";
 
 /**
@@ -195,4 +197,42 @@ export abstract class PaymentMethods extends StickerMethods {
   public async getMyStarBalance(): Promise<StarAmount> {
     return this.request<StarAmount>("getMyStarBalance");
   }
+
+  /**
+   * Returns the list of gifts that can be sent by the bot to users.
+   *
+   * @returns A {@link Gifts} object containing the available gifts.
+   * @throws {@link TelegramApiError} When retrieving gifts fails.
+   *
+   * @example
+   * ```ts
+   * const gifts = await bot.getAvailableGifts();
+   * console.log(`Available gifts count: ${gifts.gifts.length}`);
+   * ```
+   */
+  public async getAvailableGifts(): Promise<Gifts> {
+    return this.request<Gifts>("getAvailableGifts");
+  }
+
+  /**
+   * Sends a gift to the given user.
+   *
+   * @param options - Options including `user_id`, `gift_id`, and optional message `text`, `text_parse_mode`, `text_entities`, and `pay_for_upgrade`.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When sending gift fails.
+   *
+   * @example
+   * ```ts
+   * await bot.sendGift({
+   *   user_id: 123456,
+   *   gift_id: "gift_abc123",
+   *   text: "Enjoy your gift!",
+   *   pay_for_upgrade: true,
+   * });
+   * ```
+   */
+  public async sendGift(options: SendGiftOptions): Promise<boolean> {
+    return this.request<boolean>("sendGift", options as unknown as Record<string, unknown>);
+  }
 }
+
