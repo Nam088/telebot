@@ -2,6 +2,13 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## [1.1.2](https://github.com/Nam088/telebot-ts/compare/v1.1.1...v1.1.2) (2026-08-21)
+
+
+### Bug Fixes
+
+* **types:** eliminate unused type imports and ensure 0 lint warnings ([0eabc8d](https://github.com/Nam088/telebot-ts/commit/0eabc8dd548925db0099a23bc923311d871f5a28))
+
 ## [1.1.1](https://github.com/Nam088/telebot-ts/compare/v1.1.0...v1.1.1) (2026-08-21)
 
 
