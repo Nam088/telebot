@@ -13,13 +13,13 @@ export interface PaginationNavigationLabels {
   /**
    * Label text for the previous page button.
    * Can be a static string or a formatter function `(currentPage, totalPages) => string`.
-   * @defaultValue `"◀️ Prev"`
+   * @defaultValue `"Previous"`
    */
   prev?: string | ((currentPage: number, totalPages: number) => string);
   /**
    * Label text for the next page button.
    * Can be a static string or a formatter function `(currentPage, totalPages) => string`.
-   * @defaultValue `"Next ▶️"`
+   * @defaultValue `"Next"`
    */
   next?: string | ((currentPage: number, totalPages: number) => string);
   /**
@@ -30,7 +30,7 @@ export interface PaginationNavigationLabels {
   pageIndicator?: string | ((currentPage: number, totalPages: number) => string);
   /**
    * Label text displayed when a navigation button is disabled (e.g. on first/last page).
-   * @defaultValue `"⏹️"`
+   * @defaultValue `"-"`
    */
   disabled?: string;
   /**
@@ -153,14 +153,14 @@ export class PaginationKeyboard<T = unknown> {
     // Navigation control row
     if (total > 1) {
       const navRow: InlineKeyboardButton[] = [];
-      const disabledPlaceholder = this.navigation.disabled ?? "⏹️";
+      const disabledPlaceholder = this.navigation.disabled ?? "-";
       const hideDisabled = this.navigation.hideDisabled ?? false;
 
       // 1. Previous button
       if (current > 1) {
         const prevText = this.resolveLabel(
           this.navigation.prev,
-          "◀️ Prev",
+          "Previous",
           current,
           total,
         );
@@ -191,7 +191,7 @@ export class PaginationKeyboard<T = unknown> {
       if (current < total) {
         const nextText = this.resolveLabel(
           this.navigation.next,
-          "Next ▶️",
+          "Next",
           current,
           total,
         );

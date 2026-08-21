@@ -24,9 +24,9 @@ describe("PaginationKeyboard Tests", () => {
 
     // Nav row
     const navRow = markup.inline_keyboard[3]!;
-    expect(navRow[0]?.text).toBe("⏹️"); // Prev disabled on page 1
+    expect(navRow[0]?.text).toBe("-"); // Prev disabled on page 1
     expect(navRow[1]?.text).toBe("1 / 3");
-    expect(navRow[2]?.text).toBe("Next ▶️");
+    expect(navRow[2]?.text).toBe("Next");
     expect(navRow[2]?.callback_data).toBe("pagination:next:2");
   });
 
@@ -42,10 +42,10 @@ describe("PaginationKeyboard Tests", () => {
     expect(markup.inline_keyboard[0]?.[0]?.text).toBe("Date");
 
     const navRow = markup.inline_keyboard[3]!;
-    expect(navRow[0]?.text).toBe("◀️ Prev");
+    expect(navRow[0]?.text).toBe("Previous");
     expect(navRow[0]?.callback_data).toBe("pagination:prev:1");
     expect(navRow[1]?.text).toBe("2 / 3");
-    expect(navRow[2]?.text).toBe("Next ▶️");
+    expect(navRow[2]?.text).toBe("Next");
     expect(navRow[2]?.callback_data).toBe("pagination:next:3");
   });
 
