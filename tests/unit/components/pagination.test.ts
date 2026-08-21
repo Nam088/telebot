@@ -112,4 +112,3 @@ describe("PaginationKeyboard Tests", () => {
     expect(navRowHidden[1]?.text).toBe("3 / 3");
   });
 });
-

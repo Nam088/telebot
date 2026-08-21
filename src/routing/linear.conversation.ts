@@ -249,4 +249,3 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
     })();
   }
 }
-

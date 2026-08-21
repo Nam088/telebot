@@ -4,10 +4,7 @@
  * @packageDocumentation
  */
 
-import type {
-  InlineKeyboardMarkup,
-  InlineQueryResult,
-} from "../client/types.js";
+import type { InlineKeyboardMarkup, InlineQueryResult } from "../client/types.js";
 import type { ParseMode } from "../client/constants.js";
 
 /**

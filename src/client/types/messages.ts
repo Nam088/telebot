@@ -8,7 +8,14 @@ import type {
 } from "../constants.js";
 import type { InputFile } from "../../utils/http.js";
 import type { User, Chat, Location, File } from "./common.js";
-import type { Story, ChatBoostAdded, CallbackGame, Game, PassportData, InlineQueryResult } from "./business.js";
+import type {
+  Story,
+  ChatBoostAdded,
+  CallbackGame,
+  Game,
+  PassportData,
+  InlineQueryResult,
+} from "./business.js";
 import type { Invoice, SuccessfulPayment, RefundedPayment } from "./payments.js";
 import type { Sticker } from "./stickers.js";
 
@@ -1343,4 +1350,3 @@ export interface SavePreparedInlineMessageOptions {
   /** Pass True if the message can be sent to channel chats. */
   allow_channel_chats?: boolean;
 }
-

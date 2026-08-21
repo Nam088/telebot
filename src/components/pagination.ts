@@ -105,8 +105,7 @@ export class PaginationKeyboard<T = unknown> {
     this.page = Math.max(1, options.page ?? 1);
     this.itemButton = options.itemButton;
     this.callbackData =
-      options.callbackData ??
-      ((action, targetPage) => `pagination:${action}:${targetPage}`);
+      options.callbackData ?? ((action, targetPage) => `pagination:${action}:${targetPage}`);
     this.navigation = options.navigation ?? {};
   }
 
@@ -158,12 +157,7 @@ export class PaginationKeyboard<T = unknown> {
 
       // 1. Previous button
       if (current > 1) {
-        const prevText = this.resolveLabel(
-          this.navigation.prev,
-          "Previous",
-          current,
-          total,
-        );
+        const prevText = this.resolveLabel(this.navigation.prev, "Previous", current, total);
         navRow.push({
           text: prevText,
           callback_data: this.callbackData("prev", current - 1),
@@ -189,12 +183,7 @@ export class PaginationKeyboard<T = unknown> {
 
       // 3. Next button
       if (current < total) {
-        const nextText = this.resolveLabel(
-          this.navigation.next,
-          "Next",
-          current,
-          total,
-        );
+        const nextText = this.resolveLabel(this.navigation.next, "Next", current, total);
         navRow.push({
           text: nextText,
           callback_data: this.callbackData("next", current + 1),
@@ -212,4 +201,3 @@ export class PaginationKeyboard<T = unknown> {
     return { inline_keyboard };
   }
 }
-

@@ -65,9 +65,7 @@ export class BusinessMessagesHandler<
    */
   async checkUpdate(update: Update): Promise<boolean> {
     return Boolean(
-      update.business_message ||
-        update.edited_business_message ||
-        update.deleted_business_messages,
+      update.business_message || update.edited_business_message || update.deleted_business_messages,
     );
   }
 }

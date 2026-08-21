@@ -26,13 +26,7 @@ export interface WebhookCallbackOptions {
 /**
  * Supported web framework identifiers.
  */
-export type WebhookFramework =
-  | "express"
-  | "fastify"
-  | "std/http"
-  | "http"
-  | "fetch"
-  | "nextjs";
+export type WebhookFramework = "express" | "fastify" | "std/http" | "http" | "fetch" | "nextjs";
 
 /**
  * Web standard Request handler signature (Next.js App Router, Hono, Cloudflare Workers, Deno, Bun).
@@ -59,10 +53,7 @@ export type FastifyWebhookHandler = (
 /**
  * Node.js native `http` server request listener.
  */
-export type HttpWebhookHandler = (
-  req: IncomingMessage,
-  res: ServerResponse,
-) => Promise<void>;
+export type HttpWebhookHandler = (req: IncomingMessage, res: ServerResponse) => Promise<void>;
 
 function extractHeader(
   headers: Record<string, string | string[] | undefined>,
@@ -213,7 +204,10 @@ export function createHttpWebhook(
     }
 
     if (options.secret_token) {
-      const receivedToken = extractHeader(req.headers as Record<string, string | undefined>, "x-telegram-bot-api-secret-token");
+      const receivedToken = extractHeader(
+        req.headers as Record<string, string | undefined>,
+        "x-telegram-bot-api-secret-token",
+      );
       if (!receivedToken || !isSecretTokenValid(receivedToken, options.secret_token)) {
         res.writeHead(401, { "Content-Type": "text/plain" });
         res.end("Unauthorized");

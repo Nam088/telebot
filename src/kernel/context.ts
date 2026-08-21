@@ -8,6 +8,10 @@ import type { Bot } from "../client/bot.js";
 import type { Update } from "./update.js";
 import type { JobQueue } from "../scheduler/queue.js";
 import type { Job } from "../scheduler/job.js";
+import {
+  ConversationContextHelper,
+  type AsyncConversationManager,
+} from "../routing/async-conversation.js";
 
 /**
  * Context object passed to handler callbacks, error handlers, and job callbacks.
@@ -124,6 +128,11 @@ export class CallbackContext<
   }
 
   /**
+   * Linear async conversation helper instance.
+   */
+  public conversation: ConversationContextHelper;
+
+  /**
    * Creates a new {@link CallbackContext} instance.
    *
    * @param options - Initialization options for context properties.
@@ -144,6 +153,7 @@ export class CallbackContext<
     error?: Error;
     matches?: RegExpMatchArray[];
     update?: Update;
+    conversationManager?: AsyncConversationManager;
   }) {
     this.bot = options.bot;
     this.scheduler = options.scheduler ?? options.job_queue;
@@ -155,6 +165,7 @@ export class CallbackContext<
     this.error = options.error;
     this.matches = options.matches;
     this.update = options.update;
+    this.conversation = new ConversationContextHelper(this, options.conversationManager);
   }
 
   /**
@@ -237,7 +248,10 @@ export class CallbackContext<
    */
   public async replyWithHTML(
     htmlText: string,
-    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text" | "parse_mode"> = {},
+    options: Omit<
+      import("../client/types.js").SendMessageOptions,
+      "chat_id" | "text" | "parse_mode"
+    > = {},
   ): Promise<import("../client/types.js").Message> {
     return this.reply(htmlText, { ...options, parse_mode: "HTML" });
   }
@@ -251,7 +265,10 @@ export class CallbackContext<
    */
   public async replyWithMarkdown(
     markdownText: string,
-    options: Omit<import("../client/types.js").SendMessageOptions, "chat_id" | "text" | "parse_mode"> = {},
+    options: Omit<
+      import("../client/types.js").SendMessageOptions,
+      "chat_id" | "text" | "parse_mode"
+    > = {},
   ): Promise<import("../client/types.js").Message> {
     return this.reply(markdownText, { ...options, parse_mode: "MarkdownV2" });
   }
@@ -307,11 +324,16 @@ export class CallbackContext<
    * @returns `true` on success.
    */
   public async answerCallbackQuery(
-    options: Omit<import("../client/types.js").AnswerCallbackQueryOptions, "callback_query_id"> = {},
+    options: Omit<
+      import("../client/types.js").AnswerCallbackQueryOptions,
+      "callback_query_id"
+    > = {},
   ): Promise<boolean> {
     const callbackQueryId = this.update?.callback_query?.id;
     if (!callbackQueryId) {
-      throw new Error("Cannot call context.answerCallbackQuery() when update has no callback_query.");
+      throw new Error(
+        "Cannot call context.answerCallbackQuery() when update has no callback_query.",
+      );
     }
     return this.bot.answerCallbackQuery({
       callback_query_id: callbackQueryId,
@@ -328,12 +350,17 @@ export class CallbackContext<
    */
   public async editMessageText(
     text: string,
-    options: Omit<import("../client/types.js").EditMessageTextOptions, "chat_id" | "message_id" | "text"> = {},
+    options: Omit<
+      import("../client/types.js").EditMessageTextOptions,
+      "chat_id" | "message_id" | "text"
+    > = {},
   ): Promise<import("../client/types.js").Message | boolean> {
     const chatId = this.update?.effective_chat?.id;
     const messageId = this.update?.effective_message?.message_id;
     if (!chatId || !messageId) {
-      throw new Error("Cannot call context.editMessageText() without effective_chat and effective_message.");
+      throw new Error(
+        "Cannot call context.editMessageText() without effective_chat and effective_message.",
+      );
     }
     return this.bot.editMessageText({
       chat_id: chatId,
@@ -353,9 +380,10 @@ export class CallbackContext<
     const chatId = this.update?.effective_chat?.id;
     const targetMessageId = messageId ?? this.update?.effective_message?.message_id;
     if (!chatId || !targetMessageId) {
-      throw new Error("Cannot call context.deleteMessage() without effective_chat and effective_message.");
+      throw new Error(
+        "Cannot call context.deleteMessage() without effective_chat and effective_message.",
+      );
     }
     return this.bot.deleteMessage(chatId, targetMessageId);
   }
 }
-

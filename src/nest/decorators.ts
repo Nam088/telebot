@@ -80,10 +80,7 @@ export function InjectBot(botName?: string): ParameterDecorator {
   };
 }
 
-function createHandlerDecorator(
-  type: HandlerMetadata["type"],
-  pattern?: any,
-): MethodDecorator {
+function createHandlerDecorator(type: HandlerMetadata["type"], pattern?: any): MethodDecorator {
   return (target: any, propertyKey: string | symbol) => {
     const proto = target;
     if (!proto[HANDLER_META_KEY]) {
@@ -167,4 +164,3 @@ export function OnJoinRequest(): MethodDecorator {
 export function OnBusinessConnection(): MethodDecorator {
   return createHandlerDecorator("business_connection");
 }
-

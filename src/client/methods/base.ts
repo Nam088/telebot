@@ -7,6 +7,14 @@
 import { TelegramApiError } from "../types.js";
 import { buildRequestBody } from "../../utils/http.js";
 import { validateToken } from "../../utils/validation.js";
+import {
+  type RetryOptions,
+  DEFAULT_RETRY_OPTIONS,
+  computeBackoffSeconds,
+  isRetryableStatus,
+} from "../retry.js";
+
+export type { RetryOptions } from "../retry.js";
 
 /**
  * Options for initializing a {@link BaseBotClient} or {@link Bot}.
@@ -45,16 +53,12 @@ export interface BotOptions {
    * @defaultValue `30000`
    */
   requestTimeoutMs?: number;
-}
 
-/**
- * Maximum number of attempts (initial request plus retries) for a single {@link BaseBotClient.request} call.
- *
- * @remarks
- * Shared by both `429` and `5xx` handling so that repeated rate-limit responses cannot retry
- * forever, and cannot silently consume the retry budget meant for genuine server errors.
- */
-const MAX_ATTEMPTS = 4;
+  /**
+   * Configurable auto-retry and flood control options.
+   */
+  retry?: RetryOptions;
+}
 
 /**
  * Extra time, in milliseconds, added on top of a `getUpdates` long-poll `timeout` (converted
@@ -77,16 +81,6 @@ interface TelegramApiEnvelope<T> {
 }
 
 /**
- * Computes the exponential backoff delay, in seconds, for a given attempt number.
- *
- * @param attempt - The 1-indexed attempt number that just failed.
- * @returns Delay in seconds, following a `1, 2, 4, 8, ...` sequence capped at 30.
- */
-function backoffSeconds(attempt: number): number {
-  return Math.min(30, 2 ** (attempt - 1));
-}
-
-/**
  * Core HTTP dispatcher and credential manager for all Telegram Bot API operations.
  *
  * Implements automated rate-limit backoff (HTTP 429 `retry_after`), exponential backoff
@@ -103,6 +97,11 @@ export abstract class BaseBotClient {
    * Base endpoint URL of the Telegram Bot API server.
    */
   public readonly apiRoot: string;
+
+  /**
+   * Client configuration options.
+   */
+  public readonly options: BotOptions;
 
   /**
    * Internal fetch adapter instance used for HTTP dispatch.
@@ -129,10 +128,33 @@ export abstract class BaseBotClient {
   constructor(token: string, options: BotOptions = {}) {
     validateToken(token);
     this.token = token;
+    this.options = { ...options };
     this.apiRoot = options.apiRoot ?? "https://api.telegram.org";
     this._fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
     this.baseDelayMs = options.baseDelayMs;
     this.requestTimeoutMs = options.requestTimeoutMs ?? 30_000;
+  }
+
+  /**
+   * Dynamically configures or updates the auto-retry and flood control settings.
+   *
+   * @param options - Partial retry options to update.
+   * @returns This client instance for chaining.
+   *
+   * @example
+   * ```ts
+   * bot.configureRetry({
+   *   maxRetryAttempts: 5,
+   *   minDelaySeconds: 2,
+   * });
+   * ```
+   */
+  public configureRetry(options: Partial<RetryOptions>): this {
+    this.options.retry = {
+      ...this.options.retry,
+      ...options,
+    };
+    return this;
   }
 
   /**
@@ -158,8 +180,8 @@ export abstract class BaseBotClient {
    *
    * Automatically serializes JSON objects or multipart `FormData` when file buffers / `InputFile` are present.
    * Handles HTTP 429 rate-limiting (honoring `retry_after`) and HTTP 5xx retries with exponential
-   * backoff (`1s, 2s, 4s`, capped at `30s`), sharing a single 4-attempt budget across both so
-   * that repeated `429`s cannot retry forever or starve genuine `5xx` retries.
+   * backoff, sharing a single retry budget across both so that repeated `429`s cannot retry forever
+   * or starve genuine `5xx` retries.
    *
    * @typeParam T - The expected return payload type from Telegram.
    * @param method - The Bot API method name (e.g. `"sendMessage"`, `"getMe"`, `"setWebhook"`).
@@ -187,6 +209,9 @@ export abstract class BaseBotClient {
         ? Math.max(this.requestTimeoutMs, pollTimeoutMs + LONG_POLL_TIMEOUT_BUFFER_MS)
         : this.requestTimeoutMs;
 
+    const retryOpts = this.options.retry ?? {};
+    const maxAttempts = 1 + (retryOpts.maxRetryAttempts ?? DEFAULT_RETRY_OPTIONS.maxRetryAttempts);
+
     let attempt = 0;
     while (true) {
       attempt++;
@@ -202,23 +227,46 @@ export abstract class BaseBotClient {
 
         if (response.status === 429) {
           const json = (await response.json()) as TelegramApiEnvelope<T>;
-          if (attempt >= MAX_ATTEMPTS) {
-            throw new TelegramApiError(
-              json.error_code ?? response.status,
-              json.description ?? "Too Many Requests",
-              json.parameters,
-            );
+          const apiError = new TelegramApiError(
+            json.error_code ?? response.status,
+            json.description ?? "Too Many Requests",
+            json.parameters,
+          );
+
+          if (attempt >= maxAttempts) {
+            throw apiError;
           }
-          const retryAfter = json.parameters?.retry_after ?? backoffSeconds(attempt);
-          await this.sleep(retryAfter);
+
+          const retryAfter = json.parameters?.retry_after;
+          const delaySeconds = computeBackoffSeconds(attempt, retryOpts, retryAfter);
+          const delayMs = this.baseDelayMs !== undefined ? this.baseDelayMs : delaySeconds * 1000;
+
+          if (retryOpts.onRetry) {
+            retryOpts.onRetry(attempt, delayMs, apiError);
+          }
+
+          await this.sleep(delaySeconds);
           continue;
         }
 
-        if (response.status >= 500 && response.status < 600) {
-          if (attempt >= MAX_ATTEMPTS) {
-            throw new TelegramApiError(response.status, `Server error: ${response.statusText}`);
+        if (isRetryableStatus(response.status, retryOpts.retryOnStatus)) {
+          const apiError = new TelegramApiError(
+            response.status,
+            `Server error: ${response.statusText}`,
+          );
+
+          if (attempt >= maxAttempts) {
+            throw apiError;
           }
-          await this.sleep(backoffSeconds(attempt));
+
+          const delaySeconds = computeBackoffSeconds(attempt, retryOpts);
+          const delayMs = this.baseDelayMs !== undefined ? this.baseDelayMs : delaySeconds * 1000;
+
+          if (retryOpts.onRetry) {
+            retryOpts.onRetry(attempt, delayMs, apiError);
+          }
+
+          await this.sleep(delaySeconds);
           continue;
         }
 
@@ -236,11 +284,22 @@ export abstract class BaseBotClient {
         if (err instanceof TelegramApiError) {
           throw err;
         }
-        if (attempt >= MAX_ATTEMPTS) {
-          const rawMessage = err instanceof Error ? err.message : String(err);
+
+        const rawMessage = err instanceof Error ? err.message : String(err);
+        const errorObj = err instanceof Error ? err : new Error(rawMessage);
+
+        if (attempt >= maxAttempts) {
           throw new TelegramApiError(0, this.redactToken(rawMessage));
         }
-        await this.sleep(backoffSeconds(attempt));
+
+        const delaySeconds = computeBackoffSeconds(attempt, retryOpts);
+        const delayMs = this.baseDelayMs !== undefined ? this.baseDelayMs : delaySeconds * 1000;
+
+        if (retryOpts.onRetry) {
+          retryOpts.onRetry(attempt, delayMs, errorObj);
+        }
+
+        await this.sleep(delaySeconds);
       } finally {
         clearTimeout(timeoutId);
       }

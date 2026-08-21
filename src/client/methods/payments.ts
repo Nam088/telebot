@@ -235,4 +235,3 @@ export abstract class PaymentMethods extends StickerMethods {
     return this.request<boolean>("sendGift", options as unknown as Record<string, unknown>);
   }
 }
-

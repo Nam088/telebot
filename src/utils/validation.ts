@@ -202,7 +202,10 @@ export function validateWebAppData(
 
   // secret_key = HMAC_SHA256("WebAppData", bot_token)
   const secretKey = crypto.createHmac("sha256", "WebAppData").update(botToken).digest();
-  const calculatedHash = crypto.createHmac("sha256", secretKey).update(dataCheckString).digest("hex");
+  const calculatedHash = crypto
+    .createHmac("sha256", secretKey)
+    .update(dataCheckString)
+    .digest("hex");
 
   if (calculatedHash.length !== hash.length) return false;
 
@@ -258,4 +261,3 @@ export function parseWebAppData(initData: string): TelegramWebAppData {
     raw,
   };
 }
-

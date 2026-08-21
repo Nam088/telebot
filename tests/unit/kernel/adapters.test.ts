@@ -16,7 +16,11 @@ describe("Webhook Framework Adapters", () => {
   it("createExpressWebhook processes valid update and enforces secret token", async () => {
     const app = new Application(bot);
     let handled = false;
-    app.addHandler(new CommandHandler("ping", () => { handled = true; }));
+    app.addHandler(
+      new CommandHandler("ping", () => {
+        handled = true;
+      }),
+    );
 
     const handler = createExpressWebhook(app, { secret_token: "secret_123" });
 
@@ -27,7 +31,9 @@ describe("Webhook Framework Adapters", () => {
       status: (code: number) => {
         statusCode = code;
         return {
-          send: (body?: string) => { sentBody = body ?? ""; },
+          send: (body?: string) => {
+            sentBody = body ?? "";
+          },
           end: () => {},
         };
       },
@@ -62,7 +68,11 @@ describe("Webhook Framework Adapters", () => {
   it("createFastifyWebhook processes valid update and enforces secret token", async () => {
     const app = new Application(bot);
     let handled = false;
-    app.addHandler(new CommandHandler("test", () => { handled = true; }));
+    app.addHandler(
+      new CommandHandler("test", () => {
+        handled = true;
+      }),
+    );
 
     const handler = createFastifyWebhook(app, { secret_token: "fastify_secret" });
 
@@ -103,7 +113,11 @@ describe("Webhook Framework Adapters", () => {
   it("createFetchWebhook handles standard Request and returns Response for Next.js / Hono / Workers", async () => {
     const app = new Application(bot);
     let handled = false;
-    app.addHandler(new CommandHandler("start", () => { handled = true; }));
+    app.addHandler(
+      new CommandHandler("start", () => {
+        handled = true;
+      }),
+    );
 
     const handler = createFetchWebhook(app, { secret_token: "fetch_secret" });
 
@@ -147,7 +161,11 @@ describe("Webhook Framework Adapters", () => {
   it("createHttpWebhook processes Node.js stream and enforces secret token", async () => {
     const app = new Application(bot);
     let handled = false;
-    app.addHandler(new CommandHandler("http_cmd", () => { handled = true; }));
+    app.addHandler(
+      new CommandHandler("http_cmd", () => {
+        handled = true;
+      }),
+    );
 
     const handler = createHttpWebhook(app, { secret_token: "http_secret" });
 
@@ -155,8 +173,12 @@ describe("Webhook Framework Adapters", () => {
     let headStatus = 0;
     let endMessage = "";
     const mockRes405 = {
-      writeHead: (status: number) => { headStatus = status; },
-      end: (msg?: string) => { endMessage = msg ?? ""; },
+      writeHead: (status: number) => {
+        headStatus = status;
+      },
+      end: (msg?: string) => {
+        endMessage = msg ?? "";
+      },
     };
 
     await handler({ method: "GET", headers: {} } as any, mockRes405 as any);
@@ -184,8 +206,12 @@ describe("Webhook Framework Adapters", () => {
     mockReq.headers = { "x-telegram-bot-api-secret-token": "http_secret" };
 
     const mockRes200 = {
-      writeHead: (status: number) => { headStatus = status; },
-      end: (msg?: string) => { endMessage = msg ?? ""; },
+      writeHead: (status: number) => {
+        headStatus = status;
+      },
+      end: (msg?: string) => {
+        endMessage = msg ?? "";
+      },
     };
 
     await handler(mockReq, mockRes200 as any);
@@ -212,4 +238,3 @@ describe("Webhook Framework Adapters", () => {
     expect(() => webhookCallback(app, "unsupported" as any)).toThrow();
   });
 });
-

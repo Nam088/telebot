@@ -186,7 +186,7 @@ describe("Application Shorthands & Context Helpers Unit Tests", () => {
     const { bot } = createMockBot();
     const emptyApp = new Application(bot);
 
-    let errorCaught: string[] = [];
+    const errorCaught: string[] = [];
     emptyApp.addHandler(
       new TypeHandler(
         () => true,
@@ -242,4 +242,3 @@ describe("Application Shorthands & Context Helpers Unit Tests", () => {
     expect(errorCaught[4]).toContain("deleteMessage");
   });
 });
-

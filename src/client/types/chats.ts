@@ -242,4 +242,3 @@ export interface UserChatBoosts {
   /** The list of boosts added to the chat by the user. */
   boosts: ChatBoost[];
 }
-

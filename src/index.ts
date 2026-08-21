@@ -17,4 +17,3 @@ export * from "./utils/index.js";
 // classes (an alternative to the InlineKeyboard fluent builder), which are structurally compatible
 // with, and take precedence over, the plain Bot API types of the same name re-exported from `client/index.js`.
 export { InlineKeyboardButton, InlineKeyboardMarkup } from "./components/keyboard.js";
-

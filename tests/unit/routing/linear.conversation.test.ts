@@ -181,4 +181,3 @@ describe("LinearConversation", () => {
     expect(timeoutTriggered).toBe(true);
   });
 });
-

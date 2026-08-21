@@ -273,5 +273,3 @@ export interface SendGiftOptions {
   /** Special entities that appear in the gift text. */
   text_entities?: MessageEntity[];
 }
-
-

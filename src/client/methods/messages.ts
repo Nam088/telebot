@@ -242,10 +242,7 @@ export abstract class MessageMethods extends BaseBotClient {
    * ```
    */
   public async copyMessages(options: CopyMessagesOptions): Promise<MessageId[]> {
-    return this.request<MessageId[]>(
-      "copyMessages",
-      options as unknown as Record<string, unknown>,
-    );
+    return this.request<MessageId[]>("copyMessages", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -967,4 +964,3 @@ export abstract class MessageMethods extends BaseBotClient {
     );
   }
 }
-

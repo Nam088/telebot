@@ -531,7 +531,10 @@ describe("Message Reaction Handlers", () => {
       custom_emoji_id: "ce_123",
     });
     const paidHandler = new MessageReactionHandler(callback, { type: "paid" });
-    const funcHandler = new MessageReactionHandler(callback, (u) => (u.message_reaction?.message_id ?? 0) > 10);
+    const funcHandler = new MessageReactionHandler(
+      callback,
+      (u) => (u.message_reaction?.message_id ?? 0) > 10,
+    );
 
     const updateEmoji = new Update({
       update_id: 1,
@@ -701,4 +704,3 @@ describe("Business Handlers", () => {
     expect(await handler.checkUpdate(updateDeleted)).toBe(true);
   });
 });
-

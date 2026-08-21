@@ -107,7 +107,9 @@ export interface SessionOptions<S> {
  * }));
  * ```
  */
-export function session<S = Record<string, unknown>>(options: SessionOptions<S> = {}): MiddlewareFn {
+export function session<S = Record<string, unknown>>(
+  options: SessionOptions<S> = {},
+): MiddlewareFn {
   const initial = options.initial;
   const storage = options.storage ?? new MemorySessionStorage<S>();
   const prefix = options.prefix ?? "session:";

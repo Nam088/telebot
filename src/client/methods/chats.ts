@@ -654,4 +654,3 @@ export abstract class ChatMethods extends MessageMethods {
     return this.request<UserChatBoosts>("getUserChatBoosts", { chat_id: chatId, user_id: userId });
   }
 }
-

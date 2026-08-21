@@ -123,4 +123,3 @@ describe("NestJS Integration Module (tele-bot/nest)", () => {
     expect(tokens[1]).toBe("TELEGRAM_APPLICATION");
   });
 });
-

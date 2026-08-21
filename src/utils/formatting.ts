@@ -201,10 +201,7 @@ export function blockquote(text: string, mode: "HTML" | "MarkdownV2" = "HTML"): 
  * @param mode - Target parse mode (`"HTML"` or `"MarkdownV2"`). Default: `"HTML"`.
  * @returns Formatted expandable blockquote string.
  */
-export function expandableBlockquote(
-  text: string,
-  mode: "HTML" | "MarkdownV2" = "HTML",
-): string {
+export function expandableBlockquote(text: string, mode: "HTML" | "MarkdownV2" = "HTML"): string {
   if (mode === "HTML") {
     return `<blockquote expandable>${escapeHtml(text)}</blockquote>`;
   }

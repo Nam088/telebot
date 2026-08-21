@@ -26,10 +26,15 @@ import { JobQueue } from "../scheduler/queue.js";
 import { dispatchUpdate, type MiddlewareFn } from "./dispatcher.js";
 import { runPollingLoop, type PollingLoopOptions } from "./polling.js";
 import { createWebhookServer, type WebhookServerOptions } from "./webhook.js";
+import {
+  AsyncConversationManager,
+  type AsyncConversationHandlerFn,
+} from "../routing/async-conversation.js";
 import { ApplicationBuilder } from "./builder.js";
 
 export { ApplicationBuilder } from "./builder.js";
 export { type MiddlewareFn } from "./dispatcher.js";
+export { type AsyncConversationHandlerFn } from "../routing/async-conversation.js";
 export {
   isSecretTokenValid,
   MAX_WEBHOOK_BODY_BYTES,
@@ -95,6 +100,7 @@ export class Application {
   private readonly errorHandlers: ErrorHandlerCallback[] = [];
   private readonly middlewares: MiddlewareFn[] = [];
   private readonly stateLocks: Map<string, Promise<void>> = new Map();
+  private readonly conversationManager = new AsyncConversationManager();
 
   /**
    * Indicates whether the polling loop is actively running.
@@ -137,9 +143,9 @@ export class Application {
   }
 
   /**
-   * Registers one or more global middleware functions executed on every incoming update.
+   * Registers one or more global middleware functions or middleware-providing objects (e.g. {@link Menu}) executed on every incoming update.
    *
-   * @param middlewares - Middleware functions to execute in order.
+   * @param middlewares - Middleware functions or objects with a `middleware()` method to execute in order.
    * @returns This {@link Application} instance for chaining.
    *
    * @example
@@ -149,10 +155,19 @@ export class Application {
    *   await next();
    *   console.log(`Update processed in ${Date.now() - start}ms`);
    * });
+   *
+   * // Or with Menu
+   * app.use(myMenu);
    * ```
    */
-  public use(...middlewares: MiddlewareFn[]): this {
-    this.middlewares.push(...middlewares);
+  public use(...middlewares: (MiddlewareFn | { middleware: () => MiddlewareFn })[]): this {
+    for (const mw of middlewares) {
+      if (typeof mw === "function") {
+        this.middlewares.push(mw);
+      } else if (mw && typeof mw === "object" && typeof mw.middleware === "function") {
+        this.middlewares.push(mw.middleware());
+      }
+    }
     return this;
   }
 
@@ -171,11 +186,7 @@ export class Application {
    * });
    * ```
    */
-  public command(
-    command: string | string[],
-    callback: HandlerCallback,
-    group: number = 0,
-  ): this {
+  public command(command: string | string[], callback: HandlerCallback, group: number = 0): this {
     this.addHandler(new CommandHandler(command, callback), group);
     return this;
   }
@@ -205,9 +216,7 @@ export class Application {
     const regexFilter = filters.Regex(
       new RegExp(
         patterns
-          .map((p) =>
-            typeof p === "string" ? p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : p.source,
-          )
+          .map((p) => (typeof p === "string" ? p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : p.source))
           .join("|"),
         typeof patterns[0] === "object" ? patterns[0].flags : undefined,
       ),
@@ -266,13 +275,13 @@ export class Application {
    * ```
    */
   public on(
-    filterOrType: BaseFilter | string | ((update: Update | RawUpdate) => boolean | Promise<boolean>),
+    filterOrType:
+      BaseFilter | string | ((update: Update | RawUpdate) => boolean | Promise<boolean>),
     callback: HandlerCallback,
     group: number = 0,
   ): this {
     if (typeof filterOrType === "function") {
       this.addHandler(new TypeHandler(filterOrType, callback), group);
-
     } else if (typeof filterOrType === "string") {
       this.addHandler(
         new TypeHandler(
@@ -285,6 +294,63 @@ export class Application {
       this.addHandler(new MessageHandler(filterOrType, callback), group);
     }
     return this;
+  }
+
+  /**
+   * Registers a named linear async/await conversation flow.
+   *
+   * @param name - Unique string identifier for the conversation.
+   * @param handler - Sequential asynchronous conversation generator or callback.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.conversation("survey", async (conv, ctx) => {
+   *   const name = await conv.ask("What is your name?");
+   *   await ctx.reply(`Nice to meet you, ${name}!`);
+   * });
+   * ```
+   */
+  public conversation(name: string, handler: AsyncConversationHandlerFn): this {
+    this.conversationManager.register(name, handler);
+    return this;
+  }
+
+  /**
+   * Enters a registered linear async conversation for a specific user.
+   *
+   * @param userId - Target user identifier.
+   * @param name - Name of the registered conversation to enter.
+   * @param initialContext - Optional initial callback context.
+   * @returns Resolves with the conversation execution promise.
+   *
+   * @example
+   * ```ts
+   * await app.enterConversation(123456, "survey");
+   * ```
+   */
+  public async enterConversation(
+    userId: number,
+    name: string,
+    initialContext?: CallbackContext,
+  ): Promise<void> {
+    const ctx =
+      initialContext ??
+      new CallbackContext({
+        bot: this.bot,
+        job_queue: this.job_queue,
+        conversationManager: this.conversationManager,
+        update: new Update({
+          update_id: 0,
+          message: {
+            message_id: 0,
+            date: Math.floor(Date.now() / 1000),
+            chat: { id: userId, type: "private" },
+            from: { id: userId, is_bot: false, first_name: "User" },
+          },
+        }),
+      });
+    await this.conversationManager.enter(name, ctx, userId, userId);
   }
 
   /**
@@ -365,6 +431,7 @@ export class Application {
       this.errorHandlers,
       this.stateLocks,
       this.middlewares,
+      this.conversationManager,
     );
   }
 

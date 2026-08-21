@@ -64,4 +64,3 @@ describe("ChatMethods Unit Tests (1:1 mapping)", () => {
     expect(await boostClient.getUserChatBoosts(456, 123)).toEqual(mockBoosts);
   });
 });
-

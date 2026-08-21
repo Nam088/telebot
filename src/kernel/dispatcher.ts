@@ -72,6 +72,7 @@ export async function dispatchUpdate(
   errorHandlers: ErrorHandlerCallback[],
   stateLocks: Map<string, Promise<void>>,
   middlewares: MiddlewareFn[] = [],
+  conversationManager?: import("../routing/async-conversation.js").AsyncConversationManager,
 ): Promise<void> {
   const update = rawUpdate instanceof Update ? rawUpdate : new Update(rawUpdate as RawUpdate);
 
@@ -102,9 +103,32 @@ export async function dispatchUpdate(
       chat_data: chatData,
       bot_data: botData,
       update,
+      conversationManager,
     });
 
     const runHandlers = async (): Promise<void> => {
+      // Check active async conversation sessions first
+      if (conversationManager) {
+        try {
+          const handled = await conversationManager.handleUpdate(update);
+          if (handled) {
+            return;
+          }
+        } catch (convErr: unknown) {
+          const error = convErr instanceof Error ? convErr : new Error(String(convErr));
+          context.error = error;
+          for (const errHandler of errorHandlers) {
+            try {
+              await errHandler(error, update, context);
+            } catch (ehErr) {
+              console.error("Error in error handler:", ehErr);
+            }
+          }
+          context.error = undefined;
+          return;
+        }
+      }
+
       const sortedGroups = Array.from(handlers.keys()).sort((a, b) => a - b);
 
       for (const group of sortedGroups) {
@@ -173,4 +197,3 @@ export async function dispatchUpdate(
     }
   });
 }
-
