@@ -8,6 +8,15 @@ import {
   PollAnswerHandler,
   ChatMemberHandler,
   TypeHandler,
+  PreCheckoutQueryHandler,
+  ShippingQueryHandler,
+  PurchasedPaidMediaHandler,
+  MessageReactionHandler,
+  MessageReactionCountHandler,
+  ChatJoinRequestHandler,
+  ChatBoostHandler,
+  BusinessConnectionHandler,
+  BusinessMessagesHandler,
 } from "../../../src/routing/handlers.js";
 import { filters } from "../../../src/filters/matchers.js";
 import { Update } from "../../../src/kernel/update.js";
@@ -448,3 +457,248 @@ describe("TypeHandler", () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Payment & Stars Handlers", () => {
+  const bot = new Bot("TEST_TOKEN");
+
+  it("PreCheckoutQueryHandler matches pre_checkout_query update", async () => {
+    const callback = vi.fn();
+    const handler = new PreCheckoutQueryHandler(callback);
+
+    const update = new Update({
+      update_id: 1,
+      pre_checkout_query: {
+        id: "pcq_1",
+        from: { id: 123, is_bot: false, first_name: "Alice" },
+        currency: "XTR",
+        total_amount: 100,
+        invoice_payload: "sub_1m",
+      },
+    });
+
+    expect(await handler.checkUpdate(update)).toBe(true);
+    const emptyUpdate = new Update({ update_id: 2 });
+    expect(await handler.checkUpdate(emptyUpdate)).toBe(false);
+  });
+
+  it("ShippingQueryHandler matches shipping_query update", async () => {
+    const callback = vi.fn();
+    const handler = new ShippingQueryHandler(callback);
+
+    const update = new Update({
+      update_id: 1,
+      shipping_query: {
+        id: "sq_1",
+        from: { id: 123, is_bot: false, first_name: "Alice" },
+        invoice_payload: "payload_1",
+        shipping_address: {
+          country_code: "US",
+          city: "New York",
+          street_line1: "5th Ave",
+          post_code: "10001",
+        },
+      },
+    });
+
+    expect(await handler.checkUpdate(update)).toBe(true);
+  });
+
+  it("PurchasedPaidMediaHandler matches purchased_paid_media update", async () => {
+    const callback = vi.fn();
+    const handler = new PurchasedPaidMediaHandler(callback);
+
+    const update = new Update({
+      update_id: 1,
+      purchased_paid_media: {
+        from: { id: 123, is_bot: false, first_name: "Alice" },
+        paid_media_payload: "media_exclusive_1",
+      },
+    });
+
+    expect(await handler.checkUpdate(update)).toBe(true);
+    expect(update.effective_user?.first_name).toBe("Alice");
+  });
+});
+
+describe("Message Reaction Handlers", () => {
+  it("MessageReactionHandler matches any, string emoji, array, custom emoji, paid, and predicate", async () => {
+    const callback = vi.fn();
+    const anyHandler = new MessageReactionHandler(callback);
+    const stringHandler = new MessageReactionHandler(callback, "👍");
+    const arrayHandler = new MessageReactionHandler(callback, ["🎉", "🔥"]);
+    const customHandler = new MessageReactionHandler(callback, {
+      type: "custom_emoji",
+      custom_emoji_id: "ce_123",
+    });
+    const paidHandler = new MessageReactionHandler(callback, { type: "paid" });
+    const funcHandler = new MessageReactionHandler(callback, (u) => (u.message_reaction?.message_id ?? 0) > 10);
+
+    const updateEmoji = new Update({
+      update_id: 1,
+      message_reaction: {
+        chat: { id: 123, type: "private" },
+        message_id: 100,
+        date: 123456,
+        old_reaction: [],
+        new_reaction: [{ type: "emoji", emoji: "👍" }],
+      },
+    });
+
+    expect(await anyHandler.checkUpdate(updateEmoji)).toBe(true);
+    expect(await stringHandler.checkUpdate(updateEmoji)).toBe(true);
+    expect(await arrayHandler.checkUpdate(updateEmoji)).toBe(false);
+    expect(await customHandler.checkUpdate(updateEmoji)).toBe(false);
+    expect(await paidHandler.checkUpdate(updateEmoji)).toBe(false);
+    expect(await funcHandler.checkUpdate(updateEmoji)).toBe(true);
+
+    const updateCustom = new Update({
+      update_id: 2,
+      message_reaction: {
+        chat: { id: 123, type: "private" },
+        message_id: 5,
+        date: 123456,
+        old_reaction: [],
+        new_reaction: [{ type: "custom_emoji", custom_emoji_id: "ce_123" }],
+      },
+    });
+
+    expect(await customHandler.checkUpdate(updateCustom)).toBe(true);
+    expect(await stringHandler.checkUpdate(updateCustom)).toBe(false);
+    expect(await funcHandler.checkUpdate(updateCustom)).toBe(false);
+
+    const updatePaid = new Update({
+      update_id: 3,
+      message_reaction: {
+        chat: { id: 123, type: "private" },
+        message_id: 200,
+        date: 123456,
+        old_reaction: [],
+        new_reaction: [{ type: "paid" }],
+      },
+    });
+    expect(await paidHandler.checkUpdate(updatePaid)).toBe(true);
+
+    const emptyUpdate = new Update({ update_id: 4 });
+    expect(await anyHandler.checkUpdate(emptyUpdate)).toBe(false);
+  });
+
+  it("MessageReactionCountHandler matches message_reaction_count", async () => {
+    const handler = new MessageReactionCountHandler(vi.fn());
+    const update = new Update({
+      update_id: 1,
+      message_reaction_count: {
+        chat: { id: 123, type: "group" },
+        message_id: 50,
+        date: 123456,
+        reactions: [{ type: { type: "emoji", emoji: "❤️" }, total_count: 5 }],
+      },
+    });
+    expect(await handler.checkUpdate(update)).toBe(true);
+  });
+});
+
+describe("ChatJoinRequest and ChatBoost Handlers", () => {
+  it("ChatJoinRequestHandler matches chat_join_request update", async () => {
+    const handler = new ChatJoinRequestHandler(vi.fn());
+    const update = new Update({
+      update_id: 1,
+      chat_join_request: {
+        chat: { id: -100123, type: "channel", title: "VIP" },
+        from: { id: 456, is_bot: false, first_name: "Bob" },
+        user_chat_id: 456,
+        date: 123456,
+      },
+    });
+    expect(await handler.checkUpdate(update)).toBe(true);
+  });
+
+  it("ChatBoostHandler matches added, removed, and any boost updates", async () => {
+    const anyHandler = new ChatBoostHandler(vi.fn(), ChatBoostHandler.ANY);
+    const addedHandler = new ChatBoostHandler(vi.fn(), ChatBoostHandler.ADDED);
+    const removedHandler = new ChatBoostHandler(vi.fn(), ChatBoostHandler.REMOVED);
+
+    const addedUpdate = new Update({
+      update_id: 1,
+      chat_boost: {
+        chat: { id: -100123, type: "supergroup" },
+        boost: {
+          boost_id: "b1",
+          add_date: 123456,
+          expiration_date: 234567,
+          source: { source: "premium", user: { id: 1, is_bot: false, first_name: "A" } },
+        },
+      },
+    });
+
+    const removedUpdate = new Update({
+      update_id: 2,
+      removed_chat_boost: {
+        chat: { id: -100123, type: "supergroup" },
+        boost_id: "b1",
+        remove_date: 123456,
+        source: { source: "premium", user: { id: 1, is_bot: false, first_name: "A" } },
+      },
+    });
+
+    expect(await anyHandler.checkUpdate(addedUpdate)).toBe(true);
+    expect(await anyHandler.checkUpdate(removedUpdate)).toBe(true);
+    expect(await addedHandler.checkUpdate(addedUpdate)).toBe(true);
+    expect(await addedHandler.checkUpdate(removedUpdate)).toBe(false);
+    expect(await removedHandler.checkUpdate(removedUpdate)).toBe(true);
+    expect(await removedHandler.checkUpdate(addedUpdate)).toBe(false);
+  });
+});
+
+describe("Business Handlers", () => {
+  it("BusinessConnectionHandler matches business_connection update", async () => {
+    const handler = new BusinessConnectionHandler(vi.fn());
+    const update = new Update({
+      update_id: 1,
+      business_connection: {
+        id: "bc_1",
+        user: { id: 123, is_bot: false, first_name: "Alice" },
+        user_chat_id: 123,
+        date: 123456,
+        can_reply: true,
+        is_enabled: true,
+      },
+    });
+    expect(await handler.checkUpdate(update)).toBe(true);
+  });
+
+  it("BusinessMessagesHandler matches business_message, edited_business_message, deleted_business_messages", async () => {
+    const handler = new BusinessMessagesHandler(vi.fn());
+
+    const updateMsg = new Update({
+      update_id: 1,
+      business_message: {
+        message_id: 1,
+        date: 123456,
+        chat: { id: 123, type: "private" },
+        text: "hello business",
+      },
+    });
+    const updateEdited = new Update({
+      update_id: 2,
+      edited_business_message: {
+        message_id: 1,
+        date: 123456,
+        chat: { id: 123, type: "private" },
+        text: "edited business",
+      },
+    });
+    const updateDeleted = new Update({
+      update_id: 3,
+      deleted_business_messages: {
+        business_connection_id: "bc_1",
+        chat: { id: 123, type: "private" },
+        message_ids: [1, 2],
+      },
+    });
+
+    expect(await handler.checkUpdate(updateMsg)).toBe(true);
+    expect(await handler.checkUpdate(updateEdited)).toBe(true);
+    expect(await handler.checkUpdate(updateDeleted)).toBe(true);
+  });
+});
+

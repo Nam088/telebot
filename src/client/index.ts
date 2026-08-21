@@ -126,6 +126,7 @@ export type {
   ShippingAddress,
   LabeledPrice,
   ShippingOption,
+  PurchasedPaidMedia,
   PassportElementError,
   Game,
   CallbackGame,

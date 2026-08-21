@@ -33,7 +33,7 @@ import type {
   MessageReactionCountUpdated,
   ReactionType,
 } from "./messages.js";
-import type { ShippingQuery, PreCheckoutQuery } from "./payments.js";
+import type { ShippingQuery, PreCheckoutQuery, PurchasedPaidMedia } from "./payments.js";
 
 export interface User {
   /** Unique identifier for this user or bot. */
@@ -300,6 +300,8 @@ export interface RawUpdate {
   chat_boost?: ChatBoostUpdated;
   /** A boost was removed from a chat. */
   removed_chat_boost?: ChatBoostRemoved;
+  /** A user purchased paid media with Telegram Stars. */
+  purchased_paid_media?: PurchasedPaidMedia;
 }
 
 export interface ApiResponse<T = unknown> {

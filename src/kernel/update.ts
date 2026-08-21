@@ -24,6 +24,7 @@ import type {
   BusinessMessagesDeleted,
   MessageReactionUpdated,
   MessageReactionCountUpdated,
+  PurchasedPaidMedia,
 } from "../client/types.js";
 import type { Bot } from "../client/bot.js";
 
@@ -63,6 +64,7 @@ export class Update implements RawUpdate {
   public readonly chat_join_request?: ChatJoinRequest;
   public readonly chat_boost?: ChatBoostUpdated;
   public readonly removed_chat_boost?: ChatBoostRemoved;
+  public readonly purchased_paid_media?: PurchasedPaidMedia;
 
   private _bot?: Bot;
 
@@ -96,6 +98,7 @@ export class Update implements RawUpdate {
     this.chat_join_request = raw.chat_join_request;
     this.chat_boost = raw.chat_boost;
     this.removed_chat_boost = raw.removed_chat_boost;
+    this.purchased_paid_media = raw.purchased_paid_media;
     this._bot = bot;
   }
 
@@ -118,6 +121,7 @@ export class Update implements RawUpdate {
     if (this.business_connection?.user) return this.business_connection.user;
     if (this.business_message?.from) return this.business_message.from;
     if (this.edited_business_message?.from) return this.edited_business_message.from;
+    if (this.purchased_paid_media?.from) return this.purchased_paid_media.from;
     return undefined;
   }
 

@@ -51,6 +51,24 @@ export interface ConversationControl {
 }
 
 /**
+ * Configuration options for {@link LinearConversation}.
+ */
+export interface LinearConversationOptions<C extends CallbackContext = CallbackContext> {
+  /** Slash command that triggers the start of this conversation (e.g. `"survey"`). */
+  entry_command?: string;
+  /** Filter matching updates that trigger the start of this conversation. */
+  entry_filter?: BaseFilter;
+  /** Maximum idle duration in seconds to wait for a user response before expiring. */
+  timeout_seconds?: number;
+  /** Optional callback invoked when the conversation times out due to inactivity. */
+  on_timeout?: (context: C) => Promise<void> | void;
+  /** Whether the conversation is scoped per chat. Default: true. */
+  per_chat?: boolean;
+  /** Whether the conversation is scoped per user. Default: true. */
+  per_user?: boolean;
+}
+
+/**
  * Modern Linear Conversation Handler.
  *
  * Allows writing complex interactive dialogs in a single, readable sequential async function.
@@ -66,6 +84,7 @@ export interface ConversationControl {
  *   });
  * }, {
  *   entry_command: "survey",
+ *   timeout_seconds: 120,
  * });
  *
  * app.addHandler(survey);
@@ -78,11 +97,14 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
   private readonly fn: (conversation: ConversationControl, context: C) => Promise<void>;
   private readonly entryCommand?: string;
   private readonly entryFilter?: BaseFilter;
+  private readonly timeoutSeconds?: number;
+  private readonly onTimeout?: (context: C) => Promise<void> | void;
   private readonly activeFlows = new Map<
     string,
     {
       resume: (update: Update) => void;
       filter?: BaseFilter;
+      timer?: NodeJS.Timeout;
     }
   >();
 
@@ -94,17 +116,14 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
    */
   constructor(
     fn: (conversation: ConversationControl, context: C) => Promise<void>,
-    options: {
-      entry_command?: string;
-      entry_filter?: BaseFilter;
-      per_chat?: boolean;
-      per_user?: boolean;
-    } = {},
+    options: LinearConversationOptions<C> = {},
   ) {
     super(async () => {});
     this.fn = fn;
     this.entryCommand = options.entry_command;
     this.entryFilter = options.entry_filter;
+    this.timeoutSeconds = options.timeout_seconds;
+    this.onTimeout = options.on_timeout;
   }
 
   private getKey(update: Update): string {
@@ -168,10 +187,31 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
     // Otherwise, start a new linear conversation execution in background
     const conversationControl: ConversationControl = {
       wait: (filter?: BaseFilter) => {
-        return new Promise<Update>((resolve) => {
+        const timeoutMs = (this.timeoutSeconds ?? 0) * 1000;
+        let timer: NodeJS.Timeout | undefined;
+
+        return new Promise<Update>((resolve, reject) => {
+          if (timeoutMs > 0) {
+            timer = setTimeout(async () => {
+              this.activeFlows.delete(key);
+              try {
+                if (this.onTimeout) {
+                  await this.onTimeout(context);
+                }
+              } catch (err) {
+                console.error("Error in on_timeout callback:", err);
+              }
+              reject(new Error("__CONVERSATION_TIMEOUT__"));
+            }, timeoutMs);
+          }
+
           this.activeFlows.set(key, {
-            resume: resolve,
+            resume: (upd: Update) => {
+              if (timer) clearTimeout(timer);
+              resolve(upd);
+            },
             filter,
+            timer,
           });
         });
       },
@@ -186,6 +226,8 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
         return responseUpdate.effective_message?.text ?? "";
       },
       exit: () => {
+        const active = this.activeFlows.get(key);
+        if (active?.timer) clearTimeout(active.timer);
         this.activeFlows.delete(key);
         throw new Error("__CONVERSATION_EXIT__");
       },
@@ -196,12 +238,15 @@ export class LinearConversation<C extends CallbackContext = CallbackContext> ext
       try {
         await this.fn(conversationControl, context);
       } catch (err: unknown) {
+        const active = this.activeFlows.get(key);
+        if (active?.timer) clearTimeout(active.timer);
         this.activeFlows.delete(key);
         const message = err instanceof Error ? err.message : undefined;
-        if (message !== "__CONVERSATION_EXIT__") {
+        if (message !== "__CONVERSATION_EXIT__" && message !== "__CONVERSATION_TIMEOUT__") {
           console.error("Error in LinearConversation:", err);
         }
       }
     })();
   }
 }
+

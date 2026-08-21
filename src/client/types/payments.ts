@@ -230,3 +230,11 @@ export interface StarTransaction {
   /** Receiver of the transaction. */
   receiver?: unknown;
 }
+
+export interface PurchasedPaidMedia {
+  /** User who purchased the media. */
+  from: User;
+  /** Bot-specified paid media payload. */
+  paid_media_payload: string;
+}
+

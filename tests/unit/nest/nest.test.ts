@@ -5,6 +5,12 @@ import {
   Command,
   Hears,
   Action,
+  OnReaction,
+  OnPaidMedia,
+  PreCheckout,
+  Shipping,
+  OnJoinRequest,
+  OnBusinessConnection,
   InjectBot,
   getParamTokenMetadata,
 } from "../../../src/nest/index.js";
@@ -31,6 +37,24 @@ class SampleUpdateService {
   public onAction() {
     this.btnCalled = true;
   }
+
+  @OnReaction("👍")
+  public onReaction() {}
+
+  @OnPaidMedia()
+  public onPaidMedia() {}
+
+  @PreCheckout()
+  public onPreCheckout() {}
+
+  @Shipping()
+  public onShipping() {}
+
+  @OnJoinRequest()
+  public onJoinRequest() {}
+
+  @OnBusinessConnection()
+  public onBusinessConnection() {}
 }
 
 describe("NestJS Integration Module (tele-bot/nest)", () => {
@@ -75,6 +99,17 @@ describe("NestJS Integration Module (tele-bot/nest)", () => {
     expect(shopHandlers).toHaveLength(1);
   });
 
+  it("binds all specialized decorators to Application", () => {
+    const app = new Application(new Bot("TEST_TOKEN"));
+    const service = new SampleUpdateService();
+
+    TelegramModule.bindHandlers(app, [service]);
+    const handlers = (app as any).handlers.get(0);
+
+    // command, hears, action, reaction, paid_media, pre_checkout, shipping, join_request, business_connection = 9 handlers
+    expect(handlers).toHaveLength(9);
+  });
+
   it("decorates parameters with @InjectBot and retrieves injection token metadata", () => {
     class BotConsumer {
       constructor(
@@ -88,3 +123,4 @@ describe("NestJS Integration Module (tele-bot/nest)", () => {
     expect(tokens[1]).toBe("TELEGRAM_APPLICATION");
   });
 });
+

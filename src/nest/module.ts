@@ -5,7 +5,17 @@
  */
 
 import { Application } from "../kernel/app.js";
-import { CommandHandler, MessageHandler, CallbackQueryHandler } from "../routing/handlers.js";
+import {
+  CommandHandler,
+  MessageHandler,
+  CallbackQueryHandler,
+  MessageReactionHandler,
+  PurchasedPaidMediaHandler,
+  PreCheckoutQueryHandler,
+  ShippingQueryHandler,
+  ChatJoinRequestHandler,
+  BusinessConnectionHandler,
+} from "../routing/handlers.js";
 import { filters } from "../filters/matchers.js";
 import { DEFAULT_BOT_NAME, getBotToken, TELEGRAM_BOT_OPTIONS } from "./constants.js";
 import { getHandlerMetadata, getBotNameMetadata, type HandlerMetadata } from "./decorators.js";
@@ -111,6 +121,18 @@ export class TelegramModule {
           );
         } else if (h.type === "action") {
           appInstance.addHandler(new CallbackQueryHandler(handlerFn, h.pattern));
+        } else if (h.type === "reaction") {
+          appInstance.addHandler(new MessageReactionHandler(handlerFn, h.pattern));
+        } else if (h.type === "paid_media") {
+          appInstance.addHandler(new PurchasedPaidMediaHandler(handlerFn));
+        } else if (h.type === "pre_checkout") {
+          appInstance.addHandler(new PreCheckoutQueryHandler(handlerFn));
+        } else if (h.type === "shipping") {
+          appInstance.addHandler(new ShippingQueryHandler(handlerFn));
+        } else if (h.type === "join_request") {
+          appInstance.addHandler(new ChatJoinRequestHandler(handlerFn));
+        } else if (h.type === "business_connection") {
+          appInstance.addHandler(new BusinessConnectionHandler(handlerFn));
         }
       }
     }

@@ -7,8 +7,20 @@
 import { DEFAULT_BOT_NAME, getBotToken } from "./constants.js";
 
 export interface HandlerMetadata {
-  type: "command" | "message" | "callback_query" | "inline_query" | "hears" | "action";
-  pattern?: string | RegExp | ((data: string) => boolean);
+  type:
+    | "command"
+    | "message"
+    | "callback_query"
+    | "inline_query"
+    | "hears"
+    | "action"
+    | "reaction"
+    | "paid_media"
+    | "pre_checkout"
+    | "shipping"
+    | "join_request"
+    | "business_connection";
+  pattern?: any;
   methodName: string;
   botName?: string;
 }
@@ -70,7 +82,7 @@ export function InjectBot(botName?: string): ParameterDecorator {
 
 function createHandlerDecorator(
   type: HandlerMetadata["type"],
-  pattern?: string | RegExp | ((data: string) => boolean),
+  pattern?: any,
 ): MethodDecorator {
   return (target: any, propertyKey: string | symbol) => {
     const proto = target;
@@ -111,3 +123,48 @@ export function Hears(pattern: string | RegExp): MethodDecorator {
 export function Action(pattern?: string | RegExp | ((data: string) => boolean)): MethodDecorator {
   return createHandlerDecorator("action", pattern);
 }
+
+/**
+ * Listens to user message reaction changes.
+ *
+ * @param filter - Optional emoji string, array, custom emoji, or predicate.
+ */
+export function OnReaction(filter?: any): MethodDecorator {
+  return createHandlerDecorator("reaction", filter);
+}
+
+/**
+ * Listens to purchased paid media transactions using Telegram Stars.
+ */
+export function OnPaidMedia(): MethodDecorator {
+  return createHandlerDecorator("paid_media");
+}
+
+/**
+ * Listens to incoming pre-checkout payment queries.
+ */
+export function PreCheckout(): MethodDecorator {
+  return createHandlerDecorator("pre_checkout");
+}
+
+/**
+ * Listens to incoming shipping queries for flexible invoices.
+ */
+export function Shipping(): MethodDecorator {
+  return createHandlerDecorator("shipping");
+}
+
+/**
+ * Listens to user requests to join private chats or channels.
+ */
+export function OnJoinRequest(): MethodDecorator {
+  return createHandlerDecorator("join_request");
+}
+
+/**
+ * Listens to Telegram Business account connection changes.
+ */
+export function OnBusinessConnection(): MethodDecorator {
+  return createHandlerDecorator("business_connection");
+}
+

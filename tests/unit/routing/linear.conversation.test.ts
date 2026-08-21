@@ -137,4 +137,48 @@ describe("LinearConversation", () => {
 
     expect(log).toEqual(["Step 1", "Exiting"]);
   });
+
+  it("expires conversation when timeout_seconds is reached and invokes on_timeout", async () => {
+    const fakeFetch = vi.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({ ok: true, result: { message_id: 1 } }),
+    });
+    const bot = new Bot("TEST_TOKEN", { fetch: fakeFetch });
+    const app = new Application(bot);
+
+    let timeoutTriggered = false;
+
+    const conv = new LinearConversation(
+      async (conversation, context) => {
+        await conversation.wait();
+      },
+      {
+        entry_command: "wait_cmd",
+        timeout_seconds: 0.05, // 50ms
+        on_timeout: async () => {
+          timeoutTriggered = true;
+        },
+      },
+    );
+
+    app.addHandler(conv);
+
+    await app.processUpdate({
+      update_id: 1,
+      message: {
+        message_id: 1,
+        date: 123456,
+        chat: { id: 10, type: "private" },
+        from: { id: 20, is_bot: false, first_name: "Test" },
+        text: "/wait_cmd",
+        entities: [{ offset: 0, length: 9, type: "bot_command" }],
+      },
+    });
+
+    // Wait for timeout to fire (80ms > 50ms)
+    await new Promise((resolve) => setTimeout(resolve, 80));
+
+    expect(timeoutTriggered).toBe(true);
+  });
 });
+

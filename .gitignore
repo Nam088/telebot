@@ -3,10 +3,21 @@ dist/
 coverage/
 docs/
 python-telegram-bot/
-.DS_Store
+**/.DS_Store
 *.log
 .env*
+.idea/
+.vscode/
+.claude/
 
+# SQLite test databases & artifacts
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.db
+*.tsbuildinfo
 
 # CodeGraph generated index (SQLite db, daemon socket/pid)
 .codegraph/
+
