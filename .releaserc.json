@@ -2,8 +2,7 @@
   "branches": [
     "+([0-9])?(.{+([0-9]),x}).x",
     "main",
-    { "name": "beta", "prerelease": true },
-    { "name": "develop", "prerelease": "dev" }
+    { "name": "beta", "prerelease": true }
   ],
   "plugins": [
     [
