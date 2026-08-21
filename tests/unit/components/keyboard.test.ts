@@ -31,7 +31,7 @@ describe("Keyboards", () => {
     expect(markup.inline_keyboard[0]?.[0]?.callback_data).toBe("opt_1");
   });
 
-  it("supports python-telegram-bot style construction via InlineKeyboardButton/InlineKeyboardMarkup classes", () => {
+  it("supports class-based construction via InlineKeyboardButton/InlineKeyboardMarkup classes", () => {
     const markup = new InlineKeyboardMarkup([
       [
         new InlineKeyboardButton("Option 1", { callback_data: "opt_1" }),

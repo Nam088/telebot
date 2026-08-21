@@ -98,8 +98,8 @@ export interface SessionOptions<S> {
  * }));
  *
  * app.addHandler(new CommandHandler("counter", async (update, context) => {
- *   const session = (context as any).session as MySession;
- *   session.count++;
+ *   const ctx = context as CallbackContext & { session: MySession };
+ *   ctx.session.count++;
  *   await context.bot.sendMessage({
  *     chat_id: update.effective_chat!.id,
  *     text: `You have called this command ${session.count} times!`,

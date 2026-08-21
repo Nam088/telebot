@@ -82,5 +82,34 @@ describe("PaginationKeyboard Tests", () => {
     expect(navRow[0]?.text).toBe("Trang 1 trên 3");
     expect(navRow[1]?.text).toBe("Next Page");
   });
+
+  it("builds last page correctly with disabled next placeholder or hidden disabled", () => {
+    const paginationDefault = new PaginationKeyboard({
+      items,
+      page: 3,
+      pageSize: 3,
+      itemButton: (item) => ({ text: item, callback_data: item }),
+    });
+
+    const markupDefault = paginationDefault.build();
+    const navRowDefault = markupDefault.inline_keyboard[1]!; // page 3 has 1 item ("Grape") + 1 nav row
+    expect(navRowDefault[0]?.text).toBe("Previous");
+    expect(navRowDefault[1]?.text).toBe("3 / 3");
+    expect(navRowDefault[2]?.text).toBe("-"); // disabled next placeholder
+
+    const paginationHidden = new PaginationKeyboard({
+      items,
+      page: 3,
+      pageSize: 3,
+      itemButton: (item) => ({ text: item, callback_data: item }),
+      navigation: { hideDisabled: true },
+    });
+
+    const markupHidden = paginationHidden.build();
+    const navRowHidden = markupHidden.inline_keyboard[1]!;
+    expect(navRowHidden).toHaveLength(2); // [Previous, PageIndicator]
+    expect(navRowHidden[0]?.text).toBe("Previous");
+    expect(navRowHidden[1]?.text).toBe("3 / 3");
+  });
 });
 

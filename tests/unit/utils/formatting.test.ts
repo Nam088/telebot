@@ -54,11 +54,23 @@ describe("Formatting & Escaping Utilities", () => {
     expect(userMention("Alice", 123456)).toBe('<a href="tg://user?id=123456">Alice</a>');
   });
 
-  it("formats spoilers, strikethrough, underline, and blockquotes", () => {
+  it("formats spoilers, strikethrough, underline, and blockquotes in both modes", () => {
     expect(spoiler("Secret")).toBe("<tg-spoiler>Secret</tg-spoiler>");
+    expect(spoiler("Secret", "MarkdownV2")).toBe("||Secret||");
+
     expect(strikethrough("Old")).toBe("<s>Old</s>");
+    expect(strikethrough("Old", "MarkdownV2")).toBe("~Old~");
+
     expect(underline("Underlined")).toBe("<u>Underlined</u>");
+    expect(underline("Underlined", "MarkdownV2")).toBe("__Underlined__");
+
     expect(blockquote("Quote text")).toBe("<blockquote>Quote text</blockquote>");
+    expect(blockquote("Quote text", "MarkdownV2")).toBe(">Quote text");
+
     expect(expandableBlockquote("Long text")).toBe("<blockquote expandable>Long text</blockquote>");
+    expect(expandableBlockquote("Long text", "MarkdownV2")).toBe("**>Long text||");
+
+    expect(code("simple", undefined, "MarkdownV2")).toBe("`simple`");
+    expect(link("Link", "https://t.me", "MarkdownV2")).toBe("[Link](https:\\/\\/t\\.me)");
   });
 });

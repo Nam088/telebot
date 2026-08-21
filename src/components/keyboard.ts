@@ -46,10 +46,9 @@ export type InlineKeyboardButtonOptions = Omit<RawInlineKeyboardButton, "text">;
  *
  * @remarks
  * A class-based alternative to the {@link InlineKeyboard} fluent builder, for developers who
- * prefer constructing keyboards the way python-telegram-bot does: as nested rows of
- * `InlineKeyboardButton` instances passed to `InlineKeyboardMarkup`. Both styles produce the
- * same {@link InlineKeyboardMarkup} shape (a plain object literal shaped like
- * {@link InlineKeyboardButton} works too) and can be freely mixed.
+ * prefer constructing keyboards as nested rows of `InlineKeyboardButton` instances passed to
+ * `InlineKeyboardMarkup`. Both styles produce the same {@link InlineKeyboardMarkup} shape (a plain
+ * object literal shaped like {@link InlineKeyboardButton} works too) and can be freely mixed.
  *
  * @example
  * ```ts
@@ -103,7 +102,7 @@ export class InlineKeyboardButton implements RawInlineKeyboardButton {
  *
  * @remarks
  * A class-based alternative to the {@link InlineKeyboard} fluent builder, for developers who
- * prefer python-telegram-bot's own `InlineKeyboardMarkup(rows)` construction. Both styles
+ * prefer class-based `InlineKeyboardMarkup(rows)` construction. Both styles
  * produce the same shape and can be freely mixed.
  *
  * @example
