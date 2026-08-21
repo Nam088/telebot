@@ -2,6 +2,13 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## [1.1.1](https://github.com/Nam088/telebot-ts/compare/v1.1.0...v1.1.1) (2026-08-21)
+
+
+### Bug Fixes
+
+* **release:** release patch v1.1.1 with clean npm metadata, full Telegram 8.x parity, and nested menus ([d58e094](https://github.com/Nam088/telebot-ts/commit/d58e094f935c5c1cd637d90fa4b8568ea8bce069))
+
 # [1.1.0](https://github.com/Nam088/telebot-ts/compare/v1.0.0...v1.1.0) (2026-08-21)
 
 
