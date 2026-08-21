@@ -6,7 +6,7 @@
 
 import type { Update } from "../../kernel/update.js";
 import { CallbackContext } from "../../kernel/context.js";
-import { BaseHandler, HandlerCallback } from "./base.js";
+import { BaseHandler, type HandlerCallback } from "./base.js";
 
 /**
  * Handler for Telegram Business account connection changes (`business_connection` updates).
