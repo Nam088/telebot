@@ -14,7 +14,7 @@ export const generateNotes = async (pluginConfig, context) => {
   return notes;
 };
 
-export const publish = async (pluginConfig, context) => {
+export const success = async (pluginConfig, context) => {
   const { nextRelease, logger } = context;
   const version = nextRelease.version;
 
@@ -50,9 +50,12 @@ bun add telebot-ts@${version}
   const { writeFileSync } = await import("node:fs");
   writeFileSync("/tmp/gh-release-notes.md", fullNotes, "utf8");
 
-  execSync(`gh release edit "v${version}" --notes-file /tmp/gh-release-notes.md`, {
-    stdio: "inherit",
-  });
-
-  logger.log(`GitHub Release v${version} updated with installation section.`);
+  try {
+    execSync(`gh release edit "v${version}" --notes-file /tmp/gh-release-notes.md`, {
+      stdio: "inherit",
+    });
+    logger.log(`GitHub Release v${version} updated with installation section.`);
+  } catch (err) {
+    logger.error("Failed to edit GitHub release notes:", err);
+  }
 };
