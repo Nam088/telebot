@@ -41,12 +41,10 @@ const settingsMenu = new Menu("settings-menu")
     async (ctx) => {
       notificationsEnabled = !notificationsEnabled;
       await ctx.answerCallbackQuery({
-        text: `Notifications are now ${notificationsEnabled ? "ENABLED" : "DISABLED"}!`,
+        text: `Notifications are now ${notificationsEnabled ? "ON" : "OFF"}!`,
       });
-      // Re-render menu in-place
-      await ctx.editMessageReplyMarkup({
-        reply_markup: settingsMenu.build(),
-      });
+      // Re-render menu in-place with new dynamic label
+      await ctx.menu?.update();
     },
   )
   .row()

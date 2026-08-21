@@ -14,6 +14,26 @@ import {
 } from "../routing/async-conversation.js";
 
 /**
+ * Interactive menu control helper attached to {@link CallbackContext}.
+ */
+export interface MenuContextControl {
+  /**
+   * Re-renders the current menu in-place, updating any dynamic button labels.
+   */
+  update(): Promise<void>;
+  /**
+   * Navigates to a specific target menu in-place.
+   *
+   * @param targetMenu - The destination menu to switch to.
+   */
+  nav(targetMenu: unknown): Promise<void>;
+  /**
+   * Navigates back to the parent menu in-place.
+   */
+  back(): Promise<void>;
+}
+
+/**
  * Context object passed to handler callbacks, error handlers, and job callbacks.
  *
  * @typeParam UserData - Custom type definition for user-level persisted state.
@@ -90,6 +110,11 @@ export class CallbackContext<
    * The {@link Update} that triggered this handler invocation, if applicable.
    */
   public readonly update?: Update;
+
+  /**
+   * Interactive menu navigation and live update helper when invoked inside a menu callback.
+   */
+  public menu?: MenuContextControl;
 
   // Compatibility aliases
   get job_queue(): JobQueue | undefined {

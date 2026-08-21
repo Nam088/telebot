@@ -5,7 +5,7 @@
  */
 
 import type { InlineKeyboardMarkup, InlineKeyboardButton } from "../client/types.js";
-import type { CallbackContext } from "../kernel/context.js";
+import type { CallbackContext, MenuContextControl } from "../kernel/context.js";
 import type { MiddlewareFn } from "../kernel/dispatcher.js";
 
 /**
@@ -246,10 +246,10 @@ export class Menu {
         const item = row[c]!;
         let text: string;
         if (typeof item.label === "function") {
-          if (ctx) {
-            const res = item.label(ctx);
+          try {
+            const res = item.label(ctx as CallbackContext);
             text = typeof res === "string" ? res : "";
-          } else {
+          } catch {
             text = "";
           }
         } else {
@@ -310,9 +310,10 @@ export class Menu {
         const item = row[c]!;
         let text: string;
         if (typeof item.label === "function") {
-          if (ctx) {
-            text = await item.label(ctx);
-          } else {
+          try {
+            const res = await item.label(ctx as CallbackContext);
+            text = typeof res === "string" ? res : "";
+          } catch {
             text = "";
           }
         } else {
@@ -416,6 +417,53 @@ export class Menu {
 
       const chatId = ctx.update?.effective_chat?.id;
       const messageId = ctx.update?.effective_message?.message_id;
+
+      const menuControl: MenuContextControl = {
+        update: async (): Promise<void> => {
+          if (chatId && messageId) {
+            const updatedMarkup = await menu.render(ctx);
+            try {
+              await ctx.bot.editMessageReplyMarkup({
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: updatedMarkup,
+              });
+            } catch {
+              // Ignore unchanged markup error
+            }
+          }
+        },
+        nav: async (targetMenu: unknown): Promise<void> => {
+          if (chatId && messageId && targetMenu instanceof Menu) {
+            const nextMarkup = await targetMenu.render(ctx);
+            try {
+              await ctx.bot.editMessageReplyMarkup({
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: nextMarkup,
+              });
+            } catch {
+              // Ignore
+            }
+          }
+        },
+        back: async (): Promise<void> => {
+          if (menu.parent && chatId && messageId) {
+            const parentMarkup = await menu.parent.render(ctx);
+            try {
+              await ctx.bot.editMessageReplyMarkup({
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: parentMarkup,
+              });
+            } catch {
+              // Ignore
+            }
+          }
+        },
+      };
+
+      ctx.menu = menuControl;
 
       if (buttonItem.type === "text" && action === "b") {
         await buttonItem.handler(ctx);
