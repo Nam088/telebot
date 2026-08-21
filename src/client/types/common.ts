@@ -1,18 +1,9 @@
-import type {
-  ChatType,
-  ParseMode,
-  MessageEntityType,
-  PollType,
-  ChatMemberStatus,
-  ChatAction,
-} from "../constants.js";
-import type { InputFile } from "../../utils/http.js";
+import type { ChatType, ParseMode } from "../constants.js";
 import type {
   BusinessIntro,
   BusinessLocation,
   BusinessOpeningHours,
   StoryArea,
-  Story,
   CallbackQuery,
   InlineQuery,
   ChosenInlineResult,

@@ -1,12 +1,4 @@
-import type {
-  ChatType,
-  ParseMode,
-  MessageEntityType,
-  PollType,
-  ChatMemberStatus,
-  ChatAction,
-} from "../constants.js";
-import type { InputFile } from "../../utils/http.js";
+import type { ChatMemberStatus } from "../constants.js";
 import type { User, Chat, Location } from "./common.js";
 import type { ChatBoost } from "./business.js";
 

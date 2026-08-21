@@ -1,13 +1,3 @@
-import type {
-  ChatType,
-  ParseMode,
-  MessageEntityType,
-  PollType,
-  ChatMemberStatus,
-  ChatAction,
-} from "../constants.js";
-import type { InputFile } from "../../utils/http.js";
-
 export interface BotName {
   /** The bot's name. */
   name: string;

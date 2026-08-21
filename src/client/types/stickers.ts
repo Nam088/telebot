@@ -1,13 +1,5 @@
-import type {
-  ChatType,
-  ParseMode,
-  MessageEntityType,
-  PollType,
-  ChatMemberStatus,
-  ChatAction,
-} from "../constants.js";
 import type { InputFile } from "../../utils/http.js";
-import type { User, File } from "./common.js";
+import type { File } from "./common.js";
 import type { PhotoSize, ReplyMarkup } from "./messages.js";
 
 export interface Sticker {
