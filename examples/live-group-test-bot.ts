@@ -37,14 +37,16 @@ let notificationsEnabled = true;
 
 const settingsMenu = new Menu("settings-menu")
   .text(
-    (ctx) => `Notifications: ${notificationsEnabled ? "ON" : "OFF"}`,
+    () => `Notifications: ${notificationsEnabled ? "ON" : "OFF"}`,
     async (ctx) => {
       notificationsEnabled = !notificationsEnabled;
-      await ctx.answerCallbackQuery({
-        text: `Notifications are now ${notificationsEnabled ? "ON" : "OFF"}!`,
-      });
-      // Re-render menu in-place with new dynamic label
-      await ctx.menu?.update();
+      // Parallelize notification and in-place markup update for instantaneous response
+      await Promise.all([
+        ctx.answerCallbackQuery({
+          text: `Notifications: ${notificationsEnabled ? "ON" : "OFF"}`,
+        }),
+        ctx.menu?.update(),
+      ]);
     },
   )
   .row()

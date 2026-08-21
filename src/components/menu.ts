@@ -465,12 +465,21 @@ export class Menu {
 
       ctx.menu = menuControl;
 
+      let isCallbackAnswered = false;
+      const originalAnswer = ctx.answerCallbackQuery.bind(ctx);
+      ctx.answerCallbackQuery = async (options) => {
+        isCallbackAnswered = true;
+        return originalAnswer(options);
+      };
+
       if (buttonItem.type === "text" && action === "b") {
         await buttonItem.handler(ctx);
-        try {
-          await ctx.answerCallbackQuery();
-        } catch {
-          // Ignore if callback was already answered
+        if (!isCallbackAnswered) {
+          try {
+            await ctx.answerCallbackQuery();
+          } catch {
+            // Ignore
+          }
         }
         return;
       }
@@ -482,21 +491,18 @@ export class Menu {
 
         if (chatId && messageId) {
           const nextMarkup = await buttonItem.targetMenu.render(ctx);
-          try {
-            await ctx.bot.editMessageReplyMarkup({
-              chat_id: chatId,
-              message_id: messageId,
-              reply_markup: nextMarkup,
-            });
-          } catch {
-            // Ignore unchanged markup error
-          }
-        }
-
-        try {
-          await ctx.answerCallbackQuery();
-        } catch {
-          // Ignore
+          await Promise.all([
+            ctx.bot
+              .editMessageReplyMarkup({
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: nextMarkup,
+              })
+              .catch(() => {}),
+            !isCallbackAnswered
+              ? ctx.answerCallbackQuery().catch(() => {})
+              : Promise.resolve(),
+          ]);
         }
         return;
       }
@@ -509,21 +515,18 @@ export class Menu {
 
           if (chatId && messageId) {
             const parentMarkup = await menu.parent.render(ctx);
-            try {
-              await ctx.bot.editMessageReplyMarkup({
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: parentMarkup,
-              });
-            } catch {
-              // Ignore unchanged markup error
-            }
-          }
-
-          try {
-            await ctx.answerCallbackQuery();
-          } catch {
-            // Ignore
+            await Promise.all([
+              ctx.bot
+                .editMessageReplyMarkup({
+                  chat_id: chatId,
+                  message_id: messageId,
+                  reply_markup: parentMarkup,
+                })
+                .catch(() => {}),
+              !isCallbackAnswered
+                ? ctx.answerCallbackQuery().catch(() => {})
+                : Promise.resolve(),
+            ]);
           }
         }
         return;
