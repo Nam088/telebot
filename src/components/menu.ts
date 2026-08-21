@@ -491,18 +491,23 @@ export class Menu {
 
         if (chatId && messageId) {
           const nextMarkup = await buttonItem.targetMenu.render(ctx);
-          await Promise.all([
-            ctx.bot
-              .editMessageReplyMarkup({
-                chat_id: chatId,
-                message_id: messageId,
-                reply_markup: nextMarkup,
-              })
-              .catch(() => {}),
-            !isCallbackAnswered
-              ? ctx.answerCallbackQuery().catch(() => {})
-              : Promise.resolve(),
-          ]);
+          try {
+            await ctx.bot.editMessageReplyMarkup({
+              chat_id: chatId,
+              message_id: messageId,
+              reply_markup: nextMarkup,
+            });
+          } catch {
+            // Ignore
+          }
+        }
+
+        if (!isCallbackAnswered) {
+          try {
+            await ctx.answerCallbackQuery();
+          } catch {
+            // Ignore
+          }
         }
         return;
       }
@@ -515,18 +520,23 @@ export class Menu {
 
           if (chatId && messageId) {
             const parentMarkup = await menu.parent.render(ctx);
-            await Promise.all([
-              ctx.bot
-                .editMessageReplyMarkup({
-                  chat_id: chatId,
-                  message_id: messageId,
-                  reply_markup: parentMarkup,
-                })
-                .catch(() => {}),
-              !isCallbackAnswered
-                ? ctx.answerCallbackQuery().catch(() => {})
-                : Promise.resolve(),
-            ]);
+            try {
+              await ctx.bot.editMessageReplyMarkup({
+                chat_id: chatId,
+                message_id: messageId,
+                reply_markup: parentMarkup,
+              });
+            } catch {
+              // Ignore
+            }
+          }
+
+          if (!isCallbackAnswered) {
+            try {
+              await ctx.answerCallbackQuery();
+            } catch {
+              // Ignore
+            }
           }
         }
         return;

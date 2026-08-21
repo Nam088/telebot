@@ -60,10 +60,7 @@ export async function runPollingLoop(
       for (const update of updates) {
         if (!isRunning()) break;
         offset = update.update_id + 1;
-        // Dispatch update immediately without blocking next getUpdates
-        void onUpdate(update as unknown as Record<string, unknown>).catch((err) => {
-          console.error("Unhandled error processing update:", err);
-        });
+        await onUpdate(update as unknown as Record<string, unknown>);
       }
     } catch (err: unknown) {
       if (!isRunning()) break;
