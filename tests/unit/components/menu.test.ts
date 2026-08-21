@@ -237,27 +237,104 @@ describe("Interactive Nested Menu System", () => {
       expect(next).toHaveBeenCalledTimes(1);
     });
 
-    it("integrates directly with app.use(menu)", async () => {
+    it("supports live in-place update with dynamic label toggle via ctx.menu.update()", async () => {
       const bot = new Bot("123:TOKEN");
       vi.spyOn(bot, "answerCallbackQuery").mockResolvedValue(true);
-      const handlerSpy = vi.fn();
+      const editMarkupSpy = vi.spyOn(bot, "editMessageReplyMarkup").mockResolvedValue(true as any);
 
-      const app = new Application(bot);
-      const menu = new Menu("test_app").text("Action", handlerSpy);
+      let isEnabled = false;
+      const menu = new Menu("toggle_menu").text(
+        () => `Status: ${isEnabled ? "ON" : "OFF"}`,
+        async (ctx) => {
+          isEnabled = !isEnabled;
+          await ctx.menu?.update();
+        },
+      );
 
-      app.use(menu);
-
-      await app.processUpdate({
-        update_id: 5,
+      const rawUpdate = {
+        update_id: 10,
         callback_query: {
-          id: "cq_app",
+          id: "cq_toggle",
           chat_instance: "ci",
           from: { id: 1, is_bot: false, first_name: "Test" },
-          data: "m:test_app:b:0:0",
+          data: "m:toggle_menu:b:0:0",
+          message: {
+            message_id: 88,
+            date: 1000,
+            chat: { id: 500, type: "private" },
+          },
         },
+      };
+
+      const ctx = new CallbackContext({
+        bot,
+        update: new Update(rawUpdate as any),
       });
 
-      expect(handlerSpy).toHaveBeenCalledTimes(1);
+      const next = vi.fn();
+      await menu.middleware()(ctx, next);
+
+      expect(isEnabled).toBe(true);
+      expect(editMarkupSpy).toHaveBeenCalledTimes(1);
+      expect(editMarkupSpy).toHaveBeenCalledWith({
+        chat_id: 500,
+        message_id: 88,
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: "Status: ON",
+                callback_data: "m:toggle_menu:b:0:0",
+              },
+            ],
+          ],
+        },
+      });
+    });
+
+    it("supports explicit programmatic navigation via ctx.menu.nav() and ctx.menu.back()", async () => {
+      const bot = new Bot("123:TOKEN");
+      vi.spyOn(bot, "answerCallbackQuery").mockResolvedValue(true);
+      const editMarkupSpy = vi.spyOn(bot, "editMessageReplyMarkup").mockResolvedValue(true as any);
+
+      const root = new Menu("root_nav");
+      const target = new Menu("target_nav").text("Target Action", () => {});
+      root.submenu("To Target", target);
+
+      // 1. Programmatic nav
+      const navMenu = new Menu("nav_trigger").text("Jump", async (ctx) => {
+        await ctx.menu?.nav(target);
+      });
+      root.submenu("Nav Trigger", navMenu);
+
+      const rawUpdate = {
+        update_id: 11,
+        callback_query: {
+          id: "cq_nav",
+          chat_instance: "ci",
+          from: { id: 1, is_bot: false, first_name: "Test" },
+          data: "m:nav_trigger:b:0:0",
+          message: {
+            message_id: 99,
+            date: 1000,
+            chat: { id: 600, type: "private" },
+          },
+        },
+      };
+
+      const ctx = new CallbackContext({
+        bot,
+        update: new Update(rawUpdate as any),
+      });
+
+      await root.middleware()(ctx, vi.fn());
+
+      expect(editMarkupSpy).toHaveBeenCalledWith({
+        chat_id: 600,
+        message_id: 99,
+        reply_markup: target.build(),
+      });
     });
   });
 });
+
