@@ -56,7 +56,7 @@ async function main() {
     process.exit(1);
   }
 
-  const app = new Application().token(token).build();
+  const app = Application.builder().token(token).build();
 
   app.addHandler(new CommandHandler("start", start));
   app.addHandler(new CommandHandler("poll", sendPoll));

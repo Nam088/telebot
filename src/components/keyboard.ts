@@ -390,6 +390,91 @@ export class ReplyKeyboard {
   }
 
   /**
+   * Appends a button that launches a Telegram Mini App Web App.
+   *
+   * @param text - Button label text.
+   * @param url - HTTPS URL of the Web App.
+   * @returns This {@link ReplyKeyboard} instance for chaining.
+   */
+  public webApp(text: string, url: string): this {
+    const currentRow = this.rows[this.rows.length - 1];
+    if (currentRow) {
+      currentRow.push({ text, web_app: { url } });
+    }
+    return this;
+  }
+
+  /**
+   * Appends a button that prompts the user to select one or more users.
+   *
+   * @param text - Button label text.
+   * @param requestId - Signed 32-bit identifier of the request.
+   * @param options - Additional user selection filters.
+   * @returns This {@link ReplyKeyboard} instance for chaining.
+   */
+  public requestUsers(
+    text: string,
+    requestId: number,
+    options: {
+      user_is_bot?: boolean;
+      user_is_premium?: boolean;
+      max_quantity?: number;
+      request_name?: boolean;
+      request_username?: boolean;
+      request_photo?: boolean;
+    } = {},
+  ): this {
+    const currentRow = this.rows[this.rows.length - 1];
+    if (currentRow) {
+      currentRow.push({
+        text,
+        request_users: {
+          request_id: requestId,
+          ...options,
+        },
+      });
+    }
+    return this;
+  }
+
+  /**
+   * Appends a button that prompts the user to select a chat.
+   *
+   * @param text - Button label text.
+   * @param requestId - Signed 32-bit identifier of the request.
+   * @param chatIsChannel - Pass `true` to request a channel chat, `false` for a group.
+   * @param options - Additional chat selection criteria.
+   * @returns This {@link ReplyKeyboard} instance for chaining.
+   */
+  public requestChat(
+    text: string,
+    requestId: number,
+    chatIsChannel: boolean,
+    options: {
+      chat_is_forum?: boolean;
+      chat_has_username?: boolean;
+      chat_is_created?: boolean;
+      bot_is_member?: boolean;
+      request_title?: boolean;
+      request_username?: boolean;
+      request_photo?: boolean;
+    } = {},
+  ): this {
+    const currentRow = this.rows[this.rows.length - 1];
+    if (currentRow) {
+      currentRow.push({
+        text,
+        request_chat: {
+          request_id: requestId,
+          chat_is_channel: chatIsChannel,
+          ...options,
+        },
+      });
+    }
+    return this;
+  }
+
+  /**
    * Advances the builder to start a new keyboard row.
    *
    * @returns This {@link ReplyKeyboard} instance for chaining.

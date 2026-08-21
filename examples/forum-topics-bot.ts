@@ -21,7 +21,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new Application().token(token).build();
+const app = Application.builder().token(token).build();
 
 // /newtopic [name] - Creates a new forum topic in the supergroup
 app.addHandler(

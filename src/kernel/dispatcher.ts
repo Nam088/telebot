@@ -51,7 +51,17 @@ export async function withStateLock<T>(
 }
 
 /**
- * Dispatches an incoming raw update through the handler pipeline.
+ * Middleware function signature for intercepting updates.
+ *
+ * @typeParam C - Type of the callback context.
+ */
+export type MiddlewareFn<C extends CallbackContext = CallbackContext> = (
+  context: C,
+  next: () => Promise<void>,
+) => Promise<void> | void;
+
+/**
+ * Dispatches an incoming raw update through the middleware chain and handler pipeline.
  */
 export async function dispatchUpdate(
   rawUpdate: RawUpdate | Record<string, unknown>,
@@ -61,6 +71,7 @@ export async function dispatchUpdate(
   handlers: Map<number, BaseHandler[]>,
   errorHandlers: ErrorHandlerCallback[],
   stateLocks: Map<string, Promise<void>>,
+  middlewares: MiddlewareFn[] = [],
 ): Promise<void> {
   const update = rawUpdate instanceof Update ? rawUpdate : new Update(rawUpdate as RawUpdate);
 
@@ -93,38 +104,57 @@ export async function dispatchUpdate(
       update,
     });
 
-    const sortedGroups = Array.from(handlers.keys()).sort((a, b) => a - b);
+    const runHandlers = async (): Promise<void> => {
+      const sortedGroups = Array.from(handlers.keys()).sort((a, b) => a - b);
 
-    for (const group of sortedGroups) {
-      const handlersInGroup = handlers.get(group) || [];
-      for (const handler of handlersInGroup) {
-        try {
-          const match = await handler.checkUpdate(update);
-          if (match) {
-            await handler.handleUpdate(update, context);
+      for (const group of sortedGroups) {
+        const handlersInGroup = handlers.get(group) || [];
+        for (const handler of handlersInGroup) {
+          try {
+            const match = await handler.checkUpdate(update);
+            if (match) {
+              await handler.handleUpdate(update, context);
 
-            // Sync persistent ConversationHandler changes
-            if (handler instanceof ConversationHandler && handler.persistent) {
-              for (const [key, state] of handler.conversations.entries()) {
-                await persistence.updateConversation(key, state);
+              // Sync persistent ConversationHandler changes
+              if (handler instanceof ConversationHandler && handler.persistent) {
+                for (const [key, state] of handler.conversations.entries()) {
+                  await persistence.updateConversation(key, state);
+                }
+              }
+
+              break; // Stop at first matching handler in this group
+            }
+          } catch (err: unknown) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            context.error = error;
+            for (const errHandler of errorHandlers) {
+              try {
+                await errHandler(error, update, context);
+              } catch (ehErr) {
+                console.error("Error in error handler:", ehErr);
               }
             }
-
-            break; // Stop at first matching handler in this group
+            context.error = undefined;
           }
-        } catch (err: unknown) {
-          const error = err instanceof Error ? err : new Error(String(err));
-          context.error = error;
-          for (const errHandler of errorHandlers) {
-            try {
-              await errHandler(error, update, context);
-            } catch (ehErr) {
-              console.error("Error in error handler:", ehErr);
-            }
-          }
-          context.error = undefined;
         }
       }
+    };
+
+    if (middlewares.length > 0) {
+      let index = 0;
+      const dispatchMiddleware = async (): Promise<void> => {
+        if (index < middlewares.length) {
+          const mw = middlewares[index++];
+          if (mw) {
+            await mw(context, dispatchMiddleware);
+          }
+        } else {
+          await runHandlers();
+        }
+      };
+      await dispatchMiddleware();
+    } else {
+      await runHandlers();
     }
 
     // Auto-save modified state to persistence
@@ -143,3 +173,4 @@ export async function dispatchUpdate(
     }
   });
 }
+

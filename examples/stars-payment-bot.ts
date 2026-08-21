@@ -22,7 +22,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new Application().token(token).build();
+const app = Application.builder().token(token).build();
 
 // /start command - Show store catalog
 app.addHandler(

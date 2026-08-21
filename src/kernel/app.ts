@@ -13,11 +13,13 @@ import { ConversationHandler } from "../routing/conversation.js";
 import { CallbackContext } from "./context.js";
 import { type Persistence, MemoryPersistence } from "../storage/index.js";
 import { JobQueue } from "../scheduler/queue.js";
-import { dispatchUpdate } from "./dispatcher.js";
+import { dispatchUpdate, type MiddlewareFn } from "./dispatcher.js";
 import { runPollingLoop, type PollingLoopOptions } from "./polling.js";
 import { createWebhookServer, type WebhookServerOptions } from "./webhook.js";
+import { ApplicationBuilder } from "./builder.js";
 
 export { ApplicationBuilder } from "./builder.js";
+export { type MiddlewareFn } from "./dispatcher.js";
 export {
   isSecretTokenValid,
   MAX_WEBHOOK_BODY_BYTES,
@@ -81,6 +83,7 @@ export class Application {
 
   private readonly handlers: Map<number, BaseHandler[]> = new Map();
   private readonly errorHandlers: ErrorHandlerCallback[] = [];
+  private readonly middlewares: MiddlewareFn[] = [];
   private readonly stateLocks: Map<string, Promise<void>> = new Map();
 
   /**
@@ -91,6 +94,15 @@ export class Application {
   private abortController?: AbortController;
   private persistenceInitialized: boolean = false;
   private webhookServer?: Server;
+
+  /**
+   * Creates a new fluent {@link ApplicationBuilder} instance.
+   *
+   * @returns An {@link ApplicationBuilder} instance.
+   */
+  public static builder(): ApplicationBuilder {
+    return new ApplicationBuilder();
+  }
 
   /**
    * Constructs a new {@link Application} from a bot token or existing {@link Bot}.
@@ -112,6 +124,26 @@ export class Application {
       }
       context.error = undefined;
     };
+  }
+
+  /**
+   * Registers one or more global middleware functions executed on every incoming update.
+   *
+   * @param middlewares - Middleware functions to execute in order.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.use(async (context, next) => {
+   *   const start = Date.now();
+   *   await next();
+   *   console.log(`Update processed in ${Date.now() - start}ms`);
+   * });
+   * ```
+   */
+  public use(...middlewares: MiddlewareFn[]): this {
+    this.middlewares.push(...middlewares);
+    return this;
   }
 
   /**
@@ -191,6 +223,7 @@ export class Application {
       this.handlers,
       this.errorHandlers,
       this.stateLocks,
+      this.middlewares,
     );
   }
 

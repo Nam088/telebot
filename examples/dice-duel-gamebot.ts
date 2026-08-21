@@ -23,7 +23,7 @@ if (!token) {
   process.exit(1);
 }
 
-const app = new Application().token(token).build();
+const app = Application.builder().token(token).build();
 
 // In-memory records
 const playerStats = new Map<number, { wins: number; losses: number; draws: number }>();

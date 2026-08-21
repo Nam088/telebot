@@ -110,18 +110,30 @@ describe("Keyboards", () => {
     const keyboard = new ReplyKeyboard({ resize_keyboard: true, one_time_keyboard: true })
       .text("Option A")
       .requestLocation("Share Location")
+      .webApp("Open App", "https://app.example.com")
       .row()
       .requestContact("Share Contact")
-      .requestPoll("Create Poll", "quiz");
+      .requestPoll("Create Poll", "quiz")
+      .row()
+      .requestUsers("Select Users", 101, { max_quantity: 5 })
+      .requestChat("Select Channel", 102, true);
 
     const markup = keyboard.build();
     expect(markup.resize_keyboard).toBe(true);
     expect(markup.one_time_keyboard).toBe(true);
     expect(markup.keyboard).toEqual([
-      [{ text: "Option A" }, { text: "Share Location", request_location: true }],
+      [
+        { text: "Option A" },
+        { text: "Share Location", request_location: true },
+        { text: "Open App", web_app: { url: "https://app.example.com" } },
+      ],
       [
         { text: "Share Contact", request_contact: true },
         { text: "Create Poll", request_poll: { type: "quiz" } },
+      ],
+      [
+        { text: "Select Users", request_users: { request_id: 101, max_quantity: 5 } },
+        { text: "Select Channel", request_chat: { request_id: 102, chat_is_channel: true } },
       ],
     ]);
   });

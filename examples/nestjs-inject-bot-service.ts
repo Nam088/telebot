@@ -61,7 +61,7 @@ class BotUpdateController {
 }
 
 // --- NestJS Lifecycle Simulation ---
-const appInstance = new Application().token(token).build();
+const appInstance = Application.builder().token(token).build();
 
 // In NestJS, providers are resolved via DI container:
 // NotificationService receives Application instance via @Inject(getBotToken())

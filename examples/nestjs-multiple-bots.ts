@@ -46,8 +46,8 @@ class ShopBotUpdateService {
 // TelegramModule.forRoot({ botName: "adminBot", token: adminToken }),
 // TelegramModule.forRoot({ botName: "shopBot", token: shopToken }),
 
-const adminApp = new Application().token(adminToken).build();
-const shopApp = new Application().token(shopToken).build();
+const adminApp = Application.builder().token(adminToken).build();
+const shopApp = Application.builder().token(shopToken).build();
 
 const adminService = new AdminBotUpdateService();
 const shopService = new ShopBotUpdateService();

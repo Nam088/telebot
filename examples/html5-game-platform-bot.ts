@@ -33,7 +33,7 @@ if (!token) {
 const gameShortName = process.env.GAME_SHORT_NAME || "cyber_runner";
 const gameServerUrl = process.env.GAME_URL || "https://tbot.xyz/lumber/"; // Example playable HTML5 game
 
-const app = new Application().token(token).build();
+const app = Application.builder().token(token).build();
 
 // /start - Welcome and instructions
 app.addHandler(
