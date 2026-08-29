@@ -331,7 +331,7 @@ export class RRule {
    */
   public after(afterDate: Date = new Date()): Date | null {
     let afterMs = afterDate.getTime();
-    const startMs = this.options.dtstart ? this.options.dtstart.getTime() : Date.now();
+    const startMs = this.options.dtstart ? this.options.dtstart.getTime() : afterMs;
     if (afterMs < startMs) {
       afterMs = startMs - 1000;
     }
