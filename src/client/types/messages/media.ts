@@ -1,6 +1,6 @@
-import type { ParseMode } from "../constants.js";
-import type { MessageEntity } from "./messages.js";
-import type { InputFile } from "../../utils/http.js";
+import type { ParseMode } from "../../constants.js";
+import type { MessageEntity } from "./core.js";
+import type { InputFile } from "../../../utils/http.js";
 
 export type { InputFile };
 

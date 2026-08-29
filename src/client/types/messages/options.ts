@@ -1,14 +1,10 @@
-import type { ParseMode, PollType, ChatAction } from "../constants.js";
-import type {
-  MessageEntity,
-  ReplyParameters,
-  EphemeralMessageParameters,
-  ReactionType,
-} from "./messages.js";
+import type { ParseMode, PollType, ChatAction } from "../../constants.js";
+import type { MessageEntity, ReplyParameters, EphemeralMessageParameters } from "./core.js";
+import type { ReactionType } from "./reactions.js";
 import type { InlineKeyboardMarkup, ReplyMarkup } from "./keyboards.js";
 import type { InputMedia, InputFile } from "./media.js";
-import type { InputRichMessage } from "./rich/index.js";
-import type { InlineQueryResult } from "./business.js";
+import type { InputRichMessage } from "../rich/index.js";
+import type { InlineQueryResult } from "../business.js";
 
 export interface SendMessageOptions {
   /** Unique identifier for the target chat or username of the target channel (in the format @channelusername). */

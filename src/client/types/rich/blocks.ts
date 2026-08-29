@@ -11,7 +11,7 @@ import type {
   InputMediaDocument,
   InputMediaPhoto,
   InputMediaVideo,
-} from "../media.js";
+} from "../messages/index.js";
 import type { RichText, RichMessageButton } from "./text.js";
 
 /**

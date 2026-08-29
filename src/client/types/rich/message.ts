@@ -4,10 +4,10 @@ import type {
   InputMediaDocument,
   InputMediaPhoto,
   InputMediaVideo,
-} from "../media.js";
+  EphemeralMessageParameters,
+  InlineKeyboardMarkup,
+} from "../messages/index.js";
 import type { InputMediaVoiceNote, RichBlock, InputRichBlock } from "./blocks.js";
-import type { EphemeralMessageParameters } from "../messages.js";
-import type { InlineKeyboardMarkup } from "../keyboards.js";
 
 /**
  * Represents a rich formatted message received from Telegram.

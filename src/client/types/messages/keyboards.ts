@@ -1,4 +1,4 @@
-import type { CallbackGame } from "./business.js";
+import type { CallbackGame } from "../business.js";
 
 /**
  * Represents a disabled button which does nothing (Bot API 10.3+).

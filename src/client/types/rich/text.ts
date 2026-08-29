@@ -5,7 +5,7 @@ import type {
   LoginUrl,
   SwitchInlineQueryChosenChat,
   CopyTextButton,
-} from "../keyboards.js";
+} from "../messages/index.js";
 
 /**
  * Button style variants for rich message buttons.
