@@ -97,7 +97,6 @@ export class InlineKeyboardButton implements RawInlineKeyboardButton {
   /** If set, then the button is disabled and does nothing (Bot API 10.3+). */
   declare public readonly disabled?: DisabledButton;
 
-
   /**
    * Constructs a new {@link InlineKeyboardButton}.
    *

@@ -14,7 +14,6 @@ import type { Community } from "./chats.js";
 import type { InputRichMessage, RichMessage } from "./rich.js";
 import type { InputFile } from "../../utils/http.js";
 
-
 export interface MessageEntity {
   /** Type of the entity (e.g. 'mention', 'hashtag', 'bot_command', 'url', 'bold', 'italic', etc.). */
   type: MessageEntityType;
@@ -314,6 +313,10 @@ export interface TextQuote {
   is_manual?: boolean;
 }
 
+/**
+ * Represents a disabled button which does nothing (Bot API 10.3+).
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface DisabledButton {}
 
 export interface WebAppInfo {
@@ -457,7 +460,6 @@ export interface CommunityChatJoined {
   /** The community from which the chat was joined. */
   community: Community;
 }
-
 
 export interface Message {
   /** Unique message identifier inside this chat. */
@@ -681,7 +683,6 @@ export interface ReplyParameters {
   /** Identifier of the ephemeral message that will be replied to (Bot API 10.2+). */
   ephemeral_message_id?: number;
 }
-
 
 export interface ReactionTypeEmoji {
   /** Type of the reaction, always 'emoji'. */
@@ -950,7 +951,6 @@ export interface SendVideoOptions {
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
-
 
 export interface SendAnimationOptions {
   /** Unique identifier for the target chat or username of the target channel. */
@@ -1553,7 +1553,6 @@ export interface DeleteEphemeralMessageOptions {
   /** Identifier of the ephemeral message to delete. */
   ephemeral_message_id: number;
 }
-
 
 export type ReplyMarkup =
   InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply;

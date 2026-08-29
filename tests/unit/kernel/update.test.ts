@@ -56,4 +56,3 @@ describe("Update wrapper", () => {
     expect(update.stopped_message_generation?.draft_id).toBe(42);
   });
 });
-

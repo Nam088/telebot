@@ -105,7 +105,6 @@ export class Update implements RawUpdate {
     this._bot = bot;
   }
 
-
   /**
    * The user that sent the message or triggered the update, resolved across update types.
    */
@@ -158,7 +157,6 @@ export class Update implements RawUpdate {
     if (this.poll_answer?.voter_chat) return this.poll_answer.voter_chat;
     if (this.stopped_message_generation?.chat) return this.stopped_message_generation.chat;
     return undefined;
-
   }
 
   /**

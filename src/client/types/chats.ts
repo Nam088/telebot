@@ -317,5 +317,5 @@ export interface CommunityChatAdded {
 /**
  * Describes a service message about a chat or a bot being removed from a community.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CommunityChatRemoved {}
-

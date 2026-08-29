@@ -2,7 +2,6 @@ import type { User, Chat } from "./common.js";
 import type { InlineKeyboardMarkup, MessageEntity } from "./messages.js";
 import type { Sticker } from "./stickers.js";
 
-
 export interface Invoice {
   /** Product name. */
   title: string;
@@ -391,4 +390,3 @@ export interface UniqueGiftInfo {
   /** Point in time (Unix timestamp) when the gift can be transferred. */
   next_transfer_date?: number;
 }
-

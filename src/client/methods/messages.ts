@@ -10,7 +10,6 @@ import type {
   Message,
   RawUpdate,
   UserProfilePhotos,
-
   File,
   WebhookInfo,
   SendMessageOptions,
@@ -877,10 +876,7 @@ export abstract class MessageMethods extends BaseBotClient {
    * @returns `true` on success.
    */
   public async sendMessageDraft(options: SendMessageDraftOptions): Promise<boolean> {
-    return this.request<boolean>(
-      "sendMessageDraft",
-      options as unknown as Record<string, unknown>,
-    );
+    return this.request<boolean>("sendMessageDraft", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -920,12 +916,8 @@ export abstract class MessageMethods extends BaseBotClient {
    * @returns Sent {@link Message}.
    */
   public async sendLivePhoto(options: SendLivePhotoOptions): Promise<Message> {
-    return this.request<Message>(
-      "sendLivePhoto",
-      options as unknown as Record<string, unknown>,
-    );
+    return this.request<Message>("sendLivePhoto", options as unknown as Record<string, unknown>);
   }
-
 
   /**
    * Retrieves messages from a personal chat.

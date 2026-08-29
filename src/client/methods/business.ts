@@ -22,7 +22,6 @@ import type {
   DeleteEphemeralMessageOptions,
 } from "../types.js";
 
-
 /**
  * Full domain mixin containing games, passport, stories, and business operations.
  */
@@ -793,10 +792,7 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns The sent {@link Message}.
    */
   public async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
-    return this.request<Message>(
-      "sendRichMessage",
-      options as unknown as Record<string, unknown>,
-    );
+    return this.request<Message>("sendRichMessage", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -897,7 +893,6 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
       ephemeral_message_id: ephemeralMessageId,
     });
   }
-
 
   /**
    * Answers a chat join request query from a user (Bot API 10.1+).

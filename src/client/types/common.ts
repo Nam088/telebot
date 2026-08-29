@@ -309,7 +309,6 @@ export interface MessageGenerationStopped {
   draft_id: number;
 }
 
-
 export interface ApiResponse<T = unknown> {
   /** True, if the request was successful. */
   ok: boolean;
@@ -396,7 +395,6 @@ export interface SetMessageReactionOptions {
 }
 
 export class TelegramApiError extends Error {
-
   /**
    * Telegram Bot API numeric error code (e.g. `400`, `401`, `403`, `429`).
    */

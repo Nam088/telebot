@@ -76,8 +76,16 @@ describe("Bot Composite Class Integration Tests", () => {
               file_unique_id: "u_photo_123",
               width: 800,
               height: 600,
-              photo: [{ file_id: "photo_123", file_unique_id: "u_photo_123", width: 800, height: 600 }],
-              video: { file_id: "video_123", file_unique_id: "u_video_123", width: 800, height: 600, duration: 3 },
+              photo: [
+                { file_id: "photo_123", file_unique_id: "u_photo_123", width: 800, height: 600 },
+              ],
+              video: {
+                file_id: "video_123",
+                file_unique_id: "u_video_123",
+                width: 800,
+                height: 600,
+                duration: 3,
+              },
             },
           },
         }),
@@ -153,9 +161,7 @@ describe("Bot Composite Class Integration Tests", () => {
         },
         {
           type: "buttons",
-          buttons: [
-            [{ text: "Disabled Button", disabled: {} as DisabledButton }],
-          ],
+          buttons: [[{ text: "Disabled Button", disabled: {} as DisabledButton }]],
         },
       ],
     };
@@ -338,4 +344,3 @@ describe("Bot Composite Class Integration Tests", () => {
     expect(giftInfo.gift.backdrop.colors.center_color).toBe(0xff0000);
   });
 });
-
