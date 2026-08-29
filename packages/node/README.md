@@ -325,6 +325,96 @@ logger.setLevel("debug");
 
 ---
 
+### 9. Plugin System & Extension Points
+
+Third-party features ship as self-contained plugins. A plugin is a named object whose synchronous `install()` receives the `Application` and registers itself through the extension points below:
+
+| Extension point      | API                                                            | Use it for                                                                        |
+| -------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Plugin registration  | `app.usePlugin(plugin)`                                        | Entry point; installs once (duplicate names throw), honors `dependsOn`/`priority` |
+| Middleware           | `app.use(fn)`                                                  | Wrap every update (auth, metrics, attaching sessions)                             |
+| Handlers             | `app.addHandler()` / `app.addErrorHandler()`                   | React to updates or handler failures                                              |
+| Lifecycle hooks      | `app.onInit(hook)` / `app.onShutdown(hook)`                    | Async setup/teardown around `runPolling` / `runWebhook` / `stop`                  |
+| Request transforms   | `bot.transformRequest(fn, tag?)`                               | Mutate every outgoing API payload (defaults, audit logging)                       |
+| Response/error hooks | `bot.transformResponse(fn, tag?)` / `bot.onApiError(fn, tag?)` | Observe or rewrite results; alert on API failures                                 |
+| Namespaced state     | `app.pluginState(name)`                                        | Private per-plugin state that never collides with bot data                        |
+| Removal              | `app.removePlugin(name)`                                       | Full deregistration (`uninstall` hook + everything the plugin registered)         |
+
+**Installing a plugin:**
+
+```typescript
+import { Application, plugins, i18nFor } from "telebot-ts";
+
+const app = new Application(token);
+
+app.usePlugin(
+  plugins.i18n({
+    default_locale: "en",
+    locales: {
+      en: { hello: "Hello, {name}!" },
+      vi: { hello: "Xin chào, {name}!" },
+    },
+  }),
+);
+
+app.on("message", async (update, context) => {
+  await context.reply(i18nFor(context)!.t("hello", { name: "Nam" }));
+});
+```
+
+**Writing your own plugin:**
+
+```typescript
+import type { Plugin, Application } from "telebot-ts";
+
+export function rateLimitReporter(): Plugin {
+  return {
+    name: "my-plugin-rate-limit-reporter",
+    // Install only after "telebot-plugin-i18n"; lower priority installs first
+    // among simultaneously ready plugins.
+    dependsOn: ["telebot-plugin-i18n"],
+    priority: 0,
+    install(app: Application) {
+      // 1. Lifecycle: async setup runs before polling/webhook starts.
+      app.onInit(async () => {
+        /* open connections, load state */
+      });
+      app.onShutdown(async () => {
+        /* flush and close */
+      });
+
+      // 2. Middleware: runs around every dispatched update.
+      app.use(async (context, next) => {
+        const start = performance.now();
+        await next();
+        console.log(`update handled in ${performance.now() - start}ms`);
+      });
+
+      // 3. Request transforms: mutate payloads before they hit the API.
+      //    The tag lets app.removePlugin() detach these hooks cleanly.
+      app.bot.transformRequest((method, payload) => {
+        if (method === "sendMessage") payload.protect_content = true;
+      }, "my-plugin-rate-limit-reporter");
+
+      // 4. Namespaced state: private key space, no collisions with bot data.
+      app.pluginState<{ calls?: number }>("my-plugin-rate-limit-reporter").calls = 0;
+    },
+    uninstall(app: Application) {
+      // Runs before app.removePlugin() deregisters middleware/hooks/handlers.
+      void app;
+    },
+  };
+}
+
+app.usePlugin(rateLimitReporter());
+// Later, fully detach it:
+// app.removePlugin("my-plugin-rate-limit-reporter");
+```
+
+Rules for plugin authors: `install()` must be synchronous (defer async work to `onInit` hooks), plugin names must be globally unique, hook failures are isolated — one throwing hook never blocks other plugins or the bot itself — and plugins whose `dependsOn` dependencies never arrive make `runPolling`/`runWebhook` throw at startup.
+
+---
+
 ## Development & Testing
 
 ```bash

@@ -29,6 +29,8 @@ import { createWebhookServer, type WebhookServerOptions } from "./webhook.js";
 import { AsyncConversationManager, type AsyncConversationHandlerFn } from "../routing/index.js";
 import { ApplicationBuilder } from "./builder.js";
 import { restoreApplicationState, flushApplicationState } from "./lifecycle.js";
+import type { Plugin } from "./plugin.js";
+import { PluginManager, type LifecycleHook } from "./plugin-manager.js";
 
 export { ApplicationBuilder } from "./builder.js";
 export { type MiddlewareFn } from "./dispatcher.js";
@@ -99,6 +101,9 @@ export class Application {
   private readonly middlewares: MiddlewareFn[] = [];
   private readonly stateLocks: Map<string, Promise<void>> = new Map();
   private readonly conversationManager = new AsyncConversationManager();
+  private readonly initHooks: LifecycleHook[] = [];
+  private readonly shutdownHooks: LifecycleHook[] = [];
+  private readonly pluginManager: PluginManager;
 
   /**
    * Indicates whether the polling loop is actively running.
@@ -127,6 +132,14 @@ export class Application {
     this.bot = typeof botOrToken === "string" ? new Bot(botOrToken, options) : botOrToken;
     this.persistence = options.persistence ?? new MemoryPersistence();
     this.scheduler = new JobQueue(this.bot);
+    this.pluginManager = new PluginManager(
+      this,
+      this.middlewares,
+      this.initHooks,
+      this.shutdownHooks,
+      this.handlers,
+      this.errorHandlers,
+    );
     this.scheduler.errorHandler = async (error, context) => {
       context.error = error;
       for (const errHandler of this.errorHandlers) {
@@ -160,13 +173,180 @@ export class Application {
    */
   public use(...middlewares: (MiddlewareFn | { middleware: () => MiddlewareFn })[]): this {
     for (const mw of middlewares) {
+      let fn: MiddlewareFn | undefined;
       if (typeof mw === "function") {
-        this.middlewares.push(mw);
+        fn = mw;
       } else if (mw && typeof mw === "object" && typeof mw.middleware === "function") {
-        this.middlewares.push(mw.middleware());
+        fn = mw.middleware();
+      }
+      if (fn) {
+        this.middlewares.push(fn);
+        this.pluginManager.trackMiddleware(fn);
       }
     }
     return this;
+  }
+
+  /**
+   * Installs a {@link Plugin} into the application.
+   *
+   * The plugin's `install` hook receives this application and wires up middleware, handlers, and
+   * lifecycle hooks synchronously. Installing two plugins with the same `name` throws. Plugins
+   * whose `dependsOn` dependencies are not installed yet are deferred and installed
+   * automatically (in ascending `priority` order) once their dependencies arrive.
+   *
+   * @param plugin - The plugin instance to install.
+   * @returns This {@link Application} instance for chaining.
+   * @throws When a plugin with the same name is already installed.
+   *
+   * @example
+   * ```ts
+   * import { plugins } from "telebot-ts";
+   *
+   * app.usePlugin(
+   *   plugins.i18n({ default_locale: "en", locales: { en: { hello: "Hello!" } } }),
+   * );
+   * ```
+   */
+  public usePlugin(plugin: Plugin): this {
+    this.pluginManager.use(plugin);
+    return this;
+  }
+
+  /**
+   * Installs all deferred plugins whose dependencies are now satisfied.
+   *
+   * Called automatically by every {@link Application.usePlugin}; invoke manually only if you
+   * need deterministic installation before registering further plugins.
+   *
+   * @returns This {@link Application} instance for chaining.
+   */
+  public flushPlugins(): this {
+    this.pluginManager.flush();
+    return this;
+  }
+
+  /**
+   * Returns whether a plugin with the given name is currently installed.
+   *
+   * @param name - Plugin name to look up.
+   * @returns True if the plugin is installed.
+   */
+  public hasPlugin(name: string): boolean {
+    return this.pluginManager.has(name);
+  }
+
+  /**
+   * Returns the mutable namespaced state object for a plugin, creating it on first access.
+   *
+   * Gives plugins their own key space so they never collide with bot code or other plugins in
+   * `user_data`/`bot_data`. The object lives for the application's lifetime; persist anything
+   * important into `bot_data` from an `onShutdown` hook.
+   *
+   * @typeParam T - Shape the caller expects the state to have.
+   * @param name - Plugin name owning the state (usually `plugin.name`).
+   * @returns The plugin's state object.
+   *
+   * @example
+   * ```ts
+   * const state = app.pluginState<{ counter?: number }>("my-plugin");
+   * state.counter = (state.counter ?? 0) + 1;
+   * ```
+   */
+  public pluginState<T extends Record<string, unknown> = Record<string, unknown>>(name: string): T {
+    return this.pluginManager.state<T>(name);
+  }
+
+  /**
+   * Uninstalls a plugin: runs its optional `uninstall` hook, deregisters every middleware,
+   * handler, lifecycle hook, and error handler it registered, removes its tagged bot hooks, and
+   * drops its {@link Application.pluginState}. The name can be reused afterwards.
+   *
+   * @param name - Name of the installed plugin to remove.
+   * @returns This {@link Application} instance for chaining.
+   * @throws When no plugin with that name is installed.
+   *
+   * @example
+   * ```ts
+   * app.removePlugin("telebot-plugin-i18n");
+   * ```
+   */
+  public removePlugin(name: string): this {
+    this.pluginManager.remove(name);
+    return this;
+  }
+
+  /**
+   * Registers a hook invoked once, in registration order, right before the application starts
+   * serving updates (polling or webhook). Use it for asynchronous plugin setup such as opening
+   * connections or warming caches.
+   *
+   * @param hook - Callback executed before startup completes.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.onInit(async () => {
+   *   await loadTranslations();
+   * });
+   * ```
+   */
+  public onInit(hook: () => Promise<void> | void): this {
+    this.initHooks.push(hook);
+    this.pluginManager.trackInitHook(hook);
+    return this;
+  }
+
+  /**
+   * Registers a hook invoked once, in registration order, during {@link Application.stop} after
+   * the server stops and persisted state is flushed. Use it to release resources held by plugins.
+   *
+   * @param hook - Callback executed during shutdown.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.onShutdown(() => metricsClient.close());
+   * ```
+   */
+  public onShutdown(hook: () => Promise<void> | void): this {
+    this.shutdownHooks.push(hook);
+    this.pluginManager.trackShutdownHook(hook);
+    return this;
+  }
+
+  private async runInitHooks(): Promise<void> {
+    for (const hook of this.initHooks) {
+      try {
+        await hook();
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        for (const errHandler of this.errorHandlers) {
+          try {
+            await errHandler(error);
+          } catch (ehErr) {
+            console.error("Error in error handler:", ehErr);
+          }
+        }
+      }
+    }
+  }
+
+  private async runShutdownHooks(): Promise<void> {
+    for (const hook of this.shutdownHooks) {
+      try {
+        await hook();
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        for (const errHandler of this.errorHandlers) {
+          try {
+            await errHandler(error);
+          } catch (ehErr) {
+            console.error("Error in error handler:", ehErr);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -362,6 +542,7 @@ export class Application {
       this.handlers.set(group, []);
     }
     this.handlers.get(group)!.push(handler);
+    this.pluginManager.trackHandler(handler);
   }
 
   /**
@@ -383,6 +564,7 @@ export class Application {
    */
   public addErrorHandler(callback: ErrorHandlerCallback): void {
     this.errorHandlers.push(callback);
+    this.pluginManager.trackErrorHandler(callback);
   }
 
   /**
@@ -425,10 +607,12 @@ export class Application {
       throw new Error("Application is already running. Cannot start polling concurrently.");
     }
 
+    this.pluginManager.assertReady();
     this.isRunning = true;
     this.abortController = new AbortController();
 
     await this.initializePersistence();
+    await this.runInitHooks();
     this.job_queue.start();
 
     await runPollingLoop(
@@ -453,8 +637,10 @@ export class Application {
       throw new Error("Application is already running. Cannot start webhook concurrently.");
     }
 
+    this.pluginManager.assertReady();
     this.isRunning = true;
     await this.initializePersistence();
+    await this.runInitHooks();
     this.scheduler.start();
 
     this.webhookServer = await createWebhookServer(
@@ -481,5 +667,6 @@ export class Application {
     }
 
     await flushApplicationState(this.persistence, this.job_queue);
+    await this.runShutdownHooks();
   }
 }
