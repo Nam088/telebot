@@ -1,0 +1,326 @@
+import type { InputFile } from "../../../utils/http.js";
+import type { User, Chat, Location } from "../common/index.js";
+import type {
+  MessageEntity,
+  PhotoSize,
+  Animation,
+  Message,
+  ReactionType,
+} from "../messages/index.js";
+import type { Sticker } from "../stickers/index.js";
+
+export interface BusinessIntro {
+  /** Title of the intro message. */
+  title?: string;
+  /** Text of the intro message. */
+  message?: string;
+  /** Sticker of the intro message. */
+  sticker?: Sticker;
+}
+
+export interface BusinessLocation {
+  /** Address of the business. */
+  address: string;
+  /** Location of the business. */
+  location?: Location;
+}
+
+export interface BusinessOpeningHoursInterval {
+  /** The minute's sequence number in a week (0-10079) when the business opens in UTC+0. */
+  opening_minute: number;
+  /** The minute's sequence number in a week (1-10080) when the business closes in UTC+0. */
+  closing_minute: number;
+}
+
+export interface BusinessOpeningHours {
+  /** Unique name of the time zone. */
+  time_zone_name: string;
+  /** List of time intervals during which the business is open. */
+  opening_hours: BusinessOpeningHoursInterval[];
+}
+
+export interface StoryAreaPosition {
+  /** The abscissa of the rectangle's center, as a percentage of the story width. */
+  x_percentage: number;
+  /** The ordinate of the rectangle's center, as a percentage of the story height. */
+  y_percentage: number;
+  /** The width of the rectangle, as a percentage of the story width. */
+  width_percentage: number;
+  /** The height of the rectangle, as a percentage of the story height. */
+  height_percentage: number;
+  /** Clockwise rotation angle of the rectangle, in degrees; 0-360. */
+  rotation_angle: number;
+  /** The radius of the rectangle corner rounding, as a percentage of the story width. */
+  corner_radius_percentage: number;
+}
+
+export interface StoryArea {
+  /** Position of the story area. */
+  position: StoryAreaPosition;
+  /** Type of the story area. */
+  type: StoryAreaType;
+}
+
+export interface Story {
+  /** Chat that posted the story. */
+  chat: Chat;
+  /** Unique identifier of the story in the chat. */
+  id: number;
+}
+
+export interface InputStoryContentPhoto {
+  /** Type of the content, must be photo. */
+  type: "photo";
+  /** File to send. Pass a file_id, HTTP URL, or upload via InputFile. */
+  photo: string | InputFile;
+}
+
+export interface InputStoryContentVideo {
+  /** Type of the content, must be video. */
+  type: "video";
+  /** File to send. Pass a file_id, HTTP URL, or upload via InputFile. */
+  video: string | InputFile;
+  /** Precise duration of the video in seconds. */
+  duration?: number;
+  /** Cover image for the video. */
+  cover?: string | InputFile;
+  /** Timestamp in seconds from which the video will play. */
+  timestamp?: number;
+  /** Pass True if the video has no sound and should be looped. */
+  is_animation?: boolean;
+}
+
+export interface CallbackQuery {
+  /** Unique identifier for this query. */
+  id: string;
+  /** Sender of the query. */
+  from: User;
+  /** Message sent by the bot with the callback button that originated the query. */
+  message?: Message;
+  /** Identifier of the message sent via the bot in inline mode, that originated the query. */
+  inline_message_id?: string;
+  /** Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. */
+  chat_instance: string;
+  /** Data associated with the callback button. */
+  data?: string;
+  /** Short name of a Game to be returned, serves as the unique identifier for the game. */
+  game_short_name?: string;
+}
+
+export interface InlineQuery {
+  /** Unique identifier for this query. */
+  id: string;
+  /** Sender of the inline query. */
+  from: User;
+  /** Text of the query (up to 256 characters). */
+  query: string;
+  /** Offset of the results to be returned. */
+  offset: string;
+  /** Type of the chat from which the inline query was sent ('sender', 'private', 'group', 'supergroup', or 'channel'). */
+  chat_type?: "sender" | "private" | "group" | "supergroup" | "channel";
+  /** Sender location, only for bots that request user location. */
+  location?: Location;
+}
+
+export interface ChosenInlineResult {
+  /** The unique identifier for the result that was chosen. */
+  result_id: string;
+  /** The user that chose the result. */
+  from: User;
+  /** Sender location, only for bots that require user location. */
+  location?: Location;
+  /** Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. */
+  inline_message_id?: string;
+  /** The query that was used to obtain the result. */
+  query: string;
+}
+
+export interface ChatBoostAdded {
+  /** Number of boosts added by the user. */
+  boost_count: number;
+}
+
+export interface ChatBoostSourcePremium {
+  /** Source of the boost, always 'premium'. */
+  source: "premium";
+  /** User that boosted the chat. */
+  user: User;
+}
+
+export interface ChatBoostSourceGiftCode {
+  /** Source of the boost, always 'gift_code'. */
+  source: "gift_code";
+  /** User for which the gift code was created. */
+  user: User;
+}
+
+export interface ChatBoostSourceGiveaway {
+  /** Source of the boost, always 'giveaway'. */
+  source: "giveaway";
+  /** Identifier of a message in the chat with the giveaway; the message could have been deleted. */
+  giveaway_message_id: number;
+  /** User that won the prize in the giveaway if any. */
+  user?: User;
+  /** The number of Telegram Stars to be split among giveaway winners. */
+  prize_star_count?: number;
+  /** True, if the giveaway was completed, but no user won the prize. */
+  is_unclaimed?: boolean;
+}
+
+export interface ChatBoost {
+  /** Unique identifier of the boost. */
+  boost_id: string;
+  /** Point in time (Unix timestamp) when the chat was boosted. */
+  add_date: number;
+  /** Point in time (Unix timestamp) when the boost will automatically expire. */
+  expiration_date: number;
+  /** Source of the added boost. */
+  source: ChatBoostSource;
+}
+
+export interface ChatBoostUpdated {
+  /** Chat which was boosted. */
+  chat: Chat;
+  /** Information about the chat boost. */
+  boost: ChatBoost;
+}
+
+export interface ChatBoostRemoved {
+  /** Chat which was boosted. */
+  chat: Chat;
+  /** Unique identifier of the boost. */
+  boost_id: string;
+  /** Point in time (Unix timestamp) when the boost was removed. */
+  remove_date: number;
+  /** Source of the removed boost. */
+  source: ChatBoostSource;
+}
+
+export interface BusinessConnection {
+  /** Unique identifier of the business connection. */
+  id: string;
+  /** Business account user that created the business connection. */
+  user: User;
+  /** Identifier of a private chat with the user who created the business connection. */
+  user_chat_id: number;
+  /** Date the connection was established in Unix time. */
+  date: number;
+  /** True, if the bot can act on behalf of the business account in chats that were active in the last 24 hours. */
+  can_reply: boolean;
+  /** True, if the connection is active. */
+  is_enabled: boolean;
+}
+
+export interface BusinessMessagesDeleted {
+  /** Unique identifier of the business connection. */
+  business_connection_id: string;
+  /** Information about a chat in the business account in which messages were deleted. */
+  chat: Chat;
+  /** The list of identifiers of deleted messages in the chat of the business account. */
+  message_ids: number[];
+}
+
+export interface GameHighScore {
+  /** Position in high score table for the game. */
+  position: number;
+  /** User who scored the points. */
+  user: User;
+  /** Score value. */
+  score: number;
+}
+
+export interface PassportElementError {
+  /** Error source. */
+  source: string;
+  /** Type of element of the user's Telegram Passport which has the issue. */
+  type: string;
+  /** Error message. */
+  message: string;
+}
+
+export interface CallbackGame {
+  [key: string]: unknown;
+}
+
+export interface Game {
+  /** Title of the game. */
+  title: string;
+  /** Description of the game. */
+  description: string;
+  /** Photo that will be displayed in the game message in chats. */
+  photo: PhotoSize[];
+  /** Brief description of the game or high scores. */
+  text?: string;
+  /** Special entities that appear in text. */
+  text_entities?: MessageEntity[];
+  /** Animation that will be displayed in the game message in chats. */
+  animation?: Animation;
+}
+
+export interface PassportData {
+  /** Array with information about documents and other Telegram Passport elements. */
+  data: EncryptedPassportElement[];
+  /** Encrypted credentials required to decrypt the data. */
+  credentials: EncryptedCredentials;
+}
+
+export interface EncryptedPassportElement {
+  /** Element type. */
+  type: string;
+  /** Base64-encoded element hash for verification. */
+  hash: string;
+  /** Base64-encoded encrypted data. */
+  data?: string;
+  /** User's verified phone number. */
+  phone_number?: string;
+  /** User's verified email address. */
+  email?: string;
+  /** Array of encrypted files. */
+  files?: PassportFile[];
+  /** Encrypted file with the front side of the document. */
+  front_side?: PassportFile;
+  /** Encrypted file with the reverse side of the document. */
+  reverse_side?: PassportFile;
+  /** Encrypted file with the selfie of the user holding a document. */
+  selfie?: PassportFile;
+  /** Array of encrypted files with translated versions of documents. */
+  translation?: PassportFile[];
+}
+
+export interface PassportFile {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file. */
+  file_unique_id: string;
+  /** File size in bytes. */
+  file_size: number;
+  /** Unix time when the file was uploaded. */
+  file_date: number;
+}
+
+export interface EncryptedCredentials {
+  /** Base64-encoded encrypted JSON-serialized data. */
+  data: string;
+  /** Base64-encoded data hash for verification. */
+  hash: string;
+  /** Base64-encoded secret hash for verification. */
+  secret: string;
+}
+
+export type StoryAreaType =
+  | { type: "location"; location: Location; address?: unknown }
+  | {
+      type: "suggested_reaction";
+      reaction_type: ReactionType;
+      is_dark?: boolean;
+      is_flipped?: boolean;
+    }
+  | { type: "link"; url: string }
+  | { type: "weather"; temperature_c: number; emoji: string; background_color: number };
+
+export type InputStoryContent = InputStoryContentPhoto | InputStoryContentVideo;
+
+export type ChatBoostSource =
+  ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
+
+export type InlineQueryResult = Record<string, unknown>;
