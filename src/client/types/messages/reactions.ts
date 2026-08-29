@@ -1,4 +1,4 @@
-import type { User, Chat } from "../common.js";
+import type { User, Chat } from "../common/index.js";
 
 /**
  * Describes a reaction that uses a regular emoji.

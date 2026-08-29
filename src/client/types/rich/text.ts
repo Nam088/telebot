@@ -1,4 +1,4 @@
-import type { User } from "../common.js";
+import type { User } from "../common/index.js";
 import type {
   DisabledButton,
   WebAppInfo,

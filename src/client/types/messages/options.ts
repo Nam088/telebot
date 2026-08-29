@@ -4,7 +4,7 @@ import type { ReactionType } from "./reactions.js";
 import type { InlineKeyboardMarkup, ReplyMarkup } from "./keyboards.js";
 import type { InputMedia, InputFile } from "./media.js";
 import type { InputRichMessage } from "../rich/index.js";
-import type { InlineQueryResult } from "../business.js";
+import type { InlineQueryResult } from "../business/index.js";
 
 export interface SendMessageOptions {
   /** Unique identifier for the target chat or username of the target channel (in the format @channelusername). */

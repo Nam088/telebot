@@ -1,10 +1,11 @@
 import type { ParseMode, MessageEntityType, PollType } from "../../constants.js";
-import type { User, Chat, Location } from "../common.js";
-import type { Story, ChatBoostAdded, Game, PassportData } from "../business.js";
-import type { Invoice, SuccessfulPayment, RefundedPayment } from "../payments.js";
-import type { Sticker } from "../stickers.js";
-import type { Community } from "../chats.js";
+import type { User, Chat, Location } from "../common/index.js";
+import type { Story, ChatBoostAdded, Game, PassportData } from "../business/index.js";
+import type { Invoice, SuccessfulPayment, RefundedPayment } from "../payments/index.js";
+import type { Sticker } from "../stickers/index.js";
+import type { Community } from "../chats/index.js";
 import type { RichMessage } from "../rich/index.js";
+
 import type {
   PhotoSize,
   Audio,

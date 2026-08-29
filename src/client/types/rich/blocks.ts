@@ -1,4 +1,4 @@
-import type { Location } from "../common.js";
+import type { Location } from "../common/index.js";
 import type {
   PhotoSize,
   Animation,
