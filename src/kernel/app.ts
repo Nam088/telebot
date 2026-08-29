@@ -31,6 +31,7 @@ import {
   type AsyncConversationHandlerFn,
 } from "../routing/async-conversation.js";
 import { ApplicationBuilder } from "./builder.js";
+import { restoreApplicationState, flushApplicationState } from "./lifecycle.js";
 
 export { ApplicationBuilder } from "./builder.js";
 export { type MiddlewareFn } from "./dispatcher.js";
@@ -392,26 +393,7 @@ export class Application {
    */
   public async initializePersistence(): Promise<void> {
     if (this.persistenceInitialized) return;
-
-    const storedConversations = await this.persistence.getConversations();
-    for (const handlers of this.handlers.values()) {
-      for (const handler of handlers) {
-        if (handler instanceof ConversationHandler && handler.persistent) {
-          for (const [key, state] of storedConversations.entries()) {
-            if (!handler.name || key.startsWith(`${handler.name}:`)) {
-              handler.conversations.set(key, state);
-            }
-          }
-        }
-      }
-    }
-
-    // Restore persistent scheduled jobs
-    const persistedJobs = await this.persistence.getJobs();
-    if (persistedJobs.length > 0) {
-      this.scheduler.restoreFromPersistedJobs(persistedJobs);
-    }
-
+    await restoreApplicationState(this.persistence, this.handlers, this.scheduler);
     this.persistenceInitialized = true;
   }
 
@@ -501,10 +483,6 @@ export class Application {
       this.webhookServer = undefined;
     }
 
-    // Persist active jobs before stopping scheduler
-    const persistedJobs = this.job_queue.toPersistedJobs();
-    await this.persistence.setJobs(persistedJobs);
-
-    this.job_queue.stop();
+    await flushApplicationState(this.persistence, this.job_queue);
   }
 }

@@ -1,0 +1,163 @@
+/**
+ * Rich message, ephemeral messages, and request methods for Bot API.
+ *
+ * @packageDocumentation
+ */
+
+import { BusinessGiftsMethods } from "./gifts.js";
+import type {
+  Message,
+  SendRichMessageOptions,
+  SendRichMessageDraftOptions,
+  EditEphemeralMessageTextOptions,
+  EditEphemeralMessageMediaOptions,
+  EditEphemeralMessageCaptionOptions,
+  EditEphemeralMessageReplyMarkupOptions,
+  DeleteEphemeralMessageOptions,
+} from "../../types/index.js";
+
+/**
+ * Mixin providing rich messages, ephemeral messages, and low-level API operations.
+ */
+export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
+  /**
+   * Sends a structured rich formatted message (Bot API 10.1+).
+   *
+   * @param options - Rich message options including `chat_id` and `rich_message`.
+   * @returns The sent {@link Message}.
+   */
+  public async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
+    return this.request<Message>("sendRichMessage", options as unknown as Record<string, unknown>);
+  }
+
+  /**
+   * Streams a draft of a rich formatted message (Bot API 10.1+).
+   *
+   * @param options - Rich message draft options.
+   * @returns `true` on success.
+   */
+  public async sendRichMessageDraft(options: SendRichMessageDraftOptions): Promise<boolean> {
+    return this.request<boolean>(
+      "sendRichMessageDraft",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message text (Bot API 10.2+).
+   *
+   * @param options - Ephemeral message edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageText(
+    options: EditEphemeralMessageTextOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageText",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message media (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message media edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageMedia(
+    options: EditEphemeralMessageMediaOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageMedia",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message caption (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message caption edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageCaption(
+    options: EditEphemeralMessageCaptionOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageCaption",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message reply markup (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message reply markup edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageReplyMarkup(
+    options: EditEphemeralMessageReplyMarkupOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageReplyMarkup",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Deletes an ephemeral message (Bot API 10.2+).
+   *
+   * @param optionsOrChatId - Options object or chat identifier.
+   * @param receiverUserId - Receiver user identifier when passing positional arguments.
+   * @param ephemeralMessageId - Ephemeral message identifier when passing positional arguments.
+   * @returns `true` on success.
+   */
+  public async deleteEphemeralMessage(
+    optionsOrChatId: DeleteEphemeralMessageOptions | number | string,
+    receiverUserId?: number,
+    ephemeralMessageId?: number,
+  ): Promise<boolean> {
+    if (typeof optionsOrChatId === "object") {
+      return this.request<boolean>(
+        "deleteEphemeralMessage",
+        optionsOrChatId as unknown as Record<string, unknown>,
+      );
+    }
+    return this.request<boolean>("deleteEphemeralMessage", {
+      chat_id: optionsOrChatId,
+      receiver_user_id: receiverUserId,
+      ephemeral_message_id: ephemeralMessageId,
+    });
+  }
+
+  /**
+   * Answers a chat join request query from a user (Bot API 10.1+).
+   *
+   * @param options - Query response options.
+   * @returns `true` on success.
+   */
+  public async answerChatJoinRequestQuery(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("answerChatJoinRequestQuery", options);
+  }
+
+  /**
+   * Sends a Web App for a chat join request (Bot API 10.1+).
+   *
+   * @param options - Join request Web App options.
+   * @returns `true` on success.
+   */
+  public async sendChatJoinRequestWebApp(options: Record<string, unknown>): Promise<boolean> {
+    return this.request<boolean>("sendChatJoinRequestWebApp", options);
+  }
+
+  /**
+   * General-purpose raw API method executor.
+   *
+   * @typeParam T - Expected result payload type.
+   * @param method - API method name.
+   * @param payload - Request parameters.
+   * @returns Unwrapped API result.
+   */
+  public async doApiRequest<T>(method: string, payload: Record<string, unknown> = {}): Promise<T> {
+    return this.request<T>(method, payload);
+  }
+}

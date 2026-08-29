@@ -7,7 +7,8 @@ import type {
   EphemeralMessageParameters,
   InlineKeyboardMarkup,
 } from "../messages/index.js";
-import type { InputMediaVoiceNote, RichBlock, InputRichBlock } from "./blocks.js";
+import type { RichBlock } from "./received-blocks.js";
+import type { InputMediaVoiceNote, InputRichBlock } from "./input-blocks.js";
 
 /**
  * Represents a rich formatted message received from Telegram.
