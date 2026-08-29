@@ -145,14 +145,14 @@ describe("Bot Composite Class Integration Tests", () => {
       blocks: [
         {
           type: "table",
-          rows: [
-            { cells: [{ text: "Header 1" }, { text: "Header 2" }] },
-            { cells: [{ text: "Val 1" }, { text: "Val 2" }] },
+          cells: [
+            [{ text: "Header 1" }, { text: "Header 2" }],
+            [{ text: "Val 1" }, { text: "Val 2" }],
           ],
           is_compact: true,
         },
         {
-          type: "expandable_block_quotation",
+          type: "expandable_blockquote",
           text: "Expanded quote text",
         },
         {
@@ -161,7 +161,7 @@ describe("Bot Composite Class Integration Tests", () => {
         },
         {
           type: "buttons",
-          buttons: [[{ text: "Disabled Button", disabled: {} as DisabledButton }]],
+          buttons: [{ text: "Disabled Button", disabled: {} as DisabledButton }],
         },
       ],
     };

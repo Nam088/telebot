@@ -15,9 +15,10 @@ This skill provides an authoritative, end-to-end guide for an AI Agent to autono
 1. Scan GitHub Issues  ──▶ 2. Checkout Feature Branch ──▶ 3. Read Bot API Docs
           │                                                       │
           ▼                                                       ▼
-7. Create PR & Link    ◀── 6. Quality Gate Pass       ◀── 4. TDD & Implementation
+8. Commit, Push & PR   ◀── 7. Quality Gate Pass       ◀── 4, 5, 6. TDD & Examples
    (Do NOT push main)
 ```
+
 
 ---
 
@@ -139,7 +140,7 @@ async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
 
 ---
 
-## Phase 6: Brand Protection & Strict Constraints
+## Phase 6: Brand Protection, Version Examples & Strict Constraints
 
 1. **Zero External Runtime Dependencies**:
    - Only Node.js built-ins (`fetch`, `http`, `crypto`, `events`, `sqlite`, etc.).
@@ -147,10 +148,14 @@ async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
 2. **Naming Rules**:
    - Method verbs → `camelCase` (`sendRichMessage`, `editEphemeralMessageText`).
    - Fields / Options → `snake_case` (`chat_id`, `is_compact`, `receiver_user_id`).
-3. **Brand Protection**:
+3. **Versioned Examples Directory**:
+   - When providing examples or test scripts for an API version changelog, always place them in `examples/versions/v<version>/` (e.g. `examples/versions/v10.3/test-features.ts`, `examples/versions/v10.3/demo.ts`).
+   - **Zero Hardcoding**: NEVER hardcode tokens, API secrets, or personal user IDs into example scripts, test files, or committed files. Always read configuration dynamically from environment variables (`BOT_TOKEN`, `TEST_USER_ID`, `TARGET_USER_ID`) or CLI arguments (`process.argv`).
+4. **Brand Protection**:
    - **NEVER** mention Python, `python-telegram-bot`, or migration in any public JSDoc, comments, README, or types.
 
 ---
+
 
 ## Phase 7: Mandatory Quality Gate Checks
 

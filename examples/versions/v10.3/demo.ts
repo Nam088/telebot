@@ -5,15 +5,14 @@ import {
   type Update,
   type CallbackContext,
   type InputRichMessage,
-  InlineKeyboardMarkup,
-} from "../src/index.js";
+  type InlineKeyboardMarkup,
+} from "../../../src/index.js";
 
 /**
- * Demo bot showcasing Telegram Bot API 10.3 features:
- * - Rich Messages (tables, expandable quotes, documents)
- * - Ephemeral Messages with replace_callback_query_message
- * - Message drafts with stop generation button (can_stop, keep_on_stop)
- * - Disabled buttons and force_reply
+ * Interactive polling demo bot for Telegram Bot API 10.3 features.
+ *
+ * Reads config strictly from environment variables:
+ * - BOT_TOKEN / TEST_BOT_TOKEN
  */
 async function start(update: Update, context: CallbackContext) {
   const chatId = update.effective_chat?.id;
@@ -27,17 +26,18 @@ async function start(update: Update, context: CallbackContext) {
       ],
       [
         { text: "👻 Send Ephemeral Message", callback_data: "demo_ephemeral" },
-        { text: "🚫 Disabled Button", disabled: {} },
+        { text: "🚫 Disabled Button (10.3)", disabled: {} },
       ],
     ],
   };
 
   await context.bot.sendMessage({
     chat_id: chatId,
-    text: "✨ *Telegram Bot API 10.3 Live Demo Bot*\n\nChoose an action below to test the new features:",
-    parse_mode: "MarkdownV2",
+    text: "✨ <b>Telegram Bot API 10.3 Demo Bot</b>\n\nChoose an action below to test the new features:",
+    parse_mode: "HTML",
     reply_markup: keyboard,
   });
+
 }
 
 async function handleRich(update: Update, context: CallbackContext) {
@@ -48,28 +48,27 @@ async function handleRich(update: Update, context: CallbackContext) {
     blocks: [
       {
         type: "table",
-        rows: [
-          { cells: [{ text: "Feature" }, { text: "Status" }] },
-          { cells: [{ text: "Rich Tables" }, { text: "✅ Supported" }] },
-          { cells: [{ text: "Bot API 10.3" }, { text: "🚀 Live" }] },
+        cells: [
+          [{ text: "Feature" }, { text: "Status" }],
+          [{ text: "Rich Tables" }, { text: "✅ Supported" }],
+          [{ text: "Bot API 10.3" }, { text: "🚀 Live" }],
         ],
         is_compact: true,
       },
       {
-        type: "expandable_block_quotation",
+        type: "expandable_blockquote",
         text: "This is an expandable block quotation introduced in Bot API 10.3. Users can tap to expand or collapse this section.",
       },
       {
         type: "buttons",
         buttons: [
-          [
-            { text: "Active Button", callback_data: "demo_active" },
-            { text: "Disabled Button", disabled: {} },
-          ],
+          { text: "Active Button", callback_data: "demo_active" },
+          { text: "Disabled Button", disabled: {} },
         ],
       },
     ],
   };
+
 
   await context.bot.sendRichMessage({
     chat_id: chatId,
@@ -132,7 +131,7 @@ async function main() {
   const token = process.env["BOT_TOKEN"] || process.env["TEST_BOT_TOKEN"];
   if (!token) {
     console.error("❌ Error: BOT_TOKEN or TEST_BOT_TOKEN environment variable is required.");
-    console.error("Usage: BOT_TOKEN=your_token npx tsx examples/bot-api-10-3-demo.ts");
+    console.error("Usage: npx tsx --env-file=.env examples/versions/v10.3/demo.ts");
     process.exit(1);
   }
 
