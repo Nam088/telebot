@@ -2,6 +2,14 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.4.0](https://github.com/Nam088/telebot/compare/v1.3.1...v1.4.0) (2026-08-29)
+
+
+### Features
+
+* **plugins:** add plugin system with six extension points and built-in i18n plugin ([d0af293](https://github.com/Nam088/telebot/commit/d0af293b33887ce308925aa0ff0b87f6d23a8516))
+* **plugins:** add response/error hooks, ordering, namespaced state, and removal ([02261be](https://github.com/Nam088/telebot/commit/02261be76559a4f94f6bcca6fbff00ac59be2b1f))
+
 ## [1.3.1](https://github.com/Nam088/telebot/compare/v1.3.0...v1.3.1) (2026-08-29)
 
 
