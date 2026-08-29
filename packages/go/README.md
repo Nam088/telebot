@@ -3,7 +3,7 @@
 > Zero-dependency, high-throughput, and idiomatic Telegram Bot Framework for Go.
 
 [![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go)](https://go.dev/)
-[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)]()
+[![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-success.svg)](<>)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
 ---
@@ -223,7 +223,7 @@ router.Use(func(next routing.HandlerFunc) routing.HandlerFunc {
         if user != nil {
             name = user.FirstName
         }
-        
+
         log.Printf("[Update %d] from %s", c.Update().UpdateID, name)
         err := next(c)
         log.Printf("[Update %d] completed in %v", c.Update().UpdateID, time.Since(start))
@@ -237,6 +237,7 @@ router.Use(func(next routing.HandlerFunc) routing.HandlerFunc {
 ### 3. Keyboards & Interactive Menus
 
 #### Inline Keyboard Builder
+
 ```go
 import "github.com/Nam088/telebot/packages/go/pkg/components/keyboard"
 
@@ -253,6 +254,7 @@ c.Reply("Please choose an option:", func(o *types.SendMessageOptions) {
 ```
 
 #### Interactive Nested Menu
+
 ```go
 import "github.com/Nam088/telebot/packages/go/pkg/components/menu"
 
@@ -418,18 +420,18 @@ Every example lives in `cmd/<name>/`. Set the `BOT_TOKEN` environment variable, 
 go run ./cmd/<name>
 ```
 
-| Example | What it shows |
-|---|---|
-| `echobot` | Minimal router: `/start`, text echo |
-| `example` | General overview: commands, keyboards, scheduler |
-| `keyboardbot` | Reply keyboards (`NewReplyKeyboard`, one-time, placeholder) + inline keyboards + callbacks |
-| `inlinebot` | Inline queries answered with `components/inlinequery` Article/Photo builders |
-| `pollbot` | Regular & quiz polls, `stopPoll`, `Router.Poll` / `Router.PollAnswer` routing |
-| `mediabot` | Dice, location, venue, contact, albums, stickers, reactions, `utils` MarkdownV2 helpers |
-| `menubot` | Nested interactive menu with pagination |
-| `conversationbot` | Multi-step FSM conversation with per-user state |
-| `webhookbot` | Production-style webhook server with secret token |
-| `apidemo` | Live smoke test of ~50 Bot API methods with a PASS/FAIL report (`CHAT_ID` env for chat-scoped methods) |
+| Example           | What it shows                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| `echobot`         | Minimal router: `/start`, text echo                                                                    |
+| `example`         | General overview: commands, keyboards, scheduler                                                       |
+| `keyboardbot`     | Reply keyboards (`NewReplyKeyboard`, one-time, placeholder) + inline keyboards + callbacks             |
+| `inlinebot`       | Inline queries answered with `components/inlinequery` Article/Photo builders                           |
+| `pollbot`         | Regular & quiz polls, `stopPoll`, `Router.Poll` / `Router.PollAnswer` routing                          |
+| `mediabot`        | Dice, location, venue, contact, albums, stickers, reactions, `utils` MarkdownV2 helpers                |
+| `menubot`         | Nested interactive menu with pagination                                                                |
+| `conversationbot` | Multi-step FSM conversation with per-user state                                                        |
+| `webhookbot`      | Production-style webhook server with secret token                                                      |
+| `apidemo`         | Live smoke test of ~50 Bot API methods with a PASS/FAIL report (`CHAT_ID` env for chat-scoped methods) |
 
 ## 🧪 Testing & Quality Gates
 
@@ -454,23 +456,23 @@ npm run test:go
 monorepo (`packages/node`, published as `telebot-ts`). The table below compares
 the two implementations:
 
-| Feature Area                | telebot-ts (Node)                                                    | telebot-go (Go)                                                              |
-| --------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Bot API client methods      | Full coverage                                                        | Broad coverage (110+ methods; see Key Features)                              |
-| Long polling                | `Application.runPolling`                                             | `Router.RunPolling`                                                          |
-| Webhook server              | Built-in HTTP server, secret-token validation                        | Built-in HTTP server, secret-token validation                                |
-| Update routing              | `Application` + handler classes (`CommandHandler`, `MessageHandler`, ...) | `Router` with filter-based routes (`Command`, `Text`, `CallbackQuery`, `Handle`) |
-| Middlewares                 | `Application` middleware pipeline                                    | `Router.Use`                                                                 |
-| Filters                     | Full PTB-mirrored catalog (`filters.TEXT`, `filters.ChatType.*`, ...) | Core predicates + media/entity matchers with `And` / `Or` / `Not`            |
-| FSM conversations           | `ConversationHandler`                                                | `ConversationHandler`                                                        |
-| Linear (async) conversations | `LinearConversation`                                                  | Not ported — use FSM `ConversationHandler`                                   |
-| Keyboards, Menus, Pagination | `InlineKeyboard`, `ReplyKeyboard`, `Menu`, `Pagination`              | `keyboard`, `menu`, `pagination` components                                  |
-| Inline query builders       | Inline query result builders                                          | `inlinequery` component (`Article`, `Photo`)                                 |
-| Job queue                   | `JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                   | `scheduler.JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                 |
-| RFC 5545 RRule engine       | ✔                                                                    | ✔ (`scheduler/rrule`)                                                        |
-| Session persistence         | Memory, JSON file, **SQLite** (`node:sqlite`)                        | Memory, JSON file                                                            |
-| Structured logging          | Optional `pino` integration                                          | Standard library `log`                                                       |
-| Retry / rate-limit handling | Exponential backoff honoring `retry_after`                           | Exponential backoff honoring `retry_after`                                   |
+| Feature Area                 | telebot-ts (Node)                                                         | telebot-go (Go)                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Bot API client methods       | Full coverage                                                             | Broad coverage (110+ methods; see Key Features)                                  |
+| Long polling                 | `Application.runPolling`                                                  | `Router.RunPolling`                                                              |
+| Webhook server               | Built-in HTTP server, secret-token validation                             | Built-in HTTP server, secret-token validation                                    |
+| Update routing               | `Application` + handler classes (`CommandHandler`, `MessageHandler`, ...) | `Router` with filter-based routes (`Command`, `Text`, `CallbackQuery`, `Handle`) |
+| Middlewares                  | `Application` middleware pipeline                                         | `Router.Use`                                                                     |
+| Filters                      | Full PTB-mirrored catalog (`filters.TEXT`, `filters.ChatType.*`, ...)     | Core predicates + media/entity matchers with `And` / `Or` / `Not`                |
+| FSM conversations            | `ConversationHandler`                                                     | `ConversationHandler`                                                            |
+| Linear (async) conversations | `LinearConversation`                                                      | Not ported — use FSM `ConversationHandler`                                       |
+| Keyboards, Menus, Pagination | `InlineKeyboard`, `ReplyKeyboard`, `Menu`, `Pagination`                   | `keyboard`, `menu`, `pagination` components                                      |
+| Inline query builders        | Inline query result builders                                              | `inlinequery` component (`Article`, `Photo`)                                     |
+| Job queue                    | `JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                        | `scheduler.JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                     |
+| RFC 5545 RRule engine        | ✔                                                                         | ✔ (`scheduler/rrule`)                                                            |
+| Session persistence          | Memory, JSON file, **SQLite** (`node:sqlite`)                             | Memory, JSON file                                                                |
+| Structured logging           | Optional `pino` integration                                               | Standard library `log`                                                           |
+| Retry / rate-limit handling  | Exponential backoff honoring `retry_after`                                | Exponential backoff honoring `retry_after`                                       |
 
 ### Not applicable to Go
 

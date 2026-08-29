@@ -16,8 +16,10 @@
     "build:go": "cd packages/go && go build ./...",
     "typecheck": "npm run typecheck --workspace=packages/node",
     "lint": "npm run lint --workspace=packages/node",
-    "format": "prettier --write \"packages/**/*.{ts,js,json,md,go}\"",
-    "format:check": "prettier --check \"packages/**/*.{ts,js,json,md,go}\"",
+    "format": "prettier --write \"packages/**/*.{ts,js,json,md}\" && npm run format:go",
+    "format:check": "prettier --check \"packages/**/*.{ts,js,json,md}\" && npm run format:go:check",
+    "format:go": "gofmt -w $(find packages/go -name '*.go')",
+    "format:go:check": "test -z \"$(gofmt -l $(find packages/go -name '*.go'))\"",
     "docs": "npm run docs --workspace=packages/node",
     "docs:node": "npm run docs --workspace=packages/node",
     "docs:go": "cd packages/go && $(go env GOPATH)/bin/pkgsite -http=:6060"
