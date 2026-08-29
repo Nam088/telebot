@@ -22,7 +22,7 @@ export interface PersistedJob {
   /**
    * Optional RFC 5545 RRule string or options.
    */
-  rrule?: string | import("../scheduler/rrule.js").RRuleOptions;
+  rrule?: string | import("../scheduler/index.js").RRuleOptions;
   /**
    * Optional timezone.
    */

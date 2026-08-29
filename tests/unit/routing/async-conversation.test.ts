@@ -4,7 +4,7 @@ import {
   AsyncConversationManager,
   ConversationTimeoutError,
   ConversationExitSignal,
-} from "../../../src/routing/async-conversation.js";
+} from "../../../src/routing/index.js";
 import { Application } from "../../../src/kernel/app.js";
 import { Bot } from "../../../src/client/bot.js";
 import { CallbackContext } from "../../../src/kernel/context.js";

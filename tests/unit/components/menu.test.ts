@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { Menu } from "../../../src/components/menu.js";
+import { Menu } from "../../../src/components/index.js";
 import { Application } from "../../../src/kernel/app.js";
 import { Bot } from "../../../src/client/bot.js";
 import { CallbackContext } from "../../../src/kernel/context.js";

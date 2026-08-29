@@ -5,5 +5,5 @@
  */
 
 export * from "./queue.js";
-export * from "./rrule.js";
+export * from "./rrule/index.js";
 export * from "./job.js";

@@ -26,16 +26,13 @@ import { JobQueue } from "../scheduler/queue.js";
 import { dispatchUpdate, type MiddlewareFn } from "./dispatcher.js";
 import { runPollingLoop, type PollingLoopOptions } from "./polling.js";
 import { createWebhookServer, type WebhookServerOptions } from "./webhook.js";
-import {
-  AsyncConversationManager,
-  type AsyncConversationHandlerFn,
-} from "../routing/async-conversation.js";
+import { AsyncConversationManager, type AsyncConversationHandlerFn } from "../routing/index.js";
 import { ApplicationBuilder } from "./builder.js";
 import { restoreApplicationState, flushApplicationState } from "./lifecycle.js";
 
 export { ApplicationBuilder } from "./builder.js";
 export { type MiddlewareFn } from "./dispatcher.js";
-export { type AsyncConversationHandlerFn } from "../routing/async-conversation.js";
+export { type AsyncConversationHandlerFn } from "../routing/index.js";
 export {
   isSecretTokenValid,
   MAX_WEBHOOK_BODY_BYTES,

@@ -8,10 +8,7 @@ import type { Bot } from "../client/bot.js";
 import type { Update } from "./update.js";
 import type { JobQueue } from "../scheduler/queue.js";
 import type { Job } from "../scheduler/job.js";
-import {
-  ConversationContextHelper,
-  type AsyncConversationManager,
-} from "../routing/async-conversation.js";
+import { ConversationContextHelper, type AsyncConversationManager } from "../routing/index.js";
 
 /**
  * Interactive menu control helper attached to {@link CallbackContext}.

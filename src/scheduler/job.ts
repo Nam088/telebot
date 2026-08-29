@@ -1,7 +1,7 @@
 const MAX_TIMEOUT_MS = 2147483647;
 import { CallbackContext } from "../kernel/context.js";
 import { JobQueue } from "./queue.js";
-import { RRule } from "./rrule.js";
+import { RRule, type RRuleOptions } from "./rrule/index.js";
 
 /**
  * Signature for job callback functions executed by the {@link JobQueue}.
@@ -42,7 +42,7 @@ export class Job<Data = unknown> {
   /** Epoch timestamp in milliseconds when the job is next scheduled to execute. */
   public next_t: number;
   /** Optional RFC 5545 rrule string or options for persistence recovery. */
-  public readonly rruleOptions?: string | import("./rrule.js").RRuleOptions;
+  public readonly rruleOptions?: string | RRuleOptions;
   /** Optional timezone for persistence recovery. */
   public readonly timezone?: string;
   private _timer?: NodeJS.Timeout;
@@ -58,7 +58,7 @@ export class Job<Data = unknown> {
     nextRunMs: number;
     intervalMs?: number;
     rrule?: RRule;
-    rruleOptions?: string | import("./rrule.js").RRuleOptions;
+    rruleOptions?: string | RRuleOptions;
     timezone?: string;
     data?: Data;
     chat_id?: number | string;

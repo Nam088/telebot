@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { BusinessAndEcosystemMethods } from "../../../../src/client/methods/business.js";
+import { BusinessAndEcosystemMethods } from "../../../../src/client/methods/index.js";
 
 class ConcreteBusinessClient extends BusinessAndEcosystemMethods {}
 

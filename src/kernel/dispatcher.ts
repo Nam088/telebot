@@ -72,7 +72,7 @@ export async function dispatchUpdate(
   errorHandlers: ErrorHandlerCallback[],
   stateLocks: Map<string, Promise<void>>,
   middlewares: MiddlewareFn[] = [],
-  conversationManager?: import("../routing/async-conversation.js").AsyncConversationManager,
+  conversationManager?: import("../routing/index.js").AsyncConversationManager,
 ): Promise<void> {
   const update = rawUpdate instanceof Update ? rawUpdate : new Update(rawUpdate as RawUpdate);
 
