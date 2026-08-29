@@ -47,6 +47,7 @@ jobs:
         run: |
           mkdir -p site/node
           cp -r packages/node/docs/. site/node/
+          cp -r .github/pages/plugins site/plugins
           cp .github/pages/index.html site/index.html
 
       - name: Setup Pages

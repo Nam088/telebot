@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>telebot — Plugin Author Guide</title>
+    <meta
+      name="description"
+      content="How to write, install, and remove plugins for the telebot Node.js/TypeScript and Go frameworks."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0d1117;
+        --card: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+        --code-bg: #161b22;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #ffffff;
+          --card: #f6f8fa;
+          --border: #d0d7de;
+          --text: #1f2328;
+          --muted: #59636e;
+          --accent: #0969da;
+          --code-bg: #f6f8fa;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 56rem;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 5rem;
+      }
+      header.top {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      header.top h1 {
+        font-size: 2rem;
+        margin: 0;
+      }
+      header.top a {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+      h2 {
+        margin-top: 3rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--border);
+      }
+      h3 {
+        margin-top: 2rem;
+      }
+      p,
+      li {
+        color: var(--text);
+      }
+      .lead {
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1rem 0;
+        font-size: 0.92rem;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--card);
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.88em;
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 0.1em 0.35em;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        overflow-x: auto;
+      }
+      pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      .note {
+        border-left: 3px solid var(--accent);
+        background: var(--card);
+        padding: 0.75rem 1rem;
+        border-radius: 0 8px 8px 0;
+        color: var(--muted);
+        margin: 1rem 0;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: var(--accent);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.1rem 0.6rem;
+        margin-right: 0.4rem;
+      }
+      footer {
+        margin-top: 4rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <h1>Plugin Author Guide</h1>
+        <a href="../">← All docs</a>
+      </header>
+
+      <p class="lead">
+        telebot exposes a stable extension surface in both languages. A plugin bundles bot
+        behavior — middleware, handlers, API hooks, lifecycle — behind a single named object (or
+        package, in Go) that installs cleanly, coexists with other plugins, and can be removed.
+      </p>
+
+      <h2>What a plugin can touch</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>What you can do</th>
+            <th>Node API</th>
+            <th>Go API</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Update pipeline</td>
+            <td>Wrap every update; add handlers / error handlers</td>
+            <td><code>app.use(fn)</code>, <code>app.addHandler()</code></td>
+            <td><code>router.Use(mw)</code>, <code>router.Command/Text/Handle</code></td>
+          </tr>
+          <tr>
+            <td>Context &amp; state</td>
+            <td>Read/write per-user/chat state; attach per-update sessions</td>
+            <td><code>context.user_data</code> / <code>chat_data</code></td>
+            <td><code>c.Set(key, v)</code> / <code>c.Get(key)</code></td>
+          </tr>
+          <tr>
+            <td>API traffic</td>
+            <td>Mutate outgoing payloads, observe/replace results, react to failures</td>
+            <td>
+              <code>bot.transformRequest(fn, tag?)</code>,
+              <code>bot.transformResponse(fn, tag?)</code>,
+              <code>bot.onApiError(fn, tag?)</code>
+            </td>
+            <td><code>b.OnResponse(h)</code>, <code>b.OnError(h)</code> (return unregister)</td>
+          </tr>
+          <tr>
+            <td>Lifecycle</td>
+            <td>Async setup/teardown around start &amp; stop</td>
+            <td><code>app.onInit(hook)</code>, <code>app.onShutdown(hook)</code></td>
+            <td>Your own init before <code>RunPolling</code> / context cancellation</td>
+          </tr>
+          <tr>
+            <td>Ordering &amp; removal</td>
+            <td>Declare dependencies, control order, detach cleanly</td>
+            <td>
+              <code>dependsOn</code>, <code>priority</code>,
+              <code>app.removePlugin(name)</code>
+            </td>
+            <td><code>router.UseNamed(name, mw)</code> / <code>router.RemoveMiddleware(name)</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Node / TypeScript</h2>
+      <p><span class="pill">telebot-ts</span>A plugin is a named object with a synchronous <code>install()</code>:</p>
+      <pre><code>import type { Plugin, Application } from "telebot-ts";
+
+export function protectContent(): Plugin {
+  return {
+    name: "telebot-plugin-protect-content",
+    // Install only after these plugins; lower priority installs first
+    // among simultaneously ready plugins.
+    dependsOn: [],
+    priority: 0,
+    install(app: Application) {
+      // 1. Wrap every dispatched update.
+      app.use(async (context, next) =&gt; {
+        const start = performance.now();
+        await next();
+        console.log(`update ${context.update.update_id} in ${performance.now() - start}ms`);
+      });
+
+      // 2. Decorate every outgoing API payload. The tag lets
+      //    app.removePlugin() detach these hooks later.
+      app.bot.transformRequest((method, payload) =&gt; {
+        if (method === "sendMessage") payload.protect_content = true;
+      }, "telebot-plugin-protect-content");
+
+      // 3. Async setup runs before polling/webhook starts.
+      app.onInit(async () =&gt; { /* open connections */ });
+      app.onShutdown(() =&gt; { /* flush and close */ });
+    },
+    uninstall(app: Application) {
+      // Runs before removePlugin() deregisters everything above.
+    },
+  };
+}
+</code></pre>
+
+      <h3>Installing, ordering, removing</h3>
+      <pre><code>app.usePlugin(protectContent());      // duplicate names throw
+app.flushPlugins();                   // usually automatic
+app.hasPlugin("telebot-plugin-protect-content");
+app.pluginState("telebot-plugin-protect-content").calls = 0; // namespaced state
+app.removePlugin("telebot-plugin-protect-content");          // full detach</code></pre>
+
+      <div class="note">
+        Plugins whose <code>dependsOn</code> dependencies are not installed yet are deferred and
+        installed automatically once the dependency arrives. Dependencies still missing when
+        <code>runPolling</code>/<code>runWebhook</code> starts make the app throw at startup.
+      </div>
+
+      <h2>Go</h2>
+      <p>
+        <span class="pill">telebot-go</span>A Go plugin is a package exporting a constructor that
+        returns a <code>routing.MiddlewareFunc</code>. The built-in
+        <code>pkg/plugins/i18n</code> package is the reference implementation:
+      </p>
+      <pre><code>import (
+    "github.com/Nam088/telebot/packages/go/pkg/plugins/i18n"
+    "github.com/Nam088/telebot/packages/go/pkg/routing"
+)
+
+// Register under a name so it can be removed later.
+_ = router.UseNamed("i18n", i18n.New(i18n.Options{
+    DefaultLocale: "en",
+    Locales: map[string]map[string]string{
+        "en": {"hello": "Hello, {name}!"},
+        "vi": {"hello": "Xin chào, {name}!"},
+    },
+}))
+
+router.Text("", func(c *routing.Context) error {
+    session, _ := i18n.For(c) // per-update session via the context store
+    _, err := c.Reply(session.T("hello", map[string]string{"name": "Nam"}))
+    return err
+})
+
+// Detach later:
+router.RemoveMiddleware("i18n")</code></pre>
+
+      <p>
+        To observe API traffic, register hooks on the <code>*bot.Bot</code> — both return an
+        unregister closure:
+      </p>
+      <pre><code>off := b.OnResponse(func(method string, result json.RawMessage) {
+    log.Printf("%s ok (%d bytes)", method, len(result))
+})
+offErr := b.OnError(func(method string, err error) {
+    log.Printf("%s failed: %v", method, err)
+})
+defer off()
+defer offErr()</code></pre>
+
+      <h2>Built-in reference plugin: i18n</h2>
+      <p>
+        Both frameworks ship an internationalization plugin demonstrating the full surface:
+        middleware attaches a per-update translation session, locale is resolved from stored user
+        preference → Telegram <code>language_code</code> → default, and
+        <code>{placeholder}</code> interpolation is built in.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Node</th>
+            <th>Go</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Install</td>
+            <td><code>app.usePlugin(plugins.i18n(options))</code></td>
+            <td><code>router.UseNamed("i18n", i18n.New(options))</code></td>
+          </tr>
+          <tr>
+            <td>Access in handler</td>
+            <td><code>i18nFor(context).t("hello", { name })</code></td>
+            <td><code>i18n.For(c)</code> → <code>session.T("hello", params)</code></td>
+          </tr>
+          <tr>
+            <td>Persist locale</td>
+            <td><code>session.setLocale("vi")</code> (stored in <code>user_data</code>)</td>
+            <td><code>session.SetLocale("vi")</code> (current update)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Author checklist</h2>
+      <ul>
+        <li>Name your plugin globally uniquely (<code>telebot-plugin-*</code> recommended).</li>
+        <li>
+          Node: keep <code>install()</code> synchronous; defer async work to
+          <code>onInit</code> hooks. Tag all bot hooks with your plugin name so
+          <code>removePlugin</code> can detach them.
+        </li>
+        <li>
+          Go: prefix context-store keys with your plugin name; register middleware with
+          <code>UseNamed</code> so it is removable.
+        </li>
+        <li>
+          Never block the update pipeline — offload slow work to the scheduler or background
+          tasks. Hook failures are isolated: a throwing hook must not take down the bot.
+        </li>
+        <li>
+          Test against a mocked transport (custom <code>fetch</code> in Node,
+          <code>httptest</code> server in Go); never hit the real Telegram API in unit tests.
+        </li>
+      </ul>
+
+      <footer>
+        <a href="../">Docs home</a> ·
+        <a href="../node/">Node API reference</a> ·
+        <a href="https://pkg.go.dev/github.com/Nam088/telebot/packages/go">Go reference</a> ·
+        <a href="https://github.com/Nam088/telebot">GitHub</a>
+      </footer>
+    </div>
+  </body>
+</html>
