@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { MessageMethods } from "../../../../src/client/methods/messages.js";
+import { MessageMethods } from "../../../../src/client/methods/index.js";
 
 class ConcreteMessageClient extends MessageMethods {}
 

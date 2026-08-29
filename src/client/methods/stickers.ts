@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { ChatMethods } from "./chats.js";
+import { ChatMethods } from "./chats/index.js";
 import type {
   Message,
   Sticker,

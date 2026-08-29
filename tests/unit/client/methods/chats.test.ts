@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { ChatMethods } from "../../../../src/client/methods/chats.js";
+import { ChatMethods } from "../../../../src/client/methods/index.js";
 
 class ConcreteChatClient extends ChatMethods {}
 

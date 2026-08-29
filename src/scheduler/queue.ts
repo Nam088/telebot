@@ -7,7 +7,7 @@
 import { Bot } from "../client/bot.js";
 import { CallbackContext } from "../kernel/context.js";
 import type { PersistedJob } from "../storage/driver.js";
-import { RRule, type RRuleOptions } from "./rrule.js";
+import { RRule, type RRuleOptions } from "./rrule/index.js";
 import { Job, JobCallback } from "./job.js";
 
 /**

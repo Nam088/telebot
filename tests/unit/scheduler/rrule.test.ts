@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { RRule } from "../../../src/scheduler/rrule.js";
+import { RRule } from "../../../src/scheduler/index.js";
 import { JobQueue } from "../../../src/scheduler/queue.js";
 import { Bot } from "../../../src/client/bot.js";
 

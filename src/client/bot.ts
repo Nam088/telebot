@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import { BusinessAndEcosystemMethods } from "./methods/business.js";
+import { BusinessAndEcosystemMethods } from "./methods/index.js";
 import type { BotOptions } from "./methods/base.js";
 
 export type { BotOptions } from "./methods/base.js";

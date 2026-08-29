@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { TopicAndProfileMethods } from "../../../../src/client/methods/topics.js";
+import { TopicAndProfileMethods } from "../../../../src/client/methods/index.js";
 
 class ConcreteTopicClient extends TopicAndProfileMethods {}
 
