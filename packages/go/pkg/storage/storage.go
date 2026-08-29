@@ -5,22 +5,29 @@ import (
 	"sync"
 )
 
-// Persistence defines the contract for session and context storage backends.
+// Persistence defines the contract for session, context, and conversation storage backends.
 type Persistence interface {
+	// GetUserData retrieves the stored custom data map for a specific Telegram user ID.
 	GetUserData(ctx context.Context, userID int64) (map[string]any, error)
+
+	// SetUserData persists custom data for a specific Telegram user ID.
 	SetUserData(ctx context.Context, userID int64, data map[string]any) error
+
+	// GetChatData retrieves the stored custom data map for a specific Telegram chat ID.
 	GetChatData(ctx context.Context, chatID int64) (map[string]any, error)
+
+	// SetChatData persists custom data for a specific Telegram chat ID.
 	SetChatData(ctx context.Context, chatID int64, data map[string]any) error
 }
 
-// MemoryStorage is a thread-safe in-memory storage implementation.
+// MemoryStorage is a thread-safe in-memory storage implementation backed by sync.RWMutex.
 type MemoryStorage struct {
 	userData map[int64]map[string]any
 	chatData map[int64]map[string]any
 	mu       sync.RWMutex
 }
 
-// NewMemoryStorage creates a new MemoryStorage.
+// NewMemoryStorage creates a new MemoryStorage instance.
 func NewMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
 		userData: make(map[int64]map[string]any),
@@ -28,6 +35,7 @@ func NewMemoryStorage() *MemoryStorage {
 	}
 }
 
+// GetUserData retrieves a copy of the user data map from memory.
 func (s *MemoryStorage) GetUserData(ctx context.Context, userID int64) (map[string]any, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -43,6 +51,7 @@ func (s *MemoryStorage) GetUserData(ctx context.Context, userID int64) (map[stri
 	return clone, nil
 }
 
+// SetUserData stores the user data map into memory.
 func (s *MemoryStorage) SetUserData(ctx context.Context, userID int64, data map[string]any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -51,6 +60,7 @@ func (s *MemoryStorage) SetUserData(ctx context.Context, userID int64, data map[
 	return nil
 }
 
+// GetChatData retrieves a copy of the chat data map from memory.
 func (s *MemoryStorage) GetChatData(ctx context.Context, chatID int64) (map[string]any, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -66,6 +76,7 @@ func (s *MemoryStorage) GetChatData(ctx context.Context, chatID int64) (map[stri
 	return clone, nil
 }
 
+// SetChatData stores the chat data map into memory.
 func (s *MemoryStorage) SetChatData(ctx context.Context, chatID int64, data map[string]any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

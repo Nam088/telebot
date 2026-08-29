@@ -6,7 +6,22 @@ import (
 	"github.com/Nam088/telebot-go/pkg/types"
 )
 
-// SendPhoto sends a photo.
+// SendPhoto sends a photo to a Telegram chat.
+//
+// Parameters:
+//   - ctx: Context for request cancellation and timeout.
+//   - chatID: Unique identifier for the target chat or username of the target channel (int64 or string).
+//   - photo: Photo to send. Pass a file_id string or HTTP URL.
+//   - caption: Optional photo caption (0-1024 characters).
+//   - replyMarkup: Optional inline keyboard markup.
+//
+// Returns:
+//   - *types.Message: The sent Message object on success.
+//   - error: TelegramError if the API returns an error code, or network error.
+//
+// Example:
+//
+//	msg, err := bot.SendPhoto(ctx, 123456, "https://example.com/cat.jpg", "Cute cat!", nil)
 func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption string, replyMarkup *types.InlineKeyboardMarkup) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
@@ -25,7 +40,17 @@ func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption stri
 	return &msg, nil
 }
 
-// SendDocument sends a general file/document.
+// SendDocument sends a general file or document to a Telegram chat.
+//
+// Parameters:
+//   - ctx: Context for request cancellation.
+//   - chatID: Target chat identifier.
+//   - document: Document to send (file_id or URL string).
+//   - caption: Optional document caption.
+//
+// Returns:
+//   - *types.Message: The sent Message object on success.
+//   - error: An error if the request failed.
 func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, caption string) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":  chatID,
@@ -41,7 +66,15 @@ func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, captio
 	return &msg, nil
 }
 
-// EditMessageText edits text and game messages.
+// EditMessageText edits text and game messages sent by the bot.
+//
+// Parameters:
+//   - ctx: Context for cancellation.
+//   - opts: Edit options including chat_id, message_id, new text, and optional inline keyboard.
+//
+// Returns:
+//   - *types.Message: The edited Message object on success.
+//   - error: Error if the message cannot be edited.
 func (b *Bot) EditMessageText(ctx context.Context, opts *types.EditMessageTextOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageText", opts, &msg); err != nil {
@@ -51,6 +84,14 @@ func (b *Bot) EditMessageText(ctx context.Context, opts *types.EditMessageTextOp
 }
 
 // EditMessageReplyMarkup edits only the reply markup of messages.
+//
+// Parameters:
+//   - ctx: Context for cancellation.
+//   - opts: Options specifying the target message and the new ReplyMarkup.
+//
+// Returns:
+//   - *types.Message: The edited Message object on success.
+//   - error: An error if the request fails.
 func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessageReplyMarkupOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageReplyMarkup", opts, &msg); err != nil {
@@ -59,7 +100,17 @@ func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessag
 	return &msg, nil
 }
 
-// ForwardMessage forwards messages of any kind.
+// ForwardMessage forwards a message of any kind to a target chat.
+//
+// Parameters:
+//   - ctx: Cancellation context.
+//   - chatID: Unique identifier for the destination chat.
+//   - fromChatID: Unique identifier for the chat where the original message was sent.
+//   - messageID: Message identifier in the chat specified in fromChatID.
+//
+// Returns:
+//   - *types.Message: The forwarded Message object on success.
+//   - error: An error if forwarding failed.
 func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
@@ -73,7 +124,17 @@ func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messag
 	return &msg, nil
 }
 
-// CopyMessage copies messages of any kind.
+// CopyMessage copies a message of any kind without linking to the original message.
+//
+// Parameters:
+//   - ctx: Cancellation context.
+//   - chatID: Unique identifier for the destination chat.
+//   - fromChatID: Chat identifier of the source message.
+//   - messageID: Message identifier to copy.
+//
+// Returns:
+//   - *types.MessageId: Unique message identifier of the newly sent message.
+//   - error: An error if copying failed.
 func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.MessageId, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
@@ -87,7 +148,16 @@ func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID
 	return &msgID, nil
 }
 
-// SendChatAction tells the user that something is happening on the bot's side.
+// SendChatAction broadcasts a chat action (typing, upload_photo, record_video, etc.).
+//
+// Parameters:
+//   - ctx: Cancellation context.
+//   - chatID: Target chat identifier.
+//   - action: Type of action to broadcast (e.g. "typing", "upload_photo", "find_location").
+//
+// Returns:
+//   - bool: True on success.
+//   - error: An error if the action failed.
 func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bool, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
