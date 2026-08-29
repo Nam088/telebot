@@ -12,10 +12,11 @@ This skill provides an authoritative, end-to-end guide for an AI Agent to autono
 ## 🔄 End-to-End Workflow Overview
 
 ```
-1. Scan GitHub Issues  ──▶ 2. Read Bot API Docs  ──▶ 3. Map to Domains & Types
-          │                                                    │
-          ▼                                                    ▼
-6. Close Issue & Commit ◀── 5. Quality Gate Pass ◀── 4. TDD & Implementation
+1. Scan GitHub Issues  ──▶ 2. Checkout Feature Branch ──▶ 3. Read Bot API Docs
+          │                                                       │
+          ▼                                                       ▼
+7. Create PR & Link    ◀── 6. Quality Gate Pass       ◀── 4. TDD & Implementation
+   (Do NOT push main)
 ```
 
 ---
@@ -31,13 +32,29 @@ This skill provides an authoritative, end-to-end guide for an AI Agent to autono
    gh issue view <issue_number> --repo Nam088/telebot-ts
    ```
 3. Extract the:
-   - Target Version (e.g. `Bot API 10.3`)
+   - Target Version (e.g. `Bot API 10.3` -> branch tag `10.3`)
    - Release Date (e.g. `August 24, 2026`)
    - Checklist of Action Items (grouped by category: *Rich Messages, Ephemeral Messages, Reply Markup, General*, etc.)
 
 ---
 
-## Phase 2: Inspect Official Telegram Bot API Documentation
+## Phase 2: Checkout Feature Branch
+
+**NEVER work directly on or push to `main` branch.** Always create and switch to an isolated feature branch before making changes:
+
+```bash
+# Ensure local main is up to date
+git checkout main
+git pull origin main
+
+# Create and checkout feature branch
+git checkout -b feat/api-<version>-support
+# Example: git checkout -b feat/api-10.3-support
+```
+
+---
+
+## Phase 3: Inspect Official Telegram Bot API Documentation
 
 Before writing any type or method, **NEVER hallucinate or guess parameter names or types**. Fetch ground truth directly:
 
@@ -54,7 +71,7 @@ Before writing any type or method, **NEVER hallucinate or guess parameter names 
 
 ---
 
-## Phase 3: Domain Placement & File Architecture
+## Phase 4: Domain Placement & File Architecture
 
 Follow the domain-driven modular structure of `telebot-ts`:
 
@@ -72,7 +89,7 @@ Follow the domain-driven modular structure of `telebot-ts`:
 
 ---
 
-## Phase 4: Test-Driven Development (TDD) Implementation
+## Phase 5: Test-Driven Development (TDD) Implementation
 
 For every item in the issue checklist:
 
@@ -122,7 +139,7 @@ async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
 
 ---
 
-## Phase 5: Brand Protection & Strict Constraints
+## Phase 6: Brand Protection & Strict Constraints
 
 1. **Zero External Runtime Dependencies**:
    - Only Node.js built-ins (`fetch`, `http`, `crypto`, `events`, `sqlite`, etc.).
@@ -135,7 +152,7 @@ async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
 
 ---
 
-## Phase 6: Mandatory Quality Gate Checks
+## Phase 7: Mandatory Quality Gate Checks
 
 Run and ensure all 5 quality checks pass with **0 errors and 0 warnings**:
 
@@ -158,19 +175,44 @@ npm run docs
 
 ---
 
-## Phase 7: Update Issue Checklist & Commit
+## Phase 8: Commit, Push Branch & Create Pull Request
 
-1. **Update Issue Checklist or Post Progress Comment:**
-   ```bash
-   gh issue comment <issue_number> --body "✅ Implemented Rich Messages & Ephemeral Messages support with 100% test coverage." --repo Nam088/telebot-ts
-   ```
-2. **Close Issue once all items are completed:**
-   ```bash
-   gh issue close <issue_number> --comment "Completed all checklist items for Telegram Bot API version. Released with tests and docs." --repo Nam088/telebot-ts
-   ```
-3. **Git Commit following Conventional Commits:**
+1. **Commit Changes following Conventional Commits:**
    ```bash
    git add .
    git commit -m "feat(api): implement Telegram Bot API <version> support (closes #<issue_number>)"
-   git push origin main
    ```
+
+2. **Push Feature Branch to Remote:**
+   ```bash
+   git push -u origin feat/api-<version>-support
+   ```
+
+3. **Create Pull Request using GitHub CLI (`gh pr create`):**
+   *(Note: Use `Closes #<issue_number>` in the PR body. Do NOT close the issue manually; GitHub will close it automatically upon merging the PR).*
+   ```bash
+   gh pr create \
+     --title "feat(api): Telegram Bot API <version> support" \
+     --body "## 🚀 Telegram Bot API <version> Support
+
+   Closes #<issue_number>
+
+   ### 📋 Implemented Features
+   - <Summary of implemented items>
+
+   ### 🛡️ Quality Gates
+   - [x] TypeCheck (0 errors)
+   - [x] Build (0 errors)
+   - [x] Unit Tests (100% pass)
+   - [x] Coverage (>90% lines)
+   - [x] TypeDoc (0 errors, 0 warnings)" \
+     --base main \
+     --head feat/api-<version>-support
+   ```
+
+4. **Update Issue with PR reference / status comment:**
+   ```bash
+   gh issue comment <issue_number> --body "Created PR for review: #<pr_number>. This issue will be closed automatically once the PR is merged." --repo Nam088/telebot-ts
+   ```
+
+
