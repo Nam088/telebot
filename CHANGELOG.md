@@ -2,6 +2,13 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## [1.3.1](https://github.com/Nam088/telebot/compare/v1.3.0...v1.3.1) (2026-08-29)
+
+
+### Bug Fixes
+
+* **monorepo:** add MIT LICENSE files for npm and pkg.go.dev detection ([56fc8e8](https://github.com/Nam088/telebot/commit/56fc8e896f7ff316eca9bfc161a545ad9af0f72e))
+
 # [1.3.0](https://github.com/Nam088/telebot/compare/v1.2.1...v1.3.0) (2026-08-29)
 
 
