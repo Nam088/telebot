@@ -1,73 +1,32 @@
 package types
 
-import "fmt"
-
-// Response represents a standard Telegram Bot API response envelope.
-type Response[T any] struct {
-	Ok          bool        `json:"ok"`
-	Result      T           `json:"result,omitempty"`
-	ErrorCode   int         `json:"error_code,omitempty"`
-	Description string      `json:"description,omitempty"`
-	Parameters  *Parameters `json:"parameters,omitempty"`
-}
-
-// Parameters contains information about why a request failed.
-type Parameters struct {
-	MigrateToChatID int64 `json:"migrate_to_chat_id,omitempty"`
-	RetryAfter      int   `json:"retry_after,omitempty"`
-}
-
-// TelegramError represents an API error returned by Telegram.
-type TelegramError struct {
-	ErrorCode   int         `json:"error_code"`
-	Description string      `json:"description"`
-	Parameters  *Parameters `json:"parameters,omitempty"`
-}
-
-func (e *TelegramError) Error() string {
-	return fmt.Sprintf("telegram api error: [%d] %s", e.ErrorCode, e.Description)
-}
-
-// User represents a Telegram user or bot.
-type User struct {
-	ID                      int64  `json:"id"`
-	IsBot                   bool   `json:"is_bot"`
-	FirstName               string `json:"first_name"`
-	LastName                string `json:"last_name,omitempty"`
-	Username                string `json:"username,omitempty"`
-	LanguageCode            string `json:"language_code,omitempty"`
-	IsPremium               bool   `json:"is_premium,omitempty"`
-	AddedToAttachmentMenu   bool   `json:"added_to_attachment_menu,omitempty"`
-	CanJoinGroups           bool   `json:"can_join_groups,omitempty"`
-	CanReadAllGroupMessages bool   `json:"can_read_all_group_messages,omitempty"`
-	SupportsInlineQueries   bool   `json:"supports_inline_queries,omitempty"`
-	CanConnectToBusiness    bool   `json:"can_connect_to_business,omitempty"`
-	HasMainWebApp           bool   `json:"has_main_web_app,omitempty"`
-}
-
-// Chat represents a Telegram chat (private, group, supergroup, channel).
-type Chat struct {
-	ID        int64  `json:"id"`
-	Type      string `json:"type"`
-	Title     string `json:"title,omitempty"`
-	Username  string `json:"username,omitempty"`
-	FirstName string `json:"first_name,omitempty"`
-	LastName  string `json:"last_name,omitempty"`
-	IsForum   bool   `json:"is_forum,omitempty"`
-}
-
 // Message represents a Telegram message.
 type Message struct {
-	MessageID      int64                  `json:"message_id"`
+	MessageID       int64                 `json:"message_id"`
 	MessageThreadID int64                 `json:"message_thread_id,omitempty"`
-	From           *User                  `json:"from,omitempty"`
-	SenderChat     *Chat                  `json:"sender_chat,omitempty"`
-	Date           int64                  `json:"date"`
-	Chat           *Chat                  `json:"chat"`
-	Text           string                 `json:"text,omitempty"`
-	Caption        string                 `json:"caption,omitempty"`
-	ReplyToMessage *Message               `json:"reply_to_message,omitempty"`
-	ReplyMarkup    *InlineKeyboardMarkup  `json:"reply_markup,omitempty"`
+	From            *User                 `json:"from,omitempty"`
+	SenderChat      *Chat                 `json:"sender_chat,omitempty"`
+	Date            int64                 `json:"date"`
+	Chat            *Chat                 `json:"chat"`
+	Text            string                `json:"text,omitempty"`
+	Caption         string                `json:"caption,omitempty"`
+	Photo           []PhotoSize           `json:"photo,omitempty"`
+	Audio           *Audio                `json:"audio,omitempty"`
+	Document        *Document             `json:"document,omitempty"`
+	Video           *Video                `json:"video,omitempty"`
+	Animation       *Animation            `json:"animation,omitempty"`
+	Voice           *Voice                `json:"voice,omitempty"`
+	VideoNote       *VideoNote            `json:"video_note,omitempty"`
+	Contact         *Contact              `json:"contact,omitempty"`
+	Location        *Location             `json:"location,omitempty"`
+	Venue           *Venue                `json:"venue,omitempty"`
+	Poll            *Poll                 `json:"poll,omitempty"`
+	Dice            *Dice                 `json:"dice,omitempty"`
+	Sticker         *Sticker              `json:"sticker,omitempty"`
+	Invoice         *Invoice              `json:"invoice,omitempty"`
+	SuccessfulPayment *SuccessfulPayment  `json:"successful_payment,omitempty"`
+	ReplyToMessage  *Message              `json:"reply_to_message,omitempty"`
+	ReplyMarkup     *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // CallbackQuery represents an incoming callback query from an inline button.
@@ -83,12 +42,13 @@ type CallbackQuery struct {
 
 // Update represents an incoming update from Telegram.
 type Update struct {
-	UpdateID          int64          `json:"update_id"`
-	Message           *Message       `json:"message,omitempty"`
-	EditedMessage     *Message       `json:"edited_message,omitempty"`
-	ChannelPost       *Message       `json:"channel_post,omitempty"`
-	EditedChannelPost *Message       `json:"edited_channel_post,omitempty"`
-	CallbackQuery     *CallbackQuery `json:"callback_query,omitempty"`
+	UpdateID          int64               `json:"update_id"`
+	Message           *Message            `json:"message,omitempty"`
+	EditedMessage     *Message            `json:"edited_message,omitempty"`
+	ChannelPost       *Message            `json:"channel_post,omitempty"`
+	EditedChannelPost *Message            `json:"edited_channel_post,omitempty"`
+	CallbackQuery     *CallbackQuery      `json:"callback_query,omitempty"`
+	BusinessConnection *BusinessConnection `json:"business_connection,omitempty"`
 }
 
 // EffectiveUser extracts the sender User from an Update regardless of update type.

@@ -28,6 +28,14 @@ func NewContext(ctx context.Context, b *bot.Bot, u *types.Update) *Context {
 	}
 }
 
+// Ctx returns the context.Context.
+func (c *Context) Ctx() context.Context {
+	if c.ctx == nil {
+		return context.Background()
+	}
+	return c.ctx
+}
+
 // Bot returns the Bot client.
 func (c *Context) Bot() *bot.Bot {
 	return c.bot
@@ -73,7 +81,7 @@ func (c *Context) Reply(text string, opts ...func(*types.SendMessageOptions)) (*
 		opt(&sendOpts)
 	}
 
-	return c.bot.SendMessage(c.ctx, &sendOpts)
+	return c.bot.SendMessage(c.Ctx(), &sendOpts)
 }
 
 // AnswerCallbackQuery answers an inline button callback query.
@@ -83,7 +91,7 @@ func (c *Context) AnswerCallbackQuery(text string, showAlert bool) (bool, error)
 		return false, fmt.Errorf("no callback query in context")
 	}
 
-	return c.bot.AnswerCallbackQuery(c.ctx, &types.AnswerCallbackQueryOptions{
+	return c.bot.AnswerCallbackQuery(c.Ctx(), &types.AnswerCallbackQueryOptions{
 		CallbackQueryID: cb.ID,
 		Text:            text,
 		ShowAlert:       showAlert,
