@@ -1,17 +1,17 @@
 ---
-name: telegram-bot-node-conventions
-description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or TypeDoc docstrings to the telebot-ts framework. Use whenever creating, modifying, or reviewing code in the repository.
+name: telebot-node-conventions
+description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or TypeDoc docstrings to the TypeScript / Node.js framework in packages/node. Use whenever developing, modifying, or reviewing code in packages/node.
 ---
 
-# Telegram Bot Node Conventions & Feature Development Workflow
+# Telebot Node.js & TypeScript Framework Conventions
 
 ## 1. Overview
-`telebot-ts` is a zero-required-dependency, TypeScript-first Telegram Bot framework for Node.js.
-When adding new methods, features, handlers, or drivers, agents must strictly follow the architectural patterns, naming conventions, zero-dependency policy, TDD workflow, file modularization (< 500 lines), and TypeDoc documentation standards described below.
+`telebot-ts` (located in `packages/node/`) is a zero-required-dependency, TypeScript-first native Telegram Bot framework for Node.js 22+.
+When adding new methods, features, handlers, or storage drivers, agents must strictly follow the domain-driven modular structure, naming conventions, zero-dependency policy, TDD workflow, file length limit (< 500 lines), and TypeDoc documentation standards.
 
 ---
 
-## 2. Naming Conventions & File Organization
+## 2. Naming Conventions & File Length Ceiling
 
 | Kind | Rule | Example |
 |---|---|---|
@@ -27,12 +27,12 @@ When adding new methods, features, handlers, or drivers, agents must strictly fo
 
 ## 3. How to Add a New Bot API Method (Domain Submodule Pattern)
 
-The `Bot` client uses modular domain submodules under `src/client/methods/`:
+The `Bot` client in `packages/node/src/client/` uses modular domain submodules:
 
-1. **Step 1: Define Types in `src/client/types/<domain>/`**
+1. **Step 1: Define Types in `packages/node/src/client/types/<domain>/`**
    - Add payload interfaces (e.g. `SendXOptions`) and model interfaces in the appropriate domain folder (`messages/`, `chats/`, `stickers/`, `payments/`, `topics/`, `business/`, `rich/`, `common/`).
-   - Export through `src/client/types/<domain>/index.ts` and `src/client/types/index.ts`.
-2. **Step 2: Implement in appropriate domain submodule under `src/client/methods/<domain>/`**
+   - Export through `packages/node/src/client/types/<domain>/index.ts` and `packages/node/src/client/types/index.ts`.
+2. **Step 2: Implement in appropriate domain submodule under `packages/node/src/client/methods/<domain>/`**
    - `messages/`: Message sending (`send-basic.ts`, `send-media.ts`), editing and reactions (`edit.ts`).
    - `chats/`: Moderation (`members.ts`), metadata and settings (`management.ts`).
    - `topics/`: Bot identity/commands (`profile.ts`), forum topics (`topics.ts`).
@@ -45,65 +45,57 @@ The `Bot` client uses modular domain submodules under `src/client/methods/`:
    - `@returns The Telegram response object wrapped in Promise.`
    - `@throws {@link TelegramApiError} When Telegram API returns an error code.`
    - `@example` Runnable TypeScript snippet.
-4. **Step 4: Add Unit Tests in `tests/unit/client/methods/`**
+4. **Step 4: Add Unit Tests in `packages/node/tests/unit/client/methods/`**
    - Mock fetch response using mock adapter to test payload serialization and error handling.
 
 ---
 
 ## 4. How to Add a New Storage Persistence Driver
 
-All storage drivers must implement the `Persistence` interface or inherit from `BasePersistence` in `src/storage/`:
+All storage drivers must implement the `Persistence` interface or inherit from `BasePersistence` in `packages/node/src/storage/`:
 
-1. **Step 1: Inherit from `BasePersistence` (`src/storage/driver.ts`)**
+1. **Inherit from `BasePersistence` (`packages/node/src/storage/driver.ts`)**
    - Implement the 3 raw primitives:
      - `getRaw(key: string): Promise<Record<string, unknown> | null>`
      - `setRaw(key: string, data: Record<string, unknown>): Promise<void>`
      - `deleteRaw(key: string): Promise<void>`
-2. **Step 2: Export in `src/storage/index.ts` and `src/index.ts`**
-3. **Step 3: Create tests in `tests/unit/storage/`**
-   - Test user data, chat data, bot data, conversation states, and deletion methods (`deleteUserData`, `deleteChatData`, `deleteConversation`).
-4. **Step 4: Create runnable example in `examples/`**
+2. **Export in `packages/node/src/storage/index.ts` and root package index**
+3. **Create tests in `packages/node/tests/unit/storage/`**
 
 ---
 
 ## 5. How to Add a New Handler or Filter
 
-1. **New Handler (`src/routing/handlers/` or `src/routing/handlers.ts`)**:
+1. **New Handler (`packages/node/src/routing/handlers/`)**:
    - Inherit from `BaseHandler<C, R>`.
    - Implement `checkUpdate(update: Update): Promise<boolean>`.
    - Implement `handleUpdate(update: Update, context: C): Promise<R>`.
-2. **New Filter (`src/filters/matchers.ts`)**:
+2. **New Filter (`packages/node/src/filters/matchers.ts`)**:
    - Inherit from `BaseFilter`.
    - Implement `checkUpdate(update: Update): boolean | Promise<boolean>`.
    - Support `.and()`, `.or()`, `.not()`.
 
 ---
 
-## 6. How to Add / Extend Scheduler Features (`src/scheduler/`)
+## 6. How to Add / Extend Scheduler Features
 
-1. **JobQueue & Job Lifecycle (`src/scheduler/queue.ts`, `src/scheduler/job.ts`)**:
+1. **JobQueue & Job Lifecycle (`packages/node/src/scheduler/queue.ts`, `job.ts`)**:
    - Always handle timer chunking (>24.8 days limit in `setTimeout`).
-   - Reschedule jobs on `JobQueue.start()` if jobs were added prior to start or restored from persistence.
+   - Reschedule jobs on `JobQueue.start()`.
    - Maintain $O(1)$ multi-index maps (`_jobsByName`, `_jobsByChatId`).
-2. **RFC 5545 RRule Engine (`src/scheduler/rrule/`)**:
+2. **RFC 5545 RRule Engine (`packages/node/src/scheduler/rrule/`)**:
    - Modularized into `types.ts`, `parser.ts`, `helpers.ts`, `rrule.ts`, `index.ts`.
-   - Full compatibility with `rrule.js` options (`freq`, `interval`, `dtstart`, `until`, `count`, `tzid`, `byweekday`, `bymonthday`, `byhour`, `byminute`, `bysecond`, `byyearday`, `byweekno`, `bysetpos`).
+   - Full compatibility with RFC 5545 recurrence options.
 
 ---
 
-## 7. Git Branching & PR Workflow
-- **Never Push Directly to `main`**: Always check out a dedicated branch (`feat/...` or `refactor/...`).
-- Push commits to the remote branch and open/update Pull Requests on GitHub.
+## 7. Mandatory Quality Gates for Node.js
 
----
-
-## 8. Mandatory Quality Gates & Verification Checklist
-
-Before considering any feature, bug fix, or refactor complete, execute:
-1. `npm run format && npm run format:check` → Formatting check.
+Before considering any Node.js feature, bug fix, or refactor complete, execute:
+1. `npm run format:check` → Prettier check.
 2. `npm run lint` → ESLint static analysis (0 errors, 0 warnings).
-3. `npm run typecheck` → TypeScript compilation (0 errors).
-4. `npm run build` → ESM + DTS build (0 errors).
-5. `npm test` → 100% test suites pass.
+3. `npm run typecheck` → TypeScript compilation under `strict: true` (0 errors).
+4. `npm run build:node` → ESM + DTS build (0 errors).
+5. `npm run test:node` → 100% test suites pass (Vitest).
 6. `npm run test:coverage` → Ensure line coverage stays **>90%**.
-7. `npm run docs` (or `npx typedoc`) → Documentation generated with **0 errors and 0 warnings**.
+7. `npm run docs` → TypeDoc generated with **0 errors and 0 warnings**.
