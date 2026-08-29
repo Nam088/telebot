@@ -72,6 +72,30 @@ export interface BotOptions {
 export type RequestTransformFn = (method: string, payload: Record<string, unknown>) => void;
 
 /**
+ * Hook invoked with every successful Bot API response after it is unwrapped.
+ *
+ * Hooks run in registration order. A hook may observe the result (return `undefined`) or return
+ * a replacement value that is passed to subsequent hooks and ultimately returned to the caller.
+ *
+ * @param method - The Bot API method name (e.g. `"sendMessage"`).
+ * @param result - The unwrapped `result` payload returned by Telegram.
+ * @returns A replacement result, or `undefined` to keep the current value.
+ */
+export type ResponseTransformFn = (method: string, result: unknown) => unknown;
+
+/**
+ * Observer hook invoked whenever a Bot API request finally fails with a {@link TelegramApiError}.
+ *
+ * Hooks run in registration order right before the error is thrown (after retry exhaustion for
+ * `429`/`5xx`/network errors, or immediately for non-retryable failures). Throwing inside a hook
+ * is swallowed so observers cannot mask the original error.
+ *
+ * @param method - The Bot API method name that failed.
+ * @param error - The final typed error about to be thrown.
+ */
+export type ApiErrorHookFn = (method: string, error: TelegramApiError) => void;
+
+/**
  * Extra time, in milliseconds, added on top of a `getUpdates` long-poll `timeout` (converted
  * to milliseconds) when computing the effective per-request abort timeout.
  */
@@ -129,7 +153,9 @@ export abstract class BaseBotClient {
    */
   protected readonly requestTimeoutMs: number;
 
-  private readonly transformHooks: RequestTransformFn[] = [];
+  private readonly transformHooks: Array<{ fn: RequestTransformFn; tag?: string }> = [];
+  private readonly responseHooks: Array<{ fn: ResponseTransformFn; tag?: string }> = [];
+  private readonly apiErrorHooks: Array<{ fn: ApiErrorHookFn; tag?: string }> = [];
 
   /**
    * Registers a hook invoked before every outgoing Bot API request.
@@ -138,6 +164,7 @@ export abstract class BaseBotClient {
    * observe or decorate all API traffic (logging, metrics, throttling signals, test mocks).
    *
    * @param hook - Callback receiving the method name and the mutable payload.
+   * @param tag - Optional owner tag; all hooks sharing a tag can be removed together via {@link BaseBotClient.removeHooksByTag}.
    * @returns This client instance for chaining.
    *
    * @example
@@ -148,9 +175,80 @@ export abstract class BaseBotClient {
    * });
    * ```
    */
-  public transformRequest(hook: RequestTransformFn): this {
-    this.transformHooks.push(hook);
+  public transformRequest(hook: RequestTransformFn, tag?: string): this {
+    this.transformHooks.push({ fn: hook, tag });
     return this;
+  }
+
+  /**
+   * Registers a hook invoked with every successful Bot API response.
+   *
+   * Hooks run in registration order. Returning a value replaces the result for subsequent hooks
+   * and the caller; returning `undefined` keeps it unchanged. Useful for response logging,
+   * caching, or normalization plugins.
+   *
+   * @param hook - Callback receiving the method name and the unwrapped result.
+   * @param tag - Optional owner tag for grouped removal via {@link BaseBotClient.removeHooksByTag}.
+   * @returns This client instance for chaining.
+   *
+   * @example
+   * ```ts
+   * bot.transformResponse((method, result) => {
+   *   console.log(`${method} succeeded`);
+   * });
+   * ```
+   */
+  public transformResponse(hook: ResponseTransformFn, tag?: string): this {
+    this.responseHooks.push({ fn: hook, tag });
+    return this;
+  }
+
+  /**
+   * Registers an observer invoked whenever a Bot API request finally fails.
+   *
+   * Hooks run in registration order right before the {@link TelegramApiError} is thrown, after
+   * retries are exhausted. Observers cannot alter the error; exceptions inside a hook are
+   * swallowed and logged. Useful for alerting and metrics plugins.
+   *
+   * @param hook - Callback receiving the method name and the final error.
+   * @param tag - Optional owner tag for grouped removal via {@link BaseBotClient.removeHooksByTag}.
+   * @returns This client instance for chaining.
+   *
+   * @example
+   * ```ts
+   * bot.onApiError((method, error) => {
+   *   console.error(`${method} failed: ${error.description}`);
+   * });
+   * ```
+   */
+  public onApiError(hook: ApiErrorHookFn, tag?: string): this {
+    this.apiErrorHooks.push({ fn: hook, tag });
+    return this;
+  }
+
+  /**
+   * Removes every request transform, response transform, and API error hook registered with
+   * the given owner tag.
+   *
+   * @param tag - Owner tag previously passed when registering hooks.
+   * @returns The number of hooks removed.
+   *
+   * @example
+   * ```ts
+   * bot.removeHooksByTag("my-plugin");
+   * ```
+   */
+  public removeHooksByTag(tag: string): number {
+    const countOf = (hooks: Array<{ tag?: string }>): number =>
+      hooks.filter((h) => h.tag === tag).length;
+    const removed =
+      countOf(this.transformHooks) + countOf(this.responseHooks) + countOf(this.apiErrorHooks);
+    const keep = <T extends { tag?: string }>(hooks: T[]): T[] =>
+      hooks.filter((h) => h.tag !== tag);
+    this.transformHooks.splice(0, this.transformHooks.length, ...keep(this.transformHooks));
+    this.responseHooks.splice(0, this.responseHooks.length, ...keep(this.responseHooks));
+    this.apiErrorHooks.splice(0, this.apiErrorHooks.length, ...keep(this.apiErrorHooks));
+    return removed;
   }
 
   /**
@@ -233,7 +331,7 @@ export abstract class BaseBotClient {
   public async request<T>(method: string, payload: Record<string, unknown> = {}): Promise<T> {
     const url = `${this.apiRoot}/bot${this.token}/${method}`;
     for (const hook of this.transformHooks) {
-      hook(method, payload);
+      hook.fn(method, payload);
     }
     const { body, headers } = buildRequestBody(payload);
 
@@ -272,7 +370,7 @@ export abstract class BaseBotClient {
           );
 
           if (attempt >= maxAttempts) {
-            throw apiError;
+            throw this.fail(method, apiError);
           }
 
           const retryAfter = json.parameters?.retry_after;
@@ -294,7 +392,7 @@ export abstract class BaseBotClient {
           );
 
           if (attempt >= maxAttempts) {
-            throw apiError;
+            throw this.fail(method, apiError);
           }
 
           const delaySeconds = computeBackoffSeconds(attempt, retryOpts);
@@ -310,14 +408,24 @@ export abstract class BaseBotClient {
 
         const data = (await response.json()) as TelegramApiEnvelope<T>;
         if (!data.ok) {
-          throw new TelegramApiError(
-            data.error_code ?? response.status,
-            data.description ?? "Unknown error",
-            data.parameters,
+          throw this.fail(
+            method,
+            new TelegramApiError(
+              data.error_code ?? response.status,
+              data.description ?? "Unknown error",
+              data.parameters,
+            ),
           );
         }
 
-        return data.result as T;
+        let result: unknown = data.result;
+        for (const hook of this.responseHooks) {
+          const next = hook.fn(method, result);
+          if (next !== undefined) {
+            result = next;
+          }
+        }
+        return result as T;
       } catch (err: unknown) {
         if (err instanceof TelegramApiError) {
           throw err;
@@ -327,7 +435,7 @@ export abstract class BaseBotClient {
         const errorObj = err instanceof Error ? err : new Error(rawMessage);
 
         if (attempt >= maxAttempts) {
-          throw new TelegramApiError(0, this.redactToken(rawMessage));
+          throw this.fail(method, new TelegramApiError(0, this.redactToken(rawMessage)));
         }
 
         const delaySeconds = computeBackoffSeconds(attempt, retryOpts);
@@ -342,6 +450,26 @@ export abstract class BaseBotClient {
         clearTimeout(timeoutId);
       }
     }
+  }
+
+  /**
+   * Runs all registered API error hooks for a failed method, then returns the error for throwing.
+   *
+   * Hook exceptions are swallowed so observers can never mask the original API error.
+   *
+   * @param method - The Bot API method name that failed.
+   * @param error - The final typed error.
+   * @returns The same error, for `throw this.fail(...)` call sites.
+   */
+  private fail(method: string, error: TelegramApiError): TelegramApiError {
+    for (const hook of this.apiErrorHooks) {
+      try {
+        hook.fn(method, error);
+      } catch (hookErr) {
+        console.error("Error in API error hook:", hookErr);
+      }
+    }
+    return error;
   }
 
   /**

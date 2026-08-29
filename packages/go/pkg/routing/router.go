@@ -22,10 +22,17 @@ type Route struct {
 	Handler HandlerFunc
 }
 
+// middlewareEntry pairs a middleware with an optional name so plugin
+// middlewares can be removed individually via Router.RemoveMiddleware.
+type middlewareEntry struct {
+	name string
+	fn   MiddlewareFunc
+}
+
 // Router orchestrates update dispatching, middlewares, and long polling.
 type Router struct {
 	bot         *bot.Bot
-	middlewares []MiddlewareFunc
+	middlewares []middlewareEntry
 	routes      []Route
 	mu          sync.RWMutex
 }
@@ -41,7 +48,9 @@ func NewRouter(b *bot.Bot) *Router {
 func (r *Router) Use(m ...MiddlewareFunc) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.middlewares = append(r.middlewares, m...)
+	for _, mw := range m {
+		r.middlewares = append(r.middlewares, middlewareEntry{fn: mw})
+	}
 }
 
 // Handle registers a handler with a custom filter predicate.
@@ -109,7 +118,7 @@ func (r *Router) ProcessUpdate(ctx context.Context, u *types.Update) error {
 		if route.Filter(u) {
 			handler := route.Handler
 			for i := len(r.middlewares) - 1; i >= 0; i-- {
-				handler = r.middlewares[i](handler)
+				handler = r.middlewares[i].fn(handler)
 			}
 			return handler(c)
 		}

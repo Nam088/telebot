@@ -10,7 +10,7 @@ import { BusinessAndEcosystemMethods } from "./methods/index.js";
 import type { BotOptions } from "./methods/base.js";
 
 export type { BotOptions } from "./methods/base.js";
-export type { RequestTransformFn } from "./methods/base.js";
+export type { RequestTransformFn, ResponseTransformFn, ApiErrorHookFn } from "./methods/base.js";
 export type { RetryOptions } from "./retry.js";
 
 /**

@@ -415,14 +415,19 @@ func main() {
 
 ### 8. Plugins & Extension Points
 
-Third-party features ship as self-contained plugin packages built on four extension points:
+Third-party features ship as self-contained plugin packages built on these extension points:
 
-| Extension point   | API                                        | Use it for                                               |
-| ----------------- | ------------------------------------------ | -------------------------------------------------------- |
-| Middleware        | `router.Use(plugin)`                       | Wrap every update (auth, metrics, attaching sessions)    |
-| Handlers          | `router.Command/Text/CallbackQuery/Handle` | React to updates                                         |
-| Per-request state | `c.Set(key, value)` / `c.Get(key)`         | Pass data between middlewares and handlers of one update |
-| Raw API access    | `c.Bot()`                                  | Call any Bot API method or wrap requests                 |
+| Extension point   | API                                                               | Use it for                                                        |
+| ----------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Middleware        | `router.Use(plugin)`                                              | Wrap every update (auth, metrics, attaching sessions)             |
+| Named middleware  | `router.UseNamed(name, plugin)` / `router.RemoveMiddleware(name)` | Register/remove plugin middleware individually                    |
+| Handlers          | `router.Command/Text/CallbackQuery/Handle`                        | React to updates                                                  |
+| Per-request state | `c.Set(key, value)` / `c.Get(key)`                                | Pass data between middlewares and handlers of one update          |
+| Response hooks    | `b.OnResponse(hook)`                                              | Observe every successful API response (logging, metrics, caching) |
+| Error hooks       | `b.OnError(hook)`                                                 | Observe every failed API request (alerting)                       |
+| Raw API access    | `c.Bot()`                                                         | Call any Bot API method or wrap requests                          |
+
+Both `OnResponse` and `OnError` return an unregister function, so plugins can detach cleanly.
 
 A Go plugin is conventionally a package that exports a constructor returning a `routing.MiddlewareFunc`. The built-in i18n plugin in `pkg/plugins/i18n` is the reference implementation:
 
@@ -432,7 +437,8 @@ import (
     "github.com/Nam088/telebot/packages/go/pkg/routing"
 )
 
-router.Use(i18n.New(i18n.Options{
+// Register under a name so it can be removed later.
+_ = router.UseNamed("i18n", i18n.New(i18n.Options{
     DefaultLocale: "en",
     Locales: map[string]map[string]string{
         "en": {"hello": "Hello, {name}!"},
@@ -445,6 +451,9 @@ router.Text("", func(c *routing.Context) error {
     _, err := c.Reply(session.T("hello", map[string]string{"name": "Nam"}))
     return err
 })
+
+// Later, detach the plugin:
+// router.RemoveMiddleware("i18n")
 ```
 
 **Writing your own plugin:**
