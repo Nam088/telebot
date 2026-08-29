@@ -21,3 +21,6 @@ python-telegram-bot/
 # CodeGraph generated index (SQLite db, daemon socket/pid)
 .codegraph/
 
+# Release pipeline artifact (written by semantic-release successCmd in CI)
+RELEASE_VERSION
+

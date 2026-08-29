@@ -1,0 +1,59 @@
+name: Go Release
+
+# Creates a GitHub Release for the Go framework whenever a telebot-go tag
+# (packages/go/vX.Y.Z) is pushed. Tags are mirrored automatically by the
+# release pipeline so Node and Go always share the same version number.
+# Release notes are generated automatically from conventional commits
+# by git-cliff.
+
+on:
+  push:
+    tags:
+      - "packages/go/v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: packages/go/go.mod
+
+      - name: Verify tagged commit builds
+        working-directory: packages/go
+        run: |
+          go build ./...
+          go vet ./...
+
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: packages/go/cliff.toml
+          args: --latest --strip all
+        env:
+          OUTPUT: go-release-notes.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Resolve version name
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#packages/go/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: telebot-go ${{ steps.ver.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          body_path: go-release-notes.md
+          draft: false
+          prerelease: false
+          # Node releases (vX.Y.Z from semantic-release) remain the repo "latest".
+          make_latest: "false"

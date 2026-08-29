@@ -1,0 +1,202 @@
+package types
+
+// SendAudioOptions represents parameters for the sendAudio method.
+type SendAudioOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	Audio                any                   `json:"audio"`
+	Caption              string                `json:"caption,omitempty"`
+	ParseMode            string                `json:"parse_mode,omitempty"`
+	CaptionEntities      []MessageEntity       `json:"caption_entities,omitempty"`
+	Duration             int                   `json:"duration,omitempty"`
+	Performer            string                `json:"performer,omitempty"`
+	Title                string                `json:"title,omitempty"`
+	Thumbnail            any                   `json:"thumbnail,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendVideoOptions represents parameters for the sendVideo method.
+type SendVideoOptions struct {
+	BusinessConnectionID  string                `json:"business_connection_id,omitempty"`
+	ChatID                any                   `json:"chat_id"`
+	Video                 any                   `json:"video"`
+	Duration              int                   `json:"duration,omitempty"`
+	Width                 int                   `json:"width,omitempty"`
+	Height                int                   `json:"height,omitempty"`
+	Thumbnail             any                   `json:"thumbnail,omitempty"`
+	Caption               string                `json:"caption,omitempty"`
+	ParseMode             string                `json:"parse_mode,omitempty"`
+	CaptionEntities       []MessageEntity       `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia bool                  `json:"show_caption_above_media,omitempty"`
+	HasSpoiler            bool                  `json:"has_spoiler,omitempty"`
+	SupportsStreaming     bool                  `json:"supports_streaming,omitempty"`
+	DisableNotification   bool                  `json:"disable_notification,omitempty"`
+	ProtectContent        bool                  `json:"protect_content,omitempty"`
+	MessageEffectID       string                `json:"message_effect_id,omitempty"`
+	ReplyParameters       *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendAnimationOptions represents parameters for the sendAnimation method.
+type SendAnimationOptions struct {
+	BusinessConnectionID  string                `json:"business_connection_id,omitempty"`
+	ChatID                any                   `json:"chat_id"`
+	Animation             any                   `json:"animation"`
+	Duration              int                   `json:"duration,omitempty"`
+	Width                 int                   `json:"width,omitempty"`
+	Height                int                   `json:"height,omitempty"`
+	Thumbnail             any                   `json:"thumbnail,omitempty"`
+	Caption               string                `json:"caption,omitempty"`
+	ParseMode             string                `json:"parse_mode,omitempty"`
+	CaptionEntities       []MessageEntity       `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia bool                  `json:"show_caption_above_media,omitempty"`
+	HasSpoiler            bool                  `json:"has_spoiler,omitempty"`
+	DisableNotification   bool                  `json:"disable_notification,omitempty"`
+	ProtectContent        bool                  `json:"protect_content,omitempty"`
+	MessageEffectID       string                `json:"message_effect_id,omitempty"`
+	ReplyParameters       *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendVoiceOptions represents parameters for the sendVoice method.
+type SendVoiceOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	Voice                any                   `json:"voice"`
+	Caption              string                `json:"caption,omitempty"`
+	ParseMode            string                `json:"parse_mode,omitempty"`
+	CaptionEntities      []MessageEntity       `json:"caption_entities,omitempty"`
+	Duration             int                   `json:"duration,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendVideoNoteOptions represents parameters for the sendVideoNote method.
+type SendVideoNoteOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	VideoNote            any                   `json:"video_note"`
+	Duration             int                   `json:"duration,omitempty"`
+	Length               int                   `json:"length,omitempty"`
+	Thumbnail            any                   `json:"thumbnail,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendLocationOptions represents parameters for the sendLocation method.
+type SendLocationOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	Latitude             float64               `json:"latitude"`
+	Longitude            float64               `json:"longitude"`
+	HorizontalAccuracy   float64               `json:"horizontal_accuracy,omitempty"`
+	LivePeriod           int                   `json:"live_period,omitempty"`
+	Heading              int                   `json:"heading,omitempty"`
+	ProximityAlertRadius int                   `json:"proximity_alert_radius,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendVenueOptions represents parameters for the sendVenue method.
+type SendVenueOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	Latitude             float64               `json:"latitude"`
+	Longitude            float64               `json:"longitude"`
+	Title                string                `json:"title"`
+	Address              string                `json:"address"`
+	FoursquareID         string                `json:"foursquare_id,omitempty"`
+	FoursquareType       string                `json:"foursquare_type,omitempty"`
+	GooglePlaceID        string                `json:"google_place_id,omitempty"`
+	GooglePlaceType      string                `json:"google_place_type,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendContactOptions represents parameters for the sendContact method.
+type SendContactOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	PhoneNumber          string                `json:"phone_number"`
+	FirstName            string                `json:"first_name"`
+	LastName             string                `json:"last_name,omitempty"`
+	VCard                string                `json:"vcard,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendPollOptions represents parameters for the sendPoll method.
+type SendPollOptions struct {
+	BusinessConnectionID  string                `json:"business_connection_id,omitempty"`
+	ChatID                any                   `json:"chat_id"`
+	Question              string                `json:"question"`
+	Options               []string              `json:"options"`
+	IsAnonymous           bool                  `json:"is_anonymous,omitempty"`
+	Type                  string                `json:"type,omitempty"`
+	AllowsMultipleAnswers bool                  `json:"allows_multiple_answers,omitempty"`
+	CorrectOptionID       int                   `json:"correct_option_id,omitempty"`
+	Explanation           string                `json:"explanation,omitempty"`
+	ExplanationParseMode  string                `json:"explanation_parse_mode,omitempty"`
+	ExplanationEntities   []MessageEntity       `json:"explanation_entities,omitempty"`
+	OpenPeriod            int                   `json:"open_period,omitempty"`
+	CloseDate             int64                 `json:"close_date,omitempty"`
+	IsClosed              bool                  `json:"is_closed,omitempty"`
+	DisableNotification   bool                  `json:"disable_notification,omitempty"`
+	ProtectContent        bool                  `json:"protect_content,omitempty"`
+	MessageEffectID       string                `json:"message_effect_id,omitempty"`
+	ReplyParameters       *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendDiceOptions represents parameters for the sendDice method.
+type SendDiceOptions struct {
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id"`
+	Emoji                string                `json:"emoji,omitempty"`
+	DisableNotification  bool                  `json:"disable_notification,omitempty"`
+	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
+}
+
+// SendMediaGroupOptions represents parameters for the sendMediaGroup method.
+type SendMediaGroupOptions struct {
+	BusinessConnectionID string           `json:"business_connection_id,omitempty"`
+	ChatID               any              `json:"chat_id"`
+	Media                []InputMedia     `json:"media"`
+	DisableNotification  bool             `json:"disable_notification,omitempty"`
+	ProtectContent       bool             `json:"protect_content,omitempty"`
+	MessageEffectID      string           `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters `json:"reply_parameters,omitempty"`
+	MessageThreadID      int64            `json:"message_thread_id,omitempty"`
+}
