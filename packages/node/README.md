@@ -325,6 +325,80 @@ logger.setLevel("debug");
 
 ---
 
+### 9. Plugin System & Extension Points
+
+Third-party features ship as self-contained plugins. A plugin is a named object whose synchronous `install()` receives the `Application` and registers itself through six extension points:
+
+| Extension point     | API                                          | Use it for                                                       |
+| ------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
+| Plugin registration | `app.usePlugin(plugin)`                      | Entry point; installs the plugin once (duplicate names throw)    |
+| Middleware          | `app.use(fn)`                                | Wrap every update (auth, metrics, attaching sessions)            |
+| Handlers            | `app.addHandler()` / `app.addErrorHandler()` | React to updates or handler failures                             |
+| Lifecycle hooks     | `app.onInit(hook)` / `app.onShutdown(hook)`  | Async setup/teardown around `runPolling` / `runWebhook` / `stop` |
+| Request transforms  | `bot.transformRequest(fn)`                   | Mutate every outgoing API payload (e.g. defaults, audit logging) |
+| Per-update state    | `context.user_data` / `context.chat_data`    | State that persists across updates via storage                   |
+
+**Installing a plugin:**
+
+```typescript
+import { Application, plugins, i18nFor } from "telebot-ts";
+
+const app = new Application(token);
+
+app.usePlugin(
+  plugins.i18n({
+    default_locale: "en",
+    locales: {
+      en: { hello: "Hello, {name}!" },
+      vi: { hello: "Xin chào, {name}!" },
+    },
+  }),
+);
+
+app.on("message", async (update, context) => {
+  await context.reply(i18nFor(context)!.t("hello", { name: "Nam" }));
+});
+```
+
+**Writing your own plugin:**
+
+```typescript
+import type { Plugin, Application } from "telebot-ts";
+
+export function rateLimitReporter(): Plugin {
+  return {
+    name: "my-plugin-rate-limit-reporter",
+    install(app: Application) {
+      // 1. Lifecycle: async setup runs before polling/webhook starts.
+      app.onInit(async () => {
+        /* open connections, load state */
+      });
+      app.onShutdown(async () => {
+        /* flush and close */
+      });
+
+      // 2. Middleware: runs around every dispatched update.
+      app.use(async (context, next) => {
+        const start = performance.now();
+        await next();
+        console.log(`update handled in ${performance.now() - start}ms`);
+      });
+
+      // 3. Request transforms: mutate payloads before they hit the API.
+      app.bot.transformRequest((method, payload) => {
+        if (method === "sendMessage") payload.protect_content = true;
+      });
+    },
+  };
+}
+
+app.usePlugin(rateLimitReporter());
+```
+
+Rules for plugin authors: `install()` must be synchronous (defer async work to `onInit` hooks), plugin names must be globally unique, and hook failures are isolated — one throwing hook never blocks other plugins or the bot itself.
+
+---
+
 ## Development & Testing
 
 ```bash

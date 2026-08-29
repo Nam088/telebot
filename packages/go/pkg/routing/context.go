@@ -3,6 +3,7 @@ package routing
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/Nam088/telebot/packages/go/pkg/bot"
 	"github.com/Nam088/telebot/packages/go/pkg/types"
@@ -16,6 +17,9 @@ type Context struct {
 	update   *types.Update
 	userData map[string]any
 	chatData map[string]any
+
+	storeMu sync.Mutex
+	store   map[string]any
 }
 
 // NewContext constructs a new Context instance for an incoming update.
@@ -34,6 +38,7 @@ func NewContext(ctx context.Context, b *bot.Bot, u *types.Update) *Context {
 		update:   u,
 		userData: make(map[string]any),
 		chatData: make(map[string]any),
+		store:    make(map[string]any),
 	}
 }
 
@@ -127,4 +132,43 @@ func (c *Context) AnswerCallbackQuery(text string, showAlert bool) (bool, error)
 		Text:            text,
 		ShowAlert:       showAlert,
 	})
+}
+
+// Set stores an arbitrary value in the per-request state store, keyed by name.
+// Middleware and plugins use it to pass data to later middlewares and handlers
+// within the same update. Values are discarded when the update finishes.
+//
+// Parameters:
+//   - key: Store key. Prefix with your plugin name to avoid collisions.
+//   - value: Value to store (may be nil).
+//
+// Example:
+//
+//	c.Set("i18n.locale", "vi")
+func (c *Context) Set(key string, value any) {
+	c.storeMu.Lock()
+	defer c.storeMu.Unlock()
+	c.store[key] = value
+}
+
+// Get retrieves a value previously stored with Set.
+//
+// Parameters:
+//   - key: Store key to look up.
+//
+// Returns:
+//   - any: The stored value (nil if nil was stored).
+//   - bool: True if the key exists, distinguishing stored nil from missing keys.
+//
+// Example:
+//
+//	if value, ok := c.Get("i18n.locale"); ok {
+//	    locale := value.(string)
+//	    // use locale
+//	}
+func (c *Context) Get(key string) (any, bool) {
+	c.storeMu.Lock()
+	defer c.storeMu.Unlock()
+	v, ok := c.store[key]
+	return v, ok
 }

@@ -61,6 +61,17 @@ export interface BotOptions {
 }
 
 /**
+ * Hook invoked with every outgoing Bot API request before it is serialized and sent.
+ *
+ * Hooks run synchronously in registration order and may mutate `payload` to decorate or rewrite
+ * requests (e.g. metrics, logging, forced options). Throwing from a hook fails the request.
+ *
+ * @param method - The Bot API method name (e.g. `"sendMessage"`).
+ * @param payload - The mutable request payload about to be sent.
+ */
+export type RequestTransformFn = (method: string, payload: Record<string, unknown>) => void;
+
+/**
  * Extra time, in milliseconds, added on top of a `getUpdates` long-poll `timeout` (converted
  * to milliseconds) when computing the effective per-request abort timeout.
  */
@@ -117,6 +128,30 @@ export abstract class BaseBotClient {
    * Default per-request abort timeout in milliseconds.
    */
   protected readonly requestTimeoutMs: number;
+
+  private readonly transformHooks: RequestTransformFn[] = [];
+
+  /**
+   * Registers a hook invoked before every outgoing Bot API request.
+   *
+   * Hooks run in registration order and may mutate the payload. Intended for plugins that need to
+   * observe or decorate all API traffic (logging, metrics, throttling signals, test mocks).
+   *
+   * @param hook - Callback receiving the method name and the mutable payload.
+   * @returns This client instance for chaining.
+   *
+   * @example
+   * ```ts
+   * bot.transformRequest((method, payload) => {
+   *   console.log(`Calling ${method}`);
+   *   payload["protect_content"] = true;
+   * });
+   * ```
+   */
+  public transformRequest(hook: RequestTransformFn): this {
+    this.transformHooks.push(hook);
+    return this;
+  }
 
   /**
    * Constructs a new {@link BaseBotClient}.
@@ -197,6 +232,9 @@ export abstract class BaseBotClient {
    */
   public async request<T>(method: string, payload: Record<string, unknown> = {}): Promise<T> {
     const url = `${this.apiRoot}/bot${this.token}/${method}`;
+    for (const hook of this.transformHooks) {
+      hook(method, payload);
+    }
     const { body, headers } = buildRequestBody(payload);
 
     // getUpdates long-polling passes its wait time (in seconds) as `timeout`; the abort

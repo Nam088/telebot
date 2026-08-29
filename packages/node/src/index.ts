@@ -12,6 +12,7 @@ export * from "./storage/index.js";
 export * from "./scheduler/index.js";
 export * from "./components/index.js";
 export * from "./utils/index.js";
+export * from "./plugins/index.js";
 
 // `components/keyboard.js` exports InlineKeyboardButton/InlineKeyboardMarkup as constructable
 // classes (an alternative to the InlineKeyboard fluent builder), which are structurally compatible

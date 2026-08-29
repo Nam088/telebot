@@ -23,6 +23,7 @@
   - [5. Task Scheduler & RRule (RFC 5545)](#5-task-scheduler--rrule-rfc-5545)
   - [6. Session Storage & Persistence](#6-session-storage--persistence)
   - [7. Production Webhooks](#7-production-webhooks)
+  - [8. Plugins & Extension Points](#8-plugins--extension-points)
 - [Example Bots](#-example-bots)
 - [Testing & Quality Gates](#-testing--quality-gates)
 - [Parity with the Node Implementation](#-parity-with-the-node-implementation)
@@ -409,6 +410,73 @@ func main() {
     }
 }
 ```
+
+---
+
+### 8. Plugins & Extension Points
+
+Third-party features ship as self-contained plugin packages built on four extension points:
+
+| Extension point   | API                                        | Use it for                                               |
+| ----------------- | ------------------------------------------ | -------------------------------------------------------- |
+| Middleware        | `router.Use(plugin)`                       | Wrap every update (auth, metrics, attaching sessions)    |
+| Handlers          | `router.Command/Text/CallbackQuery/Handle` | React to updates                                         |
+| Per-request state | `c.Set(key, value)` / `c.Get(key)`         | Pass data between middlewares and handlers of one update |
+| Raw API access    | `c.Bot()`                                  | Call any Bot API method or wrap requests                 |
+
+A Go plugin is conventionally a package that exports a constructor returning a `routing.MiddlewareFunc`. The built-in i18n plugin in `pkg/plugins/i18n` is the reference implementation:
+
+```go
+import (
+    "github.com/Nam088/telebot/packages/go/pkg/plugins/i18n"
+    "github.com/Nam088/telebot/packages/go/pkg/routing"
+)
+
+router.Use(i18n.New(i18n.Options{
+    DefaultLocale: "en",
+    Locales: map[string]map[string]string{
+        "en": {"hello": "Hello, {name}!"},
+        "vi": {"hello": "Xin chào, {name}!"},
+    },
+}))
+
+router.Text("", func(c *routing.Context) error {
+    session, _ := i18n.For(c)
+    _, err := c.Reply(session.T("hello", map[string]string{"name": "Nam"}))
+    return err
+})
+```
+
+**Writing your own plugin:**
+
+```go
+// Package timing is an example plugin: it measures update handling duration.
+package timing
+
+import (
+    "log"
+    "time"
+
+    "github.com/Nam088/telebot/packages/go/pkg/routing"
+)
+
+const StoreKey = "timing.started_at"
+
+// New returns the middleware; options would go here for real plugins.
+func New() routing.MiddlewareFunc {
+    return func(next routing.HandlerFunc) routing.HandlerFunc {
+        return func(c *routing.Context) error {
+            start := time.Now()
+            c.Set(StoreKey, start) // visible to later middlewares/handlers
+            err := next(c)
+            log.Printf("update handled in %s", time.Since(start))
+            return err
+        }
+    }
+}
+```
+
+Rules for plugin authors: prefix store keys with your plugin name to avoid collisions, keep middleware allocation-free on the hot path, and never block the handler chain — offload slow work to goroutines or the scheduler.
 
 ---
 

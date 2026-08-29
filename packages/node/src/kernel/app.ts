@@ -29,6 +29,7 @@ import { createWebhookServer, type WebhookServerOptions } from "./webhook.js";
 import { AsyncConversationManager, type AsyncConversationHandlerFn } from "../routing/index.js";
 import { ApplicationBuilder } from "./builder.js";
 import { restoreApplicationState, flushApplicationState } from "./lifecycle.js";
+import type { Plugin } from "./plugin.js";
 
 export { ApplicationBuilder } from "./builder.js";
 export { type MiddlewareFn } from "./dispatcher.js";
@@ -99,6 +100,9 @@ export class Application {
   private readonly middlewares: MiddlewareFn[] = [];
   private readonly stateLocks: Map<string, Promise<void>> = new Map();
   private readonly conversationManager = new AsyncConversationManager();
+  private readonly installedPlugins: Set<string> = new Set();
+  private readonly initHooks: Array<() => Promise<void> | void> = [];
+  private readonly shutdownHooks: Array<() => Promise<void> | void> = [];
 
   /**
    * Indicates whether the polling loop is actively running.
@@ -167,6 +171,105 @@ export class Application {
       }
     }
     return this;
+  }
+
+  /**
+   * Installs a {@link Plugin} into the application.
+   *
+   * The plugin's `install` hook receives this application and wires up middleware, handlers, and
+   * lifecycle hooks synchronously. Installing two plugins with the same `name` throws.
+   *
+   * @param plugin - The plugin instance to install.
+   * @returns This {@link Application} instance for chaining.
+   * @throws When a plugin with the same name is already installed.
+   *
+   * @example
+   * ```ts
+   * import { plugins } from "telebot-ts";
+   *
+   * app.usePlugin(
+   *   plugins.i18n({ default_locale: "en", locales: { en: { hello: "Hello!" } } }),
+   * );
+   * ```
+   */
+  public usePlugin(plugin: Plugin): this {
+    if (this.installedPlugins.has(plugin.name)) {
+      throw new Error(`Plugin "${plugin.name}" is already installed.`);
+    }
+    plugin.install(this);
+    this.installedPlugins.add(plugin.name);
+    return this;
+  }
+
+  /**
+   * Registers a hook invoked once, in registration order, right before the application starts
+   * serving updates (polling or webhook). Use it for asynchronous plugin setup such as opening
+   * connections or warming caches.
+   *
+   * @param hook - Callback executed before startup completes.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.onInit(async () => {
+   *   await loadTranslations();
+   * });
+   * ```
+   */
+  public onInit(hook: () => Promise<void> | void): this {
+    this.initHooks.push(hook);
+    return this;
+  }
+
+  /**
+   * Registers a hook invoked once, in registration order, during {@link Application.stop} after
+   * the server stops and persisted state is flushed. Use it to release resources held by plugins.
+   *
+   * @param hook - Callback executed during shutdown.
+   * @returns This {@link Application} instance for chaining.
+   *
+   * @example
+   * ```ts
+   * app.onShutdown(() => metricsClient.close());
+   * ```
+   */
+  public onShutdown(hook: () => Promise<void> | void): this {
+    this.shutdownHooks.push(hook);
+    return this;
+  }
+
+  private async runInitHooks(): Promise<void> {
+    for (const hook of this.initHooks) {
+      try {
+        await hook();
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        for (const errHandler of this.errorHandlers) {
+          try {
+            await errHandler(error);
+          } catch (ehErr) {
+            console.error("Error in error handler:", ehErr);
+          }
+        }
+      }
+    }
+  }
+
+  private async runShutdownHooks(): Promise<void> {
+    for (const hook of this.shutdownHooks) {
+      try {
+        await hook();
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        for (const errHandler of this.errorHandlers) {
+          try {
+            await errHandler(error);
+          } catch (ehErr) {
+            console.error("Error in error handler:", ehErr);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -429,6 +532,7 @@ export class Application {
     this.abortController = new AbortController();
 
     await this.initializePersistence();
+    await this.runInitHooks();
     this.job_queue.start();
 
     await runPollingLoop(
@@ -455,6 +559,7 @@ export class Application {
 
     this.isRunning = true;
     await this.initializePersistence();
+    await this.runInitHooks();
     this.scheduler.start();
 
     this.webhookServer = await createWebhookServer(
@@ -481,5 +586,6 @@ export class Application {
     }
 
     await flushApplicationState(this.persistence, this.job_queue);
+    await this.runShutdownHooks();
   }
 }
