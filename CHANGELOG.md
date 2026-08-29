@@ -2,6 +2,8 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## [1.2.1](https://github.com/Nam088/telebot-ts/compare/v1.2.0...v1.2.1) (2026-08-29)
+
 # [1.2.0](https://github.com/Nam088/telebot-ts/compare/v1.1.3...v1.2.0) (2026-08-29)
 
 
