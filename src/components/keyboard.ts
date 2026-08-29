@@ -18,7 +18,13 @@ import type {
   InputMediaDocument,
   InputMedia,
   CallbackGame,
+  LoginUrl,
+  SwitchInlineQueryChosenChat,
+  CopyTextButton,
+  DisabledButton,
+  WebAppInfo,
 } from "../client/types.js";
+
 import type { InputFile } from "../utils/http.js";
 
 export type {
@@ -69,21 +75,27 @@ export class InlineKeyboardButton implements RawInlineKeyboardButton {
   /** Data to be sent in a callback query to the bot when the button is pressed (1-64 bytes). */
   declare public readonly callback_data?: string;
   /** Description of the Web App that will be launched when the user presses the button. */
-  declare public readonly web_app?: { url: string };
+  declare public readonly web_app?: WebAppInfo;
   /** An HTTPS URL used to automatically authorize the user. */
-  declare public readonly login_url?: unknown;
+  declare public readonly login_url?: LoginUrl;
   /** If set, pressing the button prompts the user to insert the specified inline query. */
   declare public readonly switch_inline_query?: string;
   /** If set, pressing the button inserts the specified inline query in the current chat. */
   declare public readonly switch_inline_query_current_chat?: string;
   /** If set, pressing the button prompts the user to select a chat of the specified type. */
-  declare public readonly switch_inline_query_chosen_chat?: unknown;
+  declare public readonly switch_inline_query_chosen_chat?: SwitchInlineQueryChosenChat;
   /** Description of the button that copies the specified text to the clipboard. */
-  declare public readonly copy_text?: { text: string };
+  declare public readonly copy_text?: CopyTextButton;
   /** Description of the game that will be launched when the user presses the button. */
   declare public readonly callback_game?: CallbackGame;
   /** `true` to send a Pay button; must be the first button of the first row. */
   declare public readonly pay?: boolean;
+  /** Style of the button. */
+  declare public readonly style?: "danger" | "success" | "primary" | string;
+  /** Unique identifier of the custom emoji shown before the text. */
+  declare public readonly icon_custom_emoji_id?: string;
+  /** If set, then the button is disabled and does nothing (Bot API 10.3+). */
+  declare public readonly disabled?: DisabledButton;
 
   /**
    * Constructs a new {@link InlineKeyboardButton}.

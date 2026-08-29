@@ -1,4 +1,4 @@
-import type { User } from "./common.js";
+import type { User, Chat } from "./common.js";
 import type { InlineKeyboardMarkup, MessageEntity } from "./messages.js";
 import type { Sticker } from "./stickers.js";
 
@@ -263,4 +263,130 @@ export interface SendGiftOptions {
   text_parse_mode?: string;
   /** Special entities that appear in the gift text. */
   text_entities?: MessageEntity[];
+}
+
+/**
+ * Colors of the backdrop of a unique gift.
+ */
+export interface UniqueGiftBackdropColors {
+  /** The color in the center of the backdrop in RGB format. */
+  center_color: number;
+  /** The color on the edges of the backdrop in RGB format. */
+  edge_color: number;
+  /** The color to be applied to the symbol in RGB format. */
+  symbol_color: number;
+  /** The color for the text on the backdrop in RGB format. */
+  text_color: number;
+}
+
+/**
+ * Backdrop of a unique gift.
+ */
+export interface UniqueGiftBackdrop {
+  /** Name of the backdrop. */
+  name: string;
+  /** Colors of the backdrop. */
+  colors: UniqueGiftBackdropColors;
+  /** The number of unique gifts that receive this backdrop for every 1000 gifts upgraded. */
+  rarity_per_mille: number;
+}
+
+/**
+ * Model of a unique gift.
+ */
+export interface UniqueGiftModel {
+  /** Name of the model. */
+  name: string;
+  /** The sticker that represents the unique gift. */
+  sticker: Sticker;
+  /** The number of unique gifts that receive this model for every 1000 gift upgrades. */
+  rarity_per_mille: number;
+  /** Rarity of the model if it is a crafted model ('uncommon', 'rare', 'epic', 'legendary'). */
+  rarity?: "uncommon" | "rare" | "epic" | "legendary" | string;
+}
+
+/**
+ * Symbol shown on the pattern of a unique gift.
+ */
+export interface UniqueGiftSymbol {
+  /** Name of the symbol. */
+  name: string;
+  /** The sticker that represents the unique gift. */
+  sticker: Sticker;
+  /** The number of unique gifts that receive this model for every 1000 gifts upgraded. */
+  rarity_per_mille: number;
+}
+
+/**
+ * Color scheme based on a unique gift.
+ */
+export interface UniqueGiftColors {
+  /** Custom emoji identifier of the unique gift's model. */
+  model_custom_emoji_id: string;
+  /** Custom emoji identifier of the unique gift's symbol. */
+  symbol_custom_emoji_id: string;
+  /** Main color used in light themes; RGB format. */
+  light_theme_main_color: number;
+  /** List of 1-3 additional colors used in light themes; RGB format. */
+  light_theme_other_colors: number[];
+  /** Main color used in dark themes; RGB format. */
+  dark_theme_main_color: number;
+  /** List of 1-3 additional colors used in dark themes; RGB format. */
+  dark_theme_other_colors: number[];
+}
+
+/**
+ * A unique gift upgraded from a regular gift.
+ */
+export interface UniqueGift {
+  /** Identifier of the regular gift from which the gift was upgraded. */
+  gift_id: string;
+  /** Human-readable name of the regular gift. */
+  base_name: string;
+  /** Unique name of the gift. */
+  name: string;
+  /** Unique number of the upgraded gift. */
+  number: number;
+  /** Model of the gift. */
+  model: UniqueGiftModel;
+  /** Symbol of the gift. */
+  symbol: UniqueGiftSymbol;
+  /** Backdrop of the gift. */
+  backdrop: UniqueGiftBackdrop;
+  /** True, if the original regular gift was exclusively purchaseable by Telegram Premium subscribers. */
+  is_premium?: true | boolean;
+  /** True, if the gift was used to craft another gift and isn't available anymore. */
+  is_burned?: true | boolean;
+  /** True, if the gift is assigned from the TON blockchain. */
+  is_from_blockchain?: true | boolean;
+  /** The color scheme for user's name, replies, etc. */
+  colors?: UniqueGiftColors;
+  /** Information about the chat that published the gift. */
+  publisher_chat?: Chat;
+}
+
+/**
+ * Describes a service message about a unique gift that was sent or received (Bot API 10.3+).
+ */
+export interface UniqueGiftInfo {
+  /** Information about the gift. */
+  gift: UniqueGift;
+  /** Origin of the gift ('upgrade', 'transfer', 'resale', 'gifted_upgrade', 'offer'). */
+  origin: "upgrade" | "transfer" | "resale" | "gifted_upgrade" | "offer" | string;
+  /** Text of the message that was added to the gift (Bot API 10.3+). */
+  text?: string;
+  /** Special entities that appear in the text (Bot API 10.3+). */
+  entities?: MessageEntity[];
+  /** True, if the sender and gift text are shown only to the gift receiver (Bot API 10.3+). */
+  is_private?: true | boolean;
+  /** Currency in which the payment for the gift was done ('XTR', 'TON'). */
+  last_resale_currency?: "XTR" | "TON" | string;
+  /** Price paid for the gift in either Telegram Stars or nanograms. */
+  last_resale_amount?: number;
+  /** Unique identifier of the received gift for the bot. */
+  owned_gift_id?: string;
+  /** Number of Telegram Stars that must be paid to transfer the gift. */
+  transfer_star_count?: number;
+  /** Point in time (Unix timestamp) when the gift can be transferred. */
+  next_transfer_date?: number;
 }

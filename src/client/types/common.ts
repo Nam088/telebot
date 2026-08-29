@@ -293,6 +293,20 @@ export interface RawUpdate {
   removed_chat_boost?: ChatBoostRemoved;
   /** A user purchased paid media with Telegram Stars. */
   purchased_paid_media?: PurchasedPaidMedia;
+  /** A user asked the bot to stop the generation of a message (Bot API 10.3+). */
+  stopped_message_generation?: MessageGenerationStopped;
+}
+
+/**
+ * Describes an update about a user stopping message generation (Bot API 10.3+).
+ */
+export interface MessageGenerationStopped {
+  /** Chat in which the message is generated. */
+  chat: Chat;
+  /** Unique identifier of the message thread in which the message is generated. */
+  message_thread_id?: number;
+  /** Unique identifier of the message draft which was stopped. */
+  draft_id: number;
 }
 
 export interface ApiResponse<T = unknown> {
@@ -379,21 +393,6 @@ export interface SetMessageReactionOptions {
   /** Pass True to set the reaction with a big animation. */
   is_big?: boolean;
 }
-
-export interface EditEphemeralMessageTextOptions {
-  /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
-  /** Identifier of the message to edit. */
-  message_id: number;
-  /** New text of the ephemeral message. */
-  text: string;
-  /** Mode for parsing entities in the message text. */
-  parse_mode?: string;
-  /** Additional interface options. */
-  reply_markup?: unknown;
-}
-
-export type Update = RawUpdate;
 
 export class TelegramApiError extends Error {
   /**

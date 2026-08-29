@@ -10,6 +10,9 @@ import type {
 } from "./business.js";
 import type { Invoice, SuccessfulPayment, RefundedPayment } from "./payments.js";
 import type { Sticker } from "./stickers.js";
+import type { Community } from "./chats.js";
+import type { InputRichMessage, RichMessage } from "./rich.js";
+import type { InputFile } from "../../utils/http.js";
 
 export interface MessageEntity {
   /** Type of the entity (e.g. 'mention', 'hashtag', 'bot_command', 'url', 'bold', 'italic', etc.). */
@@ -310,34 +313,94 @@ export interface TextQuote {
   is_manual?: boolean;
 }
 
+/**
+ * Represents a disabled button which does nothing (Bot API 10.3+).
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface DisabledButton {}
+
+export interface WebAppInfo {
+  /** An HTTPS URL of a Web App to be opened. */
+  url: string;
+}
+
+export interface LoginUrl {
+  /** An HTTPS URL used to automatically authorize the user. */
+  url: string;
+  /** New text of the button in forwarded messages. */
+  forward_text?: string;
+  /** Username of a bot, which will be used for user authorization. */
+  bot_username?: string;
+  /** Pass True to request the permission for your bot to send messages to the user. */
+  request_write_access?: boolean;
+}
+
+export interface SwitchInlineQueryChosenChat {
+  /** The default inline query to be inserted in the input field. */
+  query?: string;
+  /** True, if private chats with users can be chosen. */
+  allow_user_chats?: boolean;
+  /** True, if private chats with bots can be chosen. */
+  allow_bot_chats?: boolean;
+  /** True, if group and supergroup chats can be chosen. */
+  allow_group_chats?: boolean;
+  /** True, if channel chats can be chosen. */
+  allow_channel_chats?: boolean;
+}
+
+export interface CopyTextButton {
+  /** The text to be copied to the clipboard; 1-256 characters. */
+  text: string;
+}
+
+/**
+ * Parameters for sending or replying with ephemeral messages (Bot API 10.3+).
+ */
+export interface EphemeralMessageParameters {
+  /** Identifier of the user who will receive the message. */
+  receiver_user_id: number;
+  /** Identifier of the callback query which triggered the message, if any. */
+  callback_query_id?: string;
+  /** Pass True if the ephemeral message must be shown in place of the original message. */
+  replace_callback_query_message?: boolean;
+}
+
 export interface InlineKeyboardButton {
   /** Label text on the button. */
   text: string;
+  /** Unique identifier of the custom emoji shown before the text of the button. */
+  icon_custom_emoji_id?: string;
+  /** Style of the button ('danger', 'success', 'primary'). */
+  style?: "danger" | "success" | "primary" | string;
   /** HTTP or tg:// URL to be opened when the button is pressed. */
   url?: string;
   /** Data to be sent in a callback query to the bot when the button is pressed (1-64 bytes). */
   callback_data?: string;
   /** Description of the Web App that will be launched when the user presses the button. */
-  web_app?: { url: string };
+  web_app?: WebAppInfo;
   /** An HTTPS URL used to automatically authorize the user. */
-  login_url?: unknown;
+  login_url?: LoginUrl;
   /** If set, pressing the button will prompt the user to select one of their chats and insert the bot's username and the specified inline query. */
   switch_inline_query?: string;
   /** If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field. */
   switch_inline_query_current_chat?: string;
   /** If set, pressing the button will prompt the user to select one of their chats of the specified type. */
-  switch_inline_query_chosen_chat?: unknown;
+  switch_inline_query_chosen_chat?: SwitchInlineQueryChosenChat;
   /** Description of the button that copies the specified text to the clipboard. */
-  copy_text?: { text: string };
+  copy_text?: CopyTextButton;
   /** Description of the game that will be launched when the user presses the button. */
   callback_game?: CallbackGame;
-  /** Specify True, to send a Pay button. NOTE: This type of button must always be the first button in the first row and can only be used in invoice messages. */
+  /** Specify True, to send a Pay button. */
   pay?: boolean;
+  /** If set, then the button is disabled and does nothing (Bot API 10.3+). */
+  disabled?: DisabledButton;
 }
 
 export interface InlineKeyboardMarkup {
   /** Array of button rows, each represented by an Array of InlineKeyboardButton objects. */
   inline_keyboard: InlineKeyboardButton[][];
+  /** Pass True if the reply interface must be shown to the user (Bot API 10.3+). */
+  force_reply?: boolean;
 }
 
 export interface KeyboardButton {
@@ -354,7 +417,7 @@ export interface KeyboardButton {
   /** If specified, the user will be asked to create a poll and send it to the bot. Available in private chats only. */
   request_poll?: { type?: string };
   /** If specified, the described Web App will be launched when the button is pressed. */
-  web_app?: { url: string };
+  web_app?: WebAppInfo;
 }
 
 export interface ReplyKeyboardMarkup {
@@ -370,6 +433,8 @@ export interface ReplyKeyboardMarkup {
   input_field_placeholder?: string;
   /** Use this parameter if you want to show the keyboard to specific users only. */
   selective?: boolean;
+  /** Pass True if the reply interface must be shown to the user (Bot API 10.3+). */
+  force_reply?: boolean;
 }
 
 export interface ReplyKeyboardRemove {
@@ -386,6 +451,14 @@ export interface ForceReply {
   input_field_placeholder?: string;
   /** Use this parameter if you want to force reply from specific users only. */
   selective?: boolean;
+}
+
+/**
+ * Describes a service message about a chat being joined by a user from a community (Bot API 10.3+).
+ */
+export interface CommunityChatJoined {
+  /** The community from which the chat was joined. */
+  community: Community;
 }
 
 export interface Message {
@@ -555,6 +628,60 @@ export interface Message {
   web_app_data?: { data: string; button_text: string };
   /** Inline keyboard attached to the message. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Service message: a user joined the chat from a community (Bot API 10.3+). */
+  community_chat_joined?: CommunityChatJoined;
+  /** Receiver user of an ephemeral message. */
+  receiver_user?: User;
+  /** Ephemeral message identifier. */
+  ephemeral_message_id?: number;
+  /** Rich formatted message content. */
+  rich_message?: RichMessage;
+  /** Live photo attachment. */
+  live_photo?: LivePhoto;
+}
+
+/**
+ * Live Photo message object.
+ */
+export interface LivePhoto {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file. */
+  file_unique_id: string;
+  /** Photo width. */
+  width: number;
+  /** Photo height. */
+  height: number;
+  /** Available sizes of the photo. */
+  photo: PhotoSize[];
+  /** Video file associated with the live photo. */
+  video: Video;
+}
+
+/**
+ * Describes reply parameters for a message to be sent.
+ */
+export interface ReplyParameters {
+  /** Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified. */
+  message_id?: number;
+  /** If the message to be replied to is from a different chat, unique identifier for the chat. */
+  chat_id?: number | string;
+  /** Pass True if the message should be sent even if the specified replied-to message is not found. */
+  allow_sending_without_reply?: boolean;
+  /** Quoted part of the message to be replied to; 0-1024 characters after entities parsing. */
+  quote?: string;
+  /** Mode for parsing entities in the quote. */
+  quote_parse_mode?: ParseMode | string;
+  /** A list of special entities that appear in the quote. */
+  quote_entities?: MessageEntity[];
+  /** Position of the quote in the original message in UTF-16 code units. */
+  quote_position?: number;
+  /** Identifier of the specific checklist item to be replied to. */
+  checklist_item_id?: number;
+  /** Persistent identifier of the specific poll option to be replied to. */
+  poll_option_id?: string;
+  /** Identifier of the ephemeral message that will be replied to (Bot API 10.2+). */
+  ephemeral_message_id?: number;
 }
 
 export interface ReactionTypeEmoji {
@@ -631,24 +758,11 @@ export interface SendMessageOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: {
-    /** Identifier of the target that will be replied to. */
-    message_id: number;
-    /** If the message to be replied to is from a different chat, unique identifier for the chat. */
-    chat_id?: number | string;
-    /** Pass True if the message should be sent even if the specified replied-to message is not found. */
-    allow_sending_without_reply?: boolean;
-    /** Quoted part of the message to be replied to. */
-    quote?: string;
-    /** Mode for parsing entities in the quote. */
-    quote_parse_mode?: string;
-    /** A list of special entities that appear in the quote. */
-    quote_entities?: MessageEntity[];
-    /** Position of the quote in the original message in UTF-16 code units. */
-    quote_position?: number;
-  };
+  reply_parameters?: ReplyParameters;
   /** Additional interface options (inline keyboard, custom reply keyboard, instructions to remove reply keyboard or force reply). */
   reply_markup?: ReplyMarkup;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface EditMessageTextOptions {
@@ -722,11 +836,13 @@ export interface SendPhotoOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendAudioOptions {
@@ -755,11 +871,13 @@ export interface SendAudioOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendDocumentOptions {
@@ -784,11 +902,13 @@ export interface SendDocumentOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendVideoOptions {
@@ -823,11 +943,13 @@ export interface SendVideoOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendAnimationOptions {
@@ -860,11 +982,13 @@ export interface SendAnimationOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendVoiceOptions {
@@ -887,11 +1011,13 @@ export interface SendVoiceOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendVideoNoteOptions {
@@ -912,11 +1038,48 @@ export interface SendVideoNoteOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
+}
+
+export interface SendLivePhotoOptions {
+  /** Unique identifier for the target chat or username of the target channel. */
+  chat_id: number | string;
+  /** Photo to send. Pass a file_id as String, an HTTP URL, or upload a new photo using InputFile. */
+  photo: string | InputFile;
+  /** Video to send along with the photo. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
+  video: string | InputFile;
+  /** Live photo caption, 0-1024 characters after entities parsing. */
+  caption?: string;
+  /** Mode for parsing entities in the photo caption. */
+  parse_mode?: ParseMode | string;
+  /** A list of special entities that appear in the caption. */
+  caption_entities?: MessageEntity[];
+  /** Pass True, if the caption must be shown above the message media. */
+  show_caption_above_media?: boolean;
+  /** Pass True, if the photo needs to be covered with a spoiler animation. */
+  has_spoiler?: boolean;
+  /** Sends the message silently. Users will receive a notification with no sound. */
+  disable_notification?: boolean;
+  /** Protects the contents of the sent message from forwarding and saving. */
+  protect_content?: boolean;
+  /** Unique identifier of the message effect to be added to the message. */
+  message_effect_id?: string;
+  /** Description of the message to reply to. */
+  reply_parameters?: ReplyParameters;
+  /** Additional interface options. */
+  reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
+  /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
+  message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface InputMediaPhoto {
@@ -1038,7 +1201,7 @@ export interface SendMediaGroupOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
 }
@@ -1065,11 +1228,13 @@ export interface SendLocationOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendVenueOptions {
@@ -1098,11 +1263,13 @@ export interface SendVenueOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendContactOptions {
@@ -1123,11 +1290,13 @@ export interface SendContactOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
 export interface SendPollOptions {
@@ -1164,7 +1333,7 @@ export interface SendPollOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
@@ -1183,7 +1352,7 @@ export interface SendDiceOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
@@ -1265,15 +1434,124 @@ export interface SendRichMessageOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Rich message payload content. */
-  rich_message: unknown;
+  rich_message: InputRichMessage;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
   /** Identifier of the receiver user if targeting a specific user. */
   receiver_user_id?: number;
   /** Identifier of the callback query if answering a query. */
   callback_query_id?: string;
   /** Additional interface options. */
-  reply_markup?: unknown;
+  reply_markup?: ReplyMarkup;
   /** Unique identifier for the target message thread. */
   message_thread_id?: number;
+}
+
+export interface SendMessageDraftOptions {
+  /** Unique identifier for the target private chat. */
+  chat_id: number | string;
+  /** Unique identifier of the message draft; must be non-zero. */
+  draft_id: number;
+  /** Unique identifier for the target message thread. */
+  message_thread_id?: number;
+  /** Text of the message to be sent, 0-4096 characters. Pass an empty text to show a 'Thinking...' placeholder. */
+  text?: string;
+  /** Mode for parsing entities in the message text. */
+  parse_mode?: ParseMode | string;
+  /** A list of special entities that appear in message text. */
+  entities?: MessageEntity[];
+  /** Pass True to show the user a button to stop further drafts (Bot API 10.3+). */
+  can_stop?: boolean;
+  /** Pass True to keep the draft in the chat when the button is pressed (Bot API 10.3+). */
+  keep_on_stop?: boolean;
+}
+
+export interface SendRichMessageDraftOptions {
+  /** Unique identifier for the target private chat. */
+  chat_id: number | string;
+  /** Unique identifier of the message draft; must be non-zero. */
+  draft_id: number;
+  /** Unique identifier for the target message thread. */
+  message_thread_id?: number;
+  /** The partial rich message to be streamed. */
+  rich_message: InputRichMessage;
+  /** Pass True to show the user a button to stop further drafts (Bot API 10.3+). */
+  can_stop?: boolean;
+  /** Pass True to keep the draft in the chat when the button is pressed (Bot API 10.3+). */
+  keep_on_stop?: boolean;
+}
+
+export interface EditEphemeralMessageTextOptions {
+  /** Unique identifier for the target chat or username of the target supergroup. */
+  chat_id: number | string;
+  /** Identifier of the user who received the message. */
+  receiver_user_id: number;
+  /** Identifier of the ephemeral message to edit. */
+  ephemeral_message_id: number;
+  /** New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified. */
+  text?: string;
+  /** Mode for parsing entities in the message text. */
+  parse_mode?: ParseMode | string;
+  /** A list of special entities that appear in message text. */
+  entities?: MessageEntity[];
+  /** New rich content of the message; required if text isn't specified (Bot API 10.3+). */
+  rich_message?: InputRichMessage;
+  /** Link preview generation options for the message. */
+  link_preview_options?: unknown;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageMediaOptions {
+  /** Unique identifier for the target chat or username of the target supergroup. */
+  chat_id: number | string;
+  /** Identifier of the user who received the message. */
+  receiver_user_id: number;
+  /** Identifier of the ephemeral message to edit. */
+  ephemeral_message_id: number;
+  /** A JSON-serialized object for the new media content of the message. */
+  media: InputMedia;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageCaptionOptions {
+  /** Unique identifier for the target chat or username of the target supergroup. */
+  chat_id: number | string;
+  /** Identifier of the user who received the message. */
+  receiver_user_id: number;
+  /** Identifier of the ephemeral message to edit. */
+  ephemeral_message_id: number;
+  /** New caption of the message, 0-1024 characters after entities parsing. */
+  caption?: string;
+  /** Mode for parsing entities in the message caption. */
+  parse_mode?: ParseMode | string;
+  /** A list of special entities that appear in the caption. */
+  caption_entities?: MessageEntity[];
+  /** Pass True if the caption must be shown above the message media (Bot API 10.3+). */
+  show_caption_above_media?: boolean;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageReplyMarkupOptions {
+  /** Unique identifier for the target chat or username of the target supergroup. */
+  chat_id: number | string;
+  /** Identifier of the user who received the message. */
+  receiver_user_id: number;
+  /** Identifier of the ephemeral message to edit. */
+  ephemeral_message_id: number;
+  /** Inline keyboard markup. */
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface DeleteEphemeralMessageOptions {
+  /** Unique identifier for the target chat or username of the target supergroup. */
+  chat_id: number | string;
+  /** Identifier of the user who received the message. */
+  receiver_user_id: number;
+  /** Identifier of the ephemeral message to delete. */
+  ephemeral_message_id: number;
 }
 
 export type ReplyMarkup =

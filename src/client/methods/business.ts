@@ -13,6 +13,13 @@ import type {
   BusinessConnection,
   AnswerCallbackQueryOptions,
   AnswerInlineQueryOptions,
+  SendRichMessageOptions,
+  SendRichMessageDraftOptions,
+  EditEphemeralMessageTextOptions,
+  EditEphemeralMessageMediaOptions,
+  EditEphemeralMessageCaptionOptions,
+  EditEphemeralMessageReplyMarkupOptions,
+  DeleteEphemeralMessageOptions,
 } from "../types.js";
 
 /**
@@ -784,8 +791,8 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Rich message options including `chat_id` and `rich_message`.
    * @returns The sent {@link Message}.
    */
-  public async sendRichMessage(options: Record<string, unknown>): Promise<Message> {
-    return this.request<Message>("sendRichMessage", options);
+  public async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
+    return this.request<Message>("sendRichMessage", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -794,8 +801,11 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @param options - Rich message draft options.
    * @returns `true` on success.
    */
-  public async sendRichMessageDraft(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("sendRichMessageDraft", options);
+  public async sendRichMessageDraft(options: SendRichMessageDraftOptions): Promise<boolean> {
+    return this.request<boolean>(
+      "sendRichMessageDraft",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -805,25 +815,82 @@ export abstract class BusinessAndEcosystemMethods extends TopicAndProfileMethods
    * @returns Edited {@link Message} or boolean.
    */
   public async editEphemeralMessageText(
-    options: Record<string, unknown>,
+    options: EditEphemeralMessageTextOptions,
   ): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editEphemeralMessageText", options);
+    return this.request<Message | boolean>(
+      "editEphemeralMessageText",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message media (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message media edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageMedia(
+    options: EditEphemeralMessageMediaOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageMedia",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message caption (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message caption edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageCaption(
+    options: EditEphemeralMessageCaptionOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageCaption",
+      options as unknown as Record<string, unknown>,
+    );
+  }
+
+  /**
+   * Edits an ephemeral message reply markup (Bot API 10.3+).
+   *
+   * @param options - Ephemeral message reply markup edit options.
+   * @returns Edited {@link Message} or boolean.
+   */
+  public async editEphemeralMessageReplyMarkup(
+    options: EditEphemeralMessageReplyMarkupOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editEphemeralMessageReplyMarkup",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
    * Deletes an ephemeral message (Bot API 10.2+).
    *
-   * @param chatId - Chat identifier.
-   * @param messageId - Message identifier.
+   * @param optionsOrChatId - Options object or chat identifier.
+   * @param receiverUserId - Receiver user identifier when passing positional arguments.
+   * @param ephemeralMessageId - Ephemeral message identifier when passing positional arguments.
    * @returns `true` on success.
    */
   public async deleteEphemeralMessage(
-    chatId: number | string,
-    messageId: number,
+    optionsOrChatId: DeleteEphemeralMessageOptions | number | string,
+    receiverUserId?: number,
+    ephemeralMessageId?: number,
   ): Promise<boolean> {
+    if (typeof optionsOrChatId === "object") {
+      return this.request<boolean>(
+        "deleteEphemeralMessage",
+        optionsOrChatId as unknown as Record<string, unknown>,
+      );
+    }
     return this.request<boolean>("deleteEphemeralMessage", {
-      chat_id: chatId,
-      message_id: messageId,
+      chat_id: optionsOrChatId,
+      receiver_user_id: receiverUserId,
+      ephemeral_message_id: ephemeralMessageId,
     });
   }
 

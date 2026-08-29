@@ -42,4 +42,17 @@ describe("Update wrapper", () => {
     expect(update.effective_user?.id).toBe(789);
     expect(update.effective_chat?.id).toBe(999);
   });
+
+  it("resolves effective_chat from stopped_message_generation (Bot API 10.3)", () => {
+    const update = new Update({
+      update_id: 3,
+      stopped_message_generation: {
+        chat: { id: 888, type: "private" },
+        draft_id: 42,
+      },
+    });
+
+    expect(update.effective_chat?.id).toBe(888);
+    expect(update.stopped_message_generation?.draft_id).toBe(42);
+  });
 });

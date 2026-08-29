@@ -8,7 +8,7 @@ import { BaseBotClient } from "./base.js";
 import type {
   User,
   Message,
-  Update as RawUpdate,
+  RawUpdate,
   UserProfilePhotos,
   File,
   WebhookInfo,
@@ -43,7 +43,10 @@ import type {
   CopyMessagesOptions,
   PreparedInlineMessage,
   SavePreparedInlineMessageOptions,
+  SendMessageDraftOptions,
+  SendLivePhotoOptions,
 } from "../types.js";
+
 import type { ParseMode } from "../constants.js";
 
 /**
@@ -872,8 +875,8 @@ export abstract class MessageMethods extends BaseBotClient {
    * @param options - Options including `chat_id` and draft content.
    * @returns `true` on success.
    */
-  public async sendMessageDraft(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("sendMessageDraft", options);
+  public async sendMessageDraft(options: SendMessageDraftOptions): Promise<boolean> {
+    return this.request<boolean>("sendMessageDraft", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -912,8 +915,8 @@ export abstract class MessageMethods extends BaseBotClient {
    * @param options - Live photo options.
    * @returns Sent {@link Message}.
    */
-  public async sendLivePhoto(options: Record<string, unknown>): Promise<Message> {
-    return this.request<Message>("sendLivePhoto", options);
+  public async sendLivePhoto(options: SendLivePhotoOptions): Promise<Message> {
+    return this.request<Message>("sendLivePhoto", options as unknown as Record<string, unknown>);
   }
 
   /**

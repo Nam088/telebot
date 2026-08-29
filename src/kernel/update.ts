@@ -25,6 +25,7 @@ import type {
   MessageReactionUpdated,
   MessageReactionCountUpdated,
   PurchasedPaidMedia,
+  MessageGenerationStopped,
 } from "../client/types.js";
 import type { Bot } from "../client/bot.js";
 
@@ -65,6 +66,7 @@ export class Update implements RawUpdate {
   public readonly chat_boost?: ChatBoostUpdated;
   public readonly removed_chat_boost?: ChatBoostRemoved;
   public readonly purchased_paid_media?: PurchasedPaidMedia;
+  public readonly stopped_message_generation?: MessageGenerationStopped;
 
   private _bot?: Bot;
 
@@ -99,6 +101,7 @@ export class Update implements RawUpdate {
     this.chat_boost = raw.chat_boost;
     this.removed_chat_boost = raw.removed_chat_boost;
     this.purchased_paid_media = raw.purchased_paid_media;
+    this.stopped_message_generation = raw.stopped_message_generation;
     this._bot = bot;
   }
 
@@ -152,6 +155,7 @@ export class Update implements RawUpdate {
     if (this.edited_business_message?.chat) return this.edited_business_message.chat;
     if (this.deleted_business_messages?.chat) return this.deleted_business_messages.chat;
     if (this.poll_answer?.voter_chat) return this.poll_answer.voter_chat;
+    if (this.stopped_message_generation?.chat) return this.stopped_message_generation.chat;
     return undefined;
   }
 
