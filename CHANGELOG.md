@@ -2,6 +2,18 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.2.0](https://github.com/Nam088/telebot-ts/compare/v1.1.3...v1.2.0) (2026-08-29)
+
+
+### Bug Fixes
+
+* **ci:** use safe HTML formatting for telegram notifications ([44800fe](https://github.com/Nam088/telebot-ts/commit/44800fe6fdb40da7836e198650d8f53ead10b93f))
+
+
+### Features
+
+* **api:** Telegram Bot API 10.3 support ([#4](https://github.com/Nam088/telebot-ts/issues/4)) ([9263841](https://github.com/Nam088/telebot-ts/commit/9263841826c6d79454bf5e0b2d27f6a374956866)), closes [#3](https://github.com/Nam088/telebot-ts/issues/3)
+
 ## [1.1.3](https://github.com/Nam088/telebot-ts/compare/v1.1.2...v1.1.3) (2026-08-29)
 
 
