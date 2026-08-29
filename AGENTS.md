@@ -48,6 +48,8 @@ Before writing code against a library not already decided in `technical-context.
 - ESM only (`"type": "module"` in `package.json`) — set.
 - Follow the file layout in spec.md's "Project Structure" section (`src/telegram/`, `src/ext/`, `src/utils/`, top-level `examples/`, `tests/unit/` + `tests/integration/`). Note `package.json`'s current `dev:*` scripts point at `src/examples/`, not the top-level `examples/` spec.md describes — reconcile this when scaffolding the real directories, don't leave both paths half-populated.
 - Multi-word source filenames use `.` as the separator, not `_`: `conversation.handler.ts`, `job.queue.ts` (not `conversation_handler.ts`/`job_queue.ts`). This is a filename-only rule — it doesn't apply to identifiers inside the code, where the Naming Conventions noun rule above still keeps `job_queue` as a property name (`context.job_queue`).
+- **Source File Length Ceiling (< 500 lines)**: Every file in `src/` must remain strictly under 500 lines. Complex domains must be split into dedicated subfolders (`messages/`, `chats/`, `topics/`, `business/`, `rrule/`, `menu/`, `keyboard/`, `async-conversation/`) exporting through an `index.ts`.
+- **Zero Loose Bridge Files**: Never create or leave single-file bridge re-exports alongside domain directories; all modules must export and import through `index.js`.
 
 ## Testing
 
