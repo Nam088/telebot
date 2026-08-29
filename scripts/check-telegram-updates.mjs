@@ -153,37 +153,50 @@ async function createGithubIssue(updateInfo) {
 }
 
 /**
- * 4. Gửi thông báo Telegram (tuỳ chọn)
+ * 4. Gửi thông báo Telegram (sử dụng HTML mode để tránh lỗi parse underscore/ký tự đặc biệt)
  */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 async function sendTelegramAlert(updateInfo) {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
 
-  let text = `🚀 *Telegram Bot API Cập Nhật Mới!*\n\n`;
-  text += `📌 *Phiên bản:* ${updateInfo.version}\n`;
-  text += `📅 *Ngày phát hành:* ${updateInfo.date}\n\n`;
-  text += `*Các điểm mới nổi bật:*\n`;
+  let text = `🚀 <b>Telegram Bot API Cập Nhật Mới!</b>\n\n`;
+  text += `📌 <b>Phiên bản:</b> ${escapeHtml(updateInfo.version)}\n`;
+  text += `📅 <b>Ngày phát hành:</b> ${escapeHtml(updateInfo.date)}\n\n`;
+  text += `<b>Các điểm mới nổi bật:</b>\n`;
 
   for (const feat of updateInfo.features.slice(0, 4)) {
-    text += `\n🔹 *${feat.category}:*\n`;
+    text += `\n🔹 <b>${escapeHtml(feat.category)}:</b>\n`;
     for (const item of feat.items.slice(0, 3)) {
-      text += `  • ${item.length > 120 ? item.slice(0, 117) + '...' : item}\n`;
+      const cleanItem = item.length > 120 ? item.slice(0, 117) + '...' : item;
+      text += `  • ${escapeHtml(cleanItem)}\n`;
     }
   }
 
-  text += `\n🔗 [Xem chi tiết tại Telegram Changelog](${updateInfo.url})`;
+  text += `\n🔗 <a href="${updateInfo.url}">Xem chi tiết tại Telegram Changelog</a>`;
 
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT_ID,
         text: text,
-        parse_mode: 'Markdown',
+        parse_mode: 'HTML',
         disable_web_page_preview: false,
       }),
     });
-    console.log('✅ Đã gửi thông báo đến Telegram!');
+    const data = await res.json();
+    if (data.ok) {
+      console.log('✅ Đã gửi thông báo đến Telegram thành công!');
+    } else {
+      console.error('❌ Telegram API trả về lỗi:', data);
+    }
   } catch (err) {
     console.error('❌ Gửi tin nhắn Telegram thất bại:', err.message);
   }
