@@ -7,8 +7,34 @@ on:
     branches: [main, master, develop]
 
 jobs:
+  changes:
+    name: Detect Changed Paths
+    runs-on: ubuntu-latest
+    outputs:
+      node: ${{ steps.filter.outputs.node }}
+      go: ${{ steps.filter.outputs.go }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            node:
+              - 'packages/node/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/ci.yml'
+            go:
+              - 'packages/go/**'
+              - '.github/workflows/ci.yml'
+
   test-node:
     name: Node.js Test & Lint (${{ matrix.node-version }})
+    needs: changes
+    if: ${{ needs.changes.outputs.node == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -44,6 +70,8 @@ jobs:
 
   test-go:
     name: Golang Test & Build (${{ matrix.go-version }})
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:

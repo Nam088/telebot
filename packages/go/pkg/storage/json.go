@@ -47,6 +47,7 @@ func (s *JSONStorage) flush() error {
 	return os.WriteFile(s.filepath, bytes, 0644)
 }
 
+// GetUserData retrieves a copy of the user data map from the JSON file.
 func (s *JSONStorage) GetUserData(ctx context.Context, userID int64) (map[string]any, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -62,6 +63,7 @@ func (s *JSONStorage) GetUserData(ctx context.Context, userID int64) (map[string
 	return clone, nil
 }
 
+// SetUserData stores the user data map and flushs it to the JSON file.
 func (s *JSONStorage) SetUserData(ctx context.Context, userID int64, data map[string]any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -70,6 +72,7 @@ func (s *JSONStorage) SetUserData(ctx context.Context, userID int64, data map[st
 	return s.flush()
 }
 
+// GetChatData retrieves a copy of the chat data map from the JSON file.
 func (s *JSONStorage) GetChatData(ctx context.Context, chatID int64) (map[string]any, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -85,6 +88,7 @@ func (s *JSONStorage) GetChatData(ctx context.Context, chatID int64) (map[string
 	return clone, nil
 }
 
+// SetChatData stores the chat data map and flushs it to the JSON file.
 func (s *JSONStorage) SetChatData(ctx context.Context, chatID int64, data map[string]any) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

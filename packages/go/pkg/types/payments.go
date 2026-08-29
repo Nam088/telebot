@@ -24,3 +24,17 @@ type SuccessfulPayment struct {
 	TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`
 	ProviderPaymentChargeID string `json:"provider_payment_charge_id"`
 }
+
+// StarTransactions represents the list of Telegram Stars transactions.
+type StarTransactions struct {
+	Transactions []StarTransaction `json:"transactions"`
+}
+
+// StarTransaction represents a single Telegram Stars transaction.
+type StarTransaction struct {
+	ID       string `json:"id"`
+	Amount   int    `json:"amount"`
+	Date     int64  `json:"date"`
+	Source   any    `json:"source,omitempty"`
+	Receiver any    `json:"receiver,omitempty"`
+}

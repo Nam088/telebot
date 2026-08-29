@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
@@ -10,12 +11,39 @@ import (
 )
 
 func main() {
+	if err := run(context.Background()); err != nil {
+		log.Fatalf("Echo bot error: %v", err)
+	}
+}
+
+// apiBaseURL optionally overrides the Telegram Bot API endpoint. It exists as
+// a test hook so the bot can be pointed at a local mock server.
+var apiBaseURL string
+
+// newBot constructs the Bot client, honouring the apiBaseURL override.
+func newBot(token string) *bot.Bot {
+	if apiBaseURL != "" {
+		return bot.NewBot(token, bot.WithBaseURL(apiBaseURL))
+	}
+	return bot.NewBot(token)
+}
+
+// run wires the echo bot and blocks on long polling until ctx is cancelled.
+func run(ctx context.Context) error {
 	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
-		log.Fatal("BOT_TOKEN is not set")
+		return errors.New("BOT_TOKEN is not set")
 	}
 
-	b := bot.NewBot(token)
+	b := newBot(token)
+	router := buildRouter(b)
+
+	log.Println("🤖 Echo bot is running...")
+	return router.RunPolling(ctx)
+}
+
+// buildRouter registers the echo bot's update routes on a fresh Router.
+func buildRouter(b *bot.Bot) *routing.Router {
 	router := routing.NewRouter(b)
 
 	router.Command("start", func(c *routing.Context) error {
@@ -32,8 +60,5 @@ func main() {
 		return nil
 	})
 
-	log.Println("🤖 Echo bot is running...")
-	if err := router.RunPolling(context.Background()); err != nil {
-		log.Fatalf("Polling error: %v", err)
-	}
+	return router
 }

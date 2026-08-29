@@ -24,6 +24,7 @@ type TelegramError struct {
 	Parameters  *Parameters `json:"parameters,omitempty"`
 }
 
+// Error implements the error interface, returning the error code and description.
 func (e *TelegramError) Error() string {
 	return fmt.Sprintf("telegram api error: [%d] %s", e.ErrorCode, e.Description)
 }

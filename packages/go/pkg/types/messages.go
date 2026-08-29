@@ -98,13 +98,13 @@ type Location struct {
 
 // Venue represents a venue.
 type Venue struct {
-	Location       Location `json:"location"`
-	Title          string   `json:"title"`
-	Address        string   `json:"address"`
-	FoursquareID   string   `json:"foursquare_id,omitempty"`
-	FoursquareType string   `json:"foursquare_type,omitempty"`
-	GooglePlaceID  string   `json:"google_place_id,omitempty"`
-	GooglePlaceType string  `json:"google_place_type,omitempty"`
+	Location        Location `json:"location"`
+	Title           string   `json:"title"`
+	Address         string   `json:"address"`
+	FoursquareID    string   `json:"foursquare_id,omitempty"`
+	FoursquareType  string   `json:"foursquare_type,omitempty"`
+	GooglePlaceID   string   `json:"google_place_id,omitempty"`
+	GooglePlaceType string   `json:"google_place_type,omitempty"`
 }
 
 // PollOption contains information about one answer option in a poll.
@@ -127,6 +127,14 @@ type Poll struct {
 	Explanation           string       `json:"explanation,omitempty"`
 }
 
+// PollAnswer represents a change of answer by a user in a non-anonymous poll.
+type PollAnswer struct {
+	PollID    string `json:"poll_id"`
+	VoterChat *Chat  `json:"voter_chat,omitempty"`
+	User      *User  `json:"user,omitempty"`
+	OptionIDs []int  `json:"option_ids"`
+}
+
 // Dice represents an animated emoji that displays a random value.
 type Dice struct {
 	Emoji string `json:"emoji"`
@@ -136,16 +144,6 @@ type Dice struct {
 // MessageId contains a unique message identifier.
 type MessageId struct {
 	MessageID int64 `json:"message_id"`
-}
-
-// EditMessageTextOptions parameters for editMessageText.
-type EditMessageTextOptions struct {
-	ChatID          any                   `json:"chat_id,omitempty"`
-	MessageID       int64                 `json:"message_id,omitempty"`
-	InlineMessageID string                `json:"inline_message_id,omitempty"`
-	Text            string                `json:"text"`
-	ParseMode       string                `json:"parse_mode,omitempty"`
-	ReplyMarkup     *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // EditMessageReplyMarkupOptions parameters for editMessageReplyMarkup.

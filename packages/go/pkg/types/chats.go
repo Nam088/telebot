@@ -28,17 +28,17 @@ type ChatPermissions struct {
 
 // ChatInviteLink represents an invite link for a chat.
 type ChatInviteLink struct {
-	InviteLink              string `json:"invite_link"`
-	Creator                 User   `json:"creator"`
-	CreatesJoinRequest      bool   `json:"creates_join_request"`
-	IsPrimary               bool   `json:"is_primary"`
-	IsRevoked               bool   `json:"is_revoked"`
-	Name                    string `json:"name,omitempty"`
-	ExpireDate              int64  `json:"expire_date,omitempty"`
-	MemberLimit             int    `json:"member_limit,omitempty"`
-	PendingMemberCount      int    `json:"pending_member_count,omitempty"`
-	SubscriptionPeriod      int    `json:"subscription_period,omitempty"`
-	SubscriptionPrice       int    `json:"subscription_price,omitempty"`
+	InviteLink         string `json:"invite_link"`
+	Creator            User   `json:"creator"`
+	CreatesJoinRequest bool   `json:"creates_join_request"`
+	IsPrimary          bool   `json:"is_primary"`
+	IsRevoked          bool   `json:"is_revoked"`
+	Name               string `json:"name,omitempty"`
+	ExpireDate         int64  `json:"expire_date,omitempty"`
+	MemberLimit        int    `json:"member_limit,omitempty"`
+	PendingMemberCount int    `json:"pending_member_count,omitempty"`
+	SubscriptionPeriod int    `json:"subscription_period,omitempty"`
+	SubscriptionPrice  int    `json:"subscription_price,omitempty"`
 }
 
 // ChatAdministratorRights represents rights of an administrator.
@@ -55,4 +55,26 @@ type ChatAdministratorRights struct {
 	CanEditMessages     bool `json:"can_edit_messages,omitempty"`
 	CanPinMessages      bool `json:"can_pin_messages,omitempty"`
 	CanManageTopics     bool `json:"can_manage_topics,omitempty"`
+}
+
+// ChatMemberUpdated represents changes in the status of a chat member.
+type ChatMemberUpdated struct {
+	Chat                    *Chat           `json:"chat"`
+	From                    *User           `json:"from"`
+	Date                    int64           `json:"date"`
+	OldChatMember           ChatMember      `json:"old_chat_member"`
+	NewChatMember           ChatMember      `json:"new_chat_member"`
+	InviteLink              *ChatInviteLink `json:"invite_link,omitempty"`
+	ViaJoinRequest          bool            `json:"via_join_request,omitempty"`
+	ViaChatFolderInviteLink bool            `json:"via_chat_folder_invite_link,omitempty"`
+}
+
+// ChatJoinRequest represents a join request sent to a chat.
+type ChatJoinRequest struct {
+	Chat       *Chat           `json:"chat"`
+	From       *User           `json:"from"`
+	UserChatID int64           `json:"user_chat_id"`
+	Date       int64           `json:"date"`
+	Bio        string          `json:"bio,omitempty"`
+	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 }

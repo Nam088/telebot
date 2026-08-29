@@ -5,6 +5,11 @@ on:
     branches:
       - main
       - beta
+    paths:
+      - 'packages/node/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/release-pipeline.yml'
 
 permissions:
   contents: write

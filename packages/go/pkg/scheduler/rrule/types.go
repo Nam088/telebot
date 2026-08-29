@@ -6,12 +6,19 @@ import "time"
 type Frequency int
 
 const (
+	// Secondly indicates recurrence every second.
 	Secondly Frequency = iota
+	// Minutely indicates recurrence every minute.
 	Minutely
+	// Hourly indicates recurrence every hour.
 	Hourly
+	// Daily indicates recurrence every day.
 	Daily
+	// Weekly indicates recurrence every week.
 	Weekly
+	// Monthly indicates recurrence every month.
 	Monthly
+	// Yearly indicates recurrence every year.
 	Yearly
 )
 

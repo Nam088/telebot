@@ -37,24 +37,3 @@ func (b *Bot) CloseForumTopic(ctx context.Context, chatID any, messageThreadID i
 	}
 	return ok, nil
 }
-
-// SetMyCommands changes the list of the bot's commands.
-func (b *Bot) SetMyCommands(ctx context.Context, commands []types.BotCommand) (bool, error) {
-	payload := map[string]any{
-		"commands": commands,
-	}
-	var ok bool
-	if err := b.Request(ctx, "setMyCommands", payload, &ok); err != nil {
-		return false, err
-	}
-	return ok, nil
-}
-
-// GetMyCommands gets the current list of the bot's commands.
-func (b *Bot) GetMyCommands(ctx context.Context) ([]types.BotCommand, error) {
-	var commands []types.BotCommand
-	if err := b.Request(ctx, "getMyCommands", nil, &commands); err != nil {
-		return nil, err
-	}
-	return commands, nil
-}

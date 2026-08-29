@@ -13,7 +13,9 @@ import (
 )
 
 const (
+	// DefaultBaseURL is the production Telegram Bot API endpoint.
 	DefaultBaseURL = "https://api.telegram.org"
+	// DefaultTimeout is the default HTTP client timeout for Bot API requests.
 	DefaultTimeout = 30 * time.Second
 )
 

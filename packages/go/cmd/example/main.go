@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/Nam088/telebot-go/pkg/bot"
@@ -16,18 +14,49 @@ import (
 )
 
 func main() {
+	if err := run(context.Background()); err != nil {
+		log.Fatalf("Example bot error: %v", err)
+	}
+}
+
+// apiBaseURL optionally overrides the Telegram Bot API endpoint for tests.
+var apiBaseURL string
+
+func newBot(token string) *bot.Bot {
+	if apiBaseURL != "" {
+		return bot.NewBot(token, bot.WithBaseURL(apiBaseURL))
+	}
+	return bot.NewBot(token)
+}
+
+// run wires the demonstration bot: middleware, command and callback handlers,
+// and a recurring health-check job. It returns once setup completes.
+func run(ctx context.Context) error {
 	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
 		log.Println("BOT_TOKEN is not set. Using dummy client demonstration.")
 		token = "123456:dummy-token"
 	}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer cancel()
-
-	b := bot.NewBot(token)
-	router := routing.NewRouter(b)
+	b := newBot(token)
+	router := buildRouter(b)
 	queue := scheduler.NewJobQueue(ctx, b)
+
+	// Background recurring task
+	queue.RunRepeating("health_check", 1*time.Minute, func(jobCtx context.Context, b *bot.Bot) error {
+		log.Println("[HealthCheck] Bot is running smoothly.")
+		return nil
+	})
+
+	_ = router
+	fmt.Println("🚀 telebot-go framework initialized successfully!")
+	return nil
+}
+
+// buildRouter registers the demonstration middleware, command and callback
+// handlers on a fresh Router.
+func buildRouter(b *bot.Bot) *routing.Router {
+	router := routing.NewRouter(b)
 
 	// Middleware: Logging
 	router.Use(func(next routing.HandlerFunc) routing.HandlerFunc {
@@ -68,11 +97,5 @@ func main() {
 		return err
 	})
 
-	// Background recurring task
-	queue.RunRepeating("health_check", 1*time.Minute, func(jobCtx context.Context, b *bot.Bot) error {
-		log.Println("[HealthCheck] Bot is running smoothly.")
-		return nil
-	})
-
-	fmt.Println("🚀 telebot-go framework initialized successfully!")
+	return router
 }

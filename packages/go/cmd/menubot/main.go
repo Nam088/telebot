@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
@@ -12,15 +13,47 @@ import (
 )
 
 func main() {
+	if err := run(context.Background()); err != nil {
+		log.Fatalf("Menu bot error: %v", err)
+	}
+}
+
+// apiBaseURL optionally overrides the Telegram Bot API endpoint for tests.
+var apiBaseURL string
+
+func newBot(token string) *bot.Bot {
+	if apiBaseURL != "" {
+		return bot.NewBot(token, bot.WithBaseURL(apiBaseURL))
+	}
+	return bot.NewBot(token)
+}
+
+// run wires the menu bot and blocks on long polling until ctx ends.
+func run(ctx context.Context) error {
 	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
-		log.Fatal("BOT_TOKEN is not set")
+		return errors.New("BOT_TOKEN is not set")
 	}
 
-	b := bot.NewBot(token)
+	b := newBot(token)
 	router := routing.NewRouter(b)
 
-	// Create nested interactive menus
+	mainMenu := buildMenu()
+	mainMenu.Register(router)
+
+	router.Command("menu", func(c *routing.Context) error {
+		_, err := c.Reply(mainMenu.Text, func(o *types.SendMessageOptions) {
+			o.ReplyMarkup = mainMenu.BuildKeyboard()
+		})
+		return err
+	})
+
+	log.Println("🤖 Menu bot is running...")
+	return router.RunPolling(ctx)
+}
+
+// buildMenu constructs the nested main/settings menu tree.
+func buildMenu() *menu.Menu {
 	mainMenu := menu.New("main", "🎛️ Main Control Panel\nPlease select an option:")
 	settingsMenu := menu.New("settings", "⚙️ Bot Settings\nConfigure your preferences:")
 
@@ -35,17 +68,5 @@ func main() {
 		return err
 	})
 
-	mainMenu.Register(router)
-
-	router.Command("menu", func(c *routing.Context) error {
-		_, err := c.Reply(mainMenu.Text, func(o *types.SendMessageOptions) {
-			o.ReplyMarkup = mainMenu.BuildKeyboard()
-		})
-		return err
-	})
-
-	log.Println("🤖 Menu bot is running...")
-	if err := router.RunPolling(context.Background()); err != nil {
-		log.Fatalf("Polling error: %v", err)
-	}
+	return mainMenu
 }

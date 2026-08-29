@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'packages/node/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:

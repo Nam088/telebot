@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	// ConversationEnd is the sentinel state value indicating the conversation has ended.
 	ConversationEnd = -1
 )
 

@@ -25,6 +25,7 @@
   - [7. Production Webhooks](#7-production-webhooks)
 - [Example Bots](#-example-bots)
 - [Testing & Quality Gates](#-testing--quality-gates)
+- [Parity with the Node Implementation](#-parity-with-the-node-implementation)
 
 ---
 
@@ -40,7 +41,7 @@ It strictly adheres to a **Zero External Runtime Dependencies** policy—built 1
 
 - **Zero External Runtime Dependencies**: Pure Go standard library.
 - **Idiomatic Concurrency**: Native Goroutine worker dispatching for high-throughput update processing.
-- **Full Telegram Bot API Coverage**: Messages, Photos, Documents, Webhooks, Forum Topics, Chat Moderation, Stickers, Payments, Business Accounts.
+- **Broad Telegram Bot API Coverage**: 110+ client methods spanning messaging, media & bulk operations, edits, reactions, chat management & invite links, forum topics, bot profile, files, inline mode, stickers, payments (invoices & Telegram Stars), games, stories & gifts, and webhooks.
 - **Composable Filters**: Logical predicates (`filters.Text`, `filters.Command`, `filters.Private`, `filters.And`, `filters.Or`, `filters.Not`).
 - **Interactive UI Components**:
   - Fluent `InlineKeyboard` builder.
@@ -116,39 +117,65 @@ packages/go/
 ├── cmd/
 │   ├── example/            # General overview example
 │   ├── echobot/            # Minimal echo bot
+│   ├── keyboardbot/        # Reply & inline keyboard builders
+│   ├── inlinebot/          # Inline query results (Article/Photo builders)
+│   ├── pollbot/            # Polls, quizzes, and poll-answer routing
+│   ├── mediabot/           # Media methods + MarkdownV2 formatting utils
 │   ├── menubot/            # Interactive menu bot
 │   ├── conversationbot/    # Multi-step survey bot (FSM)
-│   └── webhookbot/         # Production webhook server bot
+│   ├── webhookbot/         # Production webhook server bot
+│   └── apidemo/            # Live API smoke-test harness (PASS/FAIL report)
 ├── pkg/
-│   ├── types/              # Telegram Bot API models and options
-│   │   ├── common.go       # User, Chat, Response, Error, File
+│   ├── types/              # Telegram Bot API models and request options
+│   │   ├── common.go       # User, Chat, Response, TelegramError, File
 │   │   ├── messages.go     # Message media, Poll, Location, SendOptions
 │   │   ├── chats.go        # ChatMember, Permissions, InviteLinks
 │   │   ├── stickers.go     # Sticker, StickerSet
 │   │   ├── payments.go     # Invoice, LabeledPrice, SuccessfulPayment
 │   │   ├── topics.go       # ForumTopic, BotCommand, BotProfile
-│   │   └── business.go     # BusinessConnection, Story, Game
+│   │   ├── business.go     # BusinessConnection, Story, Game
+│   │   └── ...             # Domain option structs (edits, bulk, reactions, ...)
 │   ├── bot/                # HTTP client & Webhook server
-│   │   ├── bot.go          # Client core and request execution
-│   │   ├── messages.go     # Message and media API methods
+│   │   ├── bot.go          # Client core, request execution, retry
+│   │   ├── messages.go     # Basic messaging methods
+│   │   ├── media.go        # Media & send-media-group methods
+│   │   ├── bulk.go         # Bulk forward/copy/delete methods
+│   │   ├── edits.go        # Message editing methods
+│   │   ├── reactions.go    # Message reaction methods
 │   │   ├── chats.go        # Chat administration methods
-│   │   ├── topics.go       # Forum and profile methods
+│   │   ├── members.go      # Membership & moderation methods
+│   │   ├── chat_management.go # Chat settings & invite-link methods
+│   │   ├── invite_links.go # Invite link CRUD methods
+│   │   ├── topics.go       # Forum topic methods
+│   │   ├── profile.go      # Bot profile/description methods
+│   │   ├── files.go        # File download methods
+│   │   ├── inline.go       # Inline mode methods
+│   │   ├── stickers.go     # Sticker set management
+│   │   ├── payments.go     # Invoices & Telegram Stars
+│   │   ├── games.go        # Game methods
+│   │   ├── stories_gifts.go # Stories & gifts methods
 │   │   └── webhook.go      # Webhook HTTP server & handlers
 │   ├── components/         # UI Builders
-│   │   ├── keyboard/       # InlineKeyboard fluent builder
+│   │   ├── keyboard/       # InlineKeyboard & ReplyKeyboard fluent builders
 │   │   ├── menu/           # Interactive nested Menu system
-│   │   └── pagination/     # Pagination navigation builder
+│   │   ├── pagination/     # Pagination navigation builder
+│   │   └── inlinequery/    # Inline query result builders (Article, Photo)
 │   ├── routing/            # Router, Context, Middlewares & FSM
 │   │   ├── router.go       # Route registry and update dispatcher
 │   │   ├── context.go      # CallbackContext with reply shortcuts
-│   │   └── conversation.go # FSM ConversationHandler
+│   │   ├── conversation.go # FSM ConversationHandler
+│   │   └── updates.go      # Update dispatch helpers
 │   ├── filters/            # Predicate matchers (Text, Command, Private, etc.)
 │   ├── scheduler/          # Background tasks and RFC 5545 recurrence
 │   │   ├── scheduler.go    # JobQueue (RunOnce, RunRepeating, RunRRule)
 │   │   └── rrule/          # RFC 5545 Recurrence Engine
-│   └── storage/            # Data & Session Persistence
-│       ├── storage.go      # Persistence interface & MemoryStorage
-│       └── json.go         # File-based JSON storage
+│   ├── storage/            # Data & Session Persistence
+│   │   ├── storage.go      # Persistence interface & MemoryStorage
+│   │   └── json.go         # File-based JSON storage
+│   └── utils/              # Formatting, rate limiting & validation helpers
+│       ├── formatting.go   # MarkdownV2 / HTML escaping & helpers
+│       ├── ratelimit.go    # Token-bucket rate limiter
+│       └── validation.go   # Token & WebApp init-data validation
 ├── Makefile
 └── go.mod
 ```
@@ -383,6 +410,27 @@ func main() {
 
 ---
 
+## 🤖 Example Bots
+
+Every example lives in `cmd/<name>/`. Set the `BOT_TOKEN` environment variable, then run:
+
+```bash
+go run ./cmd/<name>
+```
+
+| Example | What it shows |
+|---|---|
+| `echobot` | Minimal router: `/start`, text echo |
+| `example` | General overview: commands, keyboards, scheduler |
+| `keyboardbot` | Reply keyboards (`NewReplyKeyboard`, one-time, placeholder) + inline keyboards + callbacks |
+| `inlinebot` | Inline queries answered with `components/inlinequery` Article/Photo builders |
+| `pollbot` | Regular & quiz polls, `stopPoll`, `Router.Poll` / `Router.PollAnswer` routing |
+| `mediabot` | Dice, location, venue, contact, albums, stickers, reactions, `utils` MarkdownV2 helpers |
+| `menubot` | Nested interactive menu with pagination |
+| `conversationbot` | Multi-step FSM conversation with per-user state |
+| `webhookbot` | Production-style webhook server with secret token |
+| `apidemo` | Live smoke test of ~50 Bot API methods with a PASS/FAIL report (`CHAT_ID` env for chat-scoped methods) |
+
 ## 🧪 Testing & Quality Gates
 
 Run all Go unit tests:
@@ -397,6 +445,42 @@ Or from the Monorepo root:
 ```bash
 npm run test:go
 ```
+
+---
+
+## 🔀 Parity with the Node Implementation
+
+`telebot-go` targets feature parity with the Node/TypeScript framework in this
+monorepo (`packages/node`, published as `telebot-ts`). The table below compares
+the two implementations:
+
+| Feature Area                | telebot-ts (Node)                                                    | telebot-go (Go)                                                              |
+| --------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Bot API client methods      | Full coverage                                                        | Broad coverage (110+ methods; see Key Features)                              |
+| Long polling                | `Application.runPolling`                                             | `Router.RunPolling`                                                          |
+| Webhook server              | Built-in HTTP server, secret-token validation                        | Built-in HTTP server, secret-token validation                                |
+| Update routing              | `Application` + handler classes (`CommandHandler`, `MessageHandler`, ...) | `Router` with filter-based routes (`Command`, `Text`, `CallbackQuery`, `Handle`) |
+| Middlewares                 | `Application` middleware pipeline                                    | `Router.Use`                                                                 |
+| Filters                     | Full PTB-mirrored catalog (`filters.TEXT`, `filters.ChatType.*`, ...) | Core predicates + media/entity matchers with `And` / `Or` / `Not`            |
+| FSM conversations           | `ConversationHandler`                                                | `ConversationHandler`                                                        |
+| Linear (async) conversations | `LinearConversation`                                                  | Not ported — use FSM `ConversationHandler`                                   |
+| Keyboards, Menus, Pagination | `InlineKeyboard`, `ReplyKeyboard`, `Menu`, `Pagination`              | `keyboard`, `menu`, `pagination` components                                  |
+| Inline query builders       | Inline query result builders                                          | `inlinequery` component (`Article`, `Photo`)                                 |
+| Job queue                   | `JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                   | `scheduler.JobQueue` (`RunOnce`, `RunRepeating`, `RunRRule`)                 |
+| RFC 5545 RRule engine       | ✔                                                                    | ✔ (`scheduler/rrule`)                                                        |
+| Session persistence         | Memory, JSON file, **SQLite** (`node:sqlite`)                        | Memory, JSON file                                                            |
+| Structured logging          | Optional `pino` integration                                          | Standard library `log`                                                       |
+| Retry / rate-limit handling | Exponential backoff honoring `retry_after`                           | Exponential backoff honoring `retry_after`                                   |
+
+### Not applicable to Go
+
+- **SQLite persistence**: the Node `SqlitePersistence` relies on the built-in
+  `node:sqlite` module, which has no Go counterpart. Go bots persist state with
+  the file-based `storage.JSONStorage` (or implement the `storage.Persistence`
+  interface for a custom backend).
+- **NestJS module**: the Node framework ships a NestJS integration
+  (module + decorators), a JavaScript-ecosystem concept that does not apply to
+  Go. Go bots wire components directly via `routing.Router`.
 
 ---
 
