@@ -78,3 +78,40 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -f "$GO_TAG"
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${GO_TAG}"
+
+      # Tags pushed with GITHUB_TOKEN do not trigger workflows, so the Go
+      # GitHub Release is created here instead of relying on go-release.yml.
+      - name: Resolve Go release version
+        id: gover
+        if: ${{ hashFiles('RELEASE_VERSION') != '' }}
+        run: echo "version=$(cat RELEASE_VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Go build on release commit
+        if: steps.gover.outputs.version != ''
+        working-directory: packages/go
+        run: |
+          go build ./...
+          go vet ./...
+
+      - name: Generate Go release notes
+        if: steps.gover.outputs.version != ''
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: packages/go/cliff.toml
+          args: --latest --strip all
+        env:
+          OUTPUT: go-release-notes.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Create Go GitHub Release
+        if: steps.gover.outputs.version != ''
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: telebot-go v${{ steps.gover.outputs.version }}
+          tag_name: packages/go/v${{ steps.gover.outputs.version }}
+          body_path: go-release-notes.md
+          draft: false
+          prerelease: false
+          make_latest: "false"
