@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>telebot — Native Telegram Bot Frameworks</title>
+    <meta
+      name="description"
+      content="Zero-dependency Telegram Bot frameworks for Node.js/TypeScript and Go."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0d1117;
+        --card: #161b22;
+        --border: #30363d;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #ffffff;
+          --card: #f6f8fa;
+          --border: #d0d7de;
+          --text: #1f2328;
+          --muted: #59636e;
+          --accent: #0969da;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 4rem 1.5rem;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin: 0 0 0.5rem;
+      }
+      .tagline {
+        color: var(--muted);
+        font-size: 1.1rem;
+        margin: 0 0 3rem;
+        text-align: center;
+        max-width: 40rem;
+      }
+      .cards {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 60rem;
+      }
+      a.card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 22rem;
+        padding: 1.75rem;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--card);
+        color: var(--text);
+        text-decoration: none;
+        transition:
+          border-color 0.15s,
+          transform 0.15s;
+      }
+      a.card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .card h2 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+      .card .badge {
+        font-size: 0.75rem;
+        color: var(--accent);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .card .cta {
+        margin-top: auto;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      footer {
+        margin-top: 3rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>telebot</h1>
+    <p class="tagline">
+      Zero-dependency, high-throughput Telegram Bot frameworks — pick your language.
+    </p>
+    <div class="cards">
+      <a class="card" href="./node/">
+        <span class="badge">telebot-ts · npm</span>
+        <h2>Node.js / TypeScript</h2>
+        <p>
+          PTB-compatible API, ESM, strict TypeScript. Full Bot API coverage with
+          conversations, menus, scheduling, and pluggable persistence.
+        </p>
+        <span class="cta">Read the API docs →</span>
+      </a>
+      <a class="card" href="https://pkg.go.dev/github.com/Nam088/telebot/packages/go">
+        <span class="badge">telebot-go · go modules</span>
+        <h2>Go</h2>
+        <p>
+          100% Go standard library. 160+ Bot API methods, FSM conversations, RRule
+          scheduler, interactive menus, and JSON storage.
+        </p>
+        <span class="cta">Read on pkg.go.dev →</span>
+      </a>
+    </div>
+    <footer>
+      <a href="https://github.com/Nam088/telebot">GitHub</a> ·
+      <a href="https://core.telegram.org/bots/api">Telegram Bot API</a>
+    </footer>
+  </body>
+</html>

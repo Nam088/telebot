@@ -8,6 +8,7 @@ on:
       - 'packages/node/**'
       - 'package.json'
       - 'package-lock.json'
+      - '.github/pages/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -42,13 +43,19 @@ jobs:
       - name: Generate TypeDoc documentation
         run: npm run docs
 
+      - name: Assemble combined docs site
+        run: |
+          mkdir -p site/node
+          cp -r packages/node/docs/. site/node/
+          cp .github/pages/index.html site/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./packages/node/docs"
+          path: "./site"
 
   deploy:
     environment:

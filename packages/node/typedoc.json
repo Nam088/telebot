@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "name": "tele-bot API Documentation",
+  "name": "telebot-ts API Documentation",
   "entryPoints": [
     "src/index.ts",
     "src/client/index.ts",
@@ -36,7 +36,7 @@
   "lightHighlightTheme": "github-light",
   "darkHighlightTheme": "github-dark",
   "navigationLinks": {
-    "GitHub Repository": "https://github.com/nam088/telegram-bot-node",
+    "GitHub Repository": "https://github.com/Nam088/telebot",
     "Telegram Bot API": "https://core.telegram.org/bots/api"
   }
 }
