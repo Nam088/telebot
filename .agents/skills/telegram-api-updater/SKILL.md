@@ -154,7 +154,7 @@ async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
 
 ## Phase 7: Mandatory Quality Gate Checks
 
-Run and ensure all 5 quality checks pass with **0 errors and 0 warnings**:
+Run and ensure all 7 quality checks pass with **0 errors and 0 warnings**:
 
 ```bash
 # 1. TypeCheck
@@ -163,15 +163,20 @@ npm run typecheck
 # 2. Code Build
 npm run build
 
-# 3. Unit Tests
+# 3. Formatting & Linting
+npm run format:check
+npm run lint
+
+# 4. Unit Tests
 npm test
 
-# 4. Coverage (>90%)
+# 5. Coverage (>90%)
 npm run test:coverage
 
-# 5. TypeDoc Documentation
+# 6. TypeDoc Documentation
 npm run docs
 ```
+
 
 ---
 
