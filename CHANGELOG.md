@@ -2,6 +2,13 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+## [1.1.3](https://github.com/Nam088/telebot-ts/compare/v1.1.2...v1.1.3) (2026-08-29)
+
+
+### Bug Fixes
+
+* **scheduler:** fix RRule startMs anchor calculation when dtstart is omitted ([825aea8](https://github.com/Nam088/telebot-ts/commit/825aea866f9b5498104d3c246d69936d0f7bd6d6))
+
 ## [1.1.2](https://github.com/Nam088/telebot-ts/compare/v1.1.1...v1.1.2) (2026-08-21)
 
 
