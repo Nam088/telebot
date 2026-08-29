@@ -40,7 +40,10 @@
     ],
     [
       "@semantic-release/exec",
-      { "prepareCmd": "npm run build && npm run docs" }
+      {
+        "prepareCmd": "npm run build && npm run docs",
+        "successCmd": "echo ${nextRelease.version} > RELEASE_VERSION"
+      }
     ],
     [
       "@semantic-release/npm",
