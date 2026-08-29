@@ -1,0 +1,48 @@
+{
+  "version": "Bot API 10.3",
+  "date": "August 24, 2026",
+  "features": [
+    {
+      "category": "Rich Messages",
+      "items": [
+        "Added the class RichMessageButton representing a button in a RichMessage.",
+        "Added the class RichTextButton.",
+        "Added the classes RichBlockButtons and InputRichBlockButtons.",
+        "Added the field is_compact to the classes RichBlockTable and InputRichBlockTable.",
+        "Added the classes RichBlockExpandableBlockQuotation and InputRichBlockExpandableBlockQuotation representing a block quotation, which can be expanded or collapsed back.",
+        "Added the classes RichBlockDocument and InputRichBlockDocument, containing a file.",
+        "Added support for links of the form tg://document?id= for general file uploads in rich messages."
+      ]
+    },
+    {
+      "category": "Ephemeral messages",
+      "items": [
+        "Added the class EphemeralMessageParameters and replaced the parameters receiver_user_id and callback_query_id in the methods sendMessage, sendAnimation, sendAudio, sendDocument, sendLivePhoto, sendPhoto, sendSticker, sendVideo, sendVideoNote, sendVoice, sendContact, sendLocation and sendVenue with the parameter ephemeral_message_parameters.",
+        "Added the parameter ephemeral_message_parameters to the method sendRichMessage.",
+        "Added the field replace_callback_query_message to the class EphemeralMessageParameters, which allows bots to show an ephemeral message in place of the original message.",
+        "Supported upload of new files in editEphemeralMessageMedia.",
+        "Added the parameter show_caption_above_media to the method editEphemeralMessageCaption.",
+        "Added the parameter rich_message to the method editEphemeralMessageText.",
+        "Added the field can_send_welcome_messages to the classes ChatAdministratorRights and ChatMemberAdministrator.",
+        "Added the parameter can_send_welcome_messages to the method promoteChatMember."
+      ]
+    },
+    {
+      "category": "Reply markup",
+      "items": [
+        "Added the class DisabledButton and the field disabled to the class InlineKeyboardButton.",
+        "Added the field force_reply to the classes InlineKeyboardMarkup and ReplyKeyboardMarkup."
+      ]
+    },
+    {
+      "category": "General",
+      "items": [
+        "Added the parameters can_stop and keep_on_stop to the methods sendMessageDraft and sendRichMessageDraft.",
+        "Added updates about user stopping message generation, represented by the class MessageGenerationStopped and the field stopped_message_generation in the class Update.",
+        "Added the class CommunityChatJoined and the field community_chat_joined to the class Message for service messages about join of a chat from a community.",
+        "Added the fields text, entities and is_private to the class UniqueGiftInfo."
+      ]
+    }
+  ],
+  "url": "https://core.telegram.org/bots/api-changelog"
+}
