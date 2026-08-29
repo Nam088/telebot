@@ -18,7 +18,9 @@
     "lint": "npm run lint --workspace=packages/node",
     "format": "prettier --write \"packages/**/*.{ts,js,json,md,go}\"",
     "format:check": "prettier --check \"packages/**/*.{ts,js,json,md,go}\"",
-    "docs": "npm run docs --workspace=packages/node"
+    "docs": "npm run docs --workspace=packages/node",
+    "docs:node": "npm run docs --workspace=packages/node",
+    "docs:go": "cd packages/go && $(go env GOPATH)/bin/pkgsite -http=:6060"
   },
   "devDependencies": {
     "prettier": "3.9.6"

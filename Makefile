@@ -1,4 +1,4 @@
-.PHONY: all test test-node test-go build build-node build-go lint format clean
+.PHONY: all test test-node test-go build build-node build-go lint format docs docs-node docs-go clean
 
 all: test build
 
@@ -29,8 +29,13 @@ format:
 format-check:
 	npm run format:check
 
-docs:
-	npm run docs
+docs: docs-node
+
+docs-node:
+	npm run docs:node
+
+docs-go:
+	npm run docs:go
 
 clean:
 	rm -rf packages/node/dist packages/node/docs packages/node/coverage
