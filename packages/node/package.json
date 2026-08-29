@@ -107,11 +107,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Nam088/telebot-ts.git"
+    "url": "git+https://github.com/Nam088/telebot.git"
   },
-  "homepage": "https://Nam088.github.io/telebot-ts/",
+  "homepage": "https://Nam088.github.io/telebot/",
   "bugs": {
-    "url": "https://github.com/Nam088/telebot-ts/issues"
+    "url": "https://github.com/Nam088/telebot/issues"
   },
   "author": "",
   "license": "MIT",

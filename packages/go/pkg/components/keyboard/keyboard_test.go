@@ -3,7 +3,7 @@ package keyboard_test
 import (
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/components/keyboard"
+	"github.com/Nam088/telebot/packages/go/pkg/components/keyboard"
 )
 
 func TestInlineKeyboardBuilder(t *testing.T) {

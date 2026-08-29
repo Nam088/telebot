@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/scheduler"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/scheduler"
 )
 
 func TestJobQueue_RunOnce(t *testing.T) {

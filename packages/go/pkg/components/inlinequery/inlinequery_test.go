@@ -3,9 +3,9 @@ package inlinequery_test
 import (
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/components/inlinequery"
-	"github.com/Nam088/telebot-go/pkg/components/keyboard"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/components/inlinequery"
+	"github.com/Nam088/telebot/packages/go/pkg/components/keyboard"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 func TestArticleBuilder_Minimal(t *testing.T) {

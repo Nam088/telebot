@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/routing"
-	"github.com/Nam088/telebot-go/pkg/scheduler"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/routing"
+	"github.com/Nam088/telebot/packages/go/pkg/scheduler"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 func main() {
@@ -79,7 +79,7 @@ func buildRouter(b *bot.Bot) *routing.Router {
 		keyboard := &types.InlineKeyboardMarkup{
 			InlineKeyboard: [][]types.InlineKeyboardButton{
 				{
-					{Text: "🌟 GitHub", URL: "https://github.com/Nam088/telebot-ts"},
+					{Text: "🌟 GitHub", URL: "https://github.com/Nam088/telebot"},
 					{Text: "🔔 Click Me", CallbackData: "btn:click"},
 				},
 			},

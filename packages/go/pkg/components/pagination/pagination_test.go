@@ -3,7 +3,7 @@ package pagination_test
 import (
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/components/pagination"
+	"github.com/Nam088/telebot/packages/go/pkg/components/pagination"
 )
 
 func TestPagination(t *testing.T) {

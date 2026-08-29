@@ -8,7 +8,7 @@ package inlinequery
 import (
 	"encoding/json"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // InputTextMessageContent represents the text content of a message to be sent

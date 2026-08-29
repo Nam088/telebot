@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // SetWebhook specifies a URL and receive incoming updates via an outgoing webhook.

@@ -10,8 +10,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/routing"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/routing"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 func TestRun_MissingToken(t *testing.T) {

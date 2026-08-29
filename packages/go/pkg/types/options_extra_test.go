@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 func TestStickerOptionsSerialization(t *testing.T) {

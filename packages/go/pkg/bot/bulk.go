@@ -3,7 +3,7 @@ package bot
 import (
 	"context"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // ForwardMessages forwards multiple messages of any kind to a target chat.

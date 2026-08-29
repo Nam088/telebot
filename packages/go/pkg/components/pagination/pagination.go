@@ -3,7 +3,7 @@ package pagination
 import (
 	"fmt"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // Pagination generates navigation buttons for paginated data sets.

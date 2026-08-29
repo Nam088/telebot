@@ -1,3 +1,3 @@
-module github.com/Nam088/telebot-go
+module github.com/Nam088/telebot/packages/go
 
 go 1.24

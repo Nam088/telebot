@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/utils"
+	"github.com/Nam088/telebot/packages/go/pkg/utils"
 )
 
 func TestEscapeMarkdownV2(t *testing.T) {

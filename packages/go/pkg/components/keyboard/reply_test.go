@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/components/keyboard"
+	"github.com/Nam088/telebot/packages/go/pkg/components/keyboard"
 )
 
 func TestReplyKeyboardBuilder(t *testing.T) {

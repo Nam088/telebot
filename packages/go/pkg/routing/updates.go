@@ -1,7 +1,7 @@
 package routing
 
 import (
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // ChatMemberScope selects which chat member update variants a ChatMember

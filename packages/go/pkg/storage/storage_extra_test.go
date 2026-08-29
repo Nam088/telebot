@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/storage"
+	"github.com/Nam088/telebot/packages/go/pkg/storage"
 )
 
 func TestMemoryStorage_ChatData(t *testing.T) {

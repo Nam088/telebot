@@ -1,7 +1,7 @@
 package filters
 
 import (
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // Photo matches messages carrying a photo.

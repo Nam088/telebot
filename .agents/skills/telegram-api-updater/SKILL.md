@@ -25,11 +25,11 @@ This skill provides an authoritative, end-to-end guide for an AI Agent to autono
 
 1. **List all open Telegram API update issues:**
    ```bash
-   gh issue list --label telegram-api-update --state open --repo Nam088/telebot-ts
+   gh issue list --label telegram-api-update --state open --repo Nam088/telebot
    ```
 2. **Read the selected issue details:**
    ```bash
-   gh issue view <issue_number> --repo Nam088/telebot-ts
+   gh issue view <issue_number> --repo Nam088/telebot
    ```
 3. Extract the:
    - Target Version (e.g. `Bot API 10.3` -> branch tag `10.3`)
@@ -170,5 +170,5 @@ npm run docs
 
 4. **Update Issue with PR reference comment:**
    ```bash
-   gh issue comment <issue_number> --body "Created PR for review: #<pr_number>. This issue will be closed automatically once the PR is merged." --repo Nam088/telebot-ts
+   gh issue comment <issue_number> --body "Created PR for review: #<pr_number>. This issue will be closed automatically once the PR is merged." --repo Nam088/telebot
    ```

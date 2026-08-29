@@ -1,6 +1,6 @@
 package inlinequery
 
-import "github.com/Nam088/telebot-go/pkg/types"
+import "github.com/Nam088/telebot/packages/go/pkg/types"
 
 // InlineQueryResultPhoto represents a link to a photo
 // (Telegram's InlineQueryResultPhoto object).

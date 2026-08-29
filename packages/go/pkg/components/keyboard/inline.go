@@ -1,6 +1,6 @@
 package keyboard
 
-import "github.com/Nam088/telebot-go/pkg/types"
+import "github.com/Nam088/telebot/packages/go/pkg/types"
 
 // InlineKeyboard is a fluent builder for constructing Telegram InlineKeyboardMarkup.
 type InlineKeyboard struct {

@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nam088/telebot-go/pkg/utils"
+	"github.com/Nam088/telebot/packages/go/pkg/utils"
 )
 
 const testBotToken = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"

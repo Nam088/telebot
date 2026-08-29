@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/routing"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/routing"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // messageUpdate builds a text message update from a user in a private chat.

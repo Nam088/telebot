@@ -3,7 +3,7 @@ package bot
 import (
 	"context"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // GetChatMember gets information about one member of a chat.

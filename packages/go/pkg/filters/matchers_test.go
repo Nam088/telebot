@@ -3,8 +3,8 @@ package filters_test
 import (
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/filters"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/filters"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // messageUpdate builds an update whose message is mutated by the given setup

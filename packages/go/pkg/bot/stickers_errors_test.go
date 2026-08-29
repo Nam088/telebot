@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // telegramErrorServer responds with a failed Bot API envelope.

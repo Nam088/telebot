@@ -57,7 +57,7 @@ It strictly adheres to a **Zero External Runtime Dependencies** policy—built 1
 ## 📦 Installation
 
 ```bash
-go get github.com/Nam088/telebot-go
+go get github.com/Nam088/telebot/packages/go
 ```
 
 ---
@@ -72,8 +72,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/routing"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/routing"
 )
 
 func main() {
@@ -238,13 +238,13 @@ router.Use(func(next routing.HandlerFunc) routing.HandlerFunc {
 
 #### Inline Keyboard Builder
 ```go
-import "github.com/Nam088/telebot-go/pkg/components/keyboard"
+import "github.com/Nam088/telebot/packages/go/pkg/components/keyboard"
 
 kb := keyboard.NewInlineKeyboard().
     Data("Option 1", "opt:1").
     Data("Option 2", "opt:2").
     Row().
-    URL("Documentation", "https://github.com/Nam088/telebot-ts").
+    URL("Documentation", "https://github.com/Nam088/telebot").
     Build()
 
 c.Reply("Please choose an option:", func(o *types.SendMessageOptions) {
@@ -254,7 +254,7 @@ c.Reply("Please choose an option:", func(o *types.SendMessageOptions) {
 
 #### Interactive Nested Menu
 ```go
-import "github.com/Nam088/telebot-go/pkg/components/menu"
+import "github.com/Nam088/telebot/packages/go/pkg/components/menu"
 
 mainMenu := menu.New("main", "🎛️ Main Control Panel")
 settingsMenu := menu.New("settings", "⚙️ Settings Menu")
@@ -315,8 +315,8 @@ Execute delayed or recurring jobs using goroutine timers:
 
 ```go
 import (
-    "github.com/Nam088/telebot-go/pkg/scheduler"
-    "github.com/Nam088/telebot-go/pkg/scheduler/rrule"
+    "github.com/Nam088/telebot/packages/go/pkg/scheduler"
+    "github.com/Nam088/telebot/packages/go/pkg/scheduler/rrule"
 )
 
 queue := scheduler.NewJobQueue(context.Background(), b)
@@ -350,7 +350,7 @@ queue.RunRRule("daily_digest", rule, func(ctx context.Context, b *bot.Bot) error
 ### 6. Session Storage & Persistence
 
 ```go
-import "github.com/Nam088/telebot-go/pkg/storage"
+import "github.com/Nam088/telebot/packages/go/pkg/storage"
 
 // Thread-safe in-memory storage
 memStore := storage.NewMemoryStorage()

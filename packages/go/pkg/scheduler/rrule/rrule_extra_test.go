@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Nam088/telebot-go/pkg/scheduler/rrule"
+	"github.com/Nam088/telebot/packages/go/pkg/scheduler/rrule"
 )
 
 func TestRRule_New_DefaultDtstart(t *testing.T) {

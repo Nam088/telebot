@@ -3,7 +3,7 @@ package bot
 import (
 	"context"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // SendAudio sends an audio file to a Telegram chat.

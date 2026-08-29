@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // Context encapsulates information about the incoming Telegram update,

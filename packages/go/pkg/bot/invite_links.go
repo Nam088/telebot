@@ -3,7 +3,7 @@ package bot
 import (
 	"context"
 
-	"github.com/Nam088/telebot-go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
 // CreateChatInviteLink creates an additional invite link for a chat.

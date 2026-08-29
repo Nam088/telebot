@@ -17,11 +17,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Nam088/telebot-go/pkg/bot"
-	"github.com/Nam088/telebot-go/pkg/components/inlinequery"
-	"github.com/Nam088/telebot-go/pkg/routing"
-	"github.com/Nam088/telebot-go/pkg/types"
-	"github.com/Nam088/telebot-go/pkg/utils"
+	"github.com/Nam088/telebot/packages/go/pkg/bot"
+	"github.com/Nam088/telebot/packages/go/pkg/components/inlinequery"
+	"github.com/Nam088/telebot/packages/go/pkg/routing"
+	"github.com/Nam088/telebot/packages/go/pkg/types"
+	"github.com/Nam088/telebot/packages/go/pkg/utils"
 )
 
 func main() {
