@@ -1,6 +1,7 @@
 import type { InputFile } from "../../utils/http.js";
 import type { File } from "./common.js";
-import type { PhotoSize, ReplyMarkup } from "./messages.js";
+import type { PhotoSize, ReplyMarkup, EphemeralMessageParameters, ReplyParameters } from "./messages.js";
+
 
 export interface Sticker {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -88,12 +89,15 @@ export interface SendStickerOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
   /** Unique identifier of the business connection on behalf of which the message will be sent. */
   business_connection_id?: string;
+  /** Ephemeral message parameters (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
 }
+
 
 export interface CreateNewStickerSetOptions {
   /** User identifier of created sticker set owner. */
