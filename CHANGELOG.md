@@ -2,6 +2,20 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.3.0](https://github.com/Nam088/telebot/compare/v1.2.1...v1.3.0) (2026-08-29)
+
+
+### Bug Fixes
+
+* **ci:** exclude .go files from Prettier, use gofmt for Go formatting ([be04ca9](https://github.com/Nam088/telebot/commit/be04ca94dbda9949b3cfae4dae950f52720a22ef))
+
+
+### Features
+
+* **go:** complete full migration of Bot API methods, FSM conversation, RRule scheduler, interactive menu, and JSON storage ([a46f4d3](https://github.com/Nam088/telebot/commit/a46f4d35c8b53d3fd132918e18797306e5cfdf79))
+* **go:** complete Node parity — 160+ Bot API methods, filters, utils, components, and example bots ([846dd62](https://github.com/Nam088/telebot/commit/846dd629115bd38c078ae3c953bf79a6bdd7f287))
+* **go:** initialize zero-dependency high-performance Go module (telebot-go) ([5328154](https://github.com/Nam088/telebot/commit/53281540a2813a6fc474a1f8926f5899e6773a46)), closes [hi#performance](https://github.com/hi/issues/performance)
+
 ## [1.2.1](https://github.com/Nam088/telebot-ts/compare/v1.2.0...v1.2.1) (2026-08-29)
 
 # [1.2.0](https://github.com/Nam088/telebot-ts/compare/v1.1.3...v1.2.0) (2026-08-29)
