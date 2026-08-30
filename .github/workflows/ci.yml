@@ -108,3 +108,30 @@ jobs:
       - name: Parity Audit (node/go/python)
         working-directory: packages/python
         run: python scripts/parity_audit.py
+
+  # Advisory only: this job reports Bot API coverage drift but cannot fail the
+  # build while the three packages still close gaps. Remove the continue-on-error
+  # flags once `npm run audit:fidelity` exits 0 on every package.
+  bot-api-fidelity:
+    name: Bot API Docs Fidelity (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Run Docs Parser Self-Tests (offline fixtures)
+        run: npm run test:scripts
+
+      - name: Build Bot API Oracle From Live Docs
+        run: npm run audit:docs
+
+      - name: Report Per-Package Coverage
+        continue-on-error: true
+        run: npm run audit:fidelity
