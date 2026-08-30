@@ -65,6 +65,7 @@ packages/go/pkg/
    - Use `b.Request(ctx, "methodName", payload, &result)`.
 3. **Step 3: Add Comprehensive GoDoc Comments**:
    - Provide summary, `Parameters:` list, `Returns:` list, and `Example:` snippet.
+   - End the GoDoc block with `// Telegram API: https://core.telegram.org/bots/api#<slug>` for every documented method/type, where `<slug>` is the wire method name (from the `b.Request` literal) or type name, fully lowercased. The slug MUST exist as an anchor on the official docs page (verify against a fresh fetch of `core.telegram.org/bots/api`, never from memory); skip the line for framework extensions and non-API helpers.
 4. **Step 4: Add Unit Tests in `packages/go/pkg/bot/*_test.go`**:
    - Test with `httptest.NewServer` mock server to verify URL path, headers, and payload serialization.
 

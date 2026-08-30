@@ -38,6 +38,7 @@ The `Bot` client in `packages/python/src/telebot_py/bot/` composes domain mixins
    - Compose the mixin onto `Bot` in `client.py` and re-export in `bot/__init__.py`.
 3. **Step 3: Add complete Sphinx-ready docstrings (Google style)**
    - One-line summary, an `Example:` doctest-style snippet, `Args:`, `Returns:`, `Raises:` listing `InvalidTokenError` / `TelegramApiError` / `NetworkError`.
+   - Close the docstring with a final `Telegram API: https://core.telegram.org/bots/api#<slug>` line for every documented method/type: `<slug>` is the wire name from the `self.request(...)` literal (or the class name) fully lowercased, and MUST be verified against a fresh fetch of the official docs page (never from memory); skip for framework extensions and helpers.
 4. **Step 4: TDD unit tests in `tests/unit/bot/test_methods_<domain>.py`**
    - Use the `bot_transport` MockTransport fixtures + `record_into` helpers from `tests/conftest.py`; assert URL path, snake_case payload serialization, typed results, and `TelegramApiError` on error responses. NO real HTTP ever.
 

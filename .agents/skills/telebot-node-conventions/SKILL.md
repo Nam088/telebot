@@ -45,6 +45,7 @@ The `Bot` client in `packages/node/src/client/` uses modular domain submodules:
    - `@returns The Telegram response object wrapped in Promise.`
    - `@throws {@link TelegramApiError} When Telegram API returns an error code.`
    - `@example` Runnable TypeScript snippet.
+   - `@see {@link https://core.telegram.org/bots/api#<slug> Telegram Bot API: <wireName>}` as the last tag for every documented method/type: `<slug>` is the wire method name (from the request literal) or interface name, fully lowercased, and MUST be verified against a fresh fetch of the official docs page (never from memory); skip for framework extensions and helpers.
 4. **Step 4: Add Unit Tests in `packages/node/tests/unit/client/methods/`**
    - Mock fetch response using mock adapter to test payload serialization and error handling.
 

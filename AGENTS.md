@@ -39,6 +39,7 @@ Doc comments must use the TSDoc/JSDoc tags [TypeDoc](https://typedoc.org) unders
 - `@defaultValue` on optional fields with a runtime default.
 - `@remarks` for PTB-vs-Node behavior differences.
 - `@deprecated` only for APIs kept as a migration bridge.
+- Every documented Bot API method/type carries an official-docs link (`https://core.telegram.org/bots/api#<slug>`, `<slug>` = wire name/type name fully lowercased) — as TSDoc `@see`, GoDoc `// Telegram API:`, or a Sphinx `Telegram API:` line. Slugs are verified against a fresh fetch of the docs page, never from memory; framework extensions without a docs anchor get no link rather than a guessed one.
 
 Before writing code against a library not already decided in `technical-context.md` (a new dependency, a new dev tool), resolve and query its docs via the `context7` MCP server first rather than relying on memory — this project's global instructions require it.
 
