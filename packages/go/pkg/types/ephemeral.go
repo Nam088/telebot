@@ -22,9 +22,7 @@ type EditEphemeralMessageTextOptions struct {
 	// A list of special entities that appear in the message text.
 	Entities []MessageEntity `json:"entities,omitempty"`
 	// New rich content of the message; required if Text isn't set.
-	//
-	// Typed as any until the InputRichMessage model lands (Bot API 10.3+).
-	RichMessage any `json:"rich_message,omitempty"`
+	RichMessage *InputRichMessage `json:"rich_message,omitempty"`
 	// Link preview generation options for the message.
 	LinkPreviewOptions *LinkPreviewOptions `json:"link_preview_options,omitempty"`
 	// An object for an inline keyboard.

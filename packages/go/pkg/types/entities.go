@@ -142,6 +142,34 @@ type InputMediaDocument struct {
 
 func (InputMediaDocument) inputMedia() {}
 
+// InputMediaVoiceNote represents a voice message to be sent (Bot API 10.3+).
+//
+// It joins the InputMedia union alongside the other InputMedia* classes and is
+// the media type InputRichBlockVoiceNote and InputRichMessageMedia expect for
+// voice notes. Optional scalars are pointers so an explicit zero (e.g. a
+// duration of 0) stays distinguishable from an unset field on the wire.
+//
+// Telegram API: https://core.telegram.org/bots/api#inputmediavoicenote
+type InputMediaVoiceNote struct {
+	// Type of the media, must be voice_note.
+	Type string `json:"type"`
+	// File to send. Pass a file_id to send a file that exists on the Telegram
+	// servers, pass an HTTP URL for Telegram to get a file from the Internet, or
+	// pass "attach://<file_attach_name>" to upload a new one.
+	Media string `json:"media"`
+	// Caption of the voice message to be sent, 0-1024 characters after entities parsing.
+	Caption *string `json:"caption,omitempty"`
+	// Mode for parsing entities in the voice message caption.
+	ParseMode *string `json:"parse_mode,omitempty"`
+	// List of special entities that appear in the caption, which can be specified
+	// instead of parse_mode.
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// Duration of the voice message in seconds.
+	Duration *int64 `json:"duration,omitempty"`
+}
+
+func (InputMediaVoiceNote) inputMedia() {}
+
 // ReactionType is the union of reaction types that can be set on a message.
 //
 // Telegram API: https://core.telegram.org/bots/api#reactiontype

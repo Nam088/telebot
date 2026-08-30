@@ -1,16 +1,20 @@
 package types
 
 // EditMessageTextOptions represents parameters for the editMessageText method.
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagetext
 type EditMessageTextOptions struct {
-	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
-	ChatID               any                   `json:"chat_id,omitempty"`
-	MessageID            int64                 `json:"message_id,omitempty"`
-	InlineMessageID      string                `json:"inline_message_id,omitempty"`
-	Text                 string                `json:"text"`
-	ParseMode            string                `json:"parse_mode,omitempty"`
-	Entities             []MessageEntity       `json:"entities,omitempty"`
-	LinkPreviewOptions   *LinkPreviewOptions   `json:"link_preview_options,omitempty"`
-	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	BusinessConnectionID string              `json:"business_connection_id,omitempty"`
+	ChatID               any                 `json:"chat_id,omitempty"`
+	MessageID            int64               `json:"message_id,omitempty"`
+	InlineMessageID      string              `json:"inline_message_id,omitempty"`
+	Text                 string              `json:"text,omitempty"`
+	ParseMode            string              `json:"parse_mode,omitempty"`
+	Entities             []MessageEntity     `json:"entities,omitempty"`
+	LinkPreviewOptions   *LinkPreviewOptions `json:"link_preview_options,omitempty"`
+	// RichMessage replaces Text; the docs require exactly one of the two.
+	RichMessage *InputRichMessage     `json:"rich_message,omitempty"`
+	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // EditMessageCaptionOptions represents parameters for the editMessageCaption method.

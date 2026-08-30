@@ -29,6 +29,7 @@ type Message struct {
 	Poll                  *Poll                 `json:"poll,omitempty"`
 	Dice                  *Dice                 `json:"dice,omitempty"`
 	Sticker               *Sticker              `json:"sticker,omitempty"`
+	RichMessage           *RichMessage          `json:"rich_message,omitempty"`
 	Invoice               *Invoice              `json:"invoice,omitempty"`
 	SuccessfulPayment     *SuccessfulPayment    `json:"successful_payment,omitempty"`
 	NewChatMembers        []User                `json:"new_chat_members,omitempty"`
