@@ -1,11 +1,15 @@
 package types
 
 // MenuButton is the union of all supported bot menu button types.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubutton
 type MenuButton interface {
 	menuButton()
 }
 
 // MenuButtonDefault represents the default menu button.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttondefault
 type MenuButtonDefault struct {
 	Type string `json:"type"`
 }
@@ -13,6 +17,8 @@ type MenuButtonDefault struct {
 func (MenuButtonDefault) menuButton() {}
 
 // MenuButtonCommands represents a menu button that opens the bot's commands.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttoncommands
 type MenuButtonCommands struct {
 	Type string `json:"type"`
 }
@@ -20,6 +26,8 @@ type MenuButtonCommands struct {
 func (MenuButtonCommands) menuButton() {}
 
 // MenuButtonWebApp represents a menu button that launches a Web App.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttonwebapp
 type MenuButtonWebApp struct {
 	Type   string     `json:"type"`
 	Text   string     `json:"text"`

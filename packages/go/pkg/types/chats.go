@@ -1,6 +1,8 @@
 package types
 
 // ChatMember contains information about one member of a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatmember
 type ChatMember struct {
 	Status      string `json:"status"`
 	User        User   `json:"user"`
@@ -9,6 +11,8 @@ type ChatMember struct {
 }
 
 // ChatPermissions describes actions that a non-administrator user is allowed to take in a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatpermissions
 type ChatPermissions struct {
 	CanSendMessages       bool `json:"can_send_messages,omitempty"`
 	CanSendAudios         bool `json:"can_send_audios,omitempty"`
@@ -27,6 +31,8 @@ type ChatPermissions struct {
 }
 
 // ChatInviteLink represents an invite link for a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatinvitelink
 type ChatInviteLink struct {
 	InviteLink              string `json:"invite_link"`
 	Creator                 User   `json:"creator"`
@@ -42,6 +48,8 @@ type ChatInviteLink struct {
 }
 
 // ChatAdministratorRights represents rights of an administrator.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatadministratorrights
 type ChatAdministratorRights struct {
 	IsAnonymous         bool `json:"is_anonymous"`
 	CanManageChat       bool `json:"can_manage_chat"`
@@ -58,6 +66,8 @@ type ChatAdministratorRights struct {
 }
 
 // ChatMemberUpdated represents changes in the status of a chat member.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatmemberupdated
 type ChatMemberUpdated struct {
 	Chat                    *Chat           `json:"chat"`
 	From                    *User           `json:"from"`
@@ -70,6 +80,8 @@ type ChatMemberUpdated struct {
 }
 
 // ChatJoinRequest represents a join request sent to a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatjoinrequest
 type ChatJoinRequest struct {
 	Chat       *Chat           `json:"chat"`
 	From       *User           `json:"from"`

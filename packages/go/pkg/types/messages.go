@@ -1,6 +1,8 @@
 package types
 
 // PhotoSize represents one size of a photo or a file / sticker thumbnail.
+//
+// Telegram API: https://core.telegram.org/bots/api#photosize
 type PhotoSize struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
@@ -10,6 +12,8 @@ type PhotoSize struct {
 }
 
 // Audio represents an audio file.
+//
+// Telegram API: https://core.telegram.org/bots/api#audio
 type Audio struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
@@ -23,6 +27,8 @@ type Audio struct {
 }
 
 // Document represents a general file.
+//
+// Telegram API: https://core.telegram.org/bots/api#document
 type Document struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
@@ -33,6 +39,8 @@ type Document struct {
 }
 
 // Video represents a video file.
+//
+// Telegram API: https://core.telegram.org/bots/api#video
 type Video struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
@@ -46,6 +54,8 @@ type Video struct {
 }
 
 // Animation represents an animation file (GIF or H.264 video).
+//
+// Telegram API: https://core.telegram.org/bots/api#animation
 type Animation struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
@@ -59,6 +69,8 @@ type Animation struct {
 }
 
 // Voice represents a voice note.
+//
+// Telegram API: https://core.telegram.org/bots/api#voice
 type Voice struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
@@ -68,6 +80,8 @@ type Voice struct {
 }
 
 // VideoNote represents a video note (round video message).
+//
+// Telegram API: https://core.telegram.org/bots/api#videonote
 type VideoNote struct {
 	FileID       string     `json:"file_id"`
 	FileUniqueID string     `json:"file_unique_id"`
@@ -78,6 +92,8 @@ type VideoNote struct {
 }
 
 // Contact represents a phone contact.
+//
+// Telegram API: https://core.telegram.org/bots/api#contact
 type Contact struct {
 	PhoneNumber string `json:"phone_number"`
 	FirstName   string `json:"first_name"`
@@ -87,6 +103,8 @@ type Contact struct {
 }
 
 // Location represents a point on the map.
+//
+// Telegram API: https://core.telegram.org/bots/api#location
 type Location struct {
 	Latitude             float64 `json:"latitude"`
 	Longitude            float64 `json:"longitude"`
@@ -97,6 +115,8 @@ type Location struct {
 }
 
 // Venue represents a venue.
+//
+// Telegram API: https://core.telegram.org/bots/api#venue
 type Venue struct {
 	Location        Location `json:"location"`
 	Title           string   `json:"title"`
@@ -108,12 +128,16 @@ type Venue struct {
 }
 
 // PollOption contains information about one answer option in a poll.
+//
+// Telegram API: https://core.telegram.org/bots/api#polloption
 type PollOption struct {
 	Text       string `json:"text"`
 	VoterCount int    `json:"voter_count"`
 }
 
 // Poll contains information about a poll.
+//
+// Telegram API: https://core.telegram.org/bots/api#poll
 type Poll struct {
 	ID                    string       `json:"id"`
 	Question              string       `json:"question"`
@@ -128,6 +152,8 @@ type Poll struct {
 }
 
 // PollAnswer represents a change of answer by a user in a non-anonymous poll.
+//
+// Telegram API: https://core.telegram.org/bots/api#pollanswer
 type PollAnswer struct {
 	PollID    string `json:"poll_id"`
 	VoterChat *Chat  `json:"voter_chat,omitempty"`
@@ -136,12 +162,16 @@ type PollAnswer struct {
 }
 
 // Dice represents an animated emoji that displays a random value.
+//
+// Telegram API: https://core.telegram.org/bots/api#dice
 type Dice struct {
 	Emoji string `json:"emoji"`
 	Value int    `json:"value"`
 }
 
 // MessageId contains a unique message identifier.
+//
+// Telegram API: https://core.telegram.org/bots/api#messageid
 type MessageId struct {
 	MessageID int64 `json:"message_id"`
 }

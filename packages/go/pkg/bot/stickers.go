@@ -15,6 +15,8 @@ import (
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendsticker
 func (b *Bot) SendSticker(ctx context.Context, opts *types.SendStickerOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendSticker", opts, &msg); err != nil {
@@ -32,6 +34,8 @@ func (b *Bot) SendSticker(ctx context.Context, opts *types.SendStickerOptions) (
 // Returns:
 //   - *types.StickerSet: The sticker set on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getstickerset
 func (b *Bot) GetStickerSet(ctx context.Context, opts *types.GetStickerSetOptions) (*types.StickerSet, error) {
 	var set types.StickerSet
 	if err := b.Request(ctx, "getStickerSet", opts, &set); err != nil {
@@ -49,6 +53,8 @@ func (b *Bot) GetStickerSet(ctx context.Context, opts *types.GetStickerSetOption
 // Returns:
 //   - []types.Sticker: A list of sticker objects on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getcustomemojistickers
 func (b *Bot) GetCustomEmojiStickers(ctx context.Context, customEmojiIDs []string) ([]types.Sticker, error) {
 	payload := map[string]any{
 		"custom_emoji_ids": customEmojiIDs,
@@ -69,6 +75,8 @@ func (b *Bot) GetCustomEmojiStickers(ctx context.Context, customEmojiIDs []strin
 // Returns:
 //   - *types.File: The uploaded File object on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#uploadstickerfile
 func (b *Bot) UploadStickerFile(ctx context.Context, opts *types.UploadStickerFileOptions) (*types.File, error) {
 	var file types.File
 	if err := b.Request(ctx, "uploadStickerFile", opts, &file); err != nil {
@@ -86,6 +94,8 @@ func (b *Bot) UploadStickerFile(ctx context.Context, opts *types.UploadStickerFi
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#createnewstickerset
 func (b *Bot) CreateNewStickerSet(ctx context.Context, opts *types.CreateNewStickerSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "createNewStickerSet", opts, &ok); err != nil {
@@ -103,6 +113,8 @@ func (b *Bot) CreateNewStickerSet(ctx context.Context, opts *types.CreateNewStic
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#addstickertoset
 func (b *Bot) AddStickerToSet(ctx context.Context, opts *types.AddStickerToSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "addStickerToSet", opts, &ok); err != nil {
@@ -120,6 +132,8 @@ func (b *Bot) AddStickerToSet(ctx context.Context, opts *types.AddStickerToSetOp
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickerpositioninset
 func (b *Bot) SetStickerPositionInSet(ctx context.Context, opts *types.SetStickerPositionInSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerPositionInSet", opts, &ok); err != nil {
@@ -137,6 +151,8 @@ func (b *Bot) SetStickerPositionInSet(ctx context.Context, opts *types.SetSticke
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletestickerfromset
 func (b *Bot) DeleteStickerFromSet(ctx context.Context, opts *types.DeleteStickerFromSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "deleteStickerFromSet", opts, &ok); err != nil {
@@ -154,6 +170,8 @@ func (b *Bot) DeleteStickerFromSet(ctx context.Context, opts *types.DeleteSticke
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#replacestickerinset
 func (b *Bot) ReplaceStickerInSet(ctx context.Context, opts *types.ReplaceStickerInSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "replaceStickerInSet", opts, &ok); err != nil {
@@ -171,6 +189,8 @@ func (b *Bot) ReplaceStickerInSet(ctx context.Context, opts *types.ReplaceSticke
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickeremojilist
 func (b *Bot) SetStickerEmojiList(ctx context.Context, opts *types.SetStickerEmojiListOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerEmojiList", opts, &ok); err != nil {
@@ -188,6 +208,8 @@ func (b *Bot) SetStickerEmojiList(ctx context.Context, opts *types.SetStickerEmo
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickerkeywords
 func (b *Bot) SetStickerKeywords(ctx context.Context, opts *types.SetStickerKeywordsOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerKeywords", opts, &ok); err != nil {
@@ -205,6 +227,8 @@ func (b *Bot) SetStickerKeywords(ctx context.Context, opts *types.SetStickerKeyw
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickermaskposition
 func (b *Bot) SetStickerMaskPosition(ctx context.Context, opts *types.SetStickerMaskPositionOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerMaskPosition", opts, &ok); err != nil {
@@ -222,6 +246,8 @@ func (b *Bot) SetStickerMaskPosition(ctx context.Context, opts *types.SetSticker
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletestickerset
 func (b *Bot) DeleteStickerSet(ctx context.Context, opts *types.DeleteStickerSetOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "deleteStickerSet", opts, &ok); err != nil {
@@ -240,6 +266,8 @@ func (b *Bot) DeleteStickerSet(ctx context.Context, opts *types.DeleteStickerSet
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setcustomemojistickersetthumbnail
 func (b *Bot) SetCustomEmojiStickerSetThumbnail(ctx context.Context, name string, customEmojiID string) (bool, error) {
 	payload := map[string]any{
 		"name": name,
@@ -263,6 +291,8 @@ func (b *Bot) SetCustomEmojiStickerSetThumbnail(ctx context.Context, name string
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickersetthumbnail
 func (b *Bot) SetStickerSetThumbnail(ctx context.Context, opts *types.SetStickerSetThumbnailOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerSetThumbnail", opts, &ok); err != nil {
@@ -280,6 +310,8 @@ func (b *Bot) SetStickerSetThumbnail(ctx context.Context, opts *types.SetSticker
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setstickersettitle
 func (b *Bot) SetStickerSetTitle(ctx context.Context, opts *types.SetStickerSetTitleOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setStickerSetTitle", opts, &ok); err != nil {
@@ -296,6 +328,8 @@ func (b *Bot) SetStickerSetTitle(ctx context.Context, opts *types.SetStickerSetT
 // Returns:
 //   - []types.Sticker: A list of sticker objects on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getforumtopiciconstickers
 func (b *Bot) GetForumTopicIconStickers(ctx context.Context) ([]types.Sticker, error) {
 	var stickers []types.Sticker
 	if err := b.Request(ctx, "getForumTopicIconStickers", nil, &stickers); err != nil {

@@ -7,6 +7,8 @@ import (
 )
 
 // CreateForumTopic creates a topic in a forum supergroup chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#createforumtopic
 func (b *Bot) CreateForumTopic(ctx context.Context, chatID any, name string, iconColor int, iconCustomEmojiID string) (*types.ForumTopic, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
@@ -26,6 +28,8 @@ func (b *Bot) CreateForumTopic(ctx context.Context, chatID any, name string, ico
 }
 
 // CloseForumTopic closes an open topic in a forum supergroup chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#closeforumtopic
 func (b *Bot) CloseForumTopic(ctx context.Context, chatID any, messageThreadID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":           chatID,
@@ -56,6 +60,8 @@ func (b *Bot) CloseForumTopic(ctx context.Context, chatID any, messageThreadID i
 //	ok, err := b.EditForumTopic(ctx, &types.EditForumTopicOptions{
 //	    ChatID: int64(-1001234567890), MessageThreadID: 42, Name: "Announcements",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editforumtopic
 func (b *Bot) EditForumTopic(ctx context.Context, opts *types.EditForumTopicOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "editForumTopic", opts, &ok); err != nil {
@@ -80,6 +86,8 @@ func (b *Bot) EditForumTopic(ctx context.Context, opts *types.EditForumTopicOpti
 // Example:
 //
 //	ok, err := b.ReopenForumTopic(ctx, int64(-1001234567890), 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#reopenforumtopic
 func (b *Bot) ReopenForumTopic(ctx context.Context, chatID any, messageThreadID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":           chatID,
@@ -108,6 +116,8 @@ func (b *Bot) ReopenForumTopic(ctx context.Context, chatID any, messageThreadID 
 // Example:
 //
 //	ok, err := b.DeleteForumTopic(ctx, int64(-1001234567890), 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#deleteforumtopic
 func (b *Bot) DeleteForumTopic(ctx context.Context, chatID any, messageThreadID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":           chatID,
@@ -136,6 +146,8 @@ func (b *Bot) DeleteForumTopic(ctx context.Context, chatID any, messageThreadID 
 // Example:
 //
 //	ok, err := b.UnpinAllForumTopicMessages(ctx, int64(-1001234567890), 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#unpinallforumtopicmessages
 func (b *Bot) UnpinAllForumTopicMessages(ctx context.Context, chatID any, messageThreadID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":           chatID,
@@ -164,6 +176,8 @@ func (b *Bot) UnpinAllForumTopicMessages(ctx context.Context, chatID any, messag
 // Example:
 //
 //	ok, err := b.EditGeneralForumTopic(ctx, int64(-1001234567890), "General Chat")
+//
+// Telegram API: https://core.telegram.org/bots/api#editgeneralforumtopic
 func (b *Bot) EditGeneralForumTopic(ctx context.Context, chatID any, name string) (bool, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
@@ -212,6 +226,8 @@ func (b *Bot) generalTopicRequest(ctx context.Context, method string, chatID any
 // Example:
 //
 //	ok, err := b.CloseGeneralForumTopic(ctx, int64(-1001234567890))
+//
+// Telegram API: https://core.telegram.org/bots/api#closegeneralforumtopic
 func (b *Bot) CloseGeneralForumTopic(ctx context.Context, chatID any) (bool, error) {
 	return b.generalTopicRequest(ctx, "closeGeneralForumTopic", chatID)
 }
@@ -231,6 +247,8 @@ func (b *Bot) CloseGeneralForumTopic(ctx context.Context, chatID any) (bool, err
 // Example:
 //
 //	ok, err := b.ReopenGeneralForumTopic(ctx, int64(-1001234567890))
+//
+// Telegram API: https://core.telegram.org/bots/api#reopengeneralforumtopic
 func (b *Bot) ReopenGeneralForumTopic(ctx context.Context, chatID any) (bool, error) {
 	return b.generalTopicRequest(ctx, "reopenGeneralForumTopic", chatID)
 }
@@ -250,6 +268,8 @@ func (b *Bot) ReopenGeneralForumTopic(ctx context.Context, chatID any) (bool, er
 // Example:
 //
 //	ok, err := b.HideGeneralForumTopic(ctx, int64(-1001234567890))
+//
+// Telegram API: https://core.telegram.org/bots/api#hidegeneralforumtopic
 func (b *Bot) HideGeneralForumTopic(ctx context.Context, chatID any) (bool, error) {
 	return b.generalTopicRequest(ctx, "hideGeneralForumTopic", chatID)
 }
@@ -269,6 +289,8 @@ func (b *Bot) HideGeneralForumTopic(ctx context.Context, chatID any) (bool, erro
 // Example:
 //
 //	ok, err := b.UnhideGeneralForumTopic(ctx, int64(-1001234567890))
+//
+// Telegram API: https://core.telegram.org/bots/api#unhidegeneralforumtopic
 func (b *Bot) UnhideGeneralForumTopic(ctx context.Context, chatID any) (bool, error) {
 	return b.generalTopicRequest(ctx, "unhideGeneralForumTopic", chatID)
 }
@@ -289,6 +311,8 @@ func (b *Bot) UnhideGeneralForumTopic(ctx context.Context, chatID any) (bool, er
 // Example:
 //
 //	ok, err := b.UnpinAllGeneralForumTopicMessages(ctx, int64(-1001234567890))
+//
+// Telegram API: https://core.telegram.org/bots/api#unpinallgeneralforumtopicmessages
 func (b *Bot) UnpinAllGeneralForumTopicMessages(ctx context.Context, chatID any) (bool, error) {
 	return b.generalTopicRequest(ctx, "unpinAllGeneralForumTopicMessages", chatID)
 }

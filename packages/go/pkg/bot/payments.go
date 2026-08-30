@@ -15,6 +15,8 @@ import (
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendinvoice
 func (b *Bot) SendInvoice(ctx context.Context, opts *types.SendInvoiceOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendInvoice", opts, &msg); err != nil {
@@ -32,6 +34,8 @@ func (b *Bot) SendInvoice(ctx context.Context, opts *types.SendInvoiceOptions) (
 // Returns:
 //   - string: The created invoice link on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#createinvoicelink
 func (b *Bot) CreateInvoiceLink(ctx context.Context, opts *types.CreateInvoiceLinkOptions) (string, error) {
 	var link string
 	if err := b.Request(ctx, "createInvoiceLink", opts, &link); err != nil {
@@ -49,6 +53,8 @@ func (b *Bot) CreateInvoiceLink(ctx context.Context, opts *types.CreateInvoiceLi
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#answershippingquery
 func (b *Bot) AnswerShippingQuery(ctx context.Context, opts *types.AnswerShippingQueryOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "answerShippingQuery", opts, &ok); err != nil {
@@ -66,6 +72,8 @@ func (b *Bot) AnswerShippingQuery(ctx context.Context, opts *types.AnswerShippin
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#answerprecheckoutquery
 func (b *Bot) AnswerPreCheckoutQuery(ctx context.Context, opts *types.AnswerPreCheckoutQueryOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "answerPreCheckoutQuery", opts, &ok); err != nil {
@@ -83,6 +91,8 @@ func (b *Bot) AnswerPreCheckoutQuery(ctx context.Context, opts *types.AnswerPreC
 // Returns:
 //   - *types.StarTransactions: The list of transactions on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getstartransactions
 func (b *Bot) GetStarTransactions(ctx context.Context, opts *types.GetStarTransactionsOptions) (*types.StarTransactions, error) {
 	var transactions types.StarTransactions
 	if err := b.Request(ctx, "getStarTransactions", opts, &transactions); err != nil {
@@ -100,6 +110,8 @@ func (b *Bot) GetStarTransactions(ctx context.Context, opts *types.GetStarTransa
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#refundstarpayment
 func (b *Bot) RefundStarPayment(ctx context.Context, opts *types.RefundStarPaymentOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "refundStarPayment", opts, &ok); err != nil {
@@ -117,6 +129,8 @@ func (b *Bot) RefundStarPayment(ctx context.Context, opts *types.RefundStarPayme
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#edituserstarsubscription
 func (b *Bot) EditUserStarSubscription(ctx context.Context, opts *types.EditUserStarSubscriptionOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "editUserStarSubscription", opts, &ok); err != nil {
@@ -138,6 +152,8 @@ func (b *Bot) EditUserStarSubscription(ctx context.Context, opts *types.EditUser
 //
 //	balance, err := b.GetMyStarBalance(ctx)
 //	fmt.Println(balance.Amount)
+//
+// Telegram API: https://core.telegram.org/bots/api#getmystarbalance
 func (b *Bot) GetMyStarBalance(ctx context.Context) (*types.StarAmount, error) {
 	var amount types.StarAmount
 	if err := b.Request(ctx, "getMyStarBalance", nil, &amount); err != nil {

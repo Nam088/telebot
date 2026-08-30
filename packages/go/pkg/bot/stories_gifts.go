@@ -23,6 +23,8 @@ import (
 // Returns:
 //   - *types.Story: The posted Story object on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#poststory
 func (b *Bot) PostStory(ctx context.Context, businessConnectionID string, content any, activePeriod int, caption string, privacy string) (*types.Story, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -64,6 +66,8 @@ func (b *Bot) PostStory(ctx context.Context, businessConnectionID string, conten
 // Example:
 //
 //	ok, err := b.SetUserEmojiStatus(ctx, 123456, "5368323575420792074", 0)
+//
+// Telegram API: https://core.telegram.org/bots/api#setuseremojistatus
 func (b *Bot) SetUserEmojiStatus(ctx context.Context, userID int64, emojiStatusCustomEmojiID string, emojiStatusExpirationDate int64) (bool, error) {
 	payload := map[string]any{"user_id": userID}
 	if emojiStatusCustomEmojiID != "" {

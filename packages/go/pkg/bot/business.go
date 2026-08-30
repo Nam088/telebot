@@ -20,6 +20,8 @@ import (
 // Example:
 //
 //	conn, err := b.GetBusinessConnection(ctx, "423778511293324225")
+//
+// Telegram API: https://core.telegram.org/bots/api#getbusinessconnection
 func (b *Bot) GetBusinessConnection(ctx context.Context, businessConnectionID string) (*types.BusinessConnection, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	var conn types.BusinessConnection
@@ -49,6 +51,8 @@ func (b *Bot) GetBusinessConnection(ctx context.Context, businessConnectionID st
 // Example:
 //
 //	ok, err := b.ReadBusinessMessage(ctx, "423778511293324225", 123456, 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#readbusinessmessage
 func (b *Bot) ReadBusinessMessage(ctx context.Context, businessConnectionID string, chatID int64, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -77,6 +81,8 @@ func (b *Bot) ReadBusinessMessage(ctx context.Context, businessConnectionID stri
 // Example:
 //
 //	ok, err := b.DeleteBusinessMessages(ctx, "423778511293324225", []int64{41, 42})
+//
+// Telegram API: https://core.telegram.org/bots/api#deletebusinessmessages
 func (b *Bot) DeleteBusinessMessages(ctx context.Context, businessConnectionID string, messageIDs []int64) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -103,6 +109,8 @@ func (b *Bot) DeleteBusinessMessages(ctx context.Context, businessConnectionID s
 //
 //	gifts, err := b.GetBusinessAccountGifts(ctx, "423778511293324225")
 //	fmt.Println(gifts["total_count"])
+//
+// Telegram API: https://core.telegram.org/bots/api#getbusinessaccountgifts
 func (b *Bot) GetBusinessAccountGifts(ctx context.Context, businessConnectionID string) (map[string]any, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	var gifts map[string]any
@@ -127,6 +135,8 @@ func (b *Bot) GetBusinessAccountGifts(ctx context.Context, businessConnectionID 
 //
 //	balance, err := b.GetBusinessAccountStarBalance(ctx, "423778511293324225")
 //	fmt.Println(balance.Amount)
+//
+// Telegram API: https://core.telegram.org/bots/api#getbusinessaccountstarbalance
 func (b *Bot) GetBusinessAccountStarBalance(ctx context.Context, businessConnectionID string) (*types.StarAmount, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	var amount types.StarAmount
@@ -151,6 +161,8 @@ func (b *Bot) GetBusinessAccountStarBalance(ctx context.Context, businessConnect
 // Example:
 //
 //	ok, err := b.TransferBusinessAccountStars(ctx, "423778511293324225", 100)
+//
+// Telegram API: https://core.telegram.org/bots/api#transferbusinessaccountstars
 func (b *Bot) TransferBusinessAccountStars(ctx context.Context, businessConnectionID string, starCount int) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -182,6 +194,8 @@ func (b *Bot) TransferBusinessAccountStars(ctx context.Context, businessConnecti
 // Example:
 //
 //	ok, err := b.SetBusinessAccountName(ctx, "423778511293324225", "Acme", "Support")
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountname
 func (b *Bot) SetBusinessAccountName(ctx context.Context, businessConnectionID, firstName, lastName string) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -212,6 +226,8 @@ func (b *Bot) SetBusinessAccountName(ctx context.Context, businessConnectionID, 
 // Example:
 //
 //	ok, err := b.SetBusinessAccountUsername(ctx, "423778511293324225", "acme_support")
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountusername
 func (b *Bot) SetBusinessAccountUsername(ctx context.Context, businessConnectionID, username string) (bool, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	if username != "" {
@@ -239,6 +255,8 @@ func (b *Bot) SetBusinessAccountUsername(ctx context.Context, businessConnection
 // Example:
 //
 //	ok, err := b.SetBusinessAccountBio(ctx, "423778511293324225", "We reply in 5 minutes")
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountbio
 func (b *Bot) SetBusinessAccountBio(ctx context.Context, businessConnectionID, bio string) (bool, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	if bio != "" {
@@ -269,6 +287,8 @@ func (b *Bot) SetBusinessAccountBio(ctx context.Context, businessConnectionID, b
 //	ok, err := b.SetBusinessAccountGiftSettings(ctx, "423778511293324225", map[string]any{
 //		"is_storable_gifts_allowed": true,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountgiftsettings
 func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, businessConnectionID string, options map[string]any) (bool, error) {
 	payload := mergePayload(map[string]any{"business_connection_id": businessConnectionID}, options)
 	var ok bool
@@ -299,6 +319,8 @@ func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, businessConnec
 // Example:
 //
 //	ok, err := b.SetBusinessAccountProfilePhoto(ctx, "423778511293324225", "BAACAgIAAxkBAAI", false)
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountprofilephoto
 func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string, photo any, isPublic bool) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -333,6 +355,8 @@ func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnec
 // Example:
 //
 //	ok, err := b.RemoveBusinessAccountProfilePhoto(ctx, "423778511293324225", false)
+//
+// Telegram API: https://core.telegram.org/bots/api#removebusinessaccountprofilephoto
 func (b *Bot) RemoveBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string, isPublic bool) (bool, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
 	if isPublic {

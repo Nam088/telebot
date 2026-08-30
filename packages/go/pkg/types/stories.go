@@ -30,13 +30,15 @@ type StoryAreaPosition struct {
 // StoryAreaTypeLocation, StoryAreaTypeSuggestedReaction, StoryAreaTypeLink and
 // StoryAreaTypeWeather. The concrete type's Type field carries the wire
 // discriminator.
+//
+// Telegram API: https://core.telegram.org/bots/api#storyareatype
 type StoryAreaType interface {
 	storyAreaType()
 }
 
 // StoryAreaTypeLocation tags a location on a story.
 //
-// See https://core.telegram.org/bots/api#storyaretypelocation
+// See https://core.telegram.org/bots/api#storyareatypelocation
 type StoryAreaTypeLocation struct {
 	// Type of the area, always "location".
 	Type string `json:"type"`
@@ -68,7 +70,7 @@ func (StoryAreaTypeSuggestedReaction) storyAreaType() {}
 
 // StoryAreaTypeLink attaches a clickable URL to a story.
 //
-// See https://core.telegram.org/bots/api#storyaretypelink
+// See https://core.telegram.org/bots/api#storyareatypelink
 type StoryAreaTypeLink struct {
 	// Type of the area, always "link".
 	Type string `json:"type"`
@@ -80,7 +82,7 @@ func (StoryAreaTypeLink) storyAreaType() {}
 
 // StoryAreaTypeWeather displays the current weather in a story area.
 //
-// See https://core.telegram.org/bots/api#storyaretypeweather
+// See https://core.telegram.org/bots/api#storyareatypeweather
 type StoryAreaTypeWeather struct {
 	// Type of the area, always "weather".
 	Type string `json:"type"`
@@ -110,6 +112,8 @@ type StoryArea struct {
 // Node declares "type InputStoryContent = InputStoryContentPhoto |
 // InputStoryContentVideo"; Go uses an interface implemented by both structs so
 // a story content value stays type-checked at the call site.
+//
+// Telegram API: https://core.telegram.org/bots/api#inputstorycontent
 type InputStoryContent interface {
 	inputStoryContent()
 }

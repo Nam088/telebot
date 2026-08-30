@@ -19,6 +19,8 @@ import (
 // Example:
 //
 //	ok, err := b.ApproveSuggestedPost(ctx, "@channel", 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#approvesuggestedpost
 func (b *Bot) ApproveSuggestedPost(ctx context.Context, chatID any, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":    chatID,
@@ -46,6 +48,8 @@ func (b *Bot) ApproveSuggestedPost(ctx context.Context, chatID any, messageID in
 // Example:
 //
 //	ok, err := b.DeclineSuggestedPost(ctx, "@channel", 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#declinesuggestedpost
 func (b *Bot) DeclineSuggestedPost(ctx context.Context, chatID any, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":    chatID,

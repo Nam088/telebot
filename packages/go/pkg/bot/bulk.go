@@ -15,6 +15,8 @@ import (
 // Returns:
 //   - []types.MessageId: Identifiers of the forwarded messages on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#forwardmessages
 func (b *Bot) ForwardMessages(ctx context.Context, opts *types.ForwardMessagesOptions) ([]types.MessageId, error) {
 	var ids []types.MessageId
 	if err := b.Request(ctx, "forwardMessages", opts, &ids); err != nil {
@@ -32,6 +34,8 @@ func (b *Bot) ForwardMessages(ctx context.Context, opts *types.ForwardMessagesOp
 // Returns:
 //   - []types.MessageId: Identifiers of the copied messages on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#copymessages
 func (b *Bot) CopyMessages(ctx context.Context, opts *types.CopyMessagesOptions) ([]types.MessageId, error) {
 	var ids []types.MessageId
 	if err := b.Request(ctx, "copyMessages", opts, &ids); err != nil {
@@ -49,6 +53,8 @@ func (b *Bot) CopyMessages(ctx context.Context, opts *types.CopyMessagesOptions)
 // Returns:
 //   - bool: True on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletemessages
 func (b *Bot) DeleteMessages(ctx context.Context, opts *types.DeleteMessagesOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "deleteMessages", opts, &ok); err != nil {

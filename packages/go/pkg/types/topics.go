@@ -1,6 +1,8 @@
 package types
 
 // ForumTopic represents a forum topic in a supergroup.
+//
+// Telegram API: https://core.telegram.org/bots/api#forumtopic
 type ForumTopic struct {
 	MessageThreadID   int64  `json:"message_thread_id"`
 	Name              string `json:"name"`
@@ -9,17 +11,23 @@ type ForumTopic struct {
 }
 
 // BotCommand represents a bot command.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommand
 type BotCommand struct {
 	Command     string `json:"command"`
 	Description string `json:"description"`
 }
 
 // BotName represents the bot's name.
+//
+// Telegram API: https://core.telegram.org/bots/api#botname
 type BotName struct {
 	Name string `json:"name"`
 }
 
 // BotDescription represents the bot's description.
+//
+// Telegram API: https://core.telegram.org/bots/api#botdescription
 type BotDescription struct {
 	Description string `json:"description"`
 }

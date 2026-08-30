@@ -1,12 +1,16 @@
 package types
 
 // LabeledPrice represents a portion of the price for goods or services.
+//
+// Telegram API: https://core.telegram.org/bots/api#labeledprice
 type LabeledPrice struct {
 	Label  string `json:"label"`
 	Amount int    `json:"amount"`
 }
 
 // Invoice contains basic information about an invoice.
+//
+// Telegram API: https://core.telegram.org/bots/api#invoice
 type Invoice struct {
 	Title          string `json:"title"`
 	Description    string `json:"description"`
@@ -16,6 +20,8 @@ type Invoice struct {
 }
 
 // SuccessfulPayment contains basic information about a successful payment.
+//
+// Telegram API: https://core.telegram.org/bots/api#successfulpayment
 type SuccessfulPayment struct {
 	Currency                string `json:"currency"`
 	TotalAmount             int    `json:"total_amount"`
@@ -26,11 +32,15 @@ type SuccessfulPayment struct {
 }
 
 // StarTransactions represents the list of Telegram Stars transactions.
+//
+// Telegram API: https://core.telegram.org/bots/api#startransactions
 type StarTransactions struct {
 	Transactions []StarTransaction `json:"transactions"`
 }
 
 // StarTransaction represents a single Telegram Stars transaction.
+//
+// Telegram API: https://core.telegram.org/bots/api#startransaction
 type StarTransaction struct {
 	ID       string `json:"id"`
 	Amount   int    `json:"amount"`
@@ -40,6 +50,8 @@ type StarTransaction struct {
 }
 
 // StarAmount represents an amount of Telegram Stars.
+//
+// Telegram API: https://core.telegram.org/bots/api#staramount
 type StarAmount struct {
 	Amount         int `json:"amount"`
 	NanostarAmount int `json:"nanostar_amount,omitempty"`

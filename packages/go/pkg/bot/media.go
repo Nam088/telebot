@@ -15,6 +15,8 @@ import (
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendaudio
 func (b *Bot) SendAudio(ctx context.Context, opts *types.SendAudioOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendAudio", opts, &msg); err != nil {
@@ -32,6 +34,8 @@ func (b *Bot) SendAudio(ctx context.Context, opts *types.SendAudioOptions) (*typ
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendvideo
 func (b *Bot) SendVideo(ctx context.Context, opts *types.SendVideoOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendVideo", opts, &msg); err != nil {
@@ -49,6 +53,8 @@ func (b *Bot) SendVideo(ctx context.Context, opts *types.SendVideoOptions) (*typ
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendanimation
 func (b *Bot) SendAnimation(ctx context.Context, opts *types.SendAnimationOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendAnimation", opts, &msg); err != nil {
@@ -66,6 +72,8 @@ func (b *Bot) SendAnimation(ctx context.Context, opts *types.SendAnimationOption
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendvoice
 func (b *Bot) SendVoice(ctx context.Context, opts *types.SendVoiceOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendVoice", opts, &msg); err != nil {
@@ -83,6 +91,8 @@ func (b *Bot) SendVoice(ctx context.Context, opts *types.SendVoiceOptions) (*typ
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendvideonote
 func (b *Bot) SendVideoNote(ctx context.Context, opts *types.SendVideoNoteOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendVideoNote", opts, &msg); err != nil {
@@ -100,6 +110,8 @@ func (b *Bot) SendVideoNote(ctx context.Context, opts *types.SendVideoNoteOption
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendlocation
 func (b *Bot) SendLocation(ctx context.Context, opts *types.SendLocationOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendLocation", opts, &msg); err != nil {
@@ -117,6 +129,8 @@ func (b *Bot) SendLocation(ctx context.Context, opts *types.SendLocationOptions)
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendvenue
 func (b *Bot) SendVenue(ctx context.Context, opts *types.SendVenueOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendVenue", opts, &msg); err != nil {
@@ -134,6 +148,8 @@ func (b *Bot) SendVenue(ctx context.Context, opts *types.SendVenueOptions) (*typ
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendcontact
 func (b *Bot) SendContact(ctx context.Context, opts *types.SendContactOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendContact", opts, &msg); err != nil {
@@ -151,6 +167,8 @@ func (b *Bot) SendContact(ctx context.Context, opts *types.SendContactOptions) (
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendpoll
 func (b *Bot) SendPoll(ctx context.Context, opts *types.SendPollOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendPoll", opts, &msg); err != nil {
@@ -168,6 +186,8 @@ func (b *Bot) SendPoll(ctx context.Context, opts *types.SendPollOptions) (*types
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#senddice
 func (b *Bot) SendDice(ctx context.Context, opts *types.SendDiceOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendDice", opts, &msg); err != nil {
@@ -185,6 +205,8 @@ func (b *Bot) SendDice(ctx context.Context, opts *types.SendDiceOptions) (*types
 // Returns:
 //   - []types.Message: The sent messages on success.
 //   - error: TelegramError if the API returns an error, or a network error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendmediagroup
 func (b *Bot) SendMediaGroup(ctx context.Context, opts *types.SendMediaGroupOptions) ([]types.Message, error) {
 	var msgs []types.Message
 	if err := b.Request(ctx, "sendMediaGroup", opts, &msgs); err != nil {

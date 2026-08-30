@@ -64,12 +64,16 @@ type BusinessConnection struct {
 }
 
 // Story represents a message with a story.
+//
+// Telegram API: https://core.telegram.org/bots/api#story
 type Story struct {
 	Chat Chat  `json:"chat"`
 	ID   int64 `json:"id"`
 }
 
 // Game represents a game.
+//
+// Telegram API: https://core.telegram.org/bots/api#game
 type Game struct {
 	Title       string      `json:"title"`
 	Description string      `json:"description"`
@@ -78,6 +82,8 @@ type Game struct {
 }
 
 // GameHighScore represents one row of the high scores table for a game.
+//
+// Telegram API: https://core.telegram.org/bots/api#gamehighscore
 type GameHighScore struct {
 	Position int  `json:"position"`
 	User     User `json:"user"`
@@ -91,6 +97,8 @@ type GameHighScore struct {
 // straight off the wire, so the union is flattened into one struct: Source is
 // the discriminator ("premium", "gift_code" or "giveaway") and every member of
 // the union is present as an optional field.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatboostsource
 type ChatBoostSource struct {
 	Source            string `json:"source"`
 	User              *User  `json:"user,omitempty"`
@@ -100,6 +108,8 @@ type ChatBoostSource struct {
 }
 
 // ChatBoost describes a single boost that was added to a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chatboost
 type ChatBoost struct {
 	BoostID        string          `json:"boost_id"`
 	AddDate        int64           `json:"add_date"`
@@ -108,6 +118,8 @@ type ChatBoost struct {
 }
 
 // UserChatBoosts represents a list of boosts added to a chat by a user.
+//
+// Telegram API: https://core.telegram.org/bots/api#userchatboosts
 type UserChatBoosts struct {
 	Boosts []ChatBoost `json:"boosts"`
 }

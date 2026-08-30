@@ -1,6 +1,8 @@
 package types
 
 // InputSticker represents a sticker to be added to a set.
+//
+// Telegram API: https://core.telegram.org/bots/api#inputsticker
 type InputSticker struct {
 	Sticker      any           `json:"sticker"`
 	Format       string        `json:"format"`

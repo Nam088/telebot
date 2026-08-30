@@ -29,6 +29,8 @@ import (
 //		EphemeralMessageID: 7,
 //		Text:               "Corrected text",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editephemeralmessagetext
 func (b *Bot) EditEphemeralMessageText(ctx context.Context, opts *types.EditEphemeralMessageTextOptions) (*types.Message, bool, error) {
 	return b.requestMessageOrTrue(ctx, "editEphemeralMessageText", opts)
 }
@@ -52,6 +54,8 @@ func (b *Bot) EditEphemeralMessageText(ctx context.Context, opts *types.EditEphe
 //		EphemeralMessageID: 7,
 //		Media:              &types.InputMediaPhoto{Type: "photo", Media: "AGACAD..."},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editephemeralmessagemedia
 func (b *Bot) EditEphemeralMessageMedia(ctx context.Context, opts *types.EditEphemeralMessageMediaOptions) (*types.Message, bool, error) {
 	return b.requestMessageOrTrue(ctx, "editEphemeralMessageMedia", opts)
 }
@@ -76,6 +80,8 @@ func (b *Bot) EditEphemeralMessageMedia(ctx context.Context, opts *types.EditEph
 //		EphemeralMessageID: 7,
 //		Caption:            "New caption",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editephemeralmessagecaption
 func (b *Bot) EditEphemeralMessageCaption(ctx context.Context, opts *types.EditEphemeralMessageCaptionOptions) (*types.Message, bool, error) {
 	return b.requestMessageOrTrue(ctx, "editEphemeralMessageCaption", opts)
 }
@@ -99,6 +105,8 @@ func (b *Bot) EditEphemeralMessageCaption(ctx context.Context, opts *types.EditE
 //		ReceiverUserID:     123456,
 //		EphemeralMessageID: 7,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editephemeralmessagereplymarkup
 func (b *Bot) EditEphemeralMessageReplyMarkup(ctx context.Context, opts *types.EditEphemeralMessageReplyMarkupOptions) (*types.Message, bool, error) {
 	return b.requestMessageOrTrue(ctx, "editEphemeralMessageReplyMarkup", opts)
 }
@@ -120,6 +128,8 @@ func (b *Bot) EditEphemeralMessageReplyMarkup(ctx context.Context, opts *types.E
 //		ReceiverUserID:     123456,
 //		EphemeralMessageID: 7,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#deleteephemeralmessage
 func (b *Bot) DeleteEphemeralMessage(ctx context.Context, opts *types.DeleteEphemeralMessageOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "deleteEphemeralMessage", opts, &ok); err != nil {

@@ -23,6 +23,8 @@ import (
 //	sent, err := b.AnswerGuestQuery(ctx, "gq1", map[string]any{
 //		"inline_message_id": "abc123",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#answerguestquery
 func (b *Bot) AnswerGuestQuery(ctx context.Context, guestQueryID string, result any) (*types.SentWebAppMessage, error) {
 	payload := map[string]any{
 		"guest_query_id": guestQueryID,
@@ -55,6 +57,8 @@ func (b *Bot) AnswerGuestQuery(ctx context.Context, guestQueryID string, result 
 //		"user_id": 123456,
 //		"web_app": map[string]any{"url": "https://example.com/join"},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
 func (b *Bot) SendChatJoinRequestWebApp(ctx context.Context, options map[string]any) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "sendChatJoinRequestWebApp", payloadOrEmpty(options), &ok); err != nil {

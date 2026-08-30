@@ -1,6 +1,8 @@
 package types
 
 // UserProfilePhotos contains a user's profile pictures.
+//
+// Telegram API: https://core.telegram.org/bots/api#userprofilephotos
 type UserProfilePhotos struct {
 	TotalCount int           `json:"total_count"`
 	Photos     [][]PhotoSize `json:"photos"`

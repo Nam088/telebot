@@ -27,6 +27,8 @@ import (
 //		"month_count": 3,
 //		"star_count":  1000,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#giftpremiumsubscription
 func (b *Bot) GiftPremiumSubscription(ctx context.Context, options map[string]any) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "giftPremiumSubscription", options, &ok); err != nil {
@@ -52,6 +54,8 @@ func (b *Bot) GiftPremiumSubscription(ctx context.Context, options map[string]an
 // Example:
 //
 //	ok, err := b.ConvertGiftToStars(ctx, "423778511293324225", "1234567890abcdef")
+//
+// Telegram API: https://core.telegram.org/bots/api#convertgifttostars
 func (b *Bot) ConvertGiftToStars(ctx context.Context, businessConnectionID string, ownedGiftID string) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -87,6 +91,8 @@ func (b *Bot) ConvertGiftToStars(ctx context.Context, businessConnectionID strin
 //		"keep_original_details": true,
 //		"star_count":            500,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#upgradegift
 func (b *Bot) UpgradeGift(ctx context.Context, businessConnectionID string, ownedGiftID string, options map[string]any) (bool, error) {
 	payload := mergePayload(map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -120,6 +126,8 @@ func (b *Bot) UpgradeGift(ctx context.Context, businessConnectionID string, owne
 // Example:
 //
 //	ok, err := b.TransferGift(ctx, "423778511293324225", "1234567890abcdef", int64(-1001234567890), nil)
+//
+// Telegram API: https://core.telegram.org/bots/api#transfergift
 func (b *Bot) TransferGift(ctx context.Context, businessConnectionID string, ownedGiftID string, newOwnerChatID any, options map[string]any) (bool, error) {
 	payload := mergePayload(map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -153,6 +161,8 @@ func (b *Bot) TransferGift(ctx context.Context, businessConnectionID string, own
 //
 //	gifts, err := b.GetUserGifts(ctx, 123456, map[string]any{"limit": 10})
 //	fmt.Println(gifts["total_count"])
+//
+// Telegram API: https://core.telegram.org/bots/api#getusergifts
 func (b *Bot) GetUserGifts(ctx context.Context, userID int64, options map[string]any) (map[string]any, error) {
 	payload := mergePayload(map[string]any{"user_id": userID}, options)
 	var gifts map[string]any
@@ -184,6 +194,8 @@ func (b *Bot) GetUserGifts(ctx context.Context, userID int64, options map[string
 //
 //	gifts, err := b.GetChatGifts(ctx, "@channel", map[string]any{"exclude_unsaved": true})
 //	fmt.Println(gifts["total_count"])
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatgifts
 func (b *Bot) GetChatGifts(ctx context.Context, chatID any, options map[string]any) (map[string]any, error) {
 	payload := mergePayload(map[string]any{"chat_id": chatID}, options)
 	var gifts map[string]any
@@ -207,6 +219,8 @@ func (b *Bot) GetChatGifts(ctx context.Context, chatID any, options map[string]a
 //
 //	gifts, err := b.GetAvailableGifts(ctx)
 //	fmt.Printf("Available gifts count: %d\n", len(gifts.Gifts))
+//
+// Telegram API: https://core.telegram.org/bots/api#getavailablegifts
 func (b *Bot) GetAvailableGifts(ctx context.Context) (*types.Gifts, error) {
 	var gifts types.Gifts
 	if err := b.Request(ctx, "getAvailableGifts", nil, &gifts); err != nil {
@@ -238,6 +252,8 @@ func (b *Bot) GetAvailableGifts(ctx context.Context) (*types.Gifts, error) {
 //		Text:          "Enjoy your gift!",
 //		PayForUpgrade: true,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendgift
 func (b *Bot) SendGift(ctx context.Context, opts *types.SendGiftOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "sendGift", opts, &ok); err != nil {

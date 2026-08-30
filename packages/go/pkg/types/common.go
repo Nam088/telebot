@@ -30,6 +30,8 @@ func (e *TelegramError) Error() string {
 }
 
 // User represents a Telegram user or bot.
+//
+// Telegram API: https://core.telegram.org/bots/api#user
 type User struct {
 	ID                      int64  `json:"id"`
 	IsBot                   bool   `json:"is_bot"`
@@ -47,6 +49,8 @@ type User struct {
 }
 
 // Chat represents a Telegram chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#chat
 type Chat struct {
 	ID        int64  `json:"id"`
 	Type      string `json:"type"`
@@ -58,6 +62,8 @@ type Chat struct {
 }
 
 // File represents a file ready to be downloaded.
+//
+// Telegram API: https://core.telegram.org/bots/api#file
 type File struct {
 	FileID       string `json:"file_id"`
 	FileUniqueID string `json:"file_unique_id"`
@@ -66,6 +72,8 @@ type File struct {
 }
 
 // WebhookInfo contains information about the current status of a webhook.
+//
+// Telegram API: https://core.telegram.org/bots/api#webhookinfo
 type WebhookInfo struct {
 	URL                          string   `json:"url"`
 	HasCustomCertificate         bool     `json:"has_custom_certificate"`

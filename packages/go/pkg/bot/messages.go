@@ -22,6 +22,8 @@ import (
 // Example:
 //
 //	msg, err := bot.SendPhoto(ctx, 123456, "https://example.com/cat.jpg", "Cute cat!", nil)
+//
+// Telegram API: https://core.telegram.org/bots/api#sendphoto
 func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption string, replyMarkup *types.InlineKeyboardMarkup) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
@@ -51,6 +53,8 @@ func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption stri
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: An error if the request failed.
+//
+// Telegram API: https://core.telegram.org/bots/api#senddocument
 func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, caption string) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":  chatID,
@@ -75,6 +79,8 @@ func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, captio
 // Returns:
 //   - *types.Message: The edited Message object on success.
 //   - error: Error if the message cannot be edited.
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagetext
 func (b *Bot) EditMessageText(ctx context.Context, opts *types.EditMessageTextOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageText", opts, &msg); err != nil {
@@ -92,6 +98,8 @@ func (b *Bot) EditMessageText(ctx context.Context, opts *types.EditMessageTextOp
 // Returns:
 //   - *types.Message: The edited Message object on success.
 //   - error: An error if the request fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagereplymarkup
 func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessageReplyMarkupOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageReplyMarkup", opts, &msg); err != nil {
@@ -111,6 +119,8 @@ func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessag
 // Returns:
 //   - *types.Message: The forwarded Message object on success.
 //   - error: An error if forwarding failed.
+//
+// Telegram API: https://core.telegram.org/bots/api#forwardmessage
 func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
@@ -135,6 +145,8 @@ func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messag
 // Returns:
 //   - *types.MessageId: Unique message identifier of the newly sent message.
 //   - error: An error if copying failed.
+//
+// Telegram API: https://core.telegram.org/bots/api#copymessage
 func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.MessageId, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
@@ -158,6 +170,8 @@ func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID
 // Returns:
 //   - bool: True on success.
 //   - error: An error if the action failed.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendchataction
 func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bool, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
@@ -188,6 +202,8 @@ func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bo
 //
 //	msgs, err := b.GetUserPersonalChatMessages(ctx, int64(123456), 10)
 //	fmt.Printf("%d personal chat messages\n", len(msgs))
+//
+// Telegram API: https://core.telegram.org/bots/api#getuserpersonalchatmessages
 func (b *Bot) GetUserPersonalChatMessages(ctx context.Context, chatID any, limit int) ([]types.Message, error) {
 	payload := map[string]any{"chat_id": chatID}
 	if limit > 0 {

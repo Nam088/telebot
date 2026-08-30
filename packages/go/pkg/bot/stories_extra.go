@@ -29,6 +29,8 @@ import (
 //		Type:  "photo",
 //		Photo: "AGACQADTAAQCAAFYAQACAgADAgAC8gU0AAu2Y70VbmF0dWxlLmpwZwQ",
 //	}, map[string]any{"caption": "Updated", "parse_mode": "HTML"})
+//
+// Telegram API: https://core.telegram.org/bots/api#editstory
 func (b *Bot) EditStory(ctx context.Context, businessConnectionID string, storyID int64, content any, options map[string]any) (*types.Story, error) {
 	payload := mergePayload(map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -58,6 +60,8 @@ func (b *Bot) EditStory(ctx context.Context, businessConnectionID string, storyI
 // Example:
 //
 //	ok, err := b.DeleteStory(ctx, "bc1", 42)
+//
+// Telegram API: https://core.telegram.org/bots/api#deletestory
 func (b *Bot) DeleteStory(ctx context.Context, businessConnectionID string, storyID int64) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
@@ -90,6 +94,8 @@ func (b *Bot) DeleteStory(ctx context.Context, businessConnectionID string, stor
 //		"story_id": int64(42),
 //		"privacy":  "everybody",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#repoststory
 func (b *Bot) RepostStory(ctx context.Context, options map[string]any) (any, error) {
 	return b.requestUnknown(ctx, "repostStory", payloadOrEmpty(options))
 }

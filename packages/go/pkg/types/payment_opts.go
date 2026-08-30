@@ -1,6 +1,8 @@
 package types
 
 // ShippingOption represents one shipping option.
+//
+// Telegram API: https://core.telegram.org/bots/api#shippingoption
 type ShippingOption struct {
 	ID     string         `json:"id"`
 	Title  string         `json:"title"`

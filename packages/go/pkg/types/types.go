@@ -1,6 +1,8 @@
 package types
 
 // Message represents a Telegram message.
+//
+// Telegram API: https://core.telegram.org/bots/api#message
 type Message struct {
 	MessageID             int64                 `json:"message_id"`
 	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
@@ -49,6 +51,8 @@ type Message struct {
 // It is a flattened representation of Telegram's MessageOrigin union: the
 // Type field discriminates the variant ("user", "hidden_user", "chat" or
 // "channel") and only the fields relevant to that variant are populated.
+//
+// Telegram API: https://core.telegram.org/bots/api#messageorigin
 type MessageOrigin struct {
 	Type            string `json:"type"`
 	Date            int64  `json:"date"`
@@ -61,6 +65,8 @@ type MessageOrigin struct {
 }
 
 // CallbackQuery represents an incoming callback query from an inline button.
+//
+// Telegram API: https://core.telegram.org/bots/api#callbackquery
 type CallbackQuery struct {
 	ID              string   `json:"id"`
 	From            *User    `json:"from"`
@@ -72,6 +78,8 @@ type CallbackQuery struct {
 }
 
 // InlineQuery represents an incoming inline query.
+//
+// Telegram API: https://core.telegram.org/bots/api#inlinequery
 type InlineQuery struct {
 	ID       string    `json:"id"`
 	From     *User     `json:"from"`
@@ -82,6 +90,8 @@ type InlineQuery struct {
 }
 
 // Update represents an incoming update from Telegram.
+//
+// Telegram API: https://core.telegram.org/bots/api#update
 type Update struct {
 	UpdateID           int64               `json:"update_id"`
 	Message            *Message            `json:"message,omitempty"`
@@ -174,6 +184,8 @@ func (u *Update) EffectiveMessage() *Message {
 }
 
 // InlineKeyboardButton represents a button on an inline keyboard.
+//
+// Telegram API: https://core.telegram.org/bots/api#inlinekeyboardbutton
 type InlineKeyboardButton struct {
 	Text                         string      `json:"text"`
 	URL                          string      `json:"url,omitempty"`
@@ -185,6 +197,8 @@ type InlineKeyboardButton struct {
 }
 
 // InlineKeyboardMarkup represents an inline keyboard attached to a message.
+//
+// Telegram API: https://core.telegram.org/bots/api#inlinekeyboardmarkup
 type InlineKeyboardMarkup struct {
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
 }

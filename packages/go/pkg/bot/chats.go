@@ -7,6 +7,8 @@ import (
 )
 
 // GetChat gets up to date information about the chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchat
 func (b *Bot) GetChat(ctx context.Context, chatID any) (*types.Chat, error) {
 	payload := map[string]any{"chat_id": chatID}
 	var chat types.Chat
@@ -17,6 +19,8 @@ func (b *Bot) GetChat(ctx context.Context, chatID any) (*types.Chat, error) {
 }
 
 // GetChatAdministrators gets a list of administrators in a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatadministrators
 func (b *Bot) GetChatAdministrators(ctx context.Context, chatID any) ([]types.ChatMember, error) {
 	payload := map[string]any{"chat_id": chatID}
 	var admins []types.ChatMember
@@ -27,6 +31,8 @@ func (b *Bot) GetChatAdministrators(ctx context.Context, chatID any) ([]types.Ch
 }
 
 // GetChatMemberCount gets the number of members in a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatmembercount
 func (b *Bot) GetChatMemberCount(ctx context.Context, chatID any) (int, error) {
 	payload := map[string]any{"chat_id": chatID}
 	var count int
@@ -37,6 +43,8 @@ func (b *Bot) GetChatMemberCount(ctx context.Context, chatID any) (int, error) {
 }
 
 // LeaveChat leaves a group, supergroup or channel.
+//
+// Telegram API: https://core.telegram.org/bots/api#leavechat
 func (b *Bot) LeaveChat(ctx context.Context, chatID any) (bool, error) {
 	payload := map[string]any{"chat_id": chatID}
 	var ok bool
@@ -47,6 +55,8 @@ func (b *Bot) LeaveChat(ctx context.Context, chatID any) (bool, error) {
 }
 
 // BanChatMember bans a user in a group, supergroup or channel.
+//
+// Telegram API: https://core.telegram.org/bots/api#banchatmember
 func (b *Bot) BanChatMember(ctx context.Context, chatID any, userID int64, untilDate int64, revokeMessages bool) (bool, error) {
 	payload := map[string]any{
 		"chat_id":         chatID,
@@ -64,6 +74,8 @@ func (b *Bot) BanChatMember(ctx context.Context, chatID any, userID int64, until
 }
 
 // UnbanChatMember unbans a previously banned user in a supergroup or channel.
+//
+// Telegram API: https://core.telegram.org/bots/api#unbanchatmember
 func (b *Bot) UnbanChatMember(ctx context.Context, chatID any, userID int64, onlyIfBanned bool) (bool, error) {
 	payload := map[string]any{
 		"chat_id":        chatID,

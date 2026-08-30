@@ -9,6 +9,8 @@ import (
 // LogOut logs out from the cloud Bot API server.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#logout
 func (b *Bot) LogOut(ctx context.Context) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "logOut", nil, &ok); err != nil {
@@ -20,6 +22,8 @@ func (b *Bot) LogOut(ctx context.Context) (bool, error) {
 // Close closes the bot instance before moving it from one local server to another.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#close
 func (b *Bot) Close(ctx context.Context) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "close", nil, &ok); err != nil {
@@ -31,6 +35,8 @@ func (b *Bot) Close(ctx context.Context) (bool, error) {
 // SetMyName changes the bot's name.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#setmyname
 func (b *Bot) SetMyName(ctx context.Context, opts *types.SetMyNameOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMyName", opts, &ok); err != nil {
@@ -42,6 +48,8 @@ func (b *Bot) SetMyName(ctx context.Context, opts *types.SetMyNameOptions) (bool
 // GetMyName gets the bot's name in the given language.
 //
 // Returns the bot name on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#getmyname
 func (b *Bot) GetMyName(ctx context.Context, opts *types.GetMyNameOptions) (*types.BotName, error) {
 	var name types.BotName
 	if err := b.Request(ctx, "getMyName", opts, &name); err != nil {
@@ -53,6 +61,8 @@ func (b *Bot) GetMyName(ctx context.Context, opts *types.GetMyNameOptions) (*typ
 // SetMyDescription changes the bot's description.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#setmydescription
 func (b *Bot) SetMyDescription(ctx context.Context, opts *types.SetMyDescriptionOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMyDescription", opts, &ok); err != nil {
@@ -64,6 +74,8 @@ func (b *Bot) SetMyDescription(ctx context.Context, opts *types.SetMyDescription
 // GetMyDescription gets the bot's description in the given language.
 //
 // Returns the bot description on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#getmydescription
 func (b *Bot) GetMyDescription(ctx context.Context, opts *types.GetMyDescriptionOptions) (*types.BotDescription, error) {
 	var desc types.BotDescription
 	if err := b.Request(ctx, "getMyDescription", opts, &desc); err != nil {
@@ -75,6 +87,8 @@ func (b *Bot) GetMyDescription(ctx context.Context, opts *types.GetMyDescription
 // SetMyShortDescription changes the bot's short description.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#setmyshortdescription
 func (b *Bot) SetMyShortDescription(ctx context.Context, opts *types.SetMyShortDescriptionOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMyShortDescription", opts, &ok); err != nil {
@@ -86,6 +100,8 @@ func (b *Bot) SetMyShortDescription(ctx context.Context, opts *types.SetMyShortD
 // GetMyShortDescription gets the bot's short description in the given language.
 //
 // Returns the short description on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#getmyshortdescription
 func (b *Bot) GetMyShortDescription(ctx context.Context, opts *types.GetMyShortDescriptionOptions) (*types.BotShortDescription, error) {
 	var desc types.BotShortDescription
 	if err := b.Request(ctx, "getMyShortDescription", opts, &desc); err != nil {
@@ -97,6 +113,8 @@ func (b *Bot) GetMyShortDescription(ctx context.Context, opts *types.GetMyShortD
 // SetMyCommands changes the list of the bot's commands, optionally scoped by chat type and language.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#setmycommands
 func (b *Bot) SetMyCommands(ctx context.Context, opts *types.SetMyCommandsOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMyCommands", opts, &ok); err != nil {
@@ -108,6 +126,8 @@ func (b *Bot) SetMyCommands(ctx context.Context, opts *types.SetMyCommandsOption
 // GetMyCommands gets the current list of the bot's commands, optionally scoped by chat type and language.
 //
 // Returns the list of bot commands on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#getmycommands
 func (b *Bot) GetMyCommands(ctx context.Context, opts *types.GetMyCommandsOptions) ([]types.BotCommand, error) {
 	var commands []types.BotCommand
 	if err := b.Request(ctx, "getMyCommands", opts, &commands); err != nil {
@@ -119,6 +139,8 @@ func (b *Bot) GetMyCommands(ctx context.Context, opts *types.GetMyCommandsOption
 // DeleteMyCommands deletes the list of the bot's commands, optionally scoped by chat type and language.
 //
 // Returns true on success, or an error if the API call fails.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletemycommands
 func (b *Bot) DeleteMyCommands(ctx context.Context, opts *types.DeleteMyCommandsOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "deleteMyCommands", opts, &ok); err != nil {
@@ -141,6 +163,8 @@ func (b *Bot) DeleteMyCommands(ctx context.Context, opts *types.DeleteMyCommands
 // Example:
 //
 //	ok, err := b.SetMyProfilePhoto(ctx, map[string]any{"type": "photo", "id": "12345"})
+//
+// Telegram API: https://core.telegram.org/bots/api#setmyprofilephoto
 func (b *Bot) SetMyProfilePhoto(ctx context.Context, photo any) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMyProfilePhoto", map[string]any{"photo": photo}, &ok); err != nil {
@@ -161,6 +185,8 @@ func (b *Bot) SetMyProfilePhoto(ctx context.Context, photo any) (bool, error) {
 // Example:
 //
 //	ok, err := b.RemoveMyProfilePhoto(ctx)
+//
+// Telegram API: https://core.telegram.org/bots/api#removemyprofilephoto
 func (b *Bot) RemoveMyProfilePhoto(ctx context.Context) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "removeMyProfilePhoto", nil, &ok); err != nil {
@@ -189,6 +215,8 @@ func (b *Bot) RemoveMyProfilePhoto(ctx context.Context) (bool, error) {
 //
 //	audios, err := b.GetUserProfileAudios(ctx, 123456, 0, 10)
 //	fmt.Printf("profile audios: %v\n", audios)
+//
+// Telegram API: https://core.telegram.org/bots/api#getuserprofileaudios
 func (b *Bot) GetUserProfileAudios(ctx context.Context, userID int64, offset int, limit int) (any, error) {
 	payload := map[string]any{"user_id": userID}
 	if offset > 0 {

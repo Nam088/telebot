@@ -32,6 +32,8 @@ import (
 //			"max_selected_count": 1,
 //		},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendchecklist
 func (b *Bot) SendChecklist(ctx context.Context, options map[string]any) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendChecklist", payloadOrEmpty(options), &msg); err != nil {
@@ -64,6 +66,8 @@ func (b *Bot) SendChecklist(ctx context.Context, options map[string]any) (*types
 //			"items": []map[string]any{{"id": "i1", "text": "Pack the bag"}},
 //		},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagechecklist
 func (b *Bot) EditMessageChecklist(ctx context.Context, options map[string]any) (*types.Message, bool, error) {
 	return b.requestMessageOrTrue(ctx, "editMessageChecklist", payloadOrEmpty(options))
 }

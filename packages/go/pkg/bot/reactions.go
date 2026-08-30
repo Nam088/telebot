@@ -26,6 +26,8 @@ import (
 //			types.ReactionTypeEmoji{Type: "emoji", Emoji: "👍"},
 //		},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#setmessagereaction
 func (b *Bot) SetMessageReaction(ctx context.Context, opts *types.SetMessageReactionOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "setMessageReaction", opts, &ok); err != nil {
@@ -52,6 +54,8 @@ func (b *Bot) SetMessageReaction(ctx context.Context, opts *types.SetMessageReac
 // Example:
 //
 //	ok, err := bot.DeleteMessageReaction(ctx, int64(123456), 789, false)
+//
+// Telegram API: https://core.telegram.org/bots/api#setmessagereaction
 func (b *Bot) DeleteMessageReaction(ctx context.Context, chatID any, messageID int64, isBig bool) (bool, error) {
 	payload := map[string]any{
 		"chat_id":    chatID,
@@ -86,6 +90,8 @@ func (b *Bot) DeleteMessageReaction(ctx context.Context, chatID any, messageID i
 // Example:
 //
 //	ok, err := bot.DeleteAllMessageReactions(ctx, int64(123456), 789)
+//
+// Telegram API: https://core.telegram.org/bots/api#setmessagereaction
 func (b *Bot) DeleteAllMessageReactions(ctx context.Context, chatID any, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":    chatID,

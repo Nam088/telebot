@@ -28,6 +28,8 @@ import (
 //		"media":              []map[string]any{{"type": "photo", "id": "AGACQADTAAQCAAFY"}},
 //		"paid_media_payload": "premium_content",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendpaidmedia
 func (b *Bot) SendPaidMedia(ctx context.Context, options map[string]any) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendPaidMedia", payloadOrEmpty(options), &msg); err != nil {
@@ -55,6 +57,8 @@ func (b *Bot) SendPaidMedia(ctx context.Context, options map[string]any) (*types
 //		Video:   "BAACAgADAgAC8gU0AxAAGoJtV52",
 //		Caption: "Sunset",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendlivephoto
 func (b *Bot) SendLivePhoto(ctx context.Context, opts *types.SendLivePhotoOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendLivePhoto", opts, &msg); err != nil {
