@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import types as pytypes
 import typing as t
+from collections import abc
 
 T = t.TypeVar("T", bound="TelegramObject")
 
@@ -37,6 +38,17 @@ def _hydrate(hint: object, value: object) -> object:
                         and value.get(discriminator[0]) == (discriminator[1])
                     ):
                         return arg.from_dict(value)
+            return value
+        if isinstance(value, list):
+            # A union with a sequence member (e.g. RichText's plain-text array
+            # form) hydrates its items through that member's inner hint.
+            for arg in args:
+                if t.get_origin(arg) in (list, abc.Sequence):
+                    member_args = t.get_args(arg)
+                    item_hint = member_args[0] if member_args else None
+                    if item_hint is None:
+                        return value
+                    return [_hydrate(item_hint, item) for item in value]
         return value
     if origin is list:
         list_args = t.get_args(hint)

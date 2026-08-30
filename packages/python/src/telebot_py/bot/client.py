@@ -33,6 +33,7 @@ from telebot_py.bot.payments import PaymentsMixin
 from telebot_py.bot.profile import ProfileMixin
 from telebot_py.bot.reactions import ReactionsMixin
 from telebot_py.bot.retry import RetryPolicy
+from telebot_py.bot.rich_messages import RichMessagesMixin
 from telebot_py.bot.stickers import StickersMixin
 from telebot_py.bot.stories import StoriesMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
@@ -79,6 +80,7 @@ def _api_error(method: str, response: httpx.Response, envelope: object) -> Teleg
 
 class Bot(
     MessagesMixin,
+    RichMessagesMixin,
     MediaMixin,
     StickersMixin,
     InlineMixin,

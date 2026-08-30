@@ -49,26 +49,9 @@ GO_INFRA = frozenset(
     {"token", "on_response", "on_error", "request", "run_webhook", "webhook_handler"}
 )
 
-#: Shared reason for node-only methods that Go has not implemented yet;
-#: telebot_py tracks Go parity, so these are deferred to a future
-#: cross-language parity pass rather than implemented python-first.
-NODE_ONLY_GAP_REASON = (
-    "node-only method (not yet implemented in Go); telebot_py tracks Go parity"
-    " — deferred to a future cross-language parity pass"
-)
-
-_NODE_ONLY_DEFERRED = frozenset(
-    {
-        "send_rich_message",
-        "send_rich_message_draft",
-    }
-)
-
 #: Intentional parity gaps: node/go methods deliberately absent from python.
 #: Every entry must carry a reason; stale entries are flagged as errors.
-ALLOWLIST: dict[str, str] = {
-    **dict.fromkeys(_NODE_ONLY_DEFERRED, NODE_ONLY_GAP_REASON),
-}
+ALLOWLIST: dict[str, str] = {}
 
 NODE_METHOD_RE = re.compile(r"public async (\w+)\(")
 GO_METHOD_RE = re.compile(r"^func \(b \*Bot\) ([A-Z]\w*)\(", re.MULTILINE)

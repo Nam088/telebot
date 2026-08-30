@@ -38,6 +38,7 @@ from telebot_py.types.message_extras import (
     TextQuote,
     WebAppData,
 )
+from telebot_py.types.rich_blocks import RichMessage
 from telebot_py.types.user import User
 
 
@@ -174,8 +175,8 @@ class Message(TelegramObject):
             community (Bot API 10.3+).
         receiver_user: Receiver user of an ephemeral message.
         ephemeral_message_id: Ephemeral message identifier.
-        rich_message: Rich formatted message content (payload kept raw; the
-            node rich domain is out of scope here).
+        rich_message: Rich formatted message content, decoded into the typed
+            ``RichMessage`` blocks.
         live_photo: Live photo attachment.
 
     Telegram API: https://core.telegram.org/bots/api#message
@@ -273,7 +274,7 @@ class Message(TelegramObject):
     community_chat_joined: CommunityChatJoined | None = None
     receiver_user: User | None = None
     ephemeral_message_id: int | None = None
-    rich_message: object | None = None
+    rich_message: RichMessage | None = None
     live_photo: LivePhoto | None = None
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}

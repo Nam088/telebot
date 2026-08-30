@@ -22,7 +22,7 @@ class EditsMixin(Requester):
 
     async def edit_message_text(
         self,
-        text: str,
+        text: str | None = None,
         *,
         business_connection_id: str | None = None,
         chat_id: int | str | None = None,
@@ -30,6 +30,7 @@ class EditsMixin(Requester):
         inline_message_id: str | None = None,
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
+        rich_message: MarkupLike | None = None,
         link_preview_options: MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
@@ -39,7 +40,8 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_text("new text", chat_id=1, message_id=2)
 
         Args:
-            text: New text of the message, 1-4096 characters.
+            text: New text of the message, 1-4096 characters after entity
+                parsing; required unless ``rich_message`` is given.
             business_connection_id: Unique identifier of the business
                 connection on behalf of which the message to be edited was
                 sent.
@@ -51,6 +53,7 @@ class EditsMixin(Requester):
                 instead of ``chat_id`` and ``message_id``.
             parse_mode: Parse mode for the new text entities.
             entities: Special entities for the new text.
+            rich_message: InputRichMessage with the new rich content.
             link_preview_options: Link preview generation options.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
@@ -73,6 +76,7 @@ class EditsMixin(Requester):
             inline_message_id=inline_message_id,
             parse_mode=parse_mode,
             entities=[entity.to_dict() for entity in entities] if entities is not None else None,
+            rich_message=to_wire(rich_message),
             link_preview_options=to_wire(link_preview_options),
             reply_markup=to_wire(reply_markup),
         )

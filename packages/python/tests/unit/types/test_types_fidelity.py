@@ -897,7 +897,7 @@ class TestNestedTyping:
         assert hints["web_app_data"] == (WebAppData | None)
         assert hints["community_chat_joined"] == (CommunityChatJoined | None)
         assert hints["receiver_user"] == (User | None)
-        # Deferred node types (Sticker, Game, payments, rich) stay loose.
+        # Deferred node types (Sticker, Game, payments) stay loose.
         for loose in (
             "sticker",
             "game",
@@ -905,7 +905,6 @@ class TestNestedTyping:
             "successful_payment",
             "refunded_payment",
             "passport_data",
-            "rich_message",
             "link_preview_options",
         ):
             assert hints[loose] == (object | None)
