@@ -6,7 +6,7 @@
 
 import { ChatMemberMethods } from "./members.js";
 import type { InputFile } from "../../../utils/http.js";
-import type { Chat, ChatMember, UserChatBoosts } from "../../types/index.js";
+import type { ChatMember, ChatFullInfo, UserChatBoosts } from "../../types/index.js";
 
 /**
  * Mixin providing chat metadata, administrator query, and photo operations.
@@ -22,10 +22,7 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#setchatphoto Telegram Bot API: setChatPhoto}
    */
-  public async setChatPhoto(
-    chatId: number | string,
-    photo: string | import("../../../utils/http.js").InputFile,
-  ): Promise<boolean> {
+  public async setChatPhoto(chatId: number | string, photo: string | InputFile): Promise<boolean> {
     return this.request<boolean>("setChatPhoto", { chat_id: chatId, photo });
   }
 
@@ -139,19 +136,26 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * Retrieves up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.).
    *
    * @param chatId - Unique identifier for the target chat or username of the target channel.
-   * @returns A {@link Chat} object.
+   * @returns A {@link ChatFullInfo} object.
    * @throws {@link TelegramApiError} When chat is not found or bot lacks access.
+   *
+   * @remarks
+   * The docs declare the return type as `ChatFullInfo`, not `Chat`. Because
+   * `ChatFullInfo extends Chat`, callers that annotated the result as a `Chat`
+   * keep compiling and additionally gain access to the documented full-info
+   * fields (`max_reaction_count`, `parent_chat`, `accepted_gift_types`,
+   * `rating`, `community`, `guard_bot`, …).
    *
    * @example
    * ```ts
    * const chat = await bot.getChat(chatId);
-   * console.log(`Chat title: ${chat.title}`);
+   * console.log(`Chat title: ${chat.title}, max reactions: ${chat.max_reaction_count}`);
    * ```
    *
    * @see {@link https://core.telegram.org/bots/api#getchat Telegram Bot API: getChat}
    */
-  public async getChat(chatId: number | string): Promise<Chat> {
-    return this.request<Chat>("getChat", { chat_id: chatId });
+  public async getChat(chatId: number | string): Promise<ChatFullInfo> {
+    return this.request<ChatFullInfo>("getChat", { chat_id: chatId });
   }
 
   /**
