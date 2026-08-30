@@ -78,6 +78,12 @@ interface Persistence {
 
 ## Key Dependencies
 
+> Dependency policy is scoped per implementation package (spec.md NFR-1). Everything in this
+> section describes `packages/node`. `packages/python` allows exactly one required runtime
+> dependency — `httpx` (async HTTP transport; Python's stdlib has no async HTTP client) — with
+> persistence via the stdlib `sqlite3` module and dev-only tooling in its `[dev]` extra
+> (see `specs/004-python-framework`). `packages/go` currently has zero external dependencies.
+
 ### Production: NONE required (zero required dependencies)
 Only Node.js built-in modules:
 - `node:http`, `node:https` - Webhook server

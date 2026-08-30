@@ -8,11 +8,13 @@ on:
     paths:
       - 'packages/node/**'
       - 'packages/go/**'
+      - 'packages/python/**'
       - 'package.json'
       - 'package-lock.json'
       - '.releaserc.json'
       - '.github/workflows/release-pipeline.yml'
       - '.github/workflows/go-release.yml'
+      - '.github/workflows/python-release.yml'
 
 permissions:
   contents: write
@@ -78,6 +80,38 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -f "$GO_TAG"
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${GO_TAG}"
+
+      - name: Mirror Python tag with the same version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f RELEASE_VERSION ]; then
+            echo "No release published; skipping Python tag mirror."
+            exit 0
+          fi
+          VERSION="$(cat RELEASE_VERSION)"
+          case "$VERSION" in
+            *[!0-9a-zA-Z.-]*) echo "Unexpected version format"; exit 1 ;;
+          esac
+          PY_TAG="packages/python/v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$PY_TAG"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${PY_TAG}"
+
+      # Tags pushed with GITHUB_TOKEN do not trigger workflows, so the Python
+      # release workflow is dispatched explicitly at the mirrored tag.
+      - name: Dispatch Python release workflow
+        if: ${{ hashFiles('RELEASE_VERSION') != '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          VERSION="$(cat RELEASE_VERSION)"
+          case "$VERSION" in
+            *[!0-9a-zA-Z.-]*) echo "Unexpected version format"; exit 1 ;;
+          esac
+          gh workflow run python-release.yml --ref "packages/python/v${VERSION}"
 
       # Tags pushed with GITHUB_TOKEN do not trigger workflows, so the Go
       # GitHub Release is created here instead of relying on go-release.yml.

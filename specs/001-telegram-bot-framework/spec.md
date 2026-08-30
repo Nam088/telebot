@@ -102,6 +102,7 @@ Composable filter classes with fluent API:
 ## Non-Functional Requirements
 
 ### NFR-1: Zero Required Dependencies
+- This rule is scoped per implementation package: `packages/node` (TypeScript) must remain zero-required-dependency as detailed below; `packages/python` is allowed exactly one required runtime dependency (`httpx`, for the async HTTP transport — Python's stdlib has no async HTTP client; see `specs/004-python-framework`); `packages/go` maintains its own module's dependency policy (currently zero external dependencies)
 - Only Node.js built-in modules (`fetch`, `http`, `https`, `fs`, `path`, `crypto`, `util`, `events`, `sqlite`)
 - No required external npm packages in `dependencies`
 - One optional peer dependency is allowed for opt-in, non-core features (`pino`, for structured logging — see Library Decisions); the framework must work fully without it installed, and it is excluded from Success Criteria #4's dependency check

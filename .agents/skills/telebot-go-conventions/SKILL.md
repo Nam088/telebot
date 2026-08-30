@@ -89,3 +89,9 @@ Before considering any Go feature, bug fix, or refactor complete, execute:
 1. `npm run test:go` (or `cd packages/go && go test -v -race ./...`) → 100% Go unit tests pass.
 2. `npm run build:go` (or `cd packages/go && go build ./...`) → All Go packages compile cleanly.
 3. `npm run format:check` → Formatting check across all `.go` files.
+
+---
+
+## 7. Version & Release Parity (node = go = python)
+
+All three frameworks share ONE version (currently `1.4.0`). Go embeds no version: tags `packages/go/vX.Y.Z` are mirrored automatically by `.github/workflows/release-pipeline.yml` with the exact semantic-release version of the node release. Never create or push Go tags manually, and keep commit scopes Go-specific (`feat(go)`, `fix(go)`, ...) so git-cliff release notes stay correct. See AGENTS.md "Versioning & release parity".

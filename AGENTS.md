@@ -76,6 +76,16 @@ Before writing code against a library not already decided in `technical-context.
 - Before opening a PR: `npm run build` (must typecheck clean under `strict`), `vitest` (must pass, coverage per Testing above), and — if the change touches an example bot's feature area — actually run that example against a test bot, not just unit tests, per NFR-4's "Example bots for each major feature."
 - PR description states which FR/NFR/Success Criteria item(s) it satisfies, and calls out any spec.md/technical-context.md edit it required (per "Keeping this file honest" below).
 
+## Versioning & release parity (node = go = python)
+
+All three frameworks share ONE version number (currently `1.4.0`):
+
+- **Node** — `packages/node/package.json`, published to npm as `telebot-ts` by semantic-release on pushes to `main`; tags are `vX.Y.Z`.
+- **Go** — no embedded version; tags `packages/go/vX.Y.Z` are mirrored by `.github/workflows/release-pipeline.yml` with the same version as the node release (GitHub Releases only).
+- **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py`; tags `packages/python/vX.Y.Z` are mirrored the same way and `python-release.yml` stamps the tag version into the package before building.
+
+Rules: never bump one package without the others; never hand-push `packages/go/v*` or `packages/python/v*` tags ahead of the node release line; keep conventional-commit scopes per package (`feat(py)`, `fix(go)`, ...) so git-cliff release notes stay correct. Per-package details live in the `telebot-{node,go,python}-conventions` skills.
+
 ## How to actually build this project
 
 The repo currently only has `spec.md` + `technical-context.md` — no `plan.md`/`tasks.md` yet. Don't start writing framework code straight from the spec; follow the speckit flow already set up for this repo:

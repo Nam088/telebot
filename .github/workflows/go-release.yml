@@ -2,8 +2,8 @@ name: Go Release
 
 # Creates a GitHub Release for the Go framework whenever a telebot-go tag
 # (packages/go/vX.Y.Z) is pushed. Tags are mirrored automatically by the
-# release pipeline so Node and Go always share the same version number.
-# Release notes are generated automatically from conventional commits
+# release pipeline so Node, Go, and Python always share the same version
+# number. Release notes are generated automatically from conventional commits
 # by git-cliff.
 
 on:
