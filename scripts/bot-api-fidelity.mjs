@@ -550,6 +550,10 @@ export function renderTable(reports) {
     'missing REQUIRED',
     'missing optional',
     'unmodelled docs types',
+    'methods w/ missing params',
+    'missing param REQ',
+    'missing param opt',
+    'unmeasurable methods',
   ];
   const widths = header.map((text) => text.length);
   const body = reports.map((report) => [
@@ -560,6 +564,10 @@ export function renderTable(reports) {
     String(report.missingRequired),
     String(report.missingOptional),
     String(report.unmodelled.length),
+    String(report.methodsWithMissing ?? 0),
+    String(report.missingMethodRequired ?? 0),
+    String(report.missingMethodOptional ?? 0),
+    String((report.methodsUnresolved ?? []).length),
   ]);
   for (const row of body) {
     row.forEach((cell, index) => {
@@ -694,13 +702,15 @@ export function renderMarkdown(reports, options = {}) {
 
   lines.push(
     '',
-    '| package | declared | modelled | missing REQUIRED | missing optional | unmodelled |',
-    '| --- | --- | --- | --- | --- | --- |',
+    '| package | declared | modelled | missing REQUIRED | missing optional | unmodelled | methods w/ missing params | missing param REQ | missing param opt | unmeasurable |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
   );
   for (const report of reports) {
     lines.push(
       `| ${report.key} | ${report.declared} | ${report.modelled} | ` +
-        `${report.missingRequired} | ${report.missingOptional} | ${report.unmodelled.length} |`,
+        `${report.missingRequired} | ${report.missingOptional} | ${report.unmodelled.length} | ` +
+        `${report.methodsWithMissing ?? 0} | ${report.missingMethodRequired ?? 0} | ` +
+        `${report.missingMethodOptional ?? 0} | ${(report.methodsUnresolved ?? []).length} |`,
     );
   }
 
@@ -973,11 +983,30 @@ export async function main(argv = process.argv.slice(2)) {
       }
       if (entry.closed.length > 0) parts.push(`${entry.closed.length} gap row(s) closed`);
       if (entry.nowModelled.length > 0) parts.push(`${entry.nowModelled.length} newly modelled`);
+      if ((entry.newMethodGaps ?? []).length > 0) {
+        parts.push(`${entry.newMethodGaps.length} new param gap(s)`);
+      }
+      if ((entry.newlyUnresolved ?? []).length > 0) {
+        parts.push(`${entry.newlyUnresolved.length} newly unmeasurable method(s)`);
+      }
+      if ((entry.closedMethods ?? []).length > 0) {
+        parts.push(`${entry.closedMethods.length} param row(s) closed`);
+      }
+      if ((entry.nowResolved ?? []).length > 0) {
+        parts.push(`${entry.nowResolved.length} newly measurable`);
+      }
       console.log(`  ${entry.key.padEnd(8)} ${parts.length > 0 ? parts.join(', ') : 'unchanged'}`);
       for (const gap of entry.newGaps) {
         const marks = [...gap.required.map((field) => `${field}*`), ...gap.optional];
         console.log(`      ${gap.name}: ${marks.join(', ')}`);
         if (gap.file) console.log(`        ${gap.file}`);
+      }
+      for (const gap of entry.newMethodGaps ?? []) {
+        const marks = [...gap.required.map((field) => `${field}*`), ...gap.optional];
+        console.log(`      ${gap.name}(): ${marks.join(', ')}`);
+      }
+      if ((entry.newlyUnresolved ?? []).length > 0) {
+        console.log(`      cannot measure: ${entry.newlyUnresolved.join(', ')}`);
       }
       if (entry.newlyUnmodelled.length > 0) {
         console.log(`      ${entry.newlyUnmodelled.join(', ')}`);
@@ -1001,19 +1030,23 @@ export async function main(argv = process.argv.slice(2)) {
     return 0;
   }
 
-  const failing = reports.filter((report) => report.missingRequired > 0);
+  const failing = reports.filter(
+    (report) => report.missingRequired > 0 || (report.missingMethodRequired ?? 0) > 0,
+  );
+  const detail = (report) =>
+    `type:${report.missingRequired} param:${report.missingMethodRequired ?? 0}`;
   console.log('');
   if (options.report) {
     console.log(
       failing.length === 0
         ? '--report: no missing REQUIRED docs fields.'
-        : `--report: NOT failing. ${failing.map((r) => `${r.key}=${r.missingRequired}`).join(' ')} missing REQUIRED docs fields.`,
+        : `--report: NOT failing. ${failing.map((r) => `${r.key}=${detail(r)}`).join(' ')} missing REQUIRED docs fields.`,
     );
     return 0;
   }
   if (failing.length > 0) {
     console.error(
-      `FAIL: missing REQUIRED docs fields -> ${failing.map((r) => `${r.key}=${r.missingRequired}`).join(' ')}`,
+      `FAIL: missing REQUIRED docs fields -> ${failing.map((r) => `${r.key}=${detail(r)}`).join(' ')}`,
     );
     return 1;
   }
