@@ -1,4 +1,4 @@
-"""Telegram game types: Game and GameHighScore."""
+"""Telegram game types: CallbackGame, Game and GameHighScore."""
 
 from __future__ import annotations
 
@@ -8,6 +8,14 @@ from telebot_py.types.base import TelegramObject
 from telebot_py.types.common import MessageEntity
 from telebot_py.types.media import Animation, PhotoSize
 from telebot_py.types.user import User
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class CallbackGame(TelegramObject):
+    """A placeholder, empty response sent when a game button is pressed.
+
+    Telegram API: https://core.telegram.org/bots/api#callbackgame
+    """
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

@@ -119,6 +119,45 @@ class AcceptedGiftTypes(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class GiftInfo(TelegramObject):
+    """Information about a regular gift that was sent or received.
+
+    Carried by the ``Message`` fields ``gift`` and ``gift_upgrade_sent``.
+
+    Attributes:
+        gift: Information about the gift.
+        owned_gift_id: Unique identifier of the received gift for the bot; only
+            present for gifts received on behalf of business accounts.
+        convert_star_count: Number of Telegram Stars that can be claimed by the
+            receiver by converting the gift; omitted if the gift cannot be
+            converted to stars.
+        prepaid_upgrade_star_count: Number of Telegram Stars that were prepaid
+            for the ability to upgrade the gift.
+        is_upgrade_separate: Whether the gift's upgrade was purchased after the
+            gift was sent.
+        can_be_upgraded: Whether the gift can be upgraded to a unique gift.
+        text: Text of the message that was added to the gift.
+        entities: Special entities that appear in ``text``.
+        is_private: Whether the sender and the gift text are shown only to the
+            gift receiver.
+        unique_gift_number: Unique number reserved for this gift when upgraded.
+
+    Telegram API: https://core.telegram.org/bots/api#giftinfo
+    """
+
+    gift: Gift
+    owned_gift_id: str | None = None
+    convert_star_count: int | None = None
+    prepaid_upgrade_star_count: int | None = None
+    is_upgrade_separate: bool | None = None
+    can_be_upgraded: bool | None = None
+    text: str | None = None
+    entities: list[MessageEntity] | None = None
+    is_private: bool | None = None
+    unique_gift_number: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class UniqueGiftBackdropColors(TelegramObject):
     """Colors of a unique gift backdrop.
 

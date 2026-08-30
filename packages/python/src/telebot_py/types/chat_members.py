@@ -234,6 +234,8 @@ class ChatJoinRequest(TelegramObject):
         bio: Bio of the user.
         invite_link: Chat invite link that was used by the user to send the
             join request.
+        query_id: Identifier of the join request query; for bots assigned to
+            process join requests only.
 
     Telegram API: https://core.telegram.org/bots/api#chatjoinrequest
     """
@@ -244,6 +246,7 @@ class ChatJoinRequest(TelegramObject):
     date: int
     bio: str | None = None
     invite_link: ChatInviteLink | None = None
+    query_id: str | None = None
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}
 

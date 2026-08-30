@@ -39,6 +39,7 @@ from telebot_py.types import (
     Animation,
     Audio,
     Birthdate,
+    BotSubscriptionUpdated,
     BusinessBotRights,
     BusinessConnection,
     BusinessIntro,
@@ -62,21 +63,41 @@ from telebot_py.types import (
     ChatMember,
     ChatMemberAdministrator,
     ChatMemberUpdated,
+    ChatOwnerChanged,
+    ChatOwnerLeft,
     ChatPermissions,
     ChatPhoto,
+    ChatShared,
+    Checklist,
+    ChecklistTasksAdded,
+    ChecklistTasksDone,
     ChosenInlineResult,
     Community,
+    CommunityChatAdded,
     CommunityChatJoined,
+    CommunityChatRemoved,
     Contact,
     CopyTextButton,
     Dice,
+    DirectMessagePriceChanged,
+    DirectMessagesTopic,
     Document,
     ExternalReplyInfo,
     ForceReply,
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
     Game,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
     Gift,
     GiftBackground,
     Gifts,
+    Giveaway,
+    GiveawayCompleted,
+    GiveawayCreated,
+    GiveawayWinners,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQuery,
@@ -85,11 +106,15 @@ from telebot_py.types import (
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
     KeyboardButtonRequestUsers,
+    Link,
     LinkPreviewOptions,
     LivePhoto,
     Location,
     LoginUrl,
+    ManagedBotCreated,
+    ManagedBotUpdated,
     Message,
+    MessageAutoDeleteTimerChanged,
     MessageEntity,
     MessageGenerationStopped,
     MessageOriginChannel,
@@ -99,13 +124,18 @@ from telebot_py.types import (
     MessageReactionCountUpdated,
     MessageReactionUpdated,
     OrderInfo,
+    PaidMediaPurchased,
+    PaidMessagePriceChanged,
     PassportData,
     PhotoSize,
     Poll,
     PollAnswer,
+    PollMedia,
     PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
+    ProximityAlertTriggered,
     ReactionCount,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
@@ -113,11 +143,19 @@ from telebot_py.types import (
     RefundedPayment,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    SharedUser,
     ShippingAddress,
     ShippingQuery,
     Sticker,
     Story,
     SuccessfulPayment,
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
     SwitchInlineQueryChosenChat,
     TextQuote,
     UniqueGift,
@@ -129,12 +167,19 @@ from telebot_py.types import (
     UniqueGiftSymbol,
     Update,
     User,
+    UsersShared,
     Venue,
     Video,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
     VideoNote,
+    VideoQuality,
     Voice,
     WebAppData,
     WebAppInfo,
+    WriteAccessAllowed,
 )
 from telebot_py.types.base import TelegramObject, TypeParseError
 
@@ -154,9 +199,14 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("added_to_attachment_menu", False),
         ("can_join_groups", False),
         ("can_read_all_group_messages", False),
+        ("supports_guest_queries", False),
         ("supports_inline_queries", False),
         ("can_connect_to_business", False),
         ("has_main_web_app", False),
+        ("has_topics_enabled", False),
+        ("allows_users_to_create_topics", False),
+        ("can_manage_bots", False),
+        ("supports_join_request_queries", False),
     ),
     Birthdate: (("day", True), ("month", True), ("year", False)),
     ChatPhoto: (
@@ -173,6 +223,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("first_name", False),
         ("last_name", False),
         ("is_forum", False),
+        ("is_direct_messages", False),
         ("photo", False),
         ("active_usernames", False),
         ("birthdate", False),
@@ -242,33 +293,50 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("user", False),
         ("language", False),
         ("custom_emoji_id", False),
+        ("unix_time", False),
+        ("date_time_format", False),
     ),
     PollOption: (
+        ("persistent_id", True),
         ("text", True),
-        ("voter_count", True),
-        ("persistent_id", False),
         ("text_entities", False),
+        ("media", False),
+        ("voter_count", True),
+        ("added_by_user", False),
+        ("added_by_chat", False),
+        ("addition_date", False),
     ),
     Poll: (
         ("id", True),
         ("question", True),
+        ("question_entities", False),
         ("options", True),
         ("total_voter_count", True),
         ("is_closed", True),
         ("is_anonymous", True),
         ("type", True),
         ("allows_multiple_answers", True),
-        ("correct_option_id", False),
+        ("allows_revoting", True),
+        ("members_only", True),
+        ("country_codes", False),
+        ("correct_option_ids", False),
         ("explanation", False),
         ("explanation_entities", False),
+        ("explanation_media", False),
         ("open_period", False),
         ("close_date", False),
+        ("description", False),
+        ("description_entities", False),
+        ("media", False),
+        # Legacy single-value form kept so pre-10.3 quiz payloads still decode.
+        ("correct_option_id", False),
     ),
     PollAnswer: (
         ("poll_id", True),
-        ("option_ids", True),
         ("voter_chat", False),
         ("user", False),
+        ("option_ids", True),
+        ("option_persistent_ids", True),
     ),
     PhotoSize: (
         ("file_id", True),
@@ -303,6 +371,9 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("height", True),
         ("duration", True),
         ("thumbnail", False),
+        ("cover", False),
+        ("start_timestamp", False),
+        ("qualities", False),
         ("file_name", False),
         ("mime_type", False),
         ("file_size", False),
@@ -334,12 +405,14 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("file_size", False),
     ),
     LivePhoto: (
+        ("photo", False),
         ("file_id", True),
         ("file_unique_id", True),
         ("width", True),
         ("height", True),
-        ("photo", True),
-        ("video", True),
+        ("duration", True),
+        ("mime_type", False),
+        ("file_size", False),
     ),
     Story: (("chat", True), ("id", True)),
     ChatBoostAdded: (("boost_count", True),),
@@ -400,8 +473,11 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
     ),
     KeyboardButton: (
         ("text", True),
+        ("icon_custom_emoji_id", False),
+        ("style", False),
         ("request_users", False),
         ("request_chat", False),
+        ("request_managed_bot", False),
         ("request_contact", False),
         ("request_location", False),
         ("request_poll", False),
@@ -451,6 +527,8 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("animation", False),
         ("audio", False),
         ("document", False),
+        ("live_photo", False),
+        ("paid_media", False),
         ("photo", False),
         ("sticker", False),
         ("story", False),
@@ -458,6 +536,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("video_note", False),
         ("voice", False),
         ("has_media_spoiler", False),
+        ("checklist", False),
         ("contact", False),
         ("dice", False),
         ("game", False),
@@ -481,6 +560,8 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("can_send_polls", False),
         ("can_send_other_messages", False),
         ("can_add_web_page_previews", False),
+        ("can_react_to_messages", False),
+        ("can_edit_tag", False),
         ("can_change_info", False),
         ("can_invite_users", False),
         ("can_pin_messages", False),
@@ -563,6 +644,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("date", True),
         ("bio", False),
         ("invite_link", False),
+        ("query_id", False),
     ),
     Community: (("id", True), ("name", True)),
     CommunityChatJoined: (("community", True),),
@@ -669,7 +751,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("shipping_option_id", False),
         ("order_info", False),
     ),
-    PurchasedPaidMedia: (("from_user", True), ("paid_media_payload", True)),
+    PaidMediaPurchased: (("from_user", True), ("paid_media_payload", True)),
     InlineQuery: (
         ("id", True),
         ("from_user", True),
@@ -772,9 +854,185 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("transfer_star_count", False),
         ("next_transfer_date", False),
     ),
+    # Poll and link payloads (poll_types.py)
+    Link: (("url", True),),
+    PollMedia: (
+        ("animation", False),
+        ("audio", False),
+        ("document", False),
+        ("link", False),
+        ("live_photo", False),
+        ("location", False),
+        ("photo", False),
+        ("sticker", False),
+        ("venue", False),
+        ("video", False),
+    ),
+    VideoQuality: (
+        ("file_id", True),
+        ("file_unique_id", True),
+        ("width", True),
+        ("height", True),
+        ("codec", True),
+        ("file_size", False),
+    ),
+    # Service-message payloads (message_service.py)
+    MessageAutoDeleteTimerChanged: (("message_auto_delete_time", True),),
+    ProximityAlertTriggered: (
+        ("traveler", True),
+        ("watcher", True),
+        ("distance", True),
+    ),
+    WriteAccessAllowed: (
+        ("from_request", False),
+        ("web_app_name", False),
+        ("from_attachment_menu", False),
+    ),
+    SharedUser: (
+        ("user_id", True),
+        ("first_name", False),
+        ("last_name", False),
+        ("username", False),
+        ("photo", False),
+    ),
+    UsersShared: (
+        ("request_id", True),
+        ("users", True),
+    ),
+    ChatShared: (
+        ("request_id", True),
+        ("chat_id", True),
+        ("title", False),
+        ("username", False),
+        ("photo", False),
+    ),
+    ForumTopicCreated: (
+        ("name", True),
+        ("icon_color", True),
+        ("icon_custom_emoji_id", False),
+        ("is_name_implicit", False),
+    ),
+    ForumTopicEdited: (
+        ("name", False),
+        ("icon_custom_emoji_id", False),
+    ),
+    ForumTopicClosed: (),
+    ForumTopicReopened: (),
+    GeneralForumTopicHidden: (),
+    GeneralForumTopicUnhidden: (),
+    VideoChatScheduled: (("start_date", True),),
+    VideoChatStarted: (),
+    VideoChatEnded: (("duration", True),),
+    VideoChatParticipantsInvited: (("users", True),),
+    # Community, ownership and poll-option payloads (message_community.py)
+    ChatOwnerChanged: (("new_owner", True),),
+    ChatOwnerLeft: (("new_owner", False),),
+    CommunityChatAdded: (("community", True),),
+    CommunityChatRemoved: (),
+    DirectMessagesTopic: (
+        ("topic_id", True),
+        ("user", False),
+    ),
+    DirectMessagePriceChanged: (
+        ("are_direct_messages_enabled", True),
+        ("direct_message_star_count", False),
+    ),
+    PaidMessagePriceChanged: (("paid_message_star_count", True),),
+    ManagedBotCreated: (("bot", True),),
+    ManagedBotUpdated: (
+        ("user", True),
+        ("bot", True),
+    ),
+    PollOptionAdded: (
+        ("poll_message", False),
+        ("option_persistent_id", True),
+        ("option_text", True),
+        ("option_text_entities", False),
+    ),
+    PollOptionDeleted: (
+        ("poll_message", False),
+        ("option_persistent_id", True),
+        ("option_text", True),
+        ("option_text_entities", False),
+    ),
+    ChecklistTasksAdded: (
+        ("checklist_message", False),
+        ("tasks", True),
+    ),
+    ChecklistTasksDone: (
+        ("checklist_message", False),
+        ("marked_as_done_task_ids", False),
+        ("marked_as_not_done_task_ids", False),
+    ),
+    # Giveaway payloads (giveaway_types.py)
+    GiveawayCreated: (("prize_star_count", False),),
+    Giveaway: (
+        ("chats", True),
+        ("winners_selection_date", True),
+        ("winner_count", True),
+        ("only_new_members", False),
+        ("has_public_winners", False),
+        ("prize_description", False),
+        ("country_codes", False),
+        ("prize_star_count", False),
+        ("premium_subscription_month_count", False),
+    ),
+    GiveawayCompleted: (
+        ("winner_count", True),
+        ("unclaimed_prize_count", False),
+        ("giveaway_message", False),
+        ("is_star_giveaway", False),
+    ),
+    GiveawayWinners: (
+        ("chat", True),
+        ("giveaway_message_id", True),
+        ("winners_selection_date", True),
+        ("winner_count", True),
+        ("winners", True),
+        ("additional_chat_count", False),
+        ("prize_star_count", False),
+        ("premium_subscription_month_count", False),
+        ("unclaimed_prize_count", False),
+        ("only_new_members", False),
+        ("was_refunded", False),
+        ("prize_description", False),
+    ),
+    # Suggested-post payloads (suggested_post_types.py)
+    SuggestedPostPrice: (
+        ("currency", True),
+        ("amount", True),
+    ),
+    SuggestedPostInfo: (
+        ("state", True),
+        ("price", False),
+        ("send_date", False),
+    ),
+    SuggestedPostApproved: (
+        ("suggested_post_message", False),
+        ("price", False),
+        ("send_date", True),
+    ),
+    SuggestedPostApprovalFailed: (
+        ("suggested_post_message", False),
+        ("price", True),
+    ),
+    SuggestedPostDeclined: (
+        ("suggested_post_message", False),
+        ("comment", False),
+    ),
+    SuggestedPostPaid: (
+        ("suggested_post_message", False),
+        ("currency", True),
+        ("amount", False),
+        ("star_amount", False),
+    ),
+    SuggestedPostRefunded: (
+        ("suggested_post_message", False),
+        ("reason", True),
+    ),
 }
 
-#: Node's ``RawUpdate`` payload fields (common/models.ts), in node order.
+#: Payload fields documented on ``Update`` (Bot API 10.3), in docs order.
 UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "message",
     "edited_message",
@@ -784,6 +1042,7 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "business_message",
     "edited_business_message",
     "deleted_business_messages",
+    "guest_message",
     "message_reaction",
     "message_reaction_count",
     "inline_query",
@@ -791,6 +1050,7 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "callback_query",
     "shipping_query",
     "pre_checkout_query",
+    "purchased_paid_media",
     "poll",
     "poll_answer",
     "my_chat_member",
@@ -798,7 +1058,8 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "chat_join_request",
     "chat_boost",
     "removed_chat_boost",
-    "purchased_paid_media",
+    "managed_bot",
+    "subscription",
     "stopped_message_generation",
 )
 
@@ -810,7 +1071,7 @@ FROM_USER_CLASSES: tuple[type, ...] = (
     ChosenInlineResult,
     ShippingQuery,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
+    PaidMediaPurchased,
     ChatMemberUpdated,
     ChatJoinRequest,
 )
@@ -915,19 +1176,26 @@ class TestNestedTyping:
         assert hints["passport_data"] == (PassportData | None)
         assert hints["link_preview_options"] == (LinkPreviewOptions | None)
         assert hints["chat_background_set"] == (ChatBackground | None)
-        # Docs types still unmodeled in this package (giveaway, gift, topic and
-        # service payloads) keep the loose ``object`` annotation.
-        for loose in (
-            "users_shared",
-            "chat_shared",
-            "write_access_allowed",
-            "message_auto_delete_timer_changed",
-            "proximity_alert_triggered",
-            "forum_topic_created",
-            "giveaway",
-            "giveaway_winners",
-        ):
-            assert hints[loose] == (object | None)
+        # The service, giveaway and community payloads the previous revision
+        # kept raw are concrete docs classes now, so nothing on Message is
+        # annotated with the loose ``object`` placeholder.
+        assert hints["users_shared"] == (UsersShared | None)
+        assert hints["chat_shared"] == (ChatShared | None)
+        assert hints["write_access_allowed"] == (WriteAccessAllowed | None)
+        assert hints["message_auto_delete_timer_changed"] == (MessageAutoDeleteTimerChanged | None)
+        assert hints["proximity_alert_triggered"] == (ProximityAlertTriggered | None)
+        assert hints["forum_topic_created"] == (ForumTopicCreated | None)
+        assert hints["giveaway"] == (Giveaway | None)
+        assert hints["giveaway_winners"] == (GiveawayWinners | None)
+        assert hints["managed_bot_created"] == (ManagedBotCreated | None)
+        assert hints["poll_option_added"] == (PollOptionAdded | None)
+        assert hints["checklist_tasks_done"] == (ChecklistTasksDone | None)
+        assert hints["suggested_post_paid"] == (SuggestedPostPaid | None)
+        assert hints["direct_messages_topic"] == (DirectMessagesTopic | None)
+        assert hints["paid_message_price_changed"] == (PaidMessagePriceChanged | None)
+        assert hints["checklist"] == (Checklist | None)
+        for name, hint in hints.items():
+            assert hint is not (object | None), f"Message.{name} is still loosely typed"
 
     def test_chat_nested_types(self) -> None:
         hints = t.get_type_hints(Chat)
@@ -987,7 +1255,7 @@ class TestNestedTyping:
         assert hints["chat_join_request"] == (ChatJoinRequest | None)
         assert hints["chat_boost"] == (ChatBoostUpdated | None)
         assert hints["removed_chat_boost"] == (ChatBoostRemoved | None)
-        assert hints["purchased_paid_media"] == (PurchasedPaidMedia | None)
+        assert hints["purchased_paid_media"] == (PaidMediaPurchased | None)
         assert hints["stopped_message_generation"] == (MessageGenerationStopped | None)
 
 
@@ -1268,6 +1536,8 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "is_anonymous": True,
         "type": "quiz",
         "allows_multiple_answers": False,
+        "allows_revoting": False,
+        "members_only": False,
         "correct_option_id": 0,
         "explanation": "Pho wins",
         "explanation_entities": [{"type": "italic", "offset": 0, "length": 3}],
@@ -1328,12 +1598,25 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "invoice_payload": "pl",
         "telegram_payment_charge_id": "tg",
     },
-    "users_shared": {"request_id": 1, "users": [{"id": 5}]},
+    "users_shared": {
+        "request_id": 1,
+        "users": [
+            {
+                "user_id": 5,
+                "first_name": "Shared",
+                "photo": [{"file_id": "su", "file_unique_id": "suu", "width": 90, "height": 90}],
+            }
+        ],
+    },
     "chat_shared": {"request_id": 2, "chat_id": -1001},
     "connected_website": "https://example.com",
     "write_access_allowed": {"from_request": True},
     "passport_data": {"data": [], "credentials": {"data": "d", "hash": "h", "secret": "s"}},
-    "proximity_alert_triggered": {"traveler": {"id": 1}, "watcher": {"id": 2}, "distance": 5},
+    "proximity_alert_triggered": {
+        "traveler": {"id": 1, "is_bot": False, "first_name": "Traveler"},
+        "watcher": {"id": 2, "is_bot": False, "first_name": "Watcher"},
+        "distance": 5,
+    },
     "boost_added": {"boost_count": 3},
     "chat_background_set": {
         "type": {
@@ -1349,13 +1632,25 @@ RAW_MESSAGE: dict[str, t.Any] = {
     "general_forum_topic_hidden": {},
     "general_forum_topic_unhidden": {},
     "giveaway_created": {"prize_star_count": 100},
-    "giveaway": {"chats": [{"id": -1001}], "winners_selection_date": 1},
-    "giveaway_winners": {"chat": {"id": -1001}, "winners": [{"id": 1}]},
+    "giveaway": {
+        "chats": [{"id": -1001, "type": "supergroup"}],
+        "winners_selection_date": 1,
+        "winner_count": 2,
+    },
+    "giveaway_winners": {
+        "chat": {"id": -1001, "type": "supergroup"},
+        "giveaway_message_id": 12,
+        "winners_selection_date": 1,
+        "winner_count": 1,
+        "winners": [{"id": 1, "is_bot": False, "first_name": "Winner"}],
+    },
     "giveaway_completed": {"winner_count": 1},
     "video_chat_scheduled": {"start_date": 1},
     "video_chat_started": {},
     "video_chat_ended": {"duration": 60},
-    "video_chat_participants_invited": {"users": [{"id": 1}]},
+    "video_chat_participants_invited": {
+        "users": [{"id": 1, "is_bot": False, "first_name": "Invited"}]
+    },
     "web_app_data": {"data": '{"k":1}', "button_text": "Open"},
     "reply_markup": {
         "inline_keyboard": [
@@ -1400,14 +1695,10 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "file_unique_id": "lpu",
         "width": 1080,
         "height": 1920,
+        "duration": 3,
         "photo": [{"file_id": "lpp", "file_unique_id": "lppu", "width": 540, "height": 960}],
-        "video": {
-            "file_id": "lpv",
-            "file_unique_id": "lpvu",
-            "width": 1080,
-            "height": 1920,
-            "duration": 3,
-        },
+        "mime_type": "video/mp4",
+        "file_size": 2_400_000,
     },
 }
 
@@ -1710,6 +2001,7 @@ class TestRoundTrips:
             "voter_chat": {"id": -100, "type": "group", "title": "Voters"},
             "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
             "option_ids": [0, 2],
+            "option_persistent_ids": ["opt-a", "opt-c"],
         }
         assert PollAnswer.from_dict(raw).to_dict() == raw
 
@@ -1837,7 +2129,7 @@ class TestRoundTrips:
             "from": {"id": 7, "is_bot": False, "first_name": "Ada"},
             "paid_media_payload": "payload",
         }
-        assert PurchasedPaidMedia.from_dict(paid_raw).to_dict() == paid_raw
+        assert PaidMediaPurchased.from_dict(paid_raw).to_dict() == paid_raw
 
     def test_inline_types(self) -> None:
         inline_raw = {
@@ -1990,6 +2282,17 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         },
         BusinessMessagesDeleted,
     ),
+    "guest_message": (
+        {
+            "message_id": 8,
+            "date": 1,
+            "chat": {"id": -100, "type": "channel"},
+            "sender_chat": {"id": -100999, "type": "channel", "title": "Guest"},
+            "guest_query_id": "gq-1",
+            "text": "posted by a guest bot",
+        },
+        Message,
+    ),
     "message_reaction": (
         {
             "chat": {"id": -100, "type": "supergroup"},
@@ -2049,16 +2352,21 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         {
             "id": "p",
             "question": "q",
-            "options": [{"text": "a", "voter_count": 0}],
+            "options": [{"persistent_id": "opt-a", "text": "a", "voter_count": 0}],
             "total_voter_count": 0,
             "is_closed": False,
             "is_anonymous": True,
             "type": "regular",
             "allows_multiple_answers": False,
+            "allows_revoting": False,
+            "members_only": True,
         },
         Poll,
     ),
-    "poll_answer": ({"poll_id": "p", "option_ids": [0]}, PollAnswer),
+    "poll_answer": (
+        {"poll_id": "p", "option_ids": [0], "option_persistent_ids": ["opt-a"]},
+        PollAnswer,
+    ),
     "my_chat_member": (
         {
             "chat": {"id": -100, "type": "supergroup"},
@@ -2109,7 +2417,22 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         },
         ChatBoostRemoved,
     ),
-    "purchased_paid_media": ({"from": RAW_USER, "paid_media_payload": "p"}, PurchasedPaidMedia),
+    "managed_bot": (
+        {
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "bot": {"id": 200, "is_bot": True, "first_name": "Managed", "username": "managedbot"},
+        },
+        ManagedBotUpdated,
+    ),
+    "subscription": (
+        {
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "invoice_payload": "monthly",
+            "state": "active",
+        },
+        BotSubscriptionUpdated,
+    ),
+    "purchased_paid_media": ({"from": RAW_USER, "paid_media_payload": "p"}, PaidMediaPurchased),
     "stopped_message_generation": (
         {"chat": {"id": -100, "type": "supergroup"}, "message_thread_id": 4, "draft_id": 9},
         MessageGenerationStopped,
@@ -2139,12 +2462,14 @@ class TestUpdateFidelity:
         poll = Poll(
             id="p",
             question="q",
-            options=[PollOption(text="a", voter_count=0)],
+            options=[PollOption(persistent_id="opt-a", text="a", voter_count=0)],
             total_voter_count=0,
             is_closed=False,
             is_anonymous=True,
             type="regular",
             allows_multiple_answers=False,
+            allows_revoting=False,
+            members_only=False,
         )
         with pytest.raises(ValueError, match="exactly one"):
             Update(update_id=1, message=message, poll=poll)

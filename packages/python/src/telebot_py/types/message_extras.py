@@ -6,26 +6,30 @@ import dataclasses
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.chat import Chat
+from telebot_py.types.checklists import Checklist
 from telebot_py.types.common import (
     Contact,
     Dice,
     LinkPreviewOptions,
     Location,
     MessageEntity,
-    Poll,
     Venue,
 )
 from telebot_py.types.games import Game
+from telebot_py.types.giveaway_types import Giveaway, GiveawayWinners
 from telebot_py.types.media import (
     Animation,
     Audio,
     Document,
+    LivePhoto,
     PhotoSize,
     Video,
     VideoNote,
     Voice,
 )
+from telebot_py.types.paid_media import PaidMediaInfo
 from telebot_py.types.payments import Invoice
+from telebot_py.types.poll_types import Poll
 from telebot_py.types.stickers import Sticker
 from telebot_py.types.user import User
 
@@ -162,6 +166,8 @@ class ExternalReplyInfo(TelegramObject):
         animation: The message is an animation, information about it.
         audio: The message is an audio file, information about the file.
         document: The message is a general file, information about the file.
+        live_photo: The message is a live photo, information about it.
+        paid_media: The message contains paid media, information about it.
         photo: The message is a photo, available sizes of the photo.
         sticker: The message is a sticker, information about it.
         story: The message is a forwarded story, information about the story.
@@ -170,12 +176,12 @@ class ExternalReplyInfo(TelegramObject):
         voice: The message is a voice message, information about the file.
         has_media_spoiler: Whether the message media is covered by a spoiler
             animation.
+        checklist: The message is a checklist, information about it.
         contact: The message is a shared contact, information about it.
         dice: The message is a dice with random value.
         game: The message is a game, information about it.
-        giveaway: The message is a scheduled giveaway (kept raw).
-        giveaway_winners: A giveaway with public winners was completed
-            (kept raw).
+        giveaway: The message is a scheduled giveaway, information about it.
+        giveaway_winners: A giveaway with public winners was completed.
         invoice: The message is an invoice for a payment.
         location: The message is a shared location, information about it.
         poll: The message is a native poll, information about the poll.
@@ -191,6 +197,8 @@ class ExternalReplyInfo(TelegramObject):
     animation: Animation | None = None
     audio: Audio | None = None
     document: Document | None = None
+    live_photo: LivePhoto | None = None
+    paid_media: PaidMediaInfo | None = None
     photo: list[PhotoSize] | None = None
     sticker: Sticker | None = None
     story: Story | None = None
@@ -198,11 +206,12 @@ class ExternalReplyInfo(TelegramObject):
     video_note: VideoNote | None = None
     voice: Voice | None = None
     has_media_spoiler: bool | None = None
+    checklist: Checklist | None = None
     contact: Contact | None = None
     dice: Dice | None = None
     game: Game | None = None
-    giveaway: object | None = None
-    giveaway_winners: object | None = None
+    giveaway: Giveaway | None = None
+    giveaway_winners: GiveawayWinners | None = None
     invoice: Invoice | None = None
     location: Location | None = None
     poll: Poll | None = None
@@ -233,6 +242,8 @@ class PollAnswer(TelegramObject):
         poll_id: Unique poll identifier.
         option_ids: 0-based identifiers of chosen answer options; may be
             empty if the user retracted their vote.
+        option_persistent_ids: Persistent identifiers of chosen answer
+            options; may be empty if the user retracted their vote.
         voter_chat: The chat that changed the answer to the poll, if the
             voter is anonymous.
         user: The user who changed the answer to the poll, if not anonymous.
@@ -242,6 +253,7 @@ class PollAnswer(TelegramObject):
 
     poll_id: str
     option_ids: list[int]
+    option_persistent_ids: list[str]
     voter_chat: Chat | None = None
     user: User | None = None
 

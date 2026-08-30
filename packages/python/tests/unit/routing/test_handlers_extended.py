@@ -38,9 +38,9 @@ from telebot_py.types import (
     Message,
     MessageReactionCountUpdated,
     MessageReactionUpdated,
+    PaidMediaPurchased,
     PollAnswer,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
     ReactionCount,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
@@ -106,7 +106,12 @@ def my_chat_member_update() -> Update:
 def poll_answer_update() -> Update:
     return Update(
         update_id=1,
-        poll_answer=PollAnswer(poll_id="poll-1", option_ids=[0, 2], user=_user()),
+        poll_answer=PollAnswer(
+            poll_id="poll-1",
+            option_ids=[0, 2],
+            option_persistent_ids=["opt-a", "opt-c"],
+            user=_user(),
+        ),
     )
 
 
@@ -187,7 +192,7 @@ def shipping_query_update() -> Update:
 def purchased_paid_media_update() -> Update:
     return Update(
         update_id=1,
-        purchased_paid_media=PurchasedPaidMedia(
+        purchased_paid_media=PaidMediaPurchased(
             from_user=_user(),
             paid_media_payload="media-payload",
         ),

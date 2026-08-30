@@ -12,7 +12,7 @@ import httpx
 import pytest
 
 from telebot_py.types import Message
-from telebot_py.types.common import Poll
+from telebot_py.types.poll_types import Poll
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 
@@ -192,14 +192,16 @@ class TestStopPoll:
                     "id": "poll_1",
                     "question": "Favorite color?",
                     "options": [
-                        {"text": "Red", "voter_count": 2},
-                        {"text": "Blue", "voter_count": 1},
+                        {"persistent_id": "opt-1", "text": "Red", "voter_count": 2},
+                        {"persistent_id": "opt-2", "text": "Blue", "voter_count": 1},
                     ],
                     "total_voter_count": 3,
                     "is_closed": True,
                     "is_anonymous": True,
                     "type": "regular",
                     "allows_multiple_answers": False,
+                    "allows_revoting": False,
+                    "members_only": False,
                 }
             ),
             seen,
@@ -228,6 +230,8 @@ class TestStopPoll:
                     "is_anonymous": True,
                     "type": "regular",
                     "allows_multiple_answers": False,
+                    "allows_revoting": False,
+                    "members_only": False,
                 }
             ),
             seen,

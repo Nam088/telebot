@@ -13,8 +13,9 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
-from telebot_py.types.common import LinkPreviewOptions, MessageEntity, Poll
+from telebot_py.types.common import LinkPreviewOptions, MessageEntity
 from telebot_py.types.message import Message
+from telebot_py.types.poll_types import Poll
 
 
 class EditsMixin(Requester):

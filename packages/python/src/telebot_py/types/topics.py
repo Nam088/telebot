@@ -76,6 +76,8 @@ class ForumTopic(TelegramObject):
         icon_color: Color of the topic icon in RGB format.
         icon_custom_emoji_id: Unique identifier of the custom emoji shown as
             the topic icon.
+        is_name_implicit: Whether the name of the topic wasn't specified
+            explicitly by its creator and likely needs editing.
 
     Telegram API: https://core.telegram.org/bots/api#forumtopic
     """
@@ -84,6 +86,7 @@ class ForumTopic(TelegramObject):
     name: str
     icon_color: int
     icon_custom_emoji_id: str | None = None
+    is_name_implicit: bool | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -94,12 +97,15 @@ class BotCommand(TelegramObject):
         command: Text of the command; 1-32 characters, lowercase English
             letters, digits and underscores only.
         description: Description of the command; 1-256 characters.
+        is_ephemeral: Whether the command sends an ephemeral message, visible
+            only to the user who sent it.
 
     Telegram API: https://core.telegram.org/bots/api#botcommand
     """
 
     command: str
     description: str
+    is_ephemeral: bool | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

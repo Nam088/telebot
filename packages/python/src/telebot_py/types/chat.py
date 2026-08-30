@@ -155,6 +155,10 @@ class ChatPermissions(TelegramObject):
             stickers and use inline bots.
         can_add_web_page_previews: Whether the user may add web page previews
             to their messages.
+        can_react_to_messages: Whether the user may react to messages. If
+            omitted, defaults to the value of ``can_send_messages``.
+        can_edit_tag: Whether the user may edit their own tag. If omitted,
+            defaults to the value of ``can_change_info``.
         can_change_info: Whether the user may change the chat title, photo
             and other settings.
         can_invite_users: Whether the user may invite new users to the chat.
@@ -175,6 +179,8 @@ class ChatPermissions(TelegramObject):
     can_send_polls: bool | None = None
     can_send_other_messages: bool | None = None
     can_add_web_page_previews: bool | None = None
+    can_react_to_messages: bool | None = None
+    can_edit_tag: bool | None = None
     can_change_info: bool | None = None
     can_invite_users: bool | None = None
     can_pin_messages: bool | None = None
@@ -261,6 +267,8 @@ class Chat(TelegramObject):
         first_name: First name of the other party in a private chat.
         last_name: Last name of the other party in a private chat.
         is_forum: Whether the supergroup chat is a forum (topics enabled).
+        is_direct_messages: Whether the chat is the direct messages chat of a
+            channel.
         photo: Chat photo.
         active_usernames: If non-empty, the list of all active chat usernames.
         birthdate: For private chats, the date of birth of the user.
@@ -332,6 +340,7 @@ class Chat(TelegramObject):
     first_name: str | None = None
     last_name: str | None = None
     is_forum: bool | None = None
+    is_direct_messages: bool | None = None
     photo: ChatPhoto | None = None
     active_usernames: list[str] | None = None
     birthdate: Birthdate | None = None

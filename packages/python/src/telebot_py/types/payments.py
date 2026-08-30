@@ -160,18 +160,39 @@ class PreCheckoutQuery(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
-class PurchasedPaidMedia(TelegramObject):
+class PaidMediaPurchased(TelegramObject):
     """A user purchased paid media with Telegram Stars.
 
     Attributes:
         from_user: User who purchased the media.
         paid_media_payload: Bot-specified paid media payload.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediapurchased
     """
 
     from_user: User
     paid_media_payload: str
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class BotSubscriptionUpdated(TelegramObject):
+    """A user changed the state of a subscription to the bot's payments.
+
+    Attributes:
+        user: User who subscribed for payments toward the bot.
+        invoice_payload: Bot-specified invoice payload.
+        state: New state of the subscription; 'canceled' if the user canceled
+            the subscription, 'active' if the user re-enabled a previously
+            canceled subscription.
+
+    Telegram API: https://core.telegram.org/bots/api#botsubscriptionupdated
+    """
+
+    user: User
+    invoice_payload: str
+    state: str
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

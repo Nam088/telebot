@@ -109,6 +109,10 @@ class MessageEntity(TelegramObject):
         language: For ``pre`` only, the programming language of the entity.
         custom_emoji_id: For ``custom_emoji`` only, unique identifier of the
             custom emoji.
+        unix_time: For ``date_time`` only, the Unix time associated with the
+            entity.
+        date_time_format: For ``date_time`` only, the string that defines the
+            formatting of the date and time.
 
     Telegram API: https://core.telegram.org/bots/api#messageentity
     """
@@ -120,64 +124,8 @@ class MessageEntity(TelegramObject):
     user: User | None = None
     language: str | None = None
     custom_emoji_id: str | None = None
-
-
-@dataclasses.dataclass(frozen=True, slots=True)
-class PollOption(TelegramObject):
-    """One option of a poll.
-
-    Attributes:
-        text: Option text, 1-100 characters.
-        voter_count: Number of users that voted for this option.
-        persistent_id: Unique identifier of the option in the poll.
-        text_entities: Special entities that appear in the option text.
-
-    Telegram API: https://core.telegram.org/bots/api#polloption
-    """
-
-    text: str
-    voter_count: int
-    persistent_id: str | None = None
-    text_entities: list[MessageEntity] | None = None
-
-
-@dataclasses.dataclass(frozen=True, slots=True)
-class Poll(TelegramObject):
-    """A native Telegram poll.
-
-    Attributes:
-        id: Unique poll identifier.
-        question: Poll question, 1-300 characters.
-        options: List of poll options.
-        total_voter_count: Total number of users that voted in the poll.
-        is_closed: Whether the poll is closed.
-        is_anonymous: Whether the poll is anonymous.
-        type: Poll type, currently "regular" or "quiz".
-        allows_multiple_answers: Whether the poll allows multiple answers.
-        correct_option_id: 0-based identifier of the correct answer option
-            (quiz mode only).
-        explanation: Text shown when a user chooses an incorrect answer or
-            taps the lamp icon; 0-200 characters.
-        explanation_entities: Special entities that appear in the explanation.
-        open_period: Seconds the poll will be active after creation.
-        close_date: Unix time when the poll will be automatically closed.
-
-    Telegram API: https://core.telegram.org/bots/api#poll
-    """
-
-    id: str
-    question: str
-    options: list[PollOption]
-    total_voter_count: int
-    is_closed: bool
-    is_anonymous: bool
-    type: str
-    allows_multiple_answers: bool
-    correct_option_id: int | None = None
-    explanation: str | None = None
-    explanation_entities: list[MessageEntity] | None = None
-    open_period: int | None = None
-    close_date: int | None = None
+    unix_time: int | None = None
+    date_time_format: str | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
