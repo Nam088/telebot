@@ -173,17 +173,40 @@ export interface KeyboardButtonRequestChat {
 }
 
 /**
+ * This object defines the parameters for the creation of a managed bot.
+ *
+ * @remarks
+ * Information about the created bot will be returned in a service message.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbuttonrequestmanagedbot Telegram Bot API: KeyboardButtonRequestManagedBot}
+ */
+export interface KeyboardButtonRequestManagedBot {
+  /** Signed 32-bit identifier of the request. Must be unique within the message. */
+  request_id: number;
+  /** Suggested name for the bot. */
+  suggested_name?: string;
+  /** Suggested username for the bot. */
+  suggested_username?: string;
+}
+
+/**
  * Represents one button of the reply keyboard.
  *
  * @see {@link https://core.telegram.org/bots/api#keyboardbutton Telegram Bot API: KeyboardButton}
  */
 export interface KeyboardButton {
-  /** Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed. */
+  /** Text of the button. If none of the fields other than text, icon_custom_emoji_id, and style are used, it will be sent as a message when the button is pressed. */
   text: string;
+  /** Unique identifier of the custom emoji shown before the text of the button. */
+  icon_custom_emoji_id?: string;
+  /** Style of the button ('danger', 'success', 'primary'). */
+  style?: "danger" | "success" | "primary" | string;
   /** If specified, pressing the button will open a list of suitable users. */
-  request_users?: KeyboardButtonRequestUsers | unknown;
+  request_users?: KeyboardButtonRequestUsers;
   /** If specified, pressing the button will open a list of suitable chats. */
-  request_chat?: KeyboardButtonRequestChat | unknown;
+  request_chat?: KeyboardButtonRequestChat;
+  /** If specified, pressing the button will ask the user to create and share a bot that will be managed by the current bot. Available in private chats only. */
+  request_managed_bot?: KeyboardButtonRequestManagedBot;
   /** If True, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only. */
   request_contact?: boolean;
   /** If True, the user's current location will be sent when the button is pressed. Available in private chats only. */

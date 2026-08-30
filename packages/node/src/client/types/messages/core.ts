@@ -1,9 +1,28 @@
 import type { MessageEntityType, PollType } from "../../constants.js";
 import type { User, Chat, Location } from "../common/index.js";
 import type { Story, ChatBoostAdded, Game, PassportData } from "../business/index.js";
-import type { Invoice, SuccessfulPayment, RefundedPayment } from "../payments/index.js";
+import type {
+  Invoice,
+  SuccessfulPayment,
+  RefundedPayment,
+  PaidMediaInfo,
+  UniqueGiftInfo,
+} from "../payments/index.js";
 import type { Sticker } from "../stickers/index.js";
-import type { Community } from "../chats/index.js";
+import type {
+  Community,
+  CommunityChatAdded,
+  CommunityChatRemoved,
+  ChatBackground,
+} from "../chats/index.js";
+import type {
+  ForumTopicClosed,
+  ForumTopicCreated,
+  ForumTopicEdited,
+  ForumTopicReopened,
+  GeneralForumTopicHidden,
+  GeneralForumTopicUnhidden,
+} from "../topics/index.js";
 import type { RichMessage } from "../rich/index.js";
 
 import type {
@@ -17,7 +36,43 @@ import type {
   LivePhoto,
 } from "./media.js";
 import type { InlineKeyboardMarkup } from "./keyboards.js";
-import type { MessageOrigin, ExternalReplyInfo, TextQuote } from "./reply-context.js";
+import type {
+  MessageOrigin,
+  ExternalReplyInfo,
+  TextQuote,
+  LinkPreviewOptions,
+} from "./reply-context.js";
+import type { Checklist, ChecklistTasksAdded, ChecklistTasksDone } from "./checklist.js";
+import type { PollMedia, PollOptionAdded, PollOptionDeleted } from "./polls.js";
+import type { UsersShared, ChatShared } from "./shared.js";
+import type {
+  ChatOwnerChanged,
+  ChatOwnerLeft,
+  DirectMessagePriceChanged,
+  DirectMessagesTopic,
+  ManagedBotCreated,
+  MessageAutoDeleteTimerChanged,
+  PaidMessagePriceChanged,
+  ProximityAlertTriggered,
+  WebAppData,
+  WriteAccessAllowed,
+} from "./service-messages.js";
+import type { GiftInfo } from "./gifts.js";
+import type { Giveaway, GiveawayCompleted, GiveawayCreated, GiveawayWinners } from "./giveaways.js";
+import type {
+  SuggestedPostApprovalFailed,
+  SuggestedPostApproved,
+  SuggestedPostDeclined,
+  SuggestedPostInfo,
+  SuggestedPostPaid,
+  SuggestedPostRefunded,
+} from "./suggested-posts.js";
+import type {
+  VideoChatEnded,
+  VideoChatParticipantsInvited,
+  VideoChatScheduled,
+  VideoChatStarted,
+} from "./video-chats.js";
 
 /**
  * @see {@link https://core.telegram.org/bots/api#messageentity Telegram Bot API: MessageEntity}
@@ -37,6 +92,10 @@ export interface MessageEntity {
   language?: string;
   /** For 'custom_emoji' only, unique identifier of the custom emoji. */
   custom_emoji_id?: string;
+  /** For 'date_time' only, the Unix time associated with the entity. */
+  unix_time?: number;
+  /** For 'date_time' only, the string that defines the formatting of the date and time. */
+  date_time_format?: string;
 }
 
 /**
@@ -69,14 +128,22 @@ export interface Dice {
  * @see {@link https://core.telegram.org/bots/api#polloption Telegram Bot API: PollOption}
  */
 export interface PollOption {
-  /** Unique identifier of the option in the poll. */
-  persistent_id?: string;
+  /** Unique identifier of the option, persistent on option addition and deletion. */
+  persistent_id: string;
   /** Option text, 1-100 characters. */
   text: string;
-  /** Number of users that voted for this option. */
-  voter_count: number;
   /** Special entities that appear in the option text. */
   text_entities?: MessageEntity[];
+  /** Media added to the poll option. */
+  media?: PollMedia;
+  /** Number of users that voted for this option; may be 0 if unknown. */
+  voter_count: number;
+  /** User who added the option; omitted if the option wasn't added by a user after poll creation. */
+  added_by_user?: User;
+  /** Chat that added the option; omitted if the option wasn't added by a chat after poll creation. */
+  added_by_chat?: Chat;
+  /** Point in time (Unix timestamp) when the option was added; omitted if the option existed in the original poll. */
+  addition_date?: number;
 }
 
 /**
@@ -87,6 +154,8 @@ export interface Poll {
   id: string;
   /** Poll question, 1-300 characters. */
   question: string;
+  /** Special entities that appear in the question. */
+  question_entities?: MessageEntity[];
   /** List of poll options. */
   options: PollOption[];
   /** Total number of users that voted in the poll. */
@@ -99,16 +168,30 @@ export interface Poll {
   type: PollType;
   /** True, if the poll allows multiple answers. */
   allows_multiple_answers: boolean;
-  /** 0-based identifier of the correct answer option. Available only for polls in quiz mode. */
-  correct_option_id?: number;
+  /** True, if the poll allows to change the chosen answer options. */
+  allows_revoting: boolean;
+  /** True, if voting is limited to users who have been members of the chat where the poll was originally sent for more than 24 hours. */
+  members_only: boolean;
+  /** A list of two-letter ISO 3166-1 alpha-2 country codes indicating the countries from which users can vote in the poll. */
+  country_codes?: string[];
+  /** Array of 0-based identifiers of the correct answer options. Available only for polls in quiz mode. */
+  correct_option_ids?: number[];
   /** Text that is shown when a user chooses an incorrect answer or taps on the lamp icon; 0-200 characters. */
   explanation?: string;
   /** Special entities that appear in the explanation. */
   explanation_entities?: MessageEntity[];
+  /** Media added to the quiz explanation. */
+  explanation_media?: PollMedia;
   /** Amount of time in seconds the poll will be active after creation. */
   open_period?: number;
   /** Point in time (Unix timestamp) when the poll will be automatically closed. */
   close_date?: number;
+  /** Description of the poll; for polls inside the Message object only. */
+  description?: string;
+  /** Special entities that appear in the description. */
+  description_entities?: MessageEntity[];
+  /** Media added to the poll description; for polls inside the Message object only. */
+  media?: PollMedia;
 }
 
 /**
@@ -123,6 +206,8 @@ export interface PollAnswer {
   user?: User;
   /** 0-based identifiers of chosen answer options. May be empty if the user retracted their vote. */
   option_ids: number[];
+  /** Persistent identifiers of the chosen answer options. May be empty if the vote was retracted. */
+  option_persistent_ids: string[];
 }
 
 /**
@@ -208,7 +293,7 @@ export interface Message {
   /** For text messages, special entities like substrings that appear in the text. */
   entities?: MessageEntity[];
   /** Options used for link preview generation for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** Message is an animation, information about the animation. */
   animation?: Animation;
   /** Message is an audio file, information about the file. */
@@ -264,7 +349,7 @@ export interface Message {
   /** Service message: the channel has been created. */
   channel_chat_created?: boolean;
   /** Service message: auto-delete timer settings changed in the chat. */
-  message_auto_delete_timer_changed?: unknown;
+  message_auto_delete_timer_changed?: MessageAutoDeleteTimerChanged;
   /** The group has been migrated to a supergroup with the specified identifier. */
   migrate_to_chat_id?: number;
   /** The supergroup has been migrated from a group with the specified identifier. */
@@ -278,51 +363,51 @@ export interface Message {
   /** Message is a service message about a refunded payment, information about the payment. */
   refunded_payment?: RefundedPayment;
   /** Service message: users were shared with the bot. */
-  users_shared?: unknown;
+  users_shared?: UsersShared;
   /** Service message: a chat was shared with the bot. */
-  chat_shared?: unknown;
+  chat_shared?: ChatShared;
   /** The domain name of the website on which the user has logged in. */
   connected_website?: string;
   /** Service message: the user allowed the bot to write messages after adding it to the attachment menu. */
-  write_access_allowed?: unknown;
+  write_access_allowed?: WriteAccessAllowed;
   /** Telegram Passport data. */
   passport_data?: PassportData;
   /** Service message: a user in the chat triggered another user's proximity alert while sharing Live Location. */
-  proximity_alert_triggered?: unknown;
+  proximity_alert_triggered?: ProximityAlertTriggered;
   /** Service message: user boosted the chat. */
   boost_added?: ChatBoostAdded;
   /** Service message: chat background set. */
-  chat_background_set?: unknown;
+  chat_background_set?: ChatBackground;
   /** Service message: forum topic created. */
-  forum_topic_created?: unknown;
+  forum_topic_created?: ForumTopicCreated;
   /** Service message: forum topic edited. */
-  forum_topic_edited?: unknown;
+  forum_topic_edited?: ForumTopicEdited;
   /** Service message: forum topic closed. */
-  forum_topic_closed?: unknown;
+  forum_topic_closed?: ForumTopicClosed;
   /** Service message: forum topic reopened. */
-  forum_topic_reopened?: unknown;
+  forum_topic_reopened?: ForumTopicReopened;
   /** Service message: the 'General' forum topic hidden. */
-  general_forum_topic_hidden?: unknown;
+  general_forum_topic_hidden?: GeneralForumTopicHidden;
   /** Service message: the 'General' forum topic unhidden. */
-  general_forum_topic_unhidden?: unknown;
+  general_forum_topic_unhidden?: GeneralForumTopicUnhidden;
   /** Service message: a scheduled giveaway was created. */
-  giveaway_created?: unknown;
+  giveaway_created?: GiveawayCreated;
   /** The message is a scheduled giveaway. */
-  giveaway?: unknown;
+  giveaway?: Giveaway;
   /** A giveaway with public winners was completed. */
-  giveaway_winners?: unknown;
+  giveaway_winners?: GiveawayWinners;
   /** Service message: a giveaway without public winners was completed. */
-  giveaway_completed?: unknown;
+  giveaway_completed?: GiveawayCompleted;
   /** Service message: video chat scheduled. */
-  video_chat_scheduled?: unknown;
+  video_chat_scheduled?: VideoChatScheduled;
   /** Service message: video chat started. */
-  video_chat_started?: unknown;
+  video_chat_started?: VideoChatStarted;
   /** Service message: video chat ended. */
-  video_chat_ended?: unknown;
+  video_chat_ended?: VideoChatEnded;
   /** Service message: new participants invited to a video chat. */
-  video_chat_participants_invited?: unknown;
+  video_chat_participants_invited?: VideoChatParticipantsInvited;
   /** Service message: data sent by a Web App to the bot. */
-  web_app_data?: { data: string; button_text: string };
+  web_app_data?: WebAppData;
   /** Inline keyboard attached to the message. */
   reply_markup?: InlineKeyboardMarkup;
   /** Service message: a user joined the chat from a community (Bot API 10.3+). */
@@ -335,4 +420,68 @@ export interface Message {
   rich_message?: RichMessage;
   /** Live photo attachment. */
   live_photo?: LivePhoto;
+  /** Message is a checklist. */
+  checklist?: Checklist;
+  /** Service message: tasks were added to a checklist. */
+  checklist_tasks_added?: ChecklistTasksAdded;
+  /** Service message: some tasks in a checklist were marked as done or not done. */
+  checklist_tasks_done?: ChecklistTasksDone;
+  /** Identifier of the specific checklist task that is being replied to. */
+  reply_to_checklist_task_id?: number;
+  /** Service message: answer option was added to a poll. */
+  poll_option_added?: PollOptionAdded;
+  /** Service message: answer option was deleted from a poll. */
+  poll_option_deleted?: PollOptionDeleted;
+  /** Persistent identifier of the specific poll option that is being replied to. */
+  reply_to_poll_option_id?: string;
+  /** Service message: chat owner has changed. */
+  chat_owner_changed?: ChatOwnerChanged;
+  /** Service message: chat owner has left. */
+  chat_owner_left?: ChatOwnerLeft;
+  /** Service message: chat or bot added to a Community. */
+  community_chat_added?: CommunityChatAdded;
+  /** Service message: chat or bot removed from a Community. */
+  community_chat_removed?: CommunityChatRemoved;
+  /** Service message: user created a bot that will be managed by the current bot. */
+  managed_bot_created?: ManagedBotCreated;
+  /** Information about the direct messages chat topic that contains the message. */
+  direct_messages_topic?: DirectMessagesTopic;
+  /** Service message: the price for paid messages in the corresponding direct messages chat of a channel has changed. */
+  direct_message_price_changed?: DirectMessagePriceChanged;
+  /** Service message: the price for paid messages has changed in the chat. */
+  paid_message_price_changed?: PaidMessagePriceChanged;
+  /** Unique identifier of the message effect added to the message. */
+  effect_id?: string;
+  /** Tag or custom title of the sender of the message; for supergroups only. */
+  sender_tag?: string;
+  /** True, if the message is a paid post. */
+  is_paid_post?: boolean;
+  /** The number of Telegram Stars that were paid by the sender of the message to send it. */
+  paid_star_count?: number;
+  /** Message contains paid media; information about the paid media. */
+  paid_media?: PaidMediaInfo;
+  /** For a message sent by a guest bot, this is the chat whose original message triggered the bot's response. */
+  guest_bot_caller_chat?: Chat;
+  /** For a message sent by a guest bot, this is the user whose original message triggered the bot's response. */
+  guest_bot_caller_user?: User;
+  /** The unique identifier for the guest query, usable with the method answerGuestQuery. */
+  guest_query_id?: string;
+  /** Service message: a regular gift was sent or received. */
+  gift?: GiftInfo;
+  /** Service message: upgrade of a gift was purchased after the gift was sent. */
+  gift_upgrade_sent?: GiftInfo;
+  /** Service message: a unique gift was sent or received. */
+  unique_gift?: UniqueGiftInfo;
+  /** Information about suggested post parameters if the message is a suggested post in a channel direct messages chat. */
+  suggested_post_info?: SuggestedPostInfo;
+  /** Service message: a suggested post was approved. */
+  suggested_post_approved?: SuggestedPostApproved;
+  /** Service message: approval of a suggested post has failed. */
+  suggested_post_approval_failed?: SuggestedPostApprovalFailed;
+  /** Service message: a suggested post was declined. */
+  suggested_post_declined?: SuggestedPostDeclined;
+  /** Service message: payment for a suggested post was received. */
+  suggested_post_paid?: SuggestedPostPaid;
+  /** Service message: payment for a suggested post was refunded. */
+  suggested_post_refunded?: SuggestedPostRefunded;
 }

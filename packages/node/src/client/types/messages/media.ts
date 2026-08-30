@@ -69,6 +69,26 @@ export interface Document {
 }
 
 /**
+ * Represents a video file of a specific quality.
+ *
+ * @see {@link https://core.telegram.org/bots/api#videoquality Telegram Bot API: VideoQuality}
+ */
+export interface VideoQuality {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file, which is supposed to be the same over time and for different bots. */
+  file_unique_id: string;
+  /** Video width. */
+  width: number;
+  /** Video height. */
+  height: number;
+  /** Codec that was used to encode the video, for example, "h264", "h265", or "av01". */
+  codec: string;
+  /** File size in bytes. */
+  file_size?: number;
+}
+
+/**
  * Represents a video file.
  *
  * @see {@link https://core.telegram.org/bots/api#video Telegram Bot API: Video}
@@ -86,6 +106,12 @@ export interface Video {
   duration: number;
   /** Video thumbnail. */
   thumbnail?: PhotoSize;
+  /** Available sizes of the cover of the video in the message. */
+  cover?: PhotoSize[];
+  /** Timestamp in seconds from which the video will play in the message. */
+  start_timestamp?: number;
+  /** List of available qualities of the video. */
+  qualities?: VideoQuality[];
   /** Original filename as defined by sender. */
   file_name?: string;
   /** MIME type of the file as defined by sender. */
@@ -164,18 +190,22 @@ export interface VideoNote {
  * @see {@link https://core.telegram.org/bots/api#livephoto Telegram Bot API: LivePhoto}
  */
 export interface LivePhoto {
-  /** Identifier for this file, which can be used to download or reuse the file. */
+  /** Available sizes of the corresponding static photo. */
+  photo?: PhotoSize[];
+  /** Identifier for the video file which can be used to download or reuse the file. */
   file_id: string;
-  /** Unique identifier for this file. */
+  /** Unique identifier for the video file which is supposed to be the same over time and for different bots. */
   file_unique_id: string;
-  /** Photo width. */
+  /** Video width as defined by the sender. */
   width: number;
-  /** Photo height. */
+  /** Video height as defined by the sender. */
   height: number;
-  /** Available sizes of the photo. */
-  photo: PhotoSize[];
-  /** Video file associated with the live photo. */
-  video: Video;
+  /** Duration of the video in seconds as defined by the sender. */
+  duration: number;
+  /** MIME type of the file as defined by the sender. */
+  mime_type?: string;
+  /** File size in bytes. */
+  file_size?: number;
 }
 
 /**
@@ -212,6 +242,10 @@ export interface InputMediaVideo {
   media: string | InputFile | unknown;
   /** Thumbnail of the file sent. */
   thumbnail?: string | InputFile | unknown;
+  /** Cover for the video in the message. Pass a file_id, an HTTP URL, or upload using InputFile. */
+  cover?: string | InputFile | unknown;
+  /** Start timestamp for the video in the message. */
+  start_timestamp?: number;
   /** Caption of the video to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the video caption. */
@@ -312,6 +346,8 @@ export interface InputMediaDocument {
 
 /**
  * Union of all input media types that can be sent in a media group or editMessageMedia.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmedia Telegram Bot API: InputMedia}
  */
 export type InputMedia =
   InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;

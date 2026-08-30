@@ -1,13 +1,8 @@
 import type { InputFile } from "../../../utils/http.js";
 import type { User, Chat, Location } from "../common/index.js";
-import type {
-  MessageEntity,
-  PhotoSize,
-  Animation,
-  Message,
-  ReactionType,
-} from "../messages/index.js";
+import type { MessageEntity, PhotoSize, Animation, Message } from "../messages/index.js";
 import type { Sticker } from "../stickers/index.js";
+import type { ChatBoostSource, StoryAreaType } from "./unions.js";
 
 /**
  * @see {@link https://core.telegram.org/bots/api#businessintro Telegram Bot API: BusinessIntro}
@@ -111,8 +106,8 @@ export interface InputStoryContentVideo {
   duration?: number;
   /** Cover image for the video. */
   cover?: string | InputFile;
-  /** Timestamp in seconds from which the video will play. */
-  timestamp?: number;
+  /** Timestamp in seconds of the frame that will be used as the static cover for the story. Defaults to 0.0. */
+  cover_frame_timestamp?: number;
   /** Pass True if the video has no sound and should be looped. */
   is_animation?: boolean;
 }
@@ -451,21 +446,3 @@ export interface EncryptedCredentials {
   /** Base64-encoded secret hash for verification. */
   secret: string;
 }
-
-export type StoryAreaType =
-  | { type: "location"; location: Location; address?: unknown }
-  | {
-      type: "suggested_reaction";
-      reaction_type: ReactionType;
-      is_dark?: boolean;
-      is_flipped?: boolean;
-    }
-  | { type: "link"; url: string }
-  | { type: "weather"; temperature_c: number; emoji: string; background_color: number };
-
-export type InputStoryContent = InputStoryContentPhoto | InputStoryContentVideo;
-
-export type ChatBoostSource =
-  ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
-
-export type InlineQueryResult = Record<string, unknown>;

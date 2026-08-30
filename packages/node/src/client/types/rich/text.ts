@@ -415,5 +415,7 @@ export type RichTextEntity =
 
 /**
  * Represents rich formatted text (string, rich text entity, or array of rich text).
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtext Telegram Bot API: RichText}
  */
 export type RichText = string | RichTextEntity | RichText[];

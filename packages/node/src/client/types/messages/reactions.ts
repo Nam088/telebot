@@ -36,6 +36,8 @@ export interface ReactionTypePaid {
 
 /**
  * Union of reaction types that can be set on a message.
+ *
+ * @see {@link https://core.telegram.org/bots/api#reactiontype Telegram Bot API: ReactionType}
  */
 export type ReactionType = ReactionTypeEmoji | ReactionTypeCustomEmoji | ReactionTypePaid;
 

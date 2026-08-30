@@ -26,6 +26,8 @@ import type {
   MessageReactionCountUpdated,
   PurchasedPaidMedia,
   MessageGenerationStopped,
+  BotSubscriptionUpdated,
+  ManagedBotUpdated,
 } from "../client/types.js";
 import type { Bot } from "../client/bot.js";
 
@@ -40,6 +42,8 @@ import type { Bot } from "../client/bot.js";
  * const user = update.effective_user;
  * const chat = update.effective_chat;
  * ```
+ *
+ * @see {@link https://core.telegram.org/bots/api#update Telegram Bot API: Update}
  */
 export class Update implements RawUpdate {
   public readonly update_id: number;
@@ -51,6 +55,7 @@ export class Update implements RawUpdate {
   public readonly business_message?: Message;
   public readonly edited_business_message?: Message;
   public readonly deleted_business_messages?: BusinessMessagesDeleted;
+  public readonly guest_message?: Message;
   public readonly message_reaction?: MessageReactionUpdated;
   public readonly message_reaction_count?: MessageReactionCountUpdated;
   public readonly inline_query?: InlineQuery;
@@ -66,6 +71,8 @@ export class Update implements RawUpdate {
   public readonly chat_boost?: ChatBoostUpdated;
   public readonly removed_chat_boost?: ChatBoostRemoved;
   public readonly purchased_paid_media?: PurchasedPaidMedia;
+  public readonly managed_bot?: ManagedBotUpdated;
+  public readonly subscription?: BotSubscriptionUpdated;
   public readonly stopped_message_generation?: MessageGenerationStopped;
 
   private _bot?: Bot;
@@ -86,6 +93,7 @@ export class Update implements RawUpdate {
     this.business_message = raw.business_message;
     this.edited_business_message = raw.edited_business_message;
     this.deleted_business_messages = raw.deleted_business_messages;
+    this.guest_message = raw.guest_message;
     this.message_reaction = raw.message_reaction;
     this.message_reaction_count = raw.message_reaction_count;
     this.inline_query = raw.inline_query;
@@ -101,6 +109,8 @@ export class Update implements RawUpdate {
     this.chat_boost = raw.chat_boost;
     this.removed_chat_boost = raw.removed_chat_boost;
     this.purchased_paid_media = raw.purchased_paid_media;
+    this.managed_bot = raw.managed_bot;
+    this.subscription = raw.subscription;
     this.stopped_message_generation = raw.stopped_message_generation;
     this._bot = bot;
   }

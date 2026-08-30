@@ -24,6 +24,10 @@ export interface ChatPermissions {
   can_send_other_messages?: boolean;
   /** True, if the user is allowed to add web page previews to their messages. */
   can_add_web_page_previews?: boolean;
+  /** True, if the user is allowed to react to messages. If omitted, defaults to the value of can_send_messages. */
+  can_react_to_messages?: boolean;
+  /** True, if the user is allowed to edit their own tag. If omitted, defaults to the value of can_pin_messages. */
+  can_edit_tag?: boolean;
   /** True, if the user is allowed to change the chat title, photo and other settings. */
   can_change_info?: boolean;
   /** True, if the user is allowed to invite new users to the chat. */

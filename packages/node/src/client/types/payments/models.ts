@@ -1,6 +1,7 @@
 import type { User, Chat } from "../common/index.js";
 import type { Sticker } from "../stickers/index.js";
 import type { MessageEntity } from "../messages/index.js";
+import type { PaidMediaPurchased } from "./paid-media.js";
 
 /**
  * @see {@link https://core.telegram.org/bots/api#invoice Telegram Bot API: Invoice}
@@ -60,6 +61,12 @@ export interface SuccessfulPayment {
   total_amount: number;
   /** Bot specified invoice payload. */
   invoice_payload: string;
+  /** Expiration date of the subscription, in Unix time; for recurring payments only. */
+  subscription_expiration_date?: number;
+  /** True, if the payment is a recurring subscription. */
+  is_recurring?: boolean;
+  /** True, if the payment is the first payment for a subscription. */
+  is_first_recurring?: boolean;
   /** Identifier of the shipping option chosen by the user. */
   shipping_option_id?: string;
   /** Order info provided by the user. */
@@ -68,10 +75,6 @@ export interface SuccessfulPayment {
   telegram_payment_charge_id: string;
   /** Provider payment identifier. */
   provider_payment_charge_id: string;
-  /** True, if the payment is a recurring subscription. */
-  is_recurring?: boolean;
-  /** True, if the payment is the first payment for a subscription. */
-  is_first_recurring?: boolean;
 }
 
 /**
@@ -157,37 +160,11 @@ export interface StarAmount {
 }
 
 /**
- * @see {@link https://core.telegram.org/bots/api#startransactions Telegram Bot API: StarTransactions}
+ * Legacy name for {@link PaidMediaPurchased}, kept as a migration bridge.
+ *
+ * @deprecated Use {@link PaidMediaPurchased}, the name the Bot API docs use, instead.
  */
-export interface StarTransactions {
-  /** List of transactions. */
-  transactions: StarTransaction[];
-}
-
-/**
- * @see {@link https://core.telegram.org/bots/api#startransaction Telegram Bot API: StarTransaction}
- */
-export interface StarTransaction {
-  /** Unique identifier of the transaction. */
-  id: string;
-  /** Number of Telegram Stars transferred. */
-  amount: number;
-  /** The number of 1/1000000000 shares of Telegram Stars transferred. */
-  nanostar_amount?: number;
-  /** Date the transaction took place in Unix time. */
-  date: number;
-  /** Source of the transaction. */
-  source?: unknown;
-  /** Receiver of the transaction. */
-  receiver?: unknown;
-}
-
-export interface PurchasedPaidMedia {
-  /** User who purchased the media. */
-  from: User;
-  /** Bot-specified paid media payload. */
-  paid_media_payload: string;
-}
+export type PurchasedPaidMedia = PaidMediaPurchased;
 
 /**
  * Describes the background of a {@link Gift}.

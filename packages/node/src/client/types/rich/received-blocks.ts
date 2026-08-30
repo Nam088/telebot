@@ -396,6 +396,8 @@ export interface RichBlockThinking {
 
 /**
  * Union of rich block types.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblock Telegram Bot API: RichBlock}
  */
 export type RichBlock =
   | RichBlockParagraph

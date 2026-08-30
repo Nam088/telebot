@@ -388,6 +388,8 @@ export interface InputRichBlockThinking {
 
 /**
  * Union of outgoing rich block types.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblock Telegram Bot API: InputRichBlock}
  */
 export type InputRichBlock =
   | InputRichBlockParagraph

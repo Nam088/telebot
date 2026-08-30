@@ -26,6 +26,7 @@ import type {
   MessageReactionCountUpdated,
 } from "../messages/index.js";
 import type { ShippingQuery, PreCheckoutQuery, PurchasedPaidMedia } from "../payments/index.js";
+import type { BotSubscriptionUpdated, ManagedBotUpdated } from "./update-payloads.js";
 
 /**
  * @see {@link https://core.telegram.org/bots/api#user Telegram Bot API: User}
@@ -57,6 +58,16 @@ export interface User {
   can_connect_to_business?: boolean;
   /** True, if the bot has a main Web App. Returned only in getMe. */
   has_main_web_app?: boolean;
+  /** True, if the bot supports guest queries from chats it is not a member of. Returned only in getMe. */
+  supports_guest_queries?: boolean;
+  /** True, if the bot has forum topic mode enabled in private chats. Returned only in getMe. */
+  has_topics_enabled?: boolean;
+  /** True, if the bot allows users to create and delete topics in private chats. Returned only in getMe. */
+  allows_users_to_create_topics?: boolean;
+  /** True, if other bots can be created to be controlled by the bot. Returned only in getMe. */
+  can_manage_bots?: boolean;
+  /** True, if the bot supports join request queries and can be assigned to process them. Returned only in getMe. */
+  supports_join_request_queries?: boolean;
 }
 
 /**
@@ -89,6 +100,8 @@ export interface Chat {
   last_name?: string;
   /** True, if the supergroup chat is a forum (has topics enabled). */
   is_forum?: boolean;
+  /** True, if the chat is the direct messages chat of a channel. */
+  is_direct_messages?: boolean;
   /** Chat photo. */
   photo?: ChatPhoto;
   /** If non-empty, the list of all active chat usernames. */
@@ -176,6 +189,16 @@ export interface ChatPhoto {
 }
 
 /**
+ * Represents an HTTP link.
+ *
+ * @see {@link https://core.telegram.org/bots/api#link Telegram Bot API: Link}
+ */
+export interface Link {
+  /** URL of the link. */
+  url: string;
+}
+
+/**
  * @see {@link https://core.telegram.org/bots/api#location Telegram Bot API: Location}
  */
 export interface Location {
@@ -260,6 +283,8 @@ export interface RawUpdate {
   edited_business_message?: Message;
   /** Messages were deleted from a connected business account. */
   deleted_business_messages?: BusinessMessagesDeleted;
+  /** New guest message. */
+  guest_message?: Message;
   /** A reaction to a message was changed by a user. */
   message_reaction?: MessageReactionUpdated;
   /** Reactions to a message with anonymous reactions were changed. */
@@ -288,6 +313,10 @@ export interface RawUpdate {
   chat_boost?: ChatBoostUpdated;
   /** A boost was removed from a chat. */
   removed_chat_boost?: ChatBoostRemoved;
+  /** A new bot was created to be managed by the bot, or the token or owner of a managed bot was changed. */
+  managed_bot?: ManagedBotUpdated;
+  /** A user payment subscription toward the bot has changed. */
+  subscription?: BotSubscriptionUpdated;
   /** A user purchased paid media with Telegram Stars. */
   purchased_paid_media?: PurchasedPaidMedia;
   /** A user asked the bot to stop the generation of a message (Bot API 10.3+). */

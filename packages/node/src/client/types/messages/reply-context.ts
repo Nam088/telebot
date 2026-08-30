@@ -2,8 +2,20 @@ import type { ParseMode } from "../../constants.js";
 import type { User, Chat, Location } from "../common/index.js";
 import type { Story, Game } from "../business/index.js";
 import type { Sticker } from "../stickers/index.js";
-import type { PhotoSize, Audio, Document, Video, Animation, Voice, VideoNote } from "./media.js";
-import type { MessageEntity, Contact, Dice, Poll, Venue } from "./core.js";
+import type {
+  PhotoSize,
+  Audio,
+  Document,
+  Video,
+  Animation,
+  Voice,
+  VideoNote,
+  LivePhoto,
+} from "./media.js";
+import type { MessageEntity, Contact, Dice, Poll, Venue, Message } from "./core.js";
+import type { Checklist } from "./checklist.js";
+import type { Giveaway, GiveawayWinners } from "./giveaways.js";
+import type { Invoice, PaidMediaInfo } from "../payments/index.js";
 
 /**
  * @see {@link https://core.telegram.org/bots/api#messageoriginuser Telegram Bot API: MessageOriginUser}
@@ -59,8 +71,34 @@ export interface MessageOriginChannel {
   author_signature?: string;
 }
 
+/**
+ * This object describes the origin of a message.
+ *
+ * @see {@link https://core.telegram.org/bots/api#messageorigin Telegram Bot API: MessageOrigin}
+ */
 export type MessageOrigin =
   MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel;
+
+/**
+ * This object describes a message that was deleted or is otherwise inaccessible to the bot.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inaccessiblemessage Telegram Bot API: InaccessibleMessage}
+ */
+export interface InaccessibleMessage {
+  /** Chat the message belonged to. */
+  chat: Chat;
+  /** Unique message identifier inside the chat. */
+  message_id: number;
+  /** Always 0. The field can be used to differentiate regular and inaccessible messages. */
+  date: number;
+}
+
+/**
+ * This object describes a message that can be inaccessible to the bot.
+ *
+ * @see {@link https://core.telegram.org/bots/api#maybeinaccessiblemessage Telegram Bot API: MaybeInaccessibleMessage}
+ */
+export type MaybeInaccessibleMessage = Message | InaccessibleMessage;
 
 /**
  * @see {@link https://core.telegram.org/bots/api#externalreplyinfo Telegram Bot API: ExternalReplyInfo}
@@ -73,13 +111,17 @@ export interface ExternalReplyInfo {
   /** Unique message identifier inside the original chat. */
   message_id?: number;
   /** Options used for link preview generation for the original message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** Message is an animation, information about the animation. */
   animation?: Animation;
   /** Message is an audio file, information about the file. */
   audio?: Audio;
   /** Message is a general file, information about the file. */
   document?: Document;
+  /** Message is a live photo, information about the live photo. */
+  live_photo?: LivePhoto;
+  /** Message contains paid media; information about the paid media. */
+  paid_media?: PaidMediaInfo;
   /** Message is a photo, available sizes of the photo. */
   photo?: PhotoSize[];
   /** Message is a sticker, information about the sticker. */
@@ -94,6 +136,8 @@ export interface ExternalReplyInfo {
   voice?: Voice;
   /** True, if the message media is covered by a spoiler animation. */
   has_media_spoiler?: boolean;
+  /** Message is a checklist. */
+  checklist?: Checklist;
   /** Message is a shared contact, information about the contact. */
   contact?: Contact;
   /** Message is a dice with random value. */
@@ -101,11 +145,11 @@ export interface ExternalReplyInfo {
   /** Message is a game, information about the game. */
   game?: Game;
   /** Message is a scheduled giveaway, information about the giveaway. */
-  giveaway?: unknown;
+  giveaway?: Giveaway;
   /** A giveaway with public winners was completed. */
-  giveaway_winners?: unknown;
+  giveaway_winners?: GiveawayWinners;
   /** Message is an invoice for a payment, information about the invoice. */
-  invoice?: unknown;
+  invoice?: Invoice;
   /** Message is a shared location, information about the location. */
   location?: Location;
   /** Message is a native poll, information about the poll. */

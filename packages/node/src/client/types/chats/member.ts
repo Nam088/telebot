@@ -188,6 +188,8 @@ export interface ChatJoinRequest {
   bio?: string;
   /** Chat invite link that was used by the user to send the join request. */
   invite_link?: ChatInviteLink;
+  /** Identifier of the join request query; for bots assigned to process join requests only. */
+  query_id?: string;
 }
 
 /**
