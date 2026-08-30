@@ -5,8 +5,10 @@ import type {
   InputMediaPhoto,
   InputMediaVideo,
   EphemeralMessageParameters,
-  InlineKeyboardMarkup,
+  ReplyMarkup,
+  ReplyParameters,
 } from "../messages/index.js";
+import type { SuggestedPostParameters } from "../payments/index.js";
 import type { RichBlock } from "./received-blocks.js";
 import type { InputMediaVoiceNote, InputRichBlock } from "./input-blocks.js";
 
@@ -72,26 +74,42 @@ export interface InputRichMessageContent {
 
 /**
  * Parameters for the sendRichMessage method (Bot API 10.1+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#sendrichmessage Telegram Bot API: sendRichMessage}
  */
 export interface SendRichMessageOptions {
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
-  /** Rich message content to be sent. */
-  rich_message: InputRichMessage;
   /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
+  /** Parameters of the ephemeral message to be sent (Bot API 10.3+). */
+  ephemeral_message_parameters?: EphemeralMessageParameters;
+  /** Rich message content to be sent. */
+  rich_message: InputRichMessage;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
-  /** Additional interface options (InlineKeyboardMarkup). */
-  reply_markup?: InlineKeyboardMarkup;
-  /** Ephemeral message parameters (Bot API 10.3+). */
-  ephemeral_message_parameters?: EphemeralMessageParameters;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
+  /** Unique identifier of the message effect to be added to the message. */
+  message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat (Bot API 10.3+). */
+  suggested_post_parameters?: SuggestedPostParameters;
+  /** Description of the message to reply to. */
+  reply_parameters?: ReplyParameters;
+  /** Additional interface options. A JSON-serialized object for an inline keyboard, a custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user. */
+  reply_markup?: ReplyMarkup;
 }
 
 /**
  * Parameters for the sendRichMessageDraft method (Bot API 10.1+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#sendrichmessagedraft Telegram Bot API: sendRichMessageDraft}
  */
 export interface SendRichMessageDraftOptions {
   /** Unique identifier for the target chat. */

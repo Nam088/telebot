@@ -1,6 +1,7 @@
 import type { ParseMode } from "../../constants.js";
 import type { MessageEntity } from "./core.js";
 import type { InlineKeyboardMarkup } from "./keyboards.js";
+import type { LinkPreviewOptions } from "./reply-context.js";
 import type { InputMedia } from "./media.js";
 import type { InputRichMessage } from "../rich/index.js";
 import type { InlineQueryResult } from "../business/index.js";
@@ -30,7 +31,7 @@ export interface EditMessageTextOptions {
   /** A list of special entities that appear in message text. */
   entities?: MessageEntity[];
   /** Link preview generation options for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
   /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
@@ -127,6 +128,14 @@ export interface StopPollOptions {
   business_connection_id?: string;
 }
 
+/**
+ * Options for {@link Bot.editEphemeralMessageText}.
+ *
+ * @remarks
+ * `text` and `rich_message` are mutually exclusive: exactly one of them must be supplied.
+ *
+ * @see {@link https://core.telegram.org/bots/api#editephemeralmessagetext Telegram Bot API: editEphemeralMessageText}
+ */
 export interface EditEphemeralMessageTextOptions {
   /** Unique identifier for the target chat or username of the target supergroup. */
   chat_id: number | string;
@@ -143,7 +152,7 @@ export interface EditEphemeralMessageTextOptions {
   /** New rich content of the message; required if text isn't specified (Bot API 10.3+). */
   rich_message?: InputRichMessage;
   /** Link preview generation options for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** Inline keyboard markup. */
   reply_markup?: InlineKeyboardMarkup;
 }

@@ -149,8 +149,14 @@ describe("Bot Composite Class Integration Tests", () => {
         {
           type: "table",
           cells: [
-            [{ text: "Header 1" }, { text: "Header 2" }],
-            [{ text: "Val 1" }, { text: "Val 2" }],
+            [
+              { text: "Header 1", align: "left", valign: "top" },
+              { text: "Header 2", align: "left", valign: "top" },
+            ],
+            [
+              { text: "Val 1", align: "left", valign: "top" },
+              { text: "Val 2", align: "left", valign: "top" },
+            ],
           ],
           is_compact: true,
         },
@@ -160,7 +166,7 @@ describe("Bot Composite Class Integration Tests", () => {
         },
         {
           type: "document",
-          document: "doc_123",
+          document: { type: "document", media: "doc_123" },
         },
         {
           type: "buttons",

@@ -13,9 +13,16 @@ describe("BusinessAndEcosystemMethods Changelog Bot API 10.x Tests", () => {
     const client = new ConcreteBusinessClient("TEST_TOKEN", { fetch: fakeFetch });
 
     expect(await client.sendRichMessage({ chat_id: 123, rich_message: {} })).toBe(true);
-    expect(await client.sendRichMessageDraft({ chat_id: 123, draft: "draft" })).toBe(true);
+    expect(await client.sendRichMessageDraft({ chat_id: 123, draft_id: 7, rich_message: {} })).toBe(
+      true,
+    );
     expect(
-      await client.editEphemeralMessageText({ chat_id: 123, message_id: 1, text: "edited" }),
+      await client.editEphemeralMessageText({
+        chat_id: 123,
+        receiver_user_id: 456,
+        ephemeral_message_id: 1,
+        text: "edited",
+      }),
     ).toBe(true);
     expect(await client.deleteEphemeralMessage(123, 1)).toBe(true);
     expect(

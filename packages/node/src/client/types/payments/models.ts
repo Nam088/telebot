@@ -368,3 +368,27 @@ export interface UniqueGiftInfo {
   /** Point in time (Unix timestamp) when the gift can be transferred. */
   next_transfer_date?: number;
 }
+
+/**
+ * Describes the price of a suggested post.
+ *
+ * @see {@link https://core.telegram.org/bots/api#suggestedpostprice Telegram Bot API: SuggestedPostPrice}
+ */
+export interface SuggestedPostPrice {
+  /** Currency in which the post will be paid. Currently, must be one of "XTR" for Telegram Stars or "TON" for Toncoins. */
+  currency: "XTR" | "TON" | string;
+  /** The amount of the currency that will be paid for the post in the smallest units of the currency (e.g. stars or nanograms). */
+  amount: number;
+}
+
+/**
+ * Contains parameters of a post that is being suggested by the bot.
+ *
+ * @see {@link https://core.telegram.org/bots/api#suggestedpostparameters Telegram Bot API: SuggestedPostParameters}
+ */
+export interface SuggestedPostParameters {
+  /** Proposed price for the post. If the field is omitted, then the post is unpaid. */
+  price?: SuggestedPostPrice;
+  /** Proposed send date of the post, as a Unix timestamp between 300 seconds and 30 days in the future. */
+  send_date?: number;
+}

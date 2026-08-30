@@ -8,11 +8,6 @@ import type {
 } from "../messages/index.js";
 
 /**
- * Button style variants for rich message buttons.
- */
-export type RichMessageButtonStyle = "danger" | "success" | "primary" | "link" | string;
-
-/**
  * Represents a button in a RichMessage.
  *
  * @see {@link https://core.telegram.org/bots/api#richmessagebutton Telegram Bot API: RichMessageButton}
@@ -20,8 +15,11 @@ export type RichMessageButtonStyle = "danger" | "success" | "primary" | "link" |
 export interface RichMessageButton {
   /** Text of the button. May contain only plain text, RichTextCustomEmoji and RichTextDateTime entities. */
   text: RichText;
-  /** Style of the button. Must be one of 'danger', 'success', 'primary', or 'link'. */
-  style?: RichMessageButtonStyle;
+  /**
+   * Style of the button. Must be one of 'danger', 'success', 'primary', or 'link' (the docs type this
+   * field as a plain String, so unknown future styles stay assignable).
+   */
+  style?: string;
   /** HTTP or tg:// URL to be opened when the button is pressed. */
   url?: string;
   /** Data to be sent in a callback query to the bot when the button is pressed, 1-64 bytes. */

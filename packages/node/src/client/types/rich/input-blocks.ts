@@ -5,6 +5,7 @@ import type {
   InputMediaDocument,
   InputMediaPhoto,
   InputMediaVideo,
+  MessageEntity,
 } from "../messages/index.js";
 import type { RichText, RichMessageButton } from "./text.js";
 import type { RichBlockCaption, RichBlockTableCell } from "./received-blocks.js";
@@ -15,16 +16,16 @@ import type { RichBlockCaption, RichBlockTableCell } from "./received-blocks.js"
  * @see {@link https://core.telegram.org/bots/api#inputmediavoicenote Telegram Bot API: InputMediaVoiceNote}
  */
 export interface InputMediaVoiceNote {
-  /** Type of the result, always 'voice'. */
-  type: "voice";
+  /** Type of the media, must be 'voice_note'. */
+  type: "voice_note";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
   media: string;
   /** Caption of the voice note to be sent, 0-1024 characters. */
   caption?: string;
   /** Mode for parsing entities in the voice note caption. */
   parse_mode?: string;
-  /** Special entities that appear in the caption. */
-  caption_entities?: unknown[];
+  /** A list of special entities that appear in the caption. */
+  caption_entities?: MessageEntity[];
   /** Duration of the voice note in seconds. */
   duration?: number;
 }
@@ -316,13 +317,17 @@ export interface InputRichBlockAudio {
 /**
  * A document file block to be sent (Bot API 10.3+).
  *
+ * @remarks
+ * The docs type `document` as `InputMediaDocument` only — a bare `file_id` string is not a
+ * valid value, matching the sibling `photo`, `video`, `animation` and `audio` blocks.
+ *
  * @see {@link https://core.telegram.org/bots/api#inputrichblockdocument Telegram Bot API: InputRichBlockDocument}
  */
 export interface InputRichBlockDocument {
   /** Type of the block, always 'document'. */
   type: "document";
   /** The document. Caption is ignored. */
-  document: InputMediaDocument | string;
+  document: InputMediaDocument;
   /** Caption of the block. */
   caption?: RichBlockCaption;
 }

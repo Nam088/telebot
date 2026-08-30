@@ -169,3 +169,21 @@ export interface ReplyParameters {
   /** Identifier of the ephemeral message that will be replied to (Bot API 10.2+). */
   ephemeral_message_id?: number;
 }
+
+/**
+ * Describes the options used for link preview generation.
+ *
+ * @see {@link https://core.telegram.org/bots/api#linkpreviewoptions Telegram Bot API: LinkPreviewOptions}
+ */
+export interface LinkPreviewOptions {
+  /** True, if the link preview is disabled. */
+  is_disabled?: boolean;
+  /** URL to use for the link preview. If empty, then the first URL found in the message text is used. */
+  url?: string;
+  /** True, if the media in the link preview is supposed to be shrunk; ignored if the URL isn't explicitly specified or media size change isn't supported for the preview. */
+  prefer_small_media?: boolean;
+  /** True, if the media in the link preview is supposed to be enlarged; ignored if the URL isn't explicitly specified or media size change isn't supported for the preview. */
+  prefer_large_media?: boolean;
+  /** True, if the link preview must be shown above the message text; otherwise, the link preview will be shown below the message text. */
+  show_above_text?: boolean;
+}
