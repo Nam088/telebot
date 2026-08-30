@@ -316,6 +316,7 @@ class EditsMixin(Requester):
         chat_id: int | str,
         message_id: int,
         *,
+        business_connection_id: str | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Poll:
         """Stop a poll which was sent by the bot.
@@ -328,6 +329,9 @@ class EditsMixin(Requester):
         Args:
             chat_id: Chat containing the poll message.
             message_id: Identifier of the message with the poll.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -344,6 +348,7 @@ class EditsMixin(Requester):
         payload = clean_payload(
             chat_id=chat_id,
             message_id=message_id,
+            business_connection_id=business_connection_id,
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Poll, await self.request("stopPoll", payload))

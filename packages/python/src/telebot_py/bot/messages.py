@@ -15,24 +15,30 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.common import LinkPreviewOptions, MessageEntity, MessageId
 from telebot_py.types.message import Message
-from telebot_py.types.message_extras import ReplyParameters
+from telebot_py.types.message_extras import EphemeralMessageParameters, ReplyParameters
+from telebot_py.types.suggested_post_types import SuggestedPostParameters
 
 
 class MessagesMixin(Requester):
-    """Bot methods for sending messages, media references, and chat actions."""
+    """Bot methods for sending text messages, chat actions, forwards, and copies."""
 
     async def send_message(
         self,
         chat_id: int | str,
         text: str,
         *,
+        business_connection_id: str | None = None,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
         link_preview_options: LinkPreviewOptions | MarkupLike | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
         message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
@@ -45,8 +51,15 @@ class MessagesMixin(Requester):
             chat_id: Unique identifier for the target chat or username of the
                 target channel (e.g. ``@channelusername``).
             text: Text of the message to be sent, 1-4096 characters.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread
                 (topic) of a forum supergroup.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
+            ephemeral_message_parameters: EphemeralMessageParameters as a
+                ``to_dict`` object or dict.
             parse_mode: Parse mode for text entities (``HTML``, ``Markdown``,
                 ``MarkdownV2``).
             entities: Special entities that appear in the text, as an
@@ -57,7 +70,11 @@ class MessagesMixin(Requester):
                 no sound.
             protect_content: Protect the message content from forwarding and
                 saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
             message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
             reply_parameters: Description of the message to reply to, as a
                 ``ReplyParameters`` object or a mapping.
             reply_markup: Inline keyboard, custom reply keyboard,
@@ -77,13 +94,18 @@ class MessagesMixin(Requester):
         payload = clean_payload(
             chat_id=chat_id,
             text=text,
+            business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
             parse_mode=parse_mode,
             entities=[entity.to_dict() for entity in entities] if entities is not None else None,
             link_preview_options=to_wire(link_preview_options),
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
             message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
@@ -94,6 +116,7 @@ class MessagesMixin(Requester):
         chat_id: int | str,
         action: str,
         *,
+        business_connection_id: str | None = None,
         message_thread_id: int | None = None,
     ) -> bool:
         """Broadcast a chat action (typing, upload_photo, ...) to the chat.
@@ -105,6 +128,8 @@ class MessagesMixin(Requester):
             chat_id: Unique identifier for the target chat or channel username.
             action: Type of action to broadcast, e.g. ``typing``,
                 ``upload_photo``, ``find_location``.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread.
 
         Returns:
@@ -120,6 +145,7 @@ class MessagesMixin(Requester):
         payload = clean_payload(
             chat_id=chat_id,
             action=action,
+            business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
         )
         return parse_flag(await self.request("sendChatAction", payload))
@@ -176,8 +202,11 @@ class MessagesMixin(Requester):
         message_id: int,
         *,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
     ) -> Message:
         """Forward a message of any kind to another chat.
 
@@ -189,8 +218,14 @@ class MessagesMixin(Requester):
             from_chat_id: Chat where the original message was sent.
             message_id: Message identifier in ``from_chat_id``.
             message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
             disable_notification: Forward silently.
             protect_content: Protect the forwarded content.
+            message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
 
         Returns:
             The forwarded Message.
@@ -207,8 +242,11 @@ class MessagesMixin(Requester):
             from_chat_id=from_chat_id,
             message_id=message_id,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
         )
         return parse_result(Message, await self.request("forwardMessage", payload))
 
@@ -219,11 +257,15 @@ class MessagesMixin(Requester):
         message_id: int,
         *,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         caption: str | None = None,
         parse_mode: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> MessageId:
@@ -237,11 +279,19 @@ class MessagesMixin(Requester):
             from_chat_id: Chat where the source message lives.
             message_id: Message identifier to copy.
             message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
             caption: New caption for the copy, 0-1024 characters.
             parse_mode: Parse mode for the new caption.
             caption_entities: Special entities for the new caption.
             disable_notification: Send the copy silently.
             protect_content: Protect the copied content.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
             reply_parameters: Description of the message to reply to, as a
                 ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the copied message; dict or ``to_dict``
@@ -262,6 +312,7 @@ class MessagesMixin(Requester):
             from_chat_id=from_chat_id,
             message_id=message_id,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=[entity.to_dict() for entity in caption_entities]
@@ -269,110 +320,13 @@ class MessagesMixin(Requester):
             else None,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(MessageId, await self.request("copyMessage", payload))
-
-    async def send_photo(
-        self,
-        chat_id: int | str,
-        photo: str,
-        *,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        disable_notification: bool | None = None,
-        protect_content: bool | None = None,
-        reply_parameters: ReplyParameters | MarkupLike | None = None,
-        reply_markup: MarkupLike | None = None,
-    ) -> Message:
-        """Send a photo by ``file_id`` or HTTP URL (file uploads are out of scope).
-
-        Example:
-            >>> msg = await bot.send_photo(123456, "https://example.com/cat.jpg")
-
-        Args:
-            chat_id: Unique identifier for the target chat.
-            photo: Photo to send as a ``file_id`` string or HTTP URL.
-            caption: Photo caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            disable_notification: Send silently.
-            protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to, as a
-                ``ReplyParameters`` object or a mapping.
-            reply_markup: Markup for the message; dict or ``to_dict`` object.
-
-        Returns:
-            The sent Message.
-
-        Raises:
-            InvalidTokenError: If Telegram rejects the token (HTTP 401).
-            TelegramApiError: If Telegram responds not-ok or retries exhaust.
-            NetworkError: If the transport keeps failing after retries.
-
-        Telegram API: https://core.telegram.org/bots/api#sendphoto
-        """
-        payload = clean_payload(
-            chat_id=chat_id,
-            photo=photo,
-            caption=caption,
-            parse_mode=parse_mode,
-            disable_notification=disable_notification,
-            protect_content=protect_content,
-            reply_parameters=to_wire(reply_parameters),
-            reply_markup=to_wire(reply_markup),
-        )
-        return parse_result(Message, await self.request("sendPhoto", payload))
-
-    async def send_document(
-        self,
-        chat_id: int | str,
-        document: str,
-        *,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        disable_notification: bool | None = None,
-        protect_content: bool | None = None,
-        reply_parameters: ReplyParameters | MarkupLike | None = None,
-        reply_markup: MarkupLike | None = None,
-    ) -> Message:
-        """Send a general file by ``file_id`` or HTTP URL (file uploads are out of scope).
-
-        Example:
-            >>> msg = await bot.send_document(123456, "https://example.com/report.pdf")
-
-        Args:
-            chat_id: Unique identifier for the target chat.
-            document: Document to send as a ``file_id`` string or HTTP URL.
-            caption: Document caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            disable_notification: Send silently.
-            protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to, as a
-                ``ReplyParameters`` object or a mapping.
-            reply_markup: Markup for the message; dict or ``to_dict`` object.
-
-        Returns:
-            The sent Message.
-
-        Raises:
-            InvalidTokenError: If Telegram rejects the token (HTTP 401).
-            TelegramApiError: If Telegram responds not-ok or retries exhaust.
-            NetworkError: If the transport keeps failing after retries.
-
-        Telegram API: https://core.telegram.org/bots/api#senddocument
-        """
-        payload = clean_payload(
-            chat_id=chat_id,
-            document=document,
-            caption=caption,
-            parse_mode=parse_mode,
-            disable_notification=disable_notification,
-            protect_content=protect_content,
-            reply_parameters=to_wire(reply_parameters),
-            reply_markup=to_wire(reply_markup),
-        )
-        return parse_result(Message, await self.request("sendDocument", payload))
 
     async def get_user_personal_chat_messages(self, user_id: int, limit: int) -> list[Message]:
         """Get the last messages from the personal chat of a user.

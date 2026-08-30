@@ -1,4 +1,8 @@
-"""Media-sending Bot API methods (parity with packages/go/pkg/bot/media.go)."""
+"""Album, location, venue, contact, and dice Bot API methods.
+
+Split out of ``media.py`` for file-length reasons; parity with
+packages/go/pkg/bot/media.go.
+"""
 
 from __future__ import annotations
 
@@ -8,38 +12,106 @@ from telebot_py.bot.base import (
     MarkupLike,
     Requester,
     clean_payload,
+    parse_list_result,
     parse_result,
     to_wire,
 )
-from telebot_py.types.common import MessageEntity
+from telebot_py.types.input_media import InputMediaLike
 from telebot_py.types.message import Message
 from telebot_py.types.message_extras import EphemeralMessageParameters, ReplyParameters
 from telebot_py.types.suggested_post_types import SuggestedPostParameters
 
 
-class MediaMixin(Requester):
-    """Bot methods for sending audio, video, animations, voice, and video notes.
+class MiscMediaMixin(Requester):
+    """Bot methods for sending media albums, locations, venues, contacts, and dice.
 
     Media parameters accept ``file_id`` strings or HTTP URLs; multipart file
     uploads are intentionally out of scope (JSON payloads only).
     """
 
-    async def send_audio(
+    async def send_media_group(
         self,
         chat_id: int | str,
-        audio: str,
+        media: Sequence[InputMediaLike],
+        *,
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        disable_notification: bool | None = None,
+        protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
+    ) -> list[Message]:
+        """Send a group of photos, videos, documents or audios as one message.
+
+        Example:
+            >>> from telebot_py.types import InputMediaPhoto, InputMediaVideo
+            >>> msgs = await bot.send_media_group(
+            ...     123456,
+            ...     [
+            ...         InputMediaPhoto(media="photo_file_id"),
+            ...         InputMediaVideo(media="video_file_id"),
+            ...     ],
+            ... )
+
+        Args:
+            chat_id: Unique identifier for the target chat or channel username.
+            media: InputMedia items, e.g. ``InputMediaPhoto(media="photo_file_id")``
+                or the equivalent mapping ``{"type": "photo", "media":
+                "photo_file_id"}``; 2-10 items.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be sent.
+            message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
+            disable_notification: Send silently.
+            protect_content: Protect the content from forwarding and saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
+
+        Returns:
+            The sent Messages (one per album item).
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendmediagroup
+        """
+        payload = clean_payload(
+            chat_id=chat_id,
+            media=[to_wire(item) for item in media],
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            reply_parameters=to_wire(reply_parameters),
+        )
+        return parse_list_result(Message, await self.request("sendMediaGroup", payload))
+
+    async def send_location(
+        self,
+        chat_id: int | str,
+        latitude: float,
+        longitude: float,
         *,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
         direct_messages_topic_id: int | None = None,
         ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        duration: int | None = None,
-        performer: str | None = None,
-        title: str | None = None,
-        thumbnail: str | None = None,
+        horizontal_accuracy: float | None = None,
+        live_period: int | None = None,
+        heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
@@ -48,14 +120,15 @@ class MediaMixin(Requester):
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
-        """Send an audio file by ``file_id`` or HTTP URL.
+        """Send a point on the map.
 
         Example:
-            >>> msg = await bot.send_audio(123456, "audio_file_id", caption="song")
+            >>> msg = await bot.send_location(123456, 40.7, -74.0, live_period=60)
 
         Args:
             chat_id: Unique identifier for the target chat or channel username.
-            audio: Audio file to send as a ``file_id`` string or HTTP URL.
+            latitude: Latitude of the location.
+            longitude: Longitude of the location.
             business_connection_id: Unique identifier of the business
                 connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread.
@@ -64,13 +137,13 @@ class MediaMixin(Requester):
                 to a direct messages chat.
             ephemeral_message_parameters: EphemeralMessageParameters as a
                 ``to_dict`` object or dict.
-            caption: Audio caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            caption_entities: Special entities for the caption.
-            duration: Duration of the audio in seconds.
-            performer: Performer of the audio.
-            title: Track name.
-            thumbnail: Thumbnail file_id or URL of the file sent.
+            horizontal_accuracy: Radius of uncertainty for the location, in
+                meters; 0-1500.
+            live_period: Period in seconds during which the location will be
+                updated; 60-86400.
+            heading: Direction in which the user is moving, in degrees; 1-360.
+            proximity_alert_radius: Maximum distance for proximity alerts
+                about approaching another chat member, in meters.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             allow_paid_broadcast: Pass True to ignore broadcasting limits for a
@@ -90,24 +163,112 @@ class MediaMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
 
-        Telegram API: https://core.telegram.org/bots/api#sendaudio
+        Telegram API: https://core.telegram.org/bots/api#sendlocation
         """
         payload = clean_payload(
             chat_id=chat_id,
-            audio=audio,
+            latitude=latitude,
+            longitude=longitude,
             business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
-            caption=caption,
-            parse_mode=parse_mode,
-            caption_entities=[entity.to_dict() for entity in caption_entities]
-            if caption_entities is not None
-            else None,
-            duration=duration,
-            performer=performer,
+            horizontal_accuracy=horizontal_accuracy,
+            live_period=live_period,
+            heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
+            disable_notification=disable_notification,
+            protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
+            reply_parameters=to_wire(reply_parameters),
+            reply_markup=to_wire(reply_markup),
+        )
+        return parse_result(Message, await self.request("sendLocation", payload))
+
+    async def send_venue(
+        self,
+        chat_id: int | str,
+        latitude: float,
+        longitude: float,
+        title: str,
+        address: str,
+        *,
+        business_connection_id: str | None = None,
+        message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
+        ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
+        foursquare_id: str | None = None,
+        foursquare_type: str | None = None,
+        google_place_id: str | None = None,
+        google_place_type: str | None = None,
+        disable_notification: bool | None = None,
+        protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
+        reply_markup: MarkupLike | None = None,
+    ) -> Message:
+        """Send information about a venue.
+
+        Example:
+            >>> msg = await bot.send_venue(123456, 40.7, -74.0, "Cafe", "1 Main St")
+
+        Args:
+            chat_id: Unique identifier for the target chat or channel username.
+            latitude: Latitude of the venue.
+            longitude: Longitude of the venue.
+            title: Name of the venue.
+            address: Address of the venue.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be sent.
+            message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
+            ephemeral_message_parameters: EphemeralMessageParameters as a
+                ``to_dict`` object or dict.
+            foursquare_id: Foursquare identifier of the venue.
+            foursquare_type: Foursquare type of the venue.
+            google_place_id: Google Places identifier of the venue.
+            google_place_type: Google Places type of the venue.
+            disable_notification: Send silently.
+            protect_content: Protect the content from forwarding and saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
+            reply_markup: Markup for the message; dict or ``to_dict`` object.
+
+        Returns:
+            The sent Message.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendvenue
+        """
+        payload = clean_payload(
+            chat_id=chat_id,
+            latitude=latitude,
+            longitude=longitude,
             title=title,
-            thumbnail=thumbnail,
+            address=address,
+            business_connection_id=business_connection_id,
+            message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
+            ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
+            foursquare_id=foursquare_id,
+            foursquare_type=foursquare_type,
+            google_place_id=google_place_id,
+            google_place_type=google_place_type,
             disable_notification=disable_notification,
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,
@@ -116,27 +277,20 @@ class MediaMixin(Requester):
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
-        return parse_result(Message, await self.request("sendAudio", payload))
+        return parse_result(Message, await self.request("sendVenue", payload))
 
-    async def send_video(
+    async def send_contact(
         self,
         chat_id: int | str,
-        video: str,
+        phone_number: str,
+        first_name: str,
         *,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
         direct_messages_topic_id: int | None = None,
         ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
-        duration: int | None = None,
-        width: int | None = None,
-        height: int | None = None,
-        thumbnail: str | None = None,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        show_caption_above_media: bool | None = None,
-        has_spoiler: bool | None = None,
-        supports_streaming: bool | None = None,
+        last_name: str | None = None,
+        vcard: str | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
@@ -145,14 +299,15 @@ class MediaMixin(Requester):
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
-        """Send a video file by ``file_id`` or HTTP URL.
+        """Send a phone contact.
 
         Example:
-            >>> msg = await bot.send_video(123456, "video_file_id", width=1920, height=1080)
+            >>> msg = await bot.send_contact(123456, "+123", "Alice", last_name="Smith")
 
         Args:
             chat_id: Unique identifier for the target chat or channel username.
-            video: Video to send as a ``file_id`` string or HTTP URL.
+            phone_number: Contact's phone number.
+            first_name: Contact's first name.
             business_connection_id: Unique identifier of the business
                 connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread.
@@ -161,17 +316,8 @@ class MediaMixin(Requester):
                 to a direct messages chat.
             ephemeral_message_parameters: EphemeralMessageParameters as a
                 ``to_dict`` object or dict.
-            duration: Duration of the video in seconds.
-            width: Video width.
-            height: Video height.
-            thumbnail: Thumbnail file_id or URL of the file sent.
-            caption: Video caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            caption_entities: Special entities for the caption.
-            show_caption_above_media: Show the caption above the media.
-            has_spoiler: Mark the video as covered with a spoiler.
-            supports_streaming: Pass True if the video is suitable for
-                streaming.
+            last_name: Contact's last name.
+            vcard: Additional data about the contact in the vCard format.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             allow_paid_broadcast: Pass True to ignore broadcasting limits for a
@@ -191,27 +337,18 @@ class MediaMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
 
-        Telegram API: https://core.telegram.org/bots/api#sendvideo
+        Telegram API: https://core.telegram.org/bots/api#sendcontact
         """
         payload = clean_payload(
             chat_id=chat_id,
-            video=video,
+            phone_number=phone_number,
+            first_name=first_name,
             business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
             ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
-            duration=duration,
-            width=width,
-            height=height,
-            thumbnail=thumbnail,
-            caption=caption,
-            parse_mode=parse_mode,
-            caption_entities=[entity.to_dict() for entity in caption_entities]
-            if caption_entities is not None
-            else None,
-            show_caption_above_media=show_caption_above_media,
-            has_spoiler=has_spoiler,
-            supports_streaming=supports_streaming,
+            last_name=last_name,
+            vcard=vcard,
             disable_notification=disable_notification,
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,
@@ -220,26 +357,16 @@ class MediaMixin(Requester):
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
-        return parse_result(Message, await self.request("sendVideo", payload))
+        return parse_result(Message, await self.request("sendContact", payload))
 
-    async def send_animation(
+    async def send_dice(
         self,
         chat_id: int | str,
-        animation: str,
         *,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
         direct_messages_topic_id: int | None = None,
-        ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
-        duration: int | None = None,
-        width: int | None = None,
-        height: int | None = None,
-        thumbnail: str | None = None,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        show_caption_above_media: bool | None = None,
-        has_spoiler: bool | None = None,
+        emoji: str | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
@@ -248,31 +375,20 @@ class MediaMixin(Requester):
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
-        """Send an animation (GIF or H.264/MPEG-4 AVC without sound).
+        """Send an animated emoji message with a random value (dice).
 
         Example:
-            >>> msg = await bot.send_animation(123456, "anim_file_id", has_spoiler=True)
+            >>> msg = await bot.send_dice(123456, emoji="🎲")
 
         Args:
             chat_id: Unique identifier for the target chat or channel username.
-            animation: Animation to send as a ``file_id`` string or HTTP URL.
             business_connection_id: Unique identifier of the business
                 connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread.
             direct_messages_topic_id: Identifier of the direct messages topic to
                 which the message will be sent; required if the message is sent
                 to a direct messages chat.
-            ephemeral_message_parameters: EphemeralMessageParameters as a
-                ``to_dict`` object or dict.
-            duration: Duration of the animation in seconds.
-            width: Animation width.
-            height: Animation height.
-            thumbnail: Thumbnail file_id or URL of the file sent.
-            caption: Animation caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            caption_entities: Special entities for the caption.
-            show_caption_above_media: Show the caption above the media.
-            has_spoiler: Mark the animation as covered with a spoiler.
+            emoji: Emoji on which the dice throw animation is based.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             allow_paid_broadcast: Pass True to ignore broadcasting limits for a
@@ -292,26 +408,14 @@ class MediaMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
 
-        Telegram API: https://core.telegram.org/bots/api#sendanimation
+        Telegram API: https://core.telegram.org/bots/api#senddice
         """
         payload = clean_payload(
             chat_id=chat_id,
-            animation=animation,
             business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
-            ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
-            duration=duration,
-            width=width,
-            height=height,
-            thumbnail=thumbnail,
-            caption=caption,
-            parse_mode=parse_mode,
-            caption_entities=[entity.to_dict() for entity in caption_entities]
-            if caption_entities is not None
-            else None,
-            show_caption_above_media=show_caption_above_media,
-            has_spoiler=has_spoiler,
+            emoji=emoji,
             disable_notification=disable_notification,
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,
@@ -320,170 +424,4 @@ class MediaMixin(Requester):
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
-        return parse_result(Message, await self.request("sendAnimation", payload))
-
-    async def send_voice(
-        self,
-        chat_id: int | str,
-        voice: str,
-        *,
-        business_connection_id: str | None = None,
-        message_thread_id: int | None = None,
-        direct_messages_topic_id: int | None = None,
-        ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
-        caption: str | None = None,
-        parse_mode: str | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        duration: int | None = None,
-        disable_notification: bool | None = None,
-        protect_content: bool | None = None,
-        allow_paid_broadcast: bool | None = None,
-        message_effect_id: str | None = None,
-        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
-        reply_parameters: ReplyParameters | MarkupLike | None = None,
-        reply_markup: MarkupLike | None = None,
-    ) -> Message:
-        """Send an audio file for display as a voice message.
-
-        Example:
-            >>> msg = await bot.send_voice(123456, "voice_file_id", duration=10)
-
-        Args:
-            chat_id: Unique identifier for the target chat or channel username.
-            voice: Voice message to send as a ``file_id`` string or HTTP URL;
-                OGG encoded with OPUS.
-            business_connection_id: Unique identifier of the business
-                connection on behalf of which the message will be sent.
-            message_thread_id: Unique identifier for the target message thread.
-            direct_messages_topic_id: Identifier of the direct messages topic to
-                which the message will be sent; required if the message is sent
-                to a direct messages chat.
-            ephemeral_message_parameters: EphemeralMessageParameters as a
-                ``to_dict`` object or dict.
-            caption: Voice message caption, 0-1024 characters.
-            parse_mode: Parse mode for the caption.
-            caption_entities: Special entities for the caption.
-            duration: Duration of the voice message in seconds.
-            disable_notification: Send silently.
-            protect_content: Protect the content from forwarding and saving.
-            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
-                fee of 0.1 Telegram Stars per message.
-            message_effect_id: Unique identifier of the message effect to add.
-            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
-                object or dict; for direct messages chats only.
-            reply_parameters: Description of the message to reply to, as a
-                ``ReplyParameters`` object or a mapping.
-            reply_markup: Markup for the message; dict or ``to_dict`` object.
-
-        Returns:
-            The sent Message.
-
-        Raises:
-            InvalidTokenError: If Telegram rejects the token (HTTP 401).
-            TelegramApiError: If Telegram responds not-ok or retries exhaust.
-            NetworkError: If the transport keeps failing after retries.
-
-        Telegram API: https://core.telegram.org/bots/api#sendvoice
-        """
-        payload = clean_payload(
-            chat_id=chat_id,
-            voice=voice,
-            business_connection_id=business_connection_id,
-            message_thread_id=message_thread_id,
-            direct_messages_topic_id=direct_messages_topic_id,
-            ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
-            caption=caption,
-            parse_mode=parse_mode,
-            caption_entities=[entity.to_dict() for entity in caption_entities]
-            if caption_entities is not None
-            else None,
-            duration=duration,
-            disable_notification=disable_notification,
-            protect_content=protect_content,
-            allow_paid_broadcast=allow_paid_broadcast,
-            message_effect_id=message_effect_id,
-            suggested_post_parameters=to_wire(suggested_post_parameters),
-            reply_parameters=to_wire(reply_parameters),
-            reply_markup=to_wire(reply_markup),
-        )
-        return parse_result(Message, await self.request("sendVoice", payload))
-
-    async def send_video_note(
-        self,
-        chat_id: int | str,
-        video_note: str,
-        *,
-        business_connection_id: str | None = None,
-        message_thread_id: int | None = None,
-        direct_messages_topic_id: int | None = None,
-        ephemeral_message_parameters: EphemeralMessageParameters | MarkupLike | None = None,
-        duration: int | None = None,
-        length: int | None = None,
-        thumbnail: str | None = None,
-        disable_notification: bool | None = None,
-        protect_content: bool | None = None,
-        allow_paid_broadcast: bool | None = None,
-        message_effect_id: str | None = None,
-        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
-        reply_parameters: ReplyParameters | MarkupLike | None = None,
-        reply_markup: MarkupLike | None = None,
-    ) -> Message:
-        """Send a square video message (video note).
-
-        Example:
-            >>> msg = await bot.send_video_note(123456, "vn_file_id", length=240)
-
-        Args:
-            chat_id: Unique identifier for the target chat or channel username.
-            video_note: Video note to send as a ``file_id`` string or HTTP URL.
-            business_connection_id: Unique identifier of the business
-                connection on behalf of which the message will be sent.
-            message_thread_id: Unique identifier for the target message thread.
-            direct_messages_topic_id: Identifier of the direct messages topic to
-                which the message will be sent; required if the message is sent
-                to a direct messages chat.
-            ephemeral_message_parameters: EphemeralMessageParameters as a
-                ``to_dict`` object or dict.
-            duration: Duration of the video in seconds.
-            length: Video width and height, i.e. diameter of the video note.
-            thumbnail: Thumbnail file_id or URL of the file sent.
-            disable_notification: Send silently.
-            protect_content: Protect the content from forwarding and saving.
-            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
-                fee of 0.1 Telegram Stars per message.
-            message_effect_id: Unique identifier of the message effect to add.
-            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
-                object or dict; for direct messages chats only.
-            reply_parameters: Description of the message to reply to, as a
-                ``ReplyParameters`` object or a mapping.
-            reply_markup: Markup for the message; dict or ``to_dict`` object.
-
-        Returns:
-            The sent Message.
-
-        Raises:
-            InvalidTokenError: If Telegram rejects the token (HTTP 401).
-            TelegramApiError: If Telegram responds not-ok or retries exhaust.
-            NetworkError: If the transport keeps failing after retries.
-
-        Telegram API: https://core.telegram.org/bots/api#sendvideonote
-        """
-        payload = clean_payload(
-            chat_id=chat_id,
-            video_note=video_note,
-            business_connection_id=business_connection_id,
-            message_thread_id=message_thread_id,
-            direct_messages_topic_id=direct_messages_topic_id,
-            ephemeral_message_parameters=to_wire(ephemeral_message_parameters),
-            duration=duration,
-            length=length,
-            thumbnail=thumbnail,
-            disable_notification=disable_notification,
-            protect_content=protect_content,
-            allow_paid_broadcast=allow_paid_broadcast,
-            message_effect_id=message_effect_id,
-            suggested_post_parameters=to_wire(suggested_post_parameters),
-            reply_parameters=to_wire(reply_parameters),
-            reply_markup=to_wire(reply_markup),
-        )
-        return parse_result(Message, await self.request("sendVideoNote", payload))
+        return parse_result(Message, await self.request("sendDice", payload))

@@ -8,6 +8,7 @@ from collections.abc import Sequence
 
 import httpx
 
+from telebot_py.bot.attachments import AttachmentsMixin
 from telebot_py.bot.base import clean_payload, parse_list_result, parse_result
 from telebot_py.bot.bulk import BulkMixin
 from telebot_py.bot.business_account import BusinessAccountMixin
@@ -27,13 +28,16 @@ from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
 from telebot_py.bot.mini_apps import MiniAppsMixin
+from telebot_py.bot.misc_media import MiscMediaMixin
 from telebot_py.bot.owned_gifts import OwnedGiftsMixin
 from telebot_py.bot.paid_media import PaidMediaMixin
 from telebot_py.bot.payments import PaymentsMixin
+from telebot_py.bot.polls import PollsMixin
 from telebot_py.bot.profile import ProfileMixin
 from telebot_py.bot.reactions import ReactionsMixin
 from telebot_py.bot.retry import RetryPolicy
 from telebot_py.bot.rich_messages import RichMessagesMixin
+from telebot_py.bot.sticker_sets import StickerSetsMixin
 from telebot_py.bot.stickers import StickersMixin
 from telebot_py.bot.stories import StoriesMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
@@ -80,9 +84,13 @@ def _api_error(method: str, response: httpx.Response, envelope: object) -> Teleg
 
 class Bot(
     MessagesMixin,
+    AttachmentsMixin,
     RichMessagesMixin,
     MediaMixin,
+    MiscMediaMixin,
+    PollsMixin,
     StickersMixin,
+    StickerSetsMixin,
     InlineMixin,
     PaymentsMixin,
     GamesMixin,

@@ -29,6 +29,8 @@ class GamesMixin(Requester):
         message_thread_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a game.
@@ -44,6 +46,9 @@ class GamesMixin(Requester):
             message_thread_id: Unique identifier for the target message thread.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
             reply_markup: Inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -64,6 +69,8 @@ class GamesMixin(Requester):
             message_thread_id=message_thread_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Message, await self.request("sendGame", payload))

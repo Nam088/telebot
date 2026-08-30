@@ -143,6 +143,7 @@ class ChatManagementMixin(Requester):
         chat_id: int | str,
         message_id: int,
         *,
+        business_connection_id: str | None = None,
         disable_notification: bool | None = None,
     ) -> bool:
         """Add a message to the list of pinned messages in a chat.
@@ -154,6 +155,8 @@ class ChatManagementMixin(Requester):
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
             message_id: Identifier of the message to pin.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be pinned.
             disable_notification: Pin without sending a notification.
 
         Returns:
@@ -169,11 +172,18 @@ class ChatManagementMixin(Requester):
         payload = clean_payload(
             chat_id=chat_id,
             message_id=message_id,
+            business_connection_id=business_connection_id,
             disable_notification=disable_notification,
         )
         return parse_flag(await self.request("pinChatMessage", payload))
 
-    async def unpin_chat_message(self, chat_id: int | str, message_id: int | None = None) -> bool:
+    async def unpin_chat_message(
+        self,
+        chat_id: int | str,
+        message_id: int | None = None,
+        *,
+        business_connection_id: str | None = None,
+    ) -> bool:
         """Remove a message from the list of pinned messages in a chat.
 
         Example:
@@ -184,6 +194,8 @@ class ChatManagementMixin(Requester):
                 target channel.
             message_id: Identifier of the message to unpin; omit to unpin the
                 most recently pinned message.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be unpinned.
 
         Returns:
             True on success.
@@ -195,7 +207,11 @@ class ChatManagementMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#unpinchatmessage
         """
-        payload = clean_payload(chat_id=chat_id, message_id=message_id)
+        payload = clean_payload(
+            chat_id=chat_id,
+            message_id=message_id,
+            business_connection_id=business_connection_id,
+        )
         return parse_flag(await self.request("unpinChatMessage", payload))
 
     async def unpin_all_chat_messages(self, chat_id: int | str) -> bool:

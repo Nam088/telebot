@@ -16,6 +16,7 @@ from telebot_py.bot.base import (
 from telebot_py.types.message import Message
 from telebot_py.types.message_extras import ReplyParameters
 from telebot_py.types.payments import StarAmount, StarTransactions
+from telebot_py.types.suggested_post_types import SuggestedPostParameters
 
 
 class PaymentsMixin(Requester):
@@ -32,6 +33,7 @@ class PaymentsMixin(Requester):
         *,
         provider_token: str | None = None,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         max_tip_amount: int | None = None,
         suggested_tip_amounts: Sequence[int] | None = None,
         start_parameter: str | None = None,
@@ -49,6 +51,9 @@ class PaymentsMixin(Requester):
         is_flexible: bool | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
         reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
@@ -66,6 +71,9 @@ class PaymentsMixin(Requester):
             prices: LabeledPrice items as dicts or ``to_dict`` objects.
             provider_token: Payment provider token (omit for Telegram Stars).
             message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
             max_tip_amount: Maximum accepted tip amount.
             suggested_tip_amounts: Suggested tip amounts in ascending order;
                 at most 4 items.
@@ -87,6 +95,11 @@ class PaymentsMixin(Requester):
                 method.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
             reply_parameters: Description of the message to reply to, as a
                 ``ReplyParameters`` object or a mapping.
             reply_markup: Inline keyboard for the message; dict or
@@ -111,6 +124,7 @@ class PaymentsMixin(Requester):
             prices=[to_wire(price) for price in prices],
             provider_token=provider_token,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=list(suggested_tip_amounts)
             if suggested_tip_amounts is not None
@@ -130,6 +144,9 @@ class PaymentsMixin(Requester):
             is_flexible=is_flexible,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
