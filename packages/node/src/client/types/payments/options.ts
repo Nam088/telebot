@@ -1,5 +1,5 @@
 import type { InlineKeyboardMarkup, MessageEntity } from "../messages/index.js";
-import type { LabeledPrice, ShippingOption } from "./models.js";
+import type { LabeledPrice, ShippingOption, SuggestedPostParameters } from "./models.js";
 
 export interface SendInvoiceOptions {
   /** Unique identifier for the target chat or username of the target channel. */
@@ -50,12 +50,20 @@ export interface SendInvoiceOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
+  /** Unique identifier of the message effect to be added to the message. */
+  message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: unknown;
   /** An inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
 }
 
 /**

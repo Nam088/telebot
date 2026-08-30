@@ -30,6 +30,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
       message_thread_id?: number;
       disable_notification?: boolean;
       protect_content?: boolean;
+      allow_paid_broadcast?: boolean;
+      message_effect_id?: string;
       reply_markup?: unknown;
     } = {},
   ): Promise<Message> {

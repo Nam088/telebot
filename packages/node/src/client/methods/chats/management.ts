@@ -75,6 +75,7 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param chatId - Unique identifier for the target chat.
    * @param messageId - Identifier of a message to pin.
    * @param disableNotification - Pass `true` if it is not necessary to send a notification to all chat members.
+   * @param businessConnectionId - Unique identifier of the business connection on behalf of which the message will be pinned.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When pinning message fails.
    *
@@ -84,9 +85,12 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
     chatId: number | string,
     messageId: number,
     disableNotification?: boolean,
+    businessConnectionId?: string,
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId, message_id: messageId };
     if (disableNotification !== undefined) payload["disable_notification"] = disableNotification;
+    if (businessConnectionId !== undefined)
+      payload["business_connection_id"] = businessConnectionId;
     return this.request<boolean>("pinChatMessage", payload);
   }
 
@@ -95,14 +99,21 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @param chatId - Unique identifier for the target chat.
    * @param messageId - Identifier of a message to unpin. If not specified, the most recent pinned message is unpinned.
+   * @param businessConnectionId - Unique identifier of the business connection on behalf of which the message will be unpinned.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When unpinning fails.
    *
    * @see {@link https://core.telegram.org/bots/api#unpinchatmessage Telegram Bot API: unpinChatMessage}
    */
-  public async unpinChatMessage(chatId: number | string, messageId?: number): Promise<boolean> {
+  public async unpinChatMessage(
+    chatId: number | string,
+    messageId?: number,
+    businessConnectionId?: string,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId };
     if (messageId !== undefined) payload["message_id"] = messageId;
+    if (businessConnectionId !== undefined)
+      payload["business_connection_id"] = businessConnectionId;
     return this.request<boolean>("unpinChatMessage", payload);
   }
 

@@ -23,6 +23,7 @@ import type {
   MessageId,
   EditMessageLiveLocationOptions,
   StopMessageLiveLocationOptions,
+  SuggestedPostParameters,
 } from "../../types/index.js";
 
 /**
@@ -151,6 +152,9 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
     disable_notification?: boolean;
     protect_content?: boolean;
     message_thread_id?: number;
+    direct_messages_topic_id?: number;
+    message_effect_id?: string;
+    suggested_post_parameters?: SuggestedPostParameters;
   }): Promise<Message> {
     return this.request<Message>("forwardMessage", options as unknown as Record<string, unknown>);
   }
@@ -211,6 +215,10 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
     protect_content?: boolean;
     reply_markup?: unknown;
     message_thread_id?: number;
+    direct_messages_topic_id?: number;
+    allow_paid_broadcast?: boolean;
+    message_effect_id?: string;
+    suggested_post_parameters?: SuggestedPostParameters;
   }): Promise<{ message_id: number }> {
     return this.request<{ message_id: number }>(
       "copyMessage",

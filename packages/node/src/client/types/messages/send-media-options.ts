@@ -1,4 +1,5 @@
 import type { ParseMode } from "../../constants.js";
+import type { SuggestedPostParameters } from "../payments/index.js";
 import type { MessageEntity } from "./core.js";
 import type { ReplyParameters, EphemeralMessageParameters } from "./reply-context.js";
 import type { ReplyMarkup } from "./keyboards.js";
@@ -23,14 +24,22 @@ export interface SendPhotoOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -58,14 +67,22 @@ export interface SendAudioOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -89,14 +106,22 @@ export interface SendDocumentOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -130,14 +155,22 @@ export interface SendVideoOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -169,14 +202,22 @@ export interface SendAnimationOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -198,14 +239,22 @@ export interface SendVoiceOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -225,14 +274,22 @@ export interface SendVideoNoteOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -274,7 +331,7 @@ export interface SendLivePhotoOptions {
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Parameters of the suggested post to send in a business chat. */
-  suggested_post_parameters?: unknown;
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
@@ -292,10 +349,16 @@ export interface SendMediaGroupOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent messages from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
 }

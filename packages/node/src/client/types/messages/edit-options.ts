@@ -55,6 +55,8 @@ export interface EditMessageCaptionOptions {
   show_caption_above_media?: boolean;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageReplyMarkupOptions {
@@ -66,6 +68,8 @@ export interface EditMessageReplyMarkupOptions {
   inline_message_id?: string;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageMediaOptions {
