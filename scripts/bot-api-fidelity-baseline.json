@@ -609,7 +609,7 @@
       "methodRows": [
         {
           "name": "sendPoll",
-          "file": "packages/python/src/telebot_py/bot/media.py",
+          "file": "packages/python/src/telebot_py/bot/polls.py",
           "required": [],
           "optional": [
             "question_parse_mode",
@@ -624,46 +624,33 @@
             "description",
             "description_parse_mode",
             "description_entities",
-            "media",
-            "allow_paid_broadcast"
+            "media"
           ],
           "total": 34,
           "absent": false
         },
         {
           "name": "sendDocument",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "file": "packages/python/src/telebot_py/bot/attachments.py",
           "required": [],
           "optional": [
-            "business_connection_id",
             "message_thread_id",
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
             "thumbnail",
             "caption_entities",
-            "disable_content_type_detection",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters"
+            "disable_content_type_detection"
           ],
           "total": 18,
           "absent": false
         },
         {
           "name": "sendPhoto",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "file": "packages/python/src/telebot_py/bot/attachments.py",
           "required": [],
           "optional": [
-            "business_connection_id",
             "message_thread_id",
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
             "caption_entities",
             "show_caption_above_media",
-            "has_spoiler",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters"
+            "has_spoiler"
           ],
           "total": 18,
           "absent": false
@@ -673,12 +660,8 @@
           "file": "packages/python/src/telebot_py/bot/messages.py",
           "required": [],
           "optional": [
-            "direct_messages_topic_id",
             "video_start_timestamp",
-            "show_caption_above_media",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters"
+            "show_caption_above_media"
           ],
           "total": 17,
           "absent": false
@@ -688,217 +671,10 @@
           "file": "packages/python/src/telebot_py/bot/media.py",
           "required": [],
           "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
             "cover",
-            "start_timestamp",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
+            "start_timestamp"
           ],
           "total": 25,
-          "absent": false
-        },
-        {
-          "name": "sendMessage",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "forwardMessage",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "video_start_timestamp",
-            "message_effect_id",
-            "suggested_post_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendAnimation",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 22,
-          "absent": false
-        },
-        {
-          "name": "sendAudio",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 20,
-          "absent": false
-        },
-        {
-          "name": "sendContact",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "sendInvoice",
-          "file": "packages/python/src/telebot_py/bot/payments.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters"
-          ],
-          "total": 31,
-          "absent": false
-        },
-        {
-          "name": "sendLivePhoto",
-          "file": "packages/python/src/telebot_py/bot/paid_media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 19,
-          "absent": false
-        },
-        {
-          "name": "sendLocation",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
-          "name": "sendSticker",
-          "file": "packages/python/src/telebot_py/bot/stickers.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 14,
-          "absent": false
-        },
-        {
-          "name": "sendVenue",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 20,
-          "absent": false
-        },
-        {
-          "name": "sendVideoNote",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "sendVoice",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "ephemeral_message_parameters",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 17,
-          "absent": false
-        },
-        {
-          "name": "sendDice",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 12,
-          "absent": false
-        },
-        {
-          "name": "sendGame",
-          "file": "packages/python/src/telebot_py/bot/games.py",
-          "required": [],
-          "optional": [
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "reply_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendMediaGroup",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "allow_paid_broadcast"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendPaidMedia",
-          "file": "packages/python/src/telebot_py/bot/paid_media.py",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "suggested_post_parameters"
-          ],
-          "total": 17,
           "absent": false
         },
         {
@@ -923,6 +699,16 @@
           "absent": false
         },
         {
+          "name": "forwardMessage",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "video_start_timestamp"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
           "name": "getChatAdministrators",
           "file": "packages/python/src/telebot_py/bot/chats.py",
           "required": [],
@@ -933,50 +719,20 @@
           "absent": false
         },
         {
-          "name": "pinChatMessage",
-          "file": "packages/python/src/telebot_py/bot/chat_management.py",
+          "name": "sendGame",
+          "file": "packages/python/src/telebot_py/bot/games.py",
           "required": [],
           "optional": [
-            "business_connection_id"
+            "reply_parameters"
           ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "sendChatAction",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "stopPoll",
-          "file": "packages/python/src/telebot_py/bot/edits.py",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "unpinChatMessage",
-          "file": "packages/python/src/telebot_py/bot/chat_management.py",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 3,
+          "total": 10,
           "absent": false
         }
       ],
       "methodsUnresolved": [],
-      "methodsWithMissing": 28,
+      "methodsWithMissing": 10,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 113
+      "missingMethodOptional": 31
     }
   ]
 }
