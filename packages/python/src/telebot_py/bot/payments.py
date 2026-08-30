@@ -14,7 +14,7 @@ from telebot_py.bot.base import (
     to_wire,
 )
 from telebot_py.types.message import Message
-from telebot_py.types.payments import StarTransactions
+from telebot_py.types.payments import StarAmount, StarTransactions
 
 
 class PaymentsMixin(Requester):
@@ -371,3 +371,20 @@ class PaymentsMixin(Requester):
             is_canceled=is_canceled,
         )
         return parse_flag(await self.request("editUserStarSubscription", payload))
+
+    async def get_my_star_balance(self) -> StarAmount:
+        """Get the current amount of Telegram Stars owned by the bot.
+
+        Example:
+            >>> balance = await bot.get_my_star_balance()
+            >>> print(balance.amount)
+
+        Returns:
+            The StarAmount held by the bot.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        return parse_result(StarAmount, await self.request("getMyStarBalance"))

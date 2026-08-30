@@ -27,6 +27,7 @@ from telebot_py.bot.retry import RetryPolicy
 from telebot_py.bot.stickers import StickersMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
+from telebot_py.bot.verification import VerificationMixin
 from telebot_py.bot.webhook import WebhookMixin
 
 __all__ = [
@@ -57,5 +58,6 @@ __all__ = [
     "TelegramApiError",
     "TelebotError",
     "TopicsMixin",
+    "VerificationMixin",
     "WebhookMixin",
 ]

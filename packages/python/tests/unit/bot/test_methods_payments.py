@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 
-from telebot_py.types import Message, StarTransactions
+from telebot_py.bot.errors import TelegramApiError
+from telebot_py.types import Message, StarAmount, StarTransactions
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 PRICES = [{"label": "base", "amount": 100}]
@@ -146,3 +148,32 @@ class TestEditUserStarSubscription:
             "telegram_payment_charge_id": "charge-1",
             "is_canceled": True,
         }
+
+
+class TestGetMyStarBalance:
+    async def test_returns_typed_star_amount(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response({"amount": 1000, "nanostar_amount": 5}), seen)
+        bot = make_bot(bot_transport, step)
+        balance = await bot.get_my_star_balance()
+        assert isinstance(balance, StarAmount)
+        assert balance.amount == 1000
+        assert balance.nanostar_amount == 5
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getMyStarBalance"
+        assert sent_payload(seen[0]) == {}
+
+    async def test_omits_missing_nanostar_amount(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        step = record_into(ok_response({"amount": 0}), [])
+        bot = make_bot(bot_transport, step)
+        balance = await bot.get_my_star_balance()
+        assert balance.amount == 0
+        assert balance.nanostar_amount is None
+
+    async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
+        step = record_into(error_response(401, 401, "Unauthorized"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.get_my_star_balance()
+        assert excinfo.value.error_code == 401

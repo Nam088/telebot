@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
-from telebot_py.bot.base import MarkupLike, Requester, clean_payload, parse_result, to_wire
+from telebot_py.bot.base import (
+    MarkupLike,
+    Requester,
+    clean_payload,
+    parse_flag,
+    parse_result,
+    to_wire,
+)
 from telebot_py.types.message_extras import Story
 
 
 class StoriesGiftsMixin(Requester):
-    """Bot methods for business-account stories and gifts."""
+    """Bot methods for business-account stories, gifts, and user emoji status."""
 
     async def post_story(
         self,
@@ -52,3 +59,43 @@ class StoriesGiftsMixin(Requester):
             privacy=privacy,
         )
         return parse_result(Story, await self.request("postStory", payload))
+
+    async def set_user_emoji_status(
+        self,
+        user_id: int,
+        custom_emoji_id: str | None = None,
+        *,
+        emoji_status_expiration_date: int | None = None,
+    ) -> bool:
+        """Change the emoji status of a user who allowed the bot to do so.
+
+        Remarks:
+            The keyword names follow Telegram's wire fields (``custom_emoji_id``
+            and ``emoji_status_expiration_date``) rather than
+            python-telegram-bot's ``emoji_status_custom_emoji_id`` alias, so the
+            payload stays a direct mirror of the documented parameters.
+
+        Example:
+            >>> ok = await bot.set_user_emoji_status(42, "custom-emoji-id")
+
+        Args:
+            user_id: Unique identifier of the target user.
+            custom_emoji_id: Identifier of the custom emoji to show as the
+                status; omit to clear the emoji while keeping the duration.
+            emoji_status_expiration_date: Point in time (Unix timestamp) when
+                the emoji status will be cleared.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(
+            user_id=user_id,
+            custom_emoji_id=custom_emoji_id,
+            emoji_status_expiration_date=emoji_status_expiration_date,
+        )
+        return parse_flag(await self.request("setUserEmojiStatus", payload))

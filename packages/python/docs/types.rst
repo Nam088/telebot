@@ -64,6 +64,11 @@ telebot_py.types.message
 
 .. automodule:: telebot_py.types.message
 
+telebot_py.types.passport
+-------------------------
+
+.. automodule:: telebot_py.types.passport
+
 telebot_py.types.payments
 -------------------------
 

@@ -159,6 +159,21 @@ class StarTransaction(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class StarAmount(TelegramObject):
+    """An amount of Telegram Stars.
+
+    Returned by ``Bot.get_my_star_balance``.
+
+    Attributes:
+        amount: The integer number of Telegram Stars.
+        nanostar_amount: The number of 1/1000000000 shares of Telegram Stars.
+    """
+
+    amount: int
+    nanostar_amount: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class StarTransactions(TelegramObject):
     """The list of Telegram Stars transactions of a bot.
 

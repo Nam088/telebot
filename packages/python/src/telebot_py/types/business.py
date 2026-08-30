@@ -158,3 +158,16 @@ class ChatBoostRemoved(TelegramObject):
     boost_id: str
     remove_date: int
     source: ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class UserChatBoosts(TelegramObject):
+    """A list of boosts added to a chat by a user.
+
+    Returned by ``Bot.get_user_chat_boosts``.
+
+    Attributes:
+        boosts: The list of boosts added to the chat by the user.
+    """
+
+    boosts: list[ChatBoost]

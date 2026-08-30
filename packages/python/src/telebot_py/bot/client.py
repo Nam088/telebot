@@ -28,6 +28,7 @@ from telebot_py.bot.retry import RetryPolicy
 from telebot_py.bot.stickers import StickersMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
+from telebot_py.bot.verification import VerificationMixin
 from telebot_py.bot.webhook import WebhookMixin
 from telebot_py.types.update import Update
 from telebot_py.types.user import User
@@ -77,6 +78,7 @@ class Bot(
     StoriesGiftsMixin,
     ChatsMixin,
     ChatManagementMixin,
+    VerificationMixin,
     InviteLinksMixin,
     MembersMixin,
     TopicsMixin,
@@ -93,9 +95,9 @@ class Bot(
     unwrapping, typed error mapping, and retry with exponential backoff
     (FR-012). The transport is injectable so tests can run fully offline.
     Typed Bot API methods (messages, media, stickers, inline, payments, games,
-    stories, chats, chat management, invite links, members, topics, reactions,
-    profile, files, bulk operations, edits, webhook) are composed onto this
-    class via mixins.
+    stories, chats, chat management, verification, invite links, members,
+    topics, reactions, profile, files, bulk operations, edits, webhook) are
+    composed onto this class via mixins.
 
     Example:
         >>> bot = Bot("123456:ABC...")

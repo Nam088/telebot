@@ -22,7 +22,7 @@ from telebot_py.types.topics import (
 
 
 class ProfileMixin(Requester):
-    """Bot methods for the bot's own name, descriptions, commands, and lifecycle."""
+    """Bot methods for the bot's own name, descriptions, commands, photo, and lifecycle."""
 
     async def log_out(self) -> bool:
         """Log out from the cloud Bot API server before switching local servers.
@@ -266,3 +266,42 @@ class ProfileMixin(Requester):
         """
         payload = clean_payload(scope=to_wire(scope), language_code=language_code)
         return parse_flag(await self.request("deleteMyCommands", payload))
+
+    async def set_my_profile_photo(self, photo: str) -> bool:
+        """Set a new profile photo for the bot.
+
+        Accepts a ``file_id`` string or a URL; multipart uploads are
+        intentionally out of scope (JSON payloads only).
+
+        Example:
+            >>> ok = await bot.set_my_profile_photo("photo_file_id")
+
+        Args:
+            photo: New bot profile photo as a ``file_id`` or URL.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(photo=photo)
+        return parse_flag(await self.request("setMyProfilePhoto", payload))
+
+    async def remove_my_profile_photo(self) -> bool:
+        """Delete the bot's profile photo.
+
+        Example:
+            >>> ok = await bot.remove_my_profile_photo()
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        return parse_flag(await self.request("removeMyProfilePhoto"))

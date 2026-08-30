@@ -1,11 +1,14 @@
-"""Game Bot API methods (parity with packages/go/pkg/bot/games.go)."""
+"""Game and Telegram Passport Bot API methods (parity with games-passport.ts)."""
 
 from __future__ import annotations
+
+from collections.abc import Sequence
 
 from telebot_py.bot.base import (
     MarkupLike,
     Requester,
     clean_payload,
+    parse_flag,
     parse_list_result,
     parse_result,
     to_wire,
@@ -15,7 +18,7 @@ from telebot_py.types.message import Message
 
 
 class GamesMixin(Requester):
-    """Bot methods for sending games and managing game scores."""
+    """Bot methods for sending games, managing scores, and reporting Passport errors."""
 
     async def send_game(
         self,
@@ -152,3 +155,41 @@ class GamesMixin(Requester):
             inline_message_id=inline_message_id,
         )
         return parse_list_result(GameHighScore, await self.request("getGameHighScores", payload))
+
+    async def set_passport_data_errors(self, user_id: int, errors: Sequence[MarkupLike]) -> bool:
+        """Tell a user that some Telegram Passport elements they provided are invalid.
+
+        The user will not be able to re-submit their Passport until the errors
+        are fixed. Each entry may be a plain dict or any object exposing
+        ``to_dict``; variant-specific keys (``field_name``, ``file_hash``,
+        ``element_hash``) are only reachable through the dict shape.
+
+        Example:
+            >>> ok = await bot.set_passport_data_errors(42, [
+            ...     {
+            ...         "source": "data_field",
+            ...         "type": "personal_details",
+            ...         "field_name": "first_name",
+            ...         "hash": "abc123",
+            ...         "message": "First name is invalid",
+            ...     }
+            ... ])
+
+        Args:
+            user_id: Unique identifier of the target user.
+            errors: One error per problematic Passport element, as dicts or
+                ``to_dict`` objects.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(
+            user_id=user_id,
+            errors=[to_wire(error) for error in errors],
+        )
+        return parse_flag(await self.request("setPassportDataErrors", payload))

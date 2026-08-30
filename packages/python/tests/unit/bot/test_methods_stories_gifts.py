@@ -58,3 +58,41 @@ class TestPostStory:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.post_story("bc1", {"type": "photo"}, 3600)
         assert excinfo.value.error_code == 403
+
+
+class TestSetUserEmojiStatus:
+    async def test_sets_custom_emoji_and_expiration(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert (
+            await bot.set_user_emoji_status(
+                42, "emoji-1", emoji_status_expiration_date=1_700_000_000
+            )
+            is True
+        )
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setUserEmojiStatus"
+        assert sent_payload(seen[0]) == {
+            "user_id": 42,
+            "custom_emoji_id": "emoji-1",
+            "emoji_status_expiration_date": 1_700_000_000,
+        }
+
+    async def test_omits_unset_optional_fields(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_user_emoji_status(42) is True
+        payload = sent_payload(seen[0])
+        assert payload == {"user_id": 42}
+        assert "custom_emoji_id" not in payload
+        assert "emoji_status_expiration_date" not in payload
+
+    async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: user has no permission"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.set_user_emoji_status(42)
+        assert excinfo.value.error_code == 400

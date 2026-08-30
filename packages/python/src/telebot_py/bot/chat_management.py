@@ -372,3 +372,55 @@ class ChatManagementMixin(Requester):
             ChatAdministratorRights,
             await self.request("getMyDefaultAdministratorRights", payload),
         )
+
+    async def set_chat_sticker_set(self, chat_id: int | str, sticker_set_name: str) -> bool:
+        """Set a new group sticker set for a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must
+        have the ``can_change_info`` administrator right. Use the field
+        ``active_sticker_set_id`` returned by ``get_chat`` to test whether the
+        bot can set the sticker set.
+
+        Example:
+            >>> ok = await bot.set_chat_sticker_set(-100, "test_set_by_bot")
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target supergroup.
+            sticker_set_name: Name of the sticker set to be set as the group
+                sticker set.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(chat_id=chat_id, sticker_set_name=sticker_set_name)
+        return parse_flag(await self.request("setChatStickerSet", payload))
+
+    async def delete_chat_sticker_set(self, chat_id: int | str) -> bool:
+        """Delete the group sticker set from a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must
+        have the appropriate administrator rights.
+
+        Example:
+            >>> ok = await bot.delete_chat_sticker_set(-100)
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target supergroup.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(chat_id=chat_id)
+        return parse_flag(await self.request("deleteChatStickerSet", payload))

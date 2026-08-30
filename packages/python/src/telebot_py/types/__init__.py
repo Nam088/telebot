@@ -11,6 +11,7 @@ from telebot_py.types.business import (
     ChatBoostSourceGiveaway,
     ChatBoostSourcePremium,
     ChatBoostUpdated,
+    UserChatBoosts,
 )
 from telebot_py.types.callback_query import CallbackQuery
 from telebot_py.types.chat import (
@@ -88,6 +89,7 @@ from telebot_py.types.message_extras import (
     TextQuote,
     WebAppData,
 )
+from telebot_py.types.passport import PassportElementError
 from telebot_py.types.payments import (
     LabeledPrice,
     OrderInfo,
@@ -96,6 +98,7 @@ from telebot_py.types.payments import (
     ShippingAddress,
     ShippingOption,
     ShippingQuery,
+    StarAmount,
     StarTransaction,
     StarTransactions,
 )
@@ -193,6 +196,7 @@ __all__ = [
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "PassportElementError",
     "PhotoSize",
     "Poll",
     "PollAnswer",
@@ -212,6 +216,7 @@ __all__ = [
     "ShippingQuery",
     "Sticker",
     "StickerSet",
+    "StarAmount",
     "StarTransaction",
     "StarTransactions",
     "Story",
@@ -222,6 +227,7 @@ __all__ = [
     "Update",
     "User",
     "UserProfilePhotos",
+    "UserChatBoosts",
     "Venue",
     "Video",
     "VideoNote",

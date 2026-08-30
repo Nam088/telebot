@@ -135,6 +135,24 @@ class TestBotCommands:
         }
 
 
+class TestMyProfilePhoto:
+    async def test_set_my_profile_photo(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_my_profile_photo("photo_file_id") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setMyProfilePhoto"
+        assert sent_payload(seen[0]) == {"photo": "photo_file_id"}
+
+    async def test_remove_my_profile_photo(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.remove_my_profile_photo() is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/removeMyProfilePhoto"
+        assert sent_payload(seen[0]) == {}
+
+
 class TestProfileApiError:
     async def test_set_my_name_error(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: invalid"), [])
@@ -142,3 +160,11 @@ class TestProfileApiError:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.set_my_name(name="x")
         assert excinfo.value.error_code == 400
+
+    async def test_remove_my_profile_photo_error(
+        self, bot_transport: Any, error_response: Any
+    ) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: no photo"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError):
+            await bot.remove_my_profile_photo()

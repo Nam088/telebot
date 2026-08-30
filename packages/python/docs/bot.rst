@@ -109,6 +109,11 @@ telebot_py.bot.topics
 
 .. automodule:: telebot_py.bot.topics
 
+telebot_py.bot.verification
+---------------------------
+
+.. automodule:: telebot_py.bot.verification
+
 telebot_py.bot.webhook
 ----------------------
 
