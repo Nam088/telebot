@@ -48,36 +48,41 @@ func TestQueries_AnswerGuestQueryEmptyResult(t *testing.T) {
 	}
 }
 
-// TestQueries_SendChatJoinRequestWebApp covers sendChatJoinRequestWebApp
-// ported from packages/node/src/client/methods/business/ephemeral.ts.
+// TestQueries_SendChatJoinRequestWebApp covers sendChatJoinRequestWebApp, whose
+// docs parameters are chat_join_request_query_id and web_app_url.
 func TestQueries_SendChatJoinRequestWebApp(t *testing.T) {
 	srv := profileServer(t, "sendChatJoinRequestWebApp", map[string]any{
-		"chat_id": int64(-1001234567890),
-		"user_id": float64(123456),
-		"web_app": map[string]any{"url": "https://example.com/join"},
+		"chat_join_request_query_id": "q1",
+		"web_app_url":                "https://example.com/join",
 	}, true)
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	ok, err := b.SendChatJoinRequestWebApp(context.Background(), map[string]any{
-		"chat_id": int64(-1001234567890),
-		"user_id": 123456,
-		"web_app": map[string]any{"url": "https://example.com/join"},
+	ok, err := b.SendChatJoinRequestWebApp(context.Background(), &types.SendChatJoinRequestWebAppOptions{
+		ChatJoinRequestQueryID: "q1",
+		WebAppURL:              "https://example.com/join",
 	})
 	if err != nil || !ok {
 		t.Fatalf("SendChatJoinRequestWebApp = (%v, %v)", ok, err)
 	}
 }
 
-// TestQueries_SendChatJoinRequestWebAppEmptyPayload asserts nil options sends
-// an empty JSON object body.
-func TestQueries_SendChatJoinRequestWebAppEmptyPayload(t *testing.T) {
-	srv := emptyObjectServer(t, "sendChatJoinRequestWebApp", true)
+// TestQueries_AnswerChatJoinRequestQuery covers answerChatJoinRequestQuery
+// (Bot API 10.3+): chat_join_request_query_id + a result object, returning bool.
+func TestQueries_AnswerChatJoinRequestQuery(t *testing.T) {
+	srv := profileServer(t, "answerChatJoinRequestQuery", map[string]any{
+		"chat_join_request_query_id": "q1",
+		"result":                     map[string]any{"status": "allowed"},
+	}, true)
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	if _, err := b.SendChatJoinRequestWebApp(context.Background(), nil); err != nil {
-		t.Fatalf("SendChatJoinRequestWebApp error: %v", err)
+	ok, err := b.AnswerChatJoinRequestQuery(context.Background(), &types.AnswerChatJoinRequestQueryOptions{
+		ChatJoinRequestQueryID: "q1",
+		Result:                 map[string]any{"status": "allowed"},
+	})
+	if err != nil || !ok {
+		t.Fatalf("AnswerChatJoinRequestQuery = (%v, %v)", ok, err)
 	}
 }
 
@@ -90,7 +95,7 @@ func TestMessages_GetUserPersonalChatMessages(t *testing.T) {
 		{MessageID: 2, Chat: &types.Chat{ID: 123456}, Text: "second"},
 	}
 	srv := profileServer(t, "getUserPersonalChatMessages", map[string]any{
-		"chat_id": int64(123456),
+		"user_id": int64(123456),
 		"limit":   float64(10),
 	}, result)
 	defer srv.Close()
@@ -108,15 +113,16 @@ func TestMessages_GetUserPersonalChatMessages(t *testing.T) {
 	}
 }
 
-// TestMessages_GetUserPersonalChatMessagesOmitsLimit asserts limit is dropped
-// when the caller passes 0, reproducing node's call without a limit.
-func TestMessages_GetUserPersonalChatMessagesOmitsLimit(t *testing.T) {
-	srv := omittingServer(t, "getUserPersonalChatMessages", []string{"limit"},
-		map[string]any{"chat_id": "@channel"}, []types.Message{})
+// TestMessages_GetUserPersonalChatMessagesSendsBothRequired asserts both the
+// required user_id and limit keys are always serialized and that the old
+// chat_id key is never sent.
+func TestMessages_GetUserPersonalChatMessagesSendsBothRequired(t *testing.T) {
+	srv := omittingServer(t, "getUserPersonalChatMessages", []string{"chat_id"},
+		map[string]any{"user_id": float64(123456), "limit": float64(1)}, []types.Message{})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	msgs, err := b.GetUserPersonalChatMessages(context.Background(), "@channel", 0)
+	msgs, err := b.GetUserPersonalChatMessages(context.Background(), int64(123456), 1)
 	if err != nil {
 		t.Fatalf("GetUserPersonalChatMessages error: %v", err)
 	}
@@ -187,9 +193,9 @@ func TestInline_SavePreparedKeyboardButton(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	result, err := b.SavePreparedKeyboardButton(context.Background(), map[string]any{
-		"user_id": 123456,
-		"button":  map[string]any{"text": "Open", "type": "web_app"},
+	result, err := b.SavePreparedKeyboardButton(context.Background(), &types.SavePreparedKeyboardButtonOptions{
+		UserID: int64(123456),
+		Button: map[string]any{"text": "Open", "type": "web_app"},
 	})
 	if err != nil {
 		t.Fatalf("SavePreparedKeyboardButton error: %v", err)
@@ -200,18 +206,6 @@ func TestInline_SavePreparedKeyboardButton(t *testing.T) {
 	}
 	if got["id"] != "pk1" || got["expiration_date"] != float64(1702592000) {
 		t.Errorf("unexpected prepared button: %#v", got)
-	}
-}
-
-// TestInline_SavePreparedKeyboardButtonEmptyPayload asserts nil options sends
-// an empty JSON object body.
-func TestInline_SavePreparedKeyboardButtonEmptyPayload(t *testing.T) {
-	srv := emptyObjectServer(t, "savePreparedKeyboardButton", true)
-	defer srv.Close()
-
-	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	if _, err := b.SavePreparedKeyboardButton(context.Background(), nil); err != nil {
-		t.Fatalf("SavePreparedKeyboardButton error: %v", err)
 	}
 }
 
@@ -227,7 +221,7 @@ func TestQueries_TelegramError(t *testing.T) {
 	} else {
 		requireTelegramError(t, err, 400)
 	}
-	if ok, err := b.SendChatJoinRequestWebApp(context.Background(), map[string]any{"chat_id": int64(1)}); ok {
+	if ok, err := b.SendChatJoinRequestWebApp(context.Background(), &types.SendChatJoinRequestWebAppOptions{ChatJoinRequestQueryID: "q1", WebAppURL: "https://e.com"}); ok {
 		t.Errorf("expected false on error")
 	} else {
 		requireTelegramError(t, err, 400)
@@ -238,7 +232,7 @@ func TestQueries_TelegramError(t *testing.T) {
 	if _, err := b.GetUserProfileAudios(context.Background(), 1, 0, 0); err == nil {
 		t.Errorf("expected getUserProfileAudios to reject")
 	}
-	if _, err := b.SavePreparedKeyboardButton(context.Background(), map[string]any{"user_id": 1}); err == nil {
+	if _, err := b.SavePreparedKeyboardButton(context.Background(), &types.SavePreparedKeyboardButtonOptions{UserID: 1}); err == nil {
 		t.Errorf("expected savePreparedKeyboardButton to reject")
 	}
 }

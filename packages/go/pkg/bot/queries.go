@@ -42,9 +42,8 @@ func (b *Bot) AnswerGuestQuery(ctx context.Context, guestQueryID string, result 
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Join request Web App parameters serialized as-is, mirroring
-//     node's Record<string, unknown> argument (e.g. "chat_id", "user_id",
-//     "web_app"). Pass nil for an empty object payload.
+//   - opts: Join request Web App options carrying chat_join_request_query_id
+//     and web_app_url.
 //
 // Returns:
 //   - bool: True on success.
@@ -52,16 +51,43 @@ func (b *Bot) AnswerGuestQuery(ctx context.Context, guestQueryID string, result 
 //
 // Example:
 //
-//	ok, err := b.SendChatJoinRequestWebApp(ctx, map[string]any{
-//		"chat_id": int64(-1001234567890),
-//		"user_id": 123456,
-//		"web_app": map[string]any{"url": "https://example.com/join"},
+//	ok, err := b.SendChatJoinRequestWebApp(ctx, &types.SendChatJoinRequestWebAppOptions{
+//		ChatJoinRequestQueryID: "q1",
+//		WebAppURL:              "https://example.com/join",
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
-func (b *Bot) SendChatJoinRequestWebApp(ctx context.Context, options map[string]any) (bool, error) {
+func (b *Bot) SendChatJoinRequestWebApp(ctx context.Context, opts *types.SendChatJoinRequestWebAppOptions) (bool, error) {
 	var ok bool
-	if err := b.Request(ctx, "sendChatJoinRequestWebApp", payloadOrEmpty(options), &ok); err != nil {
+	if err := b.Request(ctx, "sendChatJoinRequestWebApp", opts, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// AnswerChatJoinRequestQuery sets the result of a chat join request query
+// (Bot API 10.3+).
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - opts: Answer options carrying chat_join_request_query_id and the result
+//     object describing the outcome of the join request interaction.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.AnswerChatJoinRequestQuery(ctx, &types.AnswerChatJoinRequestQueryOptions{
+//		ChatJoinRequestQueryID: "q1",
+//		Result:                 map[string]any{"status": "allowed"},
+//	})
+//
+// Telegram API: https://core.telegram.org/bots/api#answerchatjoinrequestquery
+func (b *Bot) AnswerChatJoinRequestQuery(ctx context.Context, opts *types.AnswerChatJoinRequestQueryOptions) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "answerChatJoinRequestQuery", opts, &ok); err != nil {
 		return false, err
 	}
 	return ok, nil

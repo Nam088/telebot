@@ -10,11 +10,9 @@ import (
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Gift parameters serialized as-is, mirroring node's
-//     Record<string, unknown> argument. Per the docs the required keys are
-//     "user_id", "month_count" (one of 3, 6 or 12) and "star_count" (1000,
-//     1500 or 2500 respectively); optional keys are "text", "text_parse_mode"
-//     and "text_entities".
+//   - opts: Gift options carrying user_id, month_count (one of 3, 6 or 12) and
+//     star_count (1000, 1500 or 2500 respectively), plus the optional text,
+//     text_parse_mode and text_entities fields.
 //
 // Returns:
 //   - bool: True on success.
@@ -22,16 +20,16 @@ import (
 //
 // Example:
 //
-//	ok, err := b.GiftPremiumSubscription(ctx, map[string]any{
-//		"user_id":     123456,
-//		"month_count": 3,
-//		"star_count":  1000,
+//	ok, err := b.GiftPremiumSubscription(ctx, &types.GiftPremiumSubscriptionOptions{
+//		UserID:     int64(123456),
+//		MonthCount: 3,
+//		StarCount:  1000,
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#giftpremiumsubscription
-func (b *Bot) GiftPremiumSubscription(ctx context.Context, options map[string]any) (bool, error) {
+func (b *Bot) GiftPremiumSubscription(ctx context.Context, opts *types.GiftPremiumSubscriptionOptions) (bool, error) {
 	var ok bool
-	if err := b.Request(ctx, "giftPremiumSubscription", options, &ok); err != nil {
+	if err := b.Request(ctx, "giftPremiumSubscription", opts, &ok); err != nil {
 		return false, err
 	}
 	return ok, nil

@@ -10,11 +10,9 @@ import (
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Paid media parameters serialized as-is, mirroring node's
-//     Record<string, unknown> argument — `chat_id`, `star_count` and the
-//     `media` array of InputPaidMedia objects, plus the optional payload,
-//     caption, notification and reply fields. Pass nil for an empty object
-//     payload.
+//   - opts: Paid media options carrying chat_id, star_count and the media
+//     array of InputPaidMedia objects, plus the optional payload, caption,
+//     notification and reply fields.
 //
 // Returns:
 //   - *types.Message: The sent Message on success.
@@ -22,17 +20,19 @@ import (
 //
 // Example:
 //
-//	msg, err := b.SendPaidMedia(ctx, map[string]any{
-//		"chat_id":            int64(123456),
-//		"star_count":         50,
-//		"media":              []map[string]any{{"type": "photo", "id": "AGACQADTAAQCAAFY"}},
-//		"paid_media_payload": "premium_content",
+//	msg, err := b.SendPaidMedia(ctx, &types.SendPaidMediaOptions{
+//		ChatID:    int64(123456),
+//		StarCount: 50,
+//		Media: []any{
+//			map[string]any{"type": "photo", "id": "AGACQADTAAQCAAFY"},
+//		},
+//		Payload: "premium_content",
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#sendpaidmedia
-func (b *Bot) SendPaidMedia(ctx context.Context, options map[string]any) (*types.Message, error) {
+func (b *Bot) SendPaidMedia(ctx context.Context, opts *types.SendPaidMediaOptions) (*types.Message, error) {
 	var msg types.Message
-	if err := b.Request(ctx, "sendPaidMedia", payloadOrEmpty(options), &msg); err != nil {
+	if err := b.Request(ctx, "sendPaidMedia", opts, &msg); err != nil {
 		return nil, err
 	}
 	return &msg, nil
@@ -42,7 +42,7 @@ func (b *Bot) SendPaidMedia(ctx context.Context, options map[string]any) (*types
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - opts: Options carrying chat_id, photo and video plus the optional
+//   - opts: Options carrying chat_id, live_photo and photo plus the optional
 //     caption, spoiler and ephemeral parameters.
 //
 // Returns:
@@ -52,10 +52,10 @@ func (b *Bot) SendPaidMedia(ctx context.Context, options map[string]any) (*types
 // Example:
 //
 //	msg, err := b.SendLivePhoto(ctx, &types.SendLivePhotoOptions{
-//		ChatID:  int64(123456),
-//		Photo:   "AGACQADTAAQCAAFYAQACAgADAgAC8gU0AAQD",
-//		Video:   "BAACAgADAgAC8gU0AxAAGoJtV52",
-//		Caption: "Sunset",
+//		ChatID:    int64(123456),
+//		Photo:     "AGACQADTAAQCAAFYAQACAgADAgAC8gU0AAQD",
+//		LivePhoto: "BAACAgADAgAC8gU0AxAAGoJtV52",
+//		Caption:   "Sunset",
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#sendlivephoto

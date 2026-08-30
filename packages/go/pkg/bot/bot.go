@@ -321,22 +321,3 @@ func (b *Bot) requestUnknown(ctx context.Context, method string, payload any) (a
 	}
 	return result, nil
 }
-
-// payloadOrEmpty normalizes an optional map payload for methods whose only
-// argument is node's `Record<string, unknown>` options object.
-//
-// node always sends a JSON body for those methods (`{}` when the caller passes
-// no fields), while a nil payload in Go produces the parameterless request
-// shape with no body at all, so the nil case is mapped to an empty map.
-//
-// Parameters:
-//   - options: Caller-supplied payload; may be nil.
-//
-// Returns:
-//   - map[string]any: options itself, or an empty map when options is nil.
-func payloadOrEmpty(options map[string]any) map[string]any {
-	if options == nil {
-		return map[string]any{}
-	}
-	return options
-}

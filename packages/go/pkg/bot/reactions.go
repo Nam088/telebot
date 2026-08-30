@@ -36,16 +36,13 @@ func (b *Bot) SetMessageReaction(ctx context.Context, opts *types.SetMessageReac
 	return ok, nil
 }
 
-// DeleteMessageReaction removes the bot's reaction from a message.
-//
-// It is implemented by calling setMessageReaction with an empty reaction list,
-// which clears the reaction previously set by the bot.
+// DeleteMessageReaction removes the reaction of a user from a message.
 //
 // Parameters:
 //   - ctx: Context for request cancellation and timeout.
-//   - chatID: Unique identifier for the target chat or username of the target channel (int64 or string).
-//   - messageID: Identifier of the target message.
-//   - isBig: Pass true to remove the reaction with a big animation.
+//   - opts: Options carrying chat_id and message_id, plus the optional
+//     user_id (whose reaction to remove) and actor_chat_id (for business
+//     connections).
 //
 // Returns:
 //   - bool: True on success.
@@ -53,35 +50,27 @@ func (b *Bot) SetMessageReaction(ctx context.Context, opts *types.SetMessageReac
 //
 // Example:
 //
-//	ok, err := bot.DeleteMessageReaction(ctx, int64(123456), 789, false)
+//	ok, err := bot.DeleteMessageReaction(ctx, &types.DeleteMessageReactionOptions{
+//		ChatID:    int64(123456),
+//		MessageID: 789,
+//	})
 //
-// Telegram API: https://core.telegram.org/bots/api#setmessagereaction
-func (b *Bot) DeleteMessageReaction(ctx context.Context, chatID any, messageID int64, isBig bool) (bool, error) {
-	payload := map[string]any{
-		"chat_id":    chatID,
-		"message_id": messageID,
-		"reaction":   []types.ReactionType{},
-	}
-	if isBig {
-		payload["is_big"] = true
-	}
+// Telegram API: https://core.telegram.org/bots/api#deletemessagereaction
+func (b *Bot) DeleteMessageReaction(ctx context.Context, opts *types.DeleteMessageReactionOptions) (bool, error) {
 	var ok bool
-	if err := b.Request(ctx, "setMessageReaction", payload, &ok); err != nil {
+	if err := b.Request(ctx, "deleteMessageReaction", opts, &ok); err != nil {
 		return false, err
 	}
 	return ok, nil
 }
 
-// DeleteAllMessageReactions clears all reactions on a message.
-//
-// It is implemented by calling setMessageReaction with an empty reaction list.
-// Currently, as of January 1, 2025, only one reaction can be set on a message,
-// so this is equivalent to removing the single reaction.
+// DeleteAllMessageReactions removes all reactions set on a message by a
+// certain user or by the bot.
 //
 // Parameters:
 //   - ctx: Context for request cancellation and timeout.
-//   - chatID: Unique identifier for the target chat or username of the target channel (int64 or string).
-//   - messageID: Identifier of the target message.
+//   - opts: Options carrying chat_id, plus the optional user_id and
+//     actor_chat_id. Note this method takes no message_id.
 //
 // Returns:
 //   - bool: True on success.
@@ -89,17 +78,14 @@ func (b *Bot) DeleteMessageReaction(ctx context.Context, chatID any, messageID i
 //
 // Example:
 //
-//	ok, err := bot.DeleteAllMessageReactions(ctx, int64(123456), 789)
+//	ok, err := bot.DeleteAllMessageReactions(ctx, &types.DeleteAllMessageReactionsOptions{
+//		ChatID: int64(123456),
+//	})
 //
-// Telegram API: https://core.telegram.org/bots/api#setmessagereaction
-func (b *Bot) DeleteAllMessageReactions(ctx context.Context, chatID any, messageID int64) (bool, error) {
-	payload := map[string]any{
-		"chat_id":    chatID,
-		"message_id": messageID,
-		"reaction":   []types.ReactionType{},
-	}
+// Telegram API: https://core.telegram.org/bots/api#deleteallmessagereactions
+func (b *Bot) DeleteAllMessageReactions(ctx context.Context, opts *types.DeleteAllMessageReactionsOptions) (bool, error) {
 	var ok bool
-	if err := b.Request(ctx, "setMessageReaction", payload, &ok); err != nil {
+	if err := b.Request(ctx, "deleteAllMessageReactions", opts, &ok); err != nil {
 		return false, err
 	}
 	return ok, nil

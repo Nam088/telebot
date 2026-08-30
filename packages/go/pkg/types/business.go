@@ -123,3 +123,29 @@ type ChatBoost struct {
 type UserChatBoosts struct {
 	Boosts []ChatBoost `json:"boosts"`
 }
+
+// AcceptedGiftTypes describes which types of gifts can be received.
+//
+// Telegram API: https://core.telegram.org/bots/api#acceptedgifttypes
+type AcceptedGiftTypes struct {
+	// Pass True to allow unlimited gifts to be received by the bot.
+	UnlimitedGifts bool `json:"unlimited_gifts"`
+	// Pass True to allow premium gifts to be received by the bot.
+	PremiumGifts bool `json:"premium_gifts"`
+	// Pass True to allow unique gifts to be received by the bot.
+	UniqueGifts bool `json:"unique_gifts"`
+	// Pass True to allow storable gifts to be received by the bot.
+	StorableGifts bool `json:"storable_gifts"`
+}
+
+// SetBusinessAccountGiftSettingsOptions represents parameters for the setBusinessAccountGiftSettings method.
+//
+// Telegram API: https://core.telegram.org/bots/api#setbusinessaccountgiftsettings
+type SetBusinessAccountGiftSettingsOptions struct {
+	// Unique identifier of the business connection.
+	BusinessConnectionID string `json:"business_connection_id"`
+	// Pass True to show the button for sending gifts on the account's profile.
+	ShowGiftButton bool `json:"show_gift_button"`
+	// Object describing the types of gifts that can be received by the business account.
+	AcceptedGiftTypes AcceptedGiftTypes `json:"accepted_gift_types"`
+}

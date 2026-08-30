@@ -58,14 +58,12 @@ func (b *Bot) LeaveChat(ctx context.Context, chatID any) (bool, error) {
 //
 // Telegram API: https://core.telegram.org/bots/api#banchatmember
 func (b *Bot) BanChatMember(ctx context.Context, chatID any, userID int64, untilDate int64, revokeMessages bool) (bool, error) {
-	payload := map[string]any{
-		"chat_id":         chatID,
-		"user_id":         userID,
-		"revoke_messages": revokeMessages,
-	}
-	if untilDate > 0 {
-		payload["until_date"] = untilDate
-	}
+	payload := struct {
+		ChatID         any   `json:"chat_id"`
+		UserID         int64 `json:"user_id"`
+		UntilDate      int64 `json:"until_date,omitempty"`
+		RevokeMessages bool  `json:"revoke_messages,omitempty"`
+	}{ChatID: chatID, UserID: userID, UntilDate: untilDate, RevokeMessages: revokeMessages}
 	var ok bool
 	if err := b.Request(ctx, "banChatMember", payload, &ok); err != nil {
 		return false, err
@@ -77,11 +75,11 @@ func (b *Bot) BanChatMember(ctx context.Context, chatID any, userID int64, until
 //
 // Telegram API: https://core.telegram.org/bots/api#unbanchatmember
 func (b *Bot) UnbanChatMember(ctx context.Context, chatID any, userID int64, onlyIfBanned bool) (bool, error) {
-	payload := map[string]any{
-		"chat_id":        chatID,
-		"user_id":        userID,
-		"only_if_banned": onlyIfBanned,
-	}
+	payload := struct {
+		ChatID       any   `json:"chat_id"`
+		UserID       int64 `json:"user_id"`
+		OnlyIfBanned bool  `json:"only_if_banned,omitempty"`
+	}{ChatID: chatID, UserID: userID, OnlyIfBanned: onlyIfBanned}
 	var ok bool
 	if err := b.Request(ctx, "unbanChatMember", payload, &ok); err != nil {
 		return false, err

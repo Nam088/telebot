@@ -161,7 +161,7 @@ type SendPollOptions struct {
 	IsAnonymous           bool                  `json:"is_anonymous,omitempty"`
 	Type                  string                `json:"type,omitempty"`
 	AllowsMultipleAnswers bool                  `json:"allows_multiple_answers,omitempty"`
-	CorrectOptionID       int                   `json:"correct_option_id,omitempty"`
+	CorrectOptionIDs      []int                 `json:"correct_option_ids,omitempty"`
 	Explanation           string                `json:"explanation,omitempty"`
 	ExplanationParseMode  string                `json:"explanation_parse_mode,omitempty"`
 	ExplanationEntities   []MessageEntity       `json:"explanation_entities,omitempty"`
@@ -214,9 +214,9 @@ type SendLivePhotoOptions struct {
 	ChatID any `json:"chat_id"`
 	// Photo to send: a file_id, an HTTP URL, or an InputFile for an upload.
 	Photo any `json:"photo"`
-	// Video to send along with the photo: a file_id, an HTTP URL, or an
-	// InputFile for an upload.
-	Video any `json:"video"`
+	// Live photo video to send: a file_id, an HTTP URL, or an InputFile for
+	// an upload.
+	LivePhoto any `json:"live_photo"`
 	// Live photo caption, 0-1024 characters after entities parsing.
 	Caption string `json:"caption,omitempty"`
 	// Mode for parsing entities in the photo caption.
@@ -242,4 +242,44 @@ type SendLivePhotoOptions struct {
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
 	// Ephemeral message parameters (Bot API 10.3+).
 	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+}
+
+// SendPaidMediaOptions represents parameters for the sendPaidMedia method.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendpaidmedia
+type SendPaidMediaOptions struct {
+	// Unique identifier of the business connection on behalf of which the
+	// message will be sent.
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	// Unique identifier for the target chat or username of the target channel.
+	ChatID any `json:"chat_id"`
+	// Unique identifier for the target message thread (topic) of the forum.
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+	// The number of Telegram Stars to be charged for the media.
+	StarCount int `json:"star_count"`
+	// The array of objects to be sent; each an InputPaidMedia object.
+	Media []any `json:"media"`
+	// Object passed to the bot after a successful purchase.
+	Payload string `json:"payload,omitempty"`
+	// Media caption, 0-1024 characters after entities parsing.
+	Caption string `json:"caption,omitempty"`
+	// Mode for parsing entities in the media caption.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// A JSON-serialized list of special entities that appear in the caption.
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// True, if the caption must be shown above the message media.
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+	// Sends the message silently.
+	DisableNotification bool `json:"disable_notification,omitempty"`
+	// Protects the contents of the sent message from forwarding and saving.
+	ProtectContent bool `json:"protect_content,omitempty"`
+	// Pass True to allow the message to ignore the channel-wide limit of
+	// simultaneously sent messages.
+	AllowPaidBroadcast bool `json:"allow_paid_broadcast,omitempty"`
+	// Object describing the suggested post parameters; only for business bots.
+	SuggestedPostParameters any `json:"suggested_post_parameters,omitempty"`
+	// Description of the message to reply to.
+	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
+	// Additional interface options for a keyboard.
+	ReplyMarkup any `json:"reply_markup,omitempty"`
 }

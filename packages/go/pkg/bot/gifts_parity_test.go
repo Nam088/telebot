@@ -148,11 +148,11 @@ func TestGifts_OwnedGiftMethods(t *testing.T) {
 				"text":        "Enjoy Premium",
 			},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.GiftPremiumSubscription(context.Background(), map[string]any{
-					"user_id":     123456,
-					"month_count": 3,
-					"star_count":  1000,
-					"text":        "Enjoy Premium",
+				return b.GiftPremiumSubscription(context.Background(), &types.GiftPremiumSubscriptionOptions{
+					UserID:     123456,
+					MonthCount: 3,
+					StarCount:  1000,
+					Text:       "Enjoy Premium",
 				})
 			},
 		},

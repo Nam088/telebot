@@ -10,11 +10,9 @@ import (
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Checklist configuration serialized as-is, mirroring node's
-//     Record<string, unknown> argument — `chat_id` plus the `checklist` object
-//     (its `items` array and `max_selected_count`), and the optional caption,
-//     notification, reply and business-connection fields. Pass nil for an empty
-//     object payload.
+//   - opts: Checklist options carrying business_connection_id, chat_id and the
+//     checklist object, plus the optional notification, effect, reply and
+//     markup fields.
 //
 // Returns:
 //   - *types.Message: The sent Message on success.
@@ -22,21 +20,22 @@ import (
 //
 // Example:
 //
-//	msg, err := b.SendChecklist(ctx, map[string]any{
-//		"chat_id": int64(123456),
-//		"checklist": map[string]any{
-//			"items": []map[string]any{
-//				{"id": "i1", "text": "Pack the bag"},
-//				{"id": "i2", "text": "Check in"},
+//	msg, err := b.SendChecklist(ctx, &types.SendChecklistOptions{
+//		BusinessConnectionID: "423778511293324225",
+//		ChatID:               int64(123456),
+//		Checklist: map[string]any{
+//			"items": []any{
+//				map[string]any{"id": "i1", "text": "Pack the bag"},
+//				map[string]any{"id": "i2", "text": "Check in"},
 //			},
 //			"max_selected_count": 1,
 //		},
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#sendchecklist
-func (b *Bot) SendChecklist(ctx context.Context, options map[string]any) (*types.Message, error) {
+func (b *Bot) SendChecklist(ctx context.Context, opts *types.SendChecklistOptions) (*types.Message, error) {
 	var msg types.Message
-	if err := b.Request(ctx, "sendChecklist", payloadOrEmpty(options), &msg); err != nil {
+	if err := b.Request(ctx, "sendChecklist", opts, &msg); err != nil {
 		return nil, err
 	}
 	return &msg, nil
@@ -46,10 +45,9 @@ func (b *Bot) SendChecklist(ctx context.Context, options map[string]any) (*types
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Checklist modification parameters serialized as-is, mirroring
-//     node's Record<string, unknown> argument (`chat_id`/`message_id` or
-//     `inline_message_id`, plus the new `checklist` object). Pass nil for an
-//     empty object payload.
+//   - opts: Checklist modification options carrying business_connection_id,
+//     chat_id, message_id and the new checklist object, plus the optional
+//     reply markup.
 //
 // Returns:
 //   - *types.Message: The edited Message, non-nil when Telegram echoes one.
@@ -59,15 +57,16 @@ func (b *Bot) SendChecklist(ctx context.Context, options map[string]any) (*types
 //
 // Example:
 //
-//	msg, ok, err := b.EditMessageChecklist(ctx, map[string]any{
-//		"chat_id":    int64(123456),
-//		"message_id": int64(7),
-//		"checklist": map[string]any{
-//			"items": []map[string]any{{"id": "i1", "text": "Pack the bag"}},
+//	msg, ok, err := b.EditMessageChecklist(ctx, &types.EditMessageChecklistOptions{
+//		BusinessConnectionID: "423778511293324225",
+//		ChatID:               int64(123456),
+//		MessageID:            int64(7),
+//		Checklist: map[string]any{
+//			"items": []any{map[string]any{"id": "i1", "text": "Pack the bag"}},
 //		},
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#editmessagechecklist
-func (b *Bot) EditMessageChecklist(ctx context.Context, options map[string]any) (*types.Message, bool, error) {
-	return b.requestMessageOrTrue(ctx, "editMessageChecklist", payloadOrEmpty(options))
+func (b *Bot) EditMessageChecklist(ctx context.Context, opts *types.EditMessageChecklistOptions) (*types.Message, bool, error) {
+	return b.requestMessageOrTrue(ctx, "editMessageChecklist", opts)
 }

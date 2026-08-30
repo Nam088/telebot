@@ -41,16 +41,19 @@ type SendInvoiceOptions struct {
 }
 
 // CreateInvoiceLinkOptions represents parameters for the createInvoiceLink method.
+//
+// Telegram API: https://core.telegram.org/bots/api#createinvoicelink
 type CreateInvoiceLinkOptions struct {
+	BusinessConnectionID      string         `json:"business_connection_id,omitempty"`
 	Title                     string         `json:"title"`
 	Description               string         `json:"description"`
 	Payload                   string         `json:"payload"`
+	ProviderToken             string         `json:"provider_token,omitempty"`
 	Currency                  string         `json:"currency"`
 	Prices                    []LabeledPrice `json:"prices"`
-	ProviderToken             string         `json:"provider_token,omitempty"`
+	SubscriptionPeriod        int            `json:"subscription_period,omitempty"`
 	MaxTipAmount              int            `json:"max_tip_amount,omitempty"`
 	SuggestedTipAmounts       []int          `json:"suggested_tip_amounts,omitempty"`
-	StartParameter            string         `json:"start_parameter,omitempty"`
 	ProviderData              string         `json:"provider_data,omitempty"`
 	PhotoURL                  string         `json:"photo_url,omitempty"`
 	PhotoSize                 int            `json:"photo_size,omitempty"`

@@ -45,14 +45,16 @@ func TestStories_PostStory(t *testing.T) {
 		"content":                map[string]any{"type": "photo", "photo": "https://example.com/pic.jpg"},
 		"active_period":          86400,
 		"caption":                "Hello",
-		"privacy":                "contacts",
 	}, types.Story{Chat: types.Chat{ID: 1}, ID: 5})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	story, err := b.PostStory(context.Background(), "bc1",
-		map[string]any{"type": "photo", "photo": "https://example.com/pic.jpg"},
-		86400, "Hello", "contacts")
+	story, err := b.PostStory(context.Background(), &types.PostStoryOptions{
+		BusinessConnectionID: "bc1",
+		Content:              map[string]any{"type": "photo", "photo": "https://example.com/pic.jpg"},
+		ActivePeriod:         86400,
+		Caption:              "Hello",
+	})
 	if err != nil {
 		t.Fatalf("PostStory error: %v", err)
 	}
@@ -70,11 +72,10 @@ func TestStories_PostStory_OmitsOptionalFields(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
 			t.Fatalf("decode body: %v", err)
 		}
-		if _, present := got["caption"]; present {
-			t.Error("caption should be omitted when empty")
-		}
-		if _, present := got["privacy"]; present {
-			t.Error("privacy should be omitted when empty")
+		for _, k := range []string{"caption", "areas", "post_to_chat_page", "protect_content", "privacy"} {
+			if _, present := got[k]; present {
+				t.Errorf("%q should be omitted when unset", k)
+			}
 		}
 		if got["business_connection_id"] != "bc1" {
 			t.Errorf("unexpected business_connection_id: %v", got["business_connection_id"])
@@ -87,9 +88,11 @@ func TestStories_PostStory_OmitsOptionalFields(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	story, err := b.PostStory(context.Background(), "bc1",
-		map[string]any{"type": "photo", "photo": "https://example.com/pic.jpg"},
-		3600, "", "")
+	story, err := b.PostStory(context.Background(), &types.PostStoryOptions{
+		BusinessConnectionID: "bc1",
+		Content:              map[string]any{"type": "photo", "photo": "https://example.com/pic.jpg"},
+		ActivePeriod:         3600,
+	})
 	if err != nil {
 		t.Fatalf("PostStory error: %v", err)
 	}
@@ -103,7 +106,11 @@ func TestStories_PostStory_TelegramError(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	story, err := b.PostStory(context.Background(), "bc1", map[string]any{"type": "photo"}, 3600, "", "")
+	story, err := b.PostStory(context.Background(), &types.PostStoryOptions{
+		BusinessConnectionID: "bc1",
+		Content:              map[string]any{"type": "photo"},
+		ActivePeriod:         3600,
+	})
 	if story != nil {
 		t.Errorf("expected nil story, got %+v", story)
 	}

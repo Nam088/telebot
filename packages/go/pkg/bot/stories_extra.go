@@ -78,9 +78,9 @@ func (b *Bot) DeleteStory(ctx context.Context, businessConnectionID string, stor
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - options: Repost parameters serialized as-is, mirroring node's
-//     Record<string, unknown> argument (e.g. "chat_id", "story_id",
-//     "business_connection_id"). Pass nil for an empty object payload.
+//   - opts: Repost options carrying business_connection_id, from_chat_id,
+//     from_story_id and active_period, plus the optional post_to_chat_page and
+//     protect_content fields.
 //
 // Returns:
 //   - any: The raw result returned by Telegram — node types it as unknown, so
@@ -89,13 +89,14 @@ func (b *Bot) DeleteStory(ctx context.Context, businessConnectionID string, stor
 //
 // Example:
 //
-//	result, err := b.RepostStory(ctx, map[string]any{
-//		"chat_id":  int64(-1001234567890),
-//		"story_id": int64(42),
-//		"privacy":  "everybody",
+//	result, err := b.RepostStory(ctx, &types.RepostStoryOptions{
+//		BusinessConnectionID: "423778511293324225",
+//		FromChatID:           int64(-1001234567890),
+//		FromStoryID:          42,
+//		ActivePeriod:         86400,
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#repoststory
-func (b *Bot) RepostStory(ctx context.Context, options map[string]any) (any, error) {
-	return b.requestUnknown(ctx, "repostStory", payloadOrEmpty(options))
+func (b *Bot) RepostStory(ctx context.Context, opts *types.RepostStoryOptions) (any, error) {
+	return b.requestUnknown(ctx, "repostStory", opts)
 }

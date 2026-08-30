@@ -179,3 +179,21 @@ type UniqueGiftInfo struct {
 	// Point in time (Unix timestamp) when the gift can be transferred.
 	NextTransferDate int64 `json:"next_transfer_date,omitempty"`
 }
+
+// GiftPremiumSubscriptionOptions represents parameters for the giftPremiumSubscription method.
+//
+// Telegram API: https://core.telegram.org/bots/api#giftpremiumsubscription
+type GiftPremiumSubscriptionOptions struct {
+	// Unique identifier of the target user.
+	UserID int64 `json:"user_id"`
+	// Number of months the subscription will be gifted; must be one of 3, 6, 12.
+	MonthCount int `json:"month_count"`
+	// Number of Telegram Stars to be charged; must be 1000, 1500 or 2500 for 3, 6, 12 months respectively.
+	StarCount int `json:"star_count"`
+	// Text shown to the recipient alongside the payment receipt; 0-255 characters after entities parsing.
+	Text string `json:"text,omitempty"`
+	// Mode for parsing entities in the text.
+	TextParseMode string `json:"text_parse_mode,omitempty"`
+	// A JSON-serialized list of special entities that appear in the text.
+	TextEntities []MessageEntity `json:"text_entities,omitempty"`
+}

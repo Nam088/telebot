@@ -35,9 +35,9 @@ func (b *Bot) SetWebhook(ctx context.Context, url string, secretToken string, ma
 //
 // Telegram API: https://core.telegram.org/bots/api#deletewebhook
 func (b *Bot) DeleteWebhook(ctx context.Context, dropPendingUpdates bool) (bool, error) {
-	payload := map[string]any{
-		"drop_pending_updates": dropPendingUpdates,
-	}
+	payload := struct {
+		DropPendingUpdates bool `json:"drop_pending_updates,omitempty"`
+	}{DropPendingUpdates: dropPendingUpdates}
 	var ok bool
 	if err := b.Request(ctx, "deleteWebhook", payload, &ok); err != nil {
 		return false, err

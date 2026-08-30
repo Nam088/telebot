@@ -170,12 +170,23 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 			name: "SetBusinessAccountGiftSettings",
 			wire: "setBusinessAccountGiftSettings",
 			payload: map[string]any{
-				"business_connection_id":    "bc1",
-				"is_storable_gifts_allowed": true,
+				"business_connection_id": "bc1",
+				"show_gift_button":       true,
+				"accepted_gift_types": map[string]any{
+					"unlimited_gifts": false,
+					"premium_gifts":   true,
+					"unique_gifts":    false,
+					"storable_gifts":  true,
+				},
 			},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.SetBusinessAccountGiftSettings(context.Background(), "bc1", map[string]any{
-					"is_storable_gifts_allowed": true,
+				return b.SetBusinessAccountGiftSettings(context.Background(), &types.SetBusinessAccountGiftSettingsOptions{
+					BusinessConnectionID: "bc1",
+					ShowGiftButton:       true,
+					AcceptedGiftTypes: types.AcceptedGiftTypes{
+						PremiumGifts:  true,
+						StorableGifts: true,
+					},
 				})
 			},
 		},

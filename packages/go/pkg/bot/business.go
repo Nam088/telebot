@@ -274,9 +274,8 @@ func (b *Bot) SetBusinessAccountBio(ctx context.Context, businessConnectionID, b
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - businessConnectionID: Unique identifier of the business connection.
-//   - options: Additional gift settings serialized as-is, mirroring node's
-//     Record<string, unknown> options argument (e.g. "is_storable_gifts_allowed").
+//   - opts: Gift settings options carrying business_connection_id,
+//     show_gift_button and the accepted_gift_types object.
 //
 // Returns:
 //   - bool: True on success.
@@ -284,15 +283,21 @@ func (b *Bot) SetBusinessAccountBio(ctx context.Context, businessConnectionID, b
 //
 // Example:
 //
-//	ok, err := b.SetBusinessAccountGiftSettings(ctx, "423778511293324225", map[string]any{
-//		"is_storable_gifts_allowed": true,
+//	ok, err := b.SetBusinessAccountGiftSettings(ctx, &types.SetBusinessAccountGiftSettingsOptions{
+//		BusinessConnectionID: "423778511293324225",
+//		ShowGiftButton:       true,
+//		AcceptedGiftTypes: types.AcceptedGiftTypes{
+//			UnlimitedGifts: true,
+//			PremiumGifts:   true,
+//			UniqueGifts:    false,
+//			StorableGifts:  true,
+//		},
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#setbusinessaccountgiftsettings
-func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, businessConnectionID string, options map[string]any) (bool, error) {
-	payload := mergePayload(map[string]any{"business_connection_id": businessConnectionID}, options)
+func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, opts *types.SetBusinessAccountGiftSettingsOptions) (bool, error) {
 	var ok bool
-	if err := b.Request(ctx, "setBusinessAccountGiftSettings", payload, &ok); err != nil {
+	if err := b.Request(ctx, "setBusinessAccountGiftSettings", opts, &ok); err != nil {
 		return false, err
 	}
 	return ok, nil

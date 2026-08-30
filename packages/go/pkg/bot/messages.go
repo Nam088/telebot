@@ -188,10 +188,9 @@ func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bo
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - chatID: Unique identifier of the target chat or username of the target
-//     channel.
-//   - limit: Maximum number of messages to return; pass 0 to omit the field,
-//     reproducing node's call with an undefined limit.
+//   - userID: Identifier of the target user whose personal chat messages are
+//     retrieved (required).
+//   - limit: The maximum number of messages to be returned, 1-100 (required).
 //
 // Returns:
 //   - []types.Message: The retrieved messages, exactly as node types the
@@ -204,11 +203,8 @@ func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bo
 //	fmt.Printf("%d personal chat messages\n", len(msgs))
 //
 // Telegram API: https://core.telegram.org/bots/api#getuserpersonalchatmessages
-func (b *Bot) GetUserPersonalChatMessages(ctx context.Context, chatID any, limit int) ([]types.Message, error) {
-	payload := map[string]any{"chat_id": chatID}
-	if limit > 0 {
-		payload["limit"] = limit
-	}
+func (b *Bot) GetUserPersonalChatMessages(ctx context.Context, userID int64, limit int) ([]types.Message, error) {
+	payload := map[string]any{"user_id": userID, "limit": limit}
 	var msgs []types.Message
 	if err := b.Request(ctx, "getUserPersonalChatMessages", payload, &msgs); err != nil {
 		return nil, err

@@ -45,3 +45,13 @@ type SavePreparedInlineMessageOptions struct {
 	AllowGroupChats   bool              `json:"allow_group_chats,omitempty"`
 	AllowChannelChats bool              `json:"allow_channel_chats,omitempty"`
 }
+
+// SavePreparedKeyboardButtonOptions represents parameters for the savePreparedKeyboardButton method.
+//
+// Telegram API: https://core.telegram.org/bots/api#savepreparedkeyboardbutton
+type SavePreparedKeyboardButtonOptions struct {
+	// Unique identifier of the target user that will be able to use the button.
+	UserID int64 `json:"user_id"`
+	// A KeyboardButton object describing the button to save.
+	Button any `json:"button"`
+}

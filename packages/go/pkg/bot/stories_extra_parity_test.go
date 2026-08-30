@@ -149,23 +149,26 @@ func TestStoriesExtra_DeleteStory(t *testing.T) {
 	}
 }
 
-// TestStoriesExtra_RepostStory covers repostStory, whose options record and
-// unknown result node passes through unchanged.
+// TestStoriesExtra_RepostStory covers repostStory with its docs params:
+// business_connection_id, from_chat_id, from_story_id, active_period and the
+// optional post_to_chat_page flag.
 func TestStoriesExtra_RepostStory(t *testing.T) {
 	srv := profileServer(t, "repostStory", map[string]any{
 		"business_connection_id": "bc1",
-		"chat_id":                int64(-1001234567890),
-		"story_id":               int64(42),
-		"privacy":                "everybody",
+		"from_chat_id":           int64(-1001234567890),
+		"from_story_id":          float64(42),
+		"active_period":          float64(86400),
+		"post_to_chat_page":      true,
 	}, true)
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	result, err := b.RepostStory(context.Background(), map[string]any{
-		"business_connection_id": "bc1",
-		"chat_id":                int64(-1001234567890),
-		"story_id":               int64(42),
-		"privacy":                "everybody",
+	result, err := b.RepostStory(context.Background(), &types.RepostStoryOptions{
+		BusinessConnectionID: "bc1",
+		FromChatID:           int64(-1001234567890),
+		FromStoryID:          42,
+		ActivePeriod:         86400,
+		PostToChatPage:       true,
 	})
 	if err != nil {
 		t.Fatalf("RepostStory error: %v", err)
@@ -178,12 +181,21 @@ func TestStoriesExtra_RepostStory(t *testing.T) {
 // TestStoriesExtra_RepostStoryObjectResult asserts an object-shaped result also
 // decodes, which a bool-typed return could not.
 func TestStoriesExtra_RepostStoryObjectResult(t *testing.T) {
-	srv := profileServer(t, "repostStory", map[string]any{"chat_id": "@channel"},
-		map[string]any{"chat": map[string]any{"id": float64(1), "type": "private"}, "id": float64(9)})
+	srv := profileServer(t, "repostStory", map[string]any{
+		"business_connection_id": "bc1",
+		"from_chat_id":           "@channel",
+		"from_story_id":          float64(1),
+		"active_period":          float64(3600),
+	}, map[string]any{"chat": map[string]any{"id": float64(1), "type": "private"}, "id": float64(9)})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	result, err := b.RepostStory(context.Background(), map[string]any{"chat_id": "@channel"})
+	result, err := b.RepostStory(context.Background(), &types.RepostStoryOptions{
+		BusinessConnectionID: "bc1",
+		FromChatID:           "@channel",
+		FromStoryID:          1,
+		ActivePeriod:         3600,
+	})
 	if err != nil {
 		t.Fatalf("RepostStory error: %v", err)
 	}
@@ -193,18 +205,6 @@ func TestStoriesExtra_RepostStoryObjectResult(t *testing.T) {
 	}
 	if story["id"] != float64(9) {
 		t.Errorf("unexpected story id: %v", story["id"])
-	}
-}
-
-// TestStoriesExtra_RepostStoryEmptyPayload asserts nil options still sends a
-// JSON object body, matching node's repostStory({}).
-func TestStoriesExtra_RepostStoryEmptyPayload(t *testing.T) {
-	srv := emptyObjectServer(t, "repostStory", true)
-	defer srv.Close()
-
-	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	if _, err := b.RepostStory(context.Background(), nil); err != nil {
-		t.Fatalf("RepostStory error: %v", err)
 	}
 }
 
@@ -270,7 +270,7 @@ func TestStoriesExtra_TelegramError(t *testing.T) {
 	} else {
 		requireTelegramError(t, err, 403)
 	}
-	if _, err := b.RepostStory(context.Background(), map[string]any{"chat_id": int64(1)}); err == nil {
+	if _, err := b.RepostStory(context.Background(), &types.RepostStoryOptions{BusinessConnectionID: "bc1", FromChatID: int64(1), FromStoryID: 1, ActivePeriod: 3600}); err == nil {
 		t.Errorf("expected repostStory to reject")
 	}
 	if _, err := b.ApproveSuggestedPost(context.Background(), int64(1), 1); err == nil {

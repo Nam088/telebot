@@ -8,16 +8,16 @@ import (
 	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
-// TestPaidMedia_SendPaidMedia covers sendPaidMedia ported from
-// packages/node/src/client/methods/messages/send-media.ts: node passes the
-// caller's record straight through, so the snake_case keys must reach the wire
-// untouched and the Message result must decode.
+// TestPaidMedia_SendPaidMedia covers sendPaidMedia with the docs field set: the
+// required chat_id/star_count/media triple plus the optional payload (the docs
+// wire name is "payload", not "paid_media_payload"), caption and notification
+// fields.
 func TestPaidMedia_SendPaidMedia(t *testing.T) {
 	srv := profileServer(t, "sendPaidMedia", map[string]any{
 		"chat_id":              int64(123456),
 		"star_count":           50,
 		"media":                []map[string]any{{"type": "photo", "id": "AGACQADTAAQCAAFY"}},
-		"paid_media_payload":   "premium_content",
+		"payload":              "premium_content",
 		"caption":              "Behind the scenes",
 		"parse_mode":           "Markdown",
 		"disable_notification": true,
@@ -25,14 +25,14 @@ func TestPaidMedia_SendPaidMedia(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	msg, err := b.SendPaidMedia(context.Background(), map[string]any{
-		"chat_id":              int64(123456),
-		"star_count":           50,
-		"media":                []map[string]any{{"type": "photo", "id": "AGACQADTAAQCAAFY"}},
-		"paid_media_payload":   "premium_content",
-		"caption":              "Behind the scenes",
-		"parse_mode":           "Markdown",
-		"disable_notification": true,
+	msg, err := b.SendPaidMedia(context.Background(), &types.SendPaidMediaOptions{
+		ChatID:              int64(123456),
+		StarCount:           50,
+		Media:               []any{map[string]any{"type": "photo", "id": "AGACQADTAAQCAAFY"}},
+		Payload:             "premium_content",
+		Caption:             "Behind the scenes",
+		ParseMode:           "Markdown",
+		DisableNotification: true,
 	})
 	if err != nil {
 		t.Fatalf("SendPaidMedia error: %v", err)
@@ -45,26 +45,42 @@ func TestPaidMedia_SendPaidMedia(t *testing.T) {
 	}
 }
 
-// TestPaidMedia_SendPaidMediaEmptyPayload asserts nil options still sends a
-// JSON object body instead of the parameterless request shape.
-func TestPaidMedia_SendPaidMediaEmptyPayload(t *testing.T) {
-	srv := emptyObjectServer(t, "sendPaidMedia", types.Message{MessageID: 1, Chat: &types.Chat{ID: 1}})
+// TestPaidMedia_SendPaidMediaOmitsOptionalFields asserts only the required
+// chat_id/star_count/media keys are serialized for a minimal call.
+func TestPaidMedia_SendPaidMediaOmitsOptionalFields(t *testing.T) {
+	srv := omittingServer(t, "sendPaidMedia",
+		[]string{
+			"business_connection_id", "message_thread_id", "payload", "caption",
+			"parse_mode", "caption_entities", "show_caption_above_media",
+			"disable_notification", "protect_content", "allow_paid_broadcast",
+			"suggested_post_parameters", "reply_parameters", "reply_markup",
+		},
+		map[string]any{
+			"chat_id":    int64(123456),
+			"star_count": 10,
+			"media":      []map[string]any{{"type": "photo", "id": "AGACQ"}},
+		}, types.Message{MessageID: 1, Chat: &types.Chat{ID: 123456}})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	if _, err := b.SendPaidMedia(context.Background(), nil); err != nil {
+	if _, err := b.SendPaidMedia(context.Background(), &types.SendPaidMediaOptions{
+		ChatID:    int64(123456),
+		StarCount: 10,
+		Media:     []any{map[string]any{"type": "photo", "id": "AGACQ"}},
+	}); err != nil {
 		t.Fatalf("SendPaidMedia error: %v", err)
 	}
 }
 
 // TestPaidMedia_SendLivePhoto covers sendLivePhoto with node's full
-// SendLivePhotoOptions field set, including the ephemeral parameters object.
+// SendLivePhotoOptions field set, including the required live_photo and the
+// ephemeral parameters object.
 func TestPaidMedia_SendLivePhoto(t *testing.T) {
 	srv := profileServer(t, "sendLivePhoto", map[string]any{
 		"business_connection_id":       "bc1",
 		"chat_id":                      int64(123456),
 		"photo":                        "AGACQADTAAQCAAFYAQACAgADAgAC8gU0AAQD",
-		"video":                        "BAACAgADAgAC8gU0AxAAGoJtV5",
+		"live_photo":                   "BAACAgADAgAC8gU0AxAAGoJtV5",
 		"caption":                      "Sunset",
 		"parse_mode":                   "HTML",
 		"caption_entities":             []map[string]any{{"offset": 0, "length": 6, "type": "bold"}},
@@ -84,7 +100,7 @@ func TestPaidMedia_SendLivePhoto(t *testing.T) {
 		BusinessConnectionID:  "bc1",
 		ChatID:                int64(123456),
 		Photo:                 "AGACQADTAAQCAAFYAQACAgADAgAC8gU0AAQD",
-		Video:                 "BAACAgADAgAC8gU0AxAAGoJtV5",
+		LivePhoto:             "BAACAgADAgAC8gU0AxAAGoJtV5",
 		Caption:               "Sunset",
 		ParseMode:             "HTML",
 		CaptionEntities:       []types.MessageEntity{{Offset: 0, Length: 6, Type: "bold"}},
@@ -110,7 +126,7 @@ func TestPaidMedia_SendLivePhoto(t *testing.T) {
 }
 
 // TestPaidMedia_SendLivePhotoOmitsOptionalFields asserts only the required
-// chat_id/photo/video triple is serialized for a minimal call.
+// chat_id/photo/live_photo triple is serialized for a minimal call.
 func TestPaidMedia_SendLivePhotoOmitsOptionalFields(t *testing.T) {
 	srv := omittingServer(t, "sendLivePhoto",
 		[]string{
@@ -120,17 +136,17 @@ func TestPaidMedia_SendLivePhotoOmitsOptionalFields(t *testing.T) {
 			"ephemeral_message_parameters",
 		},
 		map[string]any{
-			"chat_id": int64(123456),
-			"photo":   "PHOTO_ID",
-			"video":   "VIDEO_ID",
+			"chat_id":    int64(123456),
+			"photo":      "PHOTO_ID",
+			"live_photo": "LIVE_PHOTO_ID",
 		}, types.Message{MessageID: 62, Chat: &types.Chat{ID: 123456}})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
 	if _, err := b.SendLivePhoto(context.Background(), &types.SendLivePhotoOptions{
-		ChatID: int64(123456),
-		Photo:  "PHOTO_ID",
-		Video:  "VIDEO_ID",
+		ChatID:    int64(123456),
+		Photo:     "PHOTO_ID",
+		LivePhoto: "LIVE_PHOTO_ID",
 	}); err != nil {
 		t.Fatalf("SendLivePhoto error: %v", err)
 	}
@@ -143,15 +159,15 @@ func TestPaidMedia_TelegramError(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	if msg, err := b.SendPaidMedia(context.Background(), map[string]any{"chat_id": int64(1)}); msg != nil {
+	if msg, err := b.SendPaidMedia(context.Background(), &types.SendPaidMediaOptions{ChatID: int64(1)}); msg != nil {
 		t.Errorf("expected nil message on error, got %+v", msg)
 	} else {
 		requireTelegramError(t, err, 400)
 	}
 	if _, err := b.SendLivePhoto(context.Background(), &types.SendLivePhotoOptions{
-		ChatID: int64(1),
-		Photo:  "p",
-		Video:  "v",
+		ChatID:    int64(1),
+		Photo:     "p",
+		LivePhoto: "v",
 	}); err == nil {
 		t.Errorf("expected sendLivePhoto to reject")
 	}

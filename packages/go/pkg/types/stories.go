@@ -151,3 +151,54 @@ type InputStoryContentVideo struct {
 }
 
 func (InputStoryContentVideo) inputStoryContent() {}
+
+// PostStoryOptions represents parameters for the postStory method.
+//
+// Telegram API: https://core.telegram.org/bots/api#poststory
+type PostStoryOptions struct {
+	// Unique identifier of the business connection on behalf of which the
+	// story will be posted.
+	BusinessConnectionID string `json:"business_connection_id"`
+	// Story media to send: an InputStoryContentPhoto, an
+	// InputStoryContentVideo, or an equivalent raw object literal.
+	Content any `json:"content"`
+	// Period after which the story is moved to the archive, in seconds; must
+	// be one of 6 * 3600, 12 * 3600, 24 * 3600, or 48 * 3600.
+	ActivePeriod int `json:"active_period"`
+	// Story caption, 0-1024 characters after entities parsing.
+	Caption string `json:"caption,omitempty"`
+	// Mode for parsing entities in the story caption.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// A JSON-serialized list of special entities that appear in the story
+	// caption; it can be specified instead of parse_mode.
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// A JSON-serialized list of story areas to add.
+	Areas []StoryArea `json:"areas,omitempty"`
+	// Pass True if the story will also be posted to the chat of the business
+	// account owning the connection.
+	PostToChatPage bool `json:"post_to_chat_page,omitempty"`
+	// Pass True if the content of the story must be protected from forwarding
+	// and saving.
+	ProtectContent bool `json:"protect_content,omitempty"`
+}
+
+// RepostStoryOptions represents parameters for the repostStory method.
+//
+// Telegram API: https://core.telegram.org/bots/api#repoststory
+type RepostStoryOptions struct {
+	// Unique identifier of the business connection on behalf of which the
+	// story will be reposted.
+	BusinessConnectionID string `json:"business_connection_id"`
+	// Unique identifier of the other chat which posted the story to repost.
+	FromChatID any `json:"from_chat_id"`
+	// Identifier of the story to repost.
+	FromStoryID int `json:"from_story_id"`
+	// Period after which the story is moved to the archive, in seconds.
+	ActivePeriod int `json:"active_period"`
+	// Pass True if the story will also be posted to the chat of the business
+	// account owning the connection.
+	PostToChatPage bool `json:"post_to_chat_page,omitempty"`
+	// Pass True if the content of the story must be protected from forwarding
+	// and saving.
+	ProtectContent bool `json:"protect_content,omitempty"`
+}
