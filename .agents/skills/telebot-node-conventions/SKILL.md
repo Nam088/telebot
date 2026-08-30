@@ -99,3 +99,9 @@ Before considering any Node.js feature, bug fix, or refactor complete, execute:
 5. `npm run test:node` → 100% test suites pass (Vitest).
 6. `npm run test:coverage` → Ensure line coverage stays **>90%**.
 7. `npm run docs` → TypeDoc generated with **0 errors and 0 warnings**.
+
+---
+
+## 8. Version & Release Parity (node = go = python)
+
+All three frameworks share ONE version (currently `1.4.0`), and Node drives it: semantic-release bumps `packages/node/package.json` on pushes to `main` (npm `telebot-ts`, tag `vX.Y.Z`), and `.github/workflows/release-pipeline.yml` mirrors the same version as `packages/go/vX.Y.Z` and `packages/python/vX.Y.Z`. Never bump the node version by hand, never hand-push the mirrored tags, and keep commit scopes node-specific (`feat(ext)`, `fix(bot)`, ...) so git-cliff/semantic-release analysis stays correct. See AGENTS.md "Versioning & release parity".
