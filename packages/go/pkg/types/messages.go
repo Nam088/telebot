@@ -42,15 +42,18 @@ type Document struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#video
 type Video struct {
-	FileID       string     `json:"file_id"`
-	FileUniqueID string     `json:"file_unique_id"`
-	Width        int        `json:"width"`
-	Height       int        `json:"height"`
-	Duration     int        `json:"duration"`
-	Thumbnail    *PhotoSize `json:"thumbnail,omitempty"`
-	FileName     string     `json:"file_name,omitempty"`
-	MimeType     string     `json:"mime_type,omitempty"`
-	FileSize     int64      `json:"file_size,omitempty"`
+	FileID         string         `json:"file_id"`
+	FileUniqueID   string         `json:"file_unique_id"`
+	Width          int            `json:"width"`
+	Height         int            `json:"height"`
+	Duration       int            `json:"duration"`
+	Thumbnail      *PhotoSize     `json:"thumbnail,omitempty"`
+	FileName       string         `json:"file_name,omitempty"`
+	MimeType       string         `json:"mime_type,omitempty"`
+	FileSize       int64          `json:"file_size,omitempty"`
+	Cover          []PhotoSize    `json:"cover,omitempty"`
+	Qualities      []VideoQuality `json:"qualities,omitempty"`
+	StartTimestamp int64          `json:"start_timestamp,omitempty"`
 }
 
 // Animation represents an animation file (GIF or H.264 video).
@@ -131,34 +134,53 @@ type Venue struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#polloption
 type PollOption struct {
-	Text       string `json:"text"`
-	VoterCount int    `json:"voter_count"`
+	Text         string          `json:"text"`
+	VoterCount   int             `json:"voter_count"`
+	AddedByChat  *Chat           `json:"added_by_chat,omitempty"`
+	AddedByUser  *User           `json:"added_by_user,omitempty"`
+	AdditionDate int64           `json:"addition_date,omitempty"`
+	Media        *PollMedia      `json:"media,omitempty"`
+	PersistentID string          `json:"persistent_id"`
+	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
 // Poll contains information about a poll.
 //
 // Telegram API: https://core.telegram.org/bots/api#poll
 type Poll struct {
-	ID                    string       `json:"id"`
-	Question              string       `json:"question"`
-	Options               []PollOption `json:"options"`
-	TotalVoterCount       int          `json:"total_voter_count"`
-	IsClosed              bool         `json:"is_closed"`
-	IsAnonymous           bool         `json:"is_anonymous"`
-	Type                  string       `json:"type"`
-	AllowsMultipleAnswers bool         `json:"allows_multiple_answers"`
-	CorrectOptionID       int          `json:"correct_option_id,omitempty"`
-	Explanation           string       `json:"explanation,omitempty"`
+	ID                    string          `json:"id"`
+	Question              string          `json:"question"`
+	Options               []PollOption    `json:"options"`
+	TotalVoterCount       int             `json:"total_voter_count"`
+	IsClosed              bool            `json:"is_closed"`
+	IsAnonymous           bool            `json:"is_anonymous"`
+	Type                  string          `json:"type"`
+	AllowsMultipleAnswers bool            `json:"allows_multiple_answers"`
+	CorrectOptionID       int             `json:"correct_option_id,omitempty"`
+	Explanation           string          `json:"explanation,omitempty"`
+	AllowsRevoting        bool            `json:"allows_revoting"`
+	CloseDate             int64           `json:"close_date,omitempty"`
+	CorrectOptionIDs      []int64         `json:"correct_option_ids,omitempty"`
+	CountryCodes          []string        `json:"country_codes,omitempty"`
+	Description           string          `json:"description,omitempty"`
+	DescriptionEntities   []MessageEntity `json:"description_entities,omitempty"`
+	ExplanationEntities   []MessageEntity `json:"explanation_entities,omitempty"`
+	ExplanationMedia      *PollMedia      `json:"explanation_media,omitempty"`
+	Media                 *PollMedia      `json:"media,omitempty"`
+	MembersOnly           bool            `json:"members_only"`
+	OpenPeriod            int64           `json:"open_period,omitempty"`
+	QuestionEntities      []MessageEntity `json:"question_entities,omitempty"`
 }
 
 // PollAnswer represents a change of answer by a user in a non-anonymous poll.
 //
 // Telegram API: https://core.telegram.org/bots/api#pollanswer
 type PollAnswer struct {
-	PollID    string `json:"poll_id"`
-	VoterChat *Chat  `json:"voter_chat,omitempty"`
-	User      *User  `json:"user,omitempty"`
-	OptionIDs []int  `json:"option_ids"`
+	PollID              string   `json:"poll_id"`
+	VoterChat           *Chat    `json:"voter_chat,omitempty"`
+	User                *User    `json:"user,omitempty"`
+	OptionIDs           []int    `json:"option_ids"`
+	OptionPersistentIDs []string `json:"option_persistent_ids"`
 }
 
 // Dice represents an animated emoji that displays a random value.

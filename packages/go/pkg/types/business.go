@@ -75,10 +75,12 @@ type Story struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#game
 type Game struct {
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Photo       []PhotoSize `json:"photo"`
-	Text        string      `json:"text,omitempty"`
+	Title        string          `json:"title"`
+	Description  string          `json:"description"`
+	Photo        []PhotoSize     `json:"photo"`
+	Text         string          `json:"text,omitempty"`
+	Animation    *Animation      `json:"animation,omitempty"`
+	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
 // GameHighScore represents one row of the high scores table for a game.

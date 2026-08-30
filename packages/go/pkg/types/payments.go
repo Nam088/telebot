@@ -23,12 +23,16 @@ type Invoice struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#successfulpayment
 type SuccessfulPayment struct {
-	Currency                string `json:"currency"`
-	TotalAmount             int    `json:"total_amount"`
-	InvoicePayload          string `json:"invoice_payload"`
-	ShippingOptionID        string `json:"shipping_option_id,omitempty"`
-	TelegramPaymentChargeID string `json:"telegram_payment_charge_id"`
-	ProviderPaymentChargeID string `json:"provider_payment_charge_id"`
+	Currency                   string     `json:"currency"`
+	TotalAmount                int        `json:"total_amount"`
+	InvoicePayload             string     `json:"invoice_payload"`
+	ShippingOptionID           string     `json:"shipping_option_id,omitempty"`
+	TelegramPaymentChargeID    string     `json:"telegram_payment_charge_id"`
+	ProviderPaymentChargeID    string     `json:"provider_payment_charge_id"`
+	IsFirstRecurring           bool       `json:"is_first_recurring,omitempty"`
+	IsRecurring                bool       `json:"is_recurring,omitempty"`
+	OrderInfo                  *OrderInfo `json:"order_info,omitempty"`
+	SubscriptionExpirationDate int64      `json:"subscription_expiration_date,omitempty"`
 }
 
 // StarTransactions represents the list of Telegram Stars transactions.
@@ -42,11 +46,12 @@ type StarTransactions struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#startransaction
 type StarTransaction struct {
-	ID       string `json:"id"`
-	Amount   int    `json:"amount"`
-	Date     int64  `json:"date"`
-	Source   any    `json:"source,omitempty"`
-	Receiver any    `json:"receiver,omitempty"`
+	ID             string `json:"id"`
+	Amount         int    `json:"amount"`
+	Date           int64  `json:"date"`
+	Source         any    `json:"source,omitempty"`
+	Receiver       any    `json:"receiver,omitempty"`
+	NanostarAmount int64  `json:"nanostar_amount,omitempty"`
 }
 
 // StarAmount represents an amount of Telegram Stars.

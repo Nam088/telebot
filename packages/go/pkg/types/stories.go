@@ -47,7 +47,9 @@ type StoryAreaTypeLocation struct {
 	// Address of the location; node types it as unknown, so Go passes the raw
 	// LocationAddress object through. Requires a story privacy context that
 	// allows addresses.
-	Address any `json:"address,omitempty"`
+	Address   any     `json:"address,omitempty"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 func (StoryAreaTypeLocation) storyAreaType() {}
@@ -91,7 +93,8 @@ type StoryAreaTypeWeather struct {
 	// Emoji describing the weather.
 	Emoji string `json:"emoji"`
 	// Background color of the displayed weather info in RGB format.
-	BackgroundColor int `json:"background_color"`
+	BackgroundColor int     `json:"background_color"`
+	Temperature     float64 `json:"temperature"`
 }
 
 func (StoryAreaTypeWeather) storyAreaType() {}
@@ -147,7 +150,8 @@ type InputStoryContentVideo struct {
 	Timestamp float64 `json:"timestamp,omitempty"`
 	// True, if the video has no sound and should be looped and displayed at a
 	// faster speed.
-	IsAnimation bool `json:"is_animation,omitempty"`
+	IsAnimation         bool    `json:"is_animation,omitempty"`
+	CoverFrameTimestamp float64 `json:"cover_frame_timestamp,omitempty"`
 }
 
 func (InputStoryContentVideo) inputStoryContent() {}

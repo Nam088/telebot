@@ -28,6 +28,8 @@ type ChatPermissions struct {
 	CanInviteUsers        bool `json:"can_invite_users,omitempty"`
 	CanPinMessages        bool `json:"can_pin_messages,omitempty"`
 	CanManageTopics       bool `json:"can_manage_topics,omitempty"`
+	CanEditTag            bool `json:"can_edit_tag,omitempty"`
+	CanReactToMessages    bool `json:"can_react_to_messages,omitempty"`
 }
 
 // ChatInviteLink represents an invite link for a chat.
@@ -51,18 +53,24 @@ type ChatInviteLink struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#chatadministratorrights
 type ChatAdministratorRights struct {
-	IsAnonymous         bool `json:"is_anonymous"`
-	CanManageChat       bool `json:"can_manage_chat"`
-	CanDeleteMessages   bool `json:"can_delete_messages"`
-	CanManageVideoChats bool `json:"can_manage_video_chats"`
-	CanRestrictMembers  bool `json:"can_restrict_members"`
-	CanPromoteMembers   bool `json:"can_promote_members"`
-	CanChangeInfo       bool `json:"can_change_info"`
-	CanInviteUsers      bool `json:"can_invite_users"`
-	CanPostMessages     bool `json:"can_post_messages,omitempty"`
-	CanEditMessages     bool `json:"can_edit_messages,omitempty"`
-	CanPinMessages      bool `json:"can_pin_messages,omitempty"`
-	CanManageTopics     bool `json:"can_manage_topics,omitempty"`
+	IsAnonymous             bool `json:"is_anonymous"`
+	CanManageChat           bool `json:"can_manage_chat"`
+	CanDeleteMessages       bool `json:"can_delete_messages"`
+	CanManageVideoChats     bool `json:"can_manage_video_chats"`
+	CanRestrictMembers      bool `json:"can_restrict_members"`
+	CanPromoteMembers       bool `json:"can_promote_members"`
+	CanChangeInfo           bool `json:"can_change_info"`
+	CanInviteUsers          bool `json:"can_invite_users"`
+	CanPostMessages         bool `json:"can_post_messages,omitempty"`
+	CanEditMessages         bool `json:"can_edit_messages,omitempty"`
+	CanPinMessages          bool `json:"can_pin_messages,omitempty"`
+	CanManageTopics         bool `json:"can_manage_topics,omitempty"`
+	CanDeleteStories        bool `json:"can_delete_stories"`
+	CanEditStories          bool `json:"can_edit_stories"`
+	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
+	CanManageTags           bool `json:"can_manage_tags,omitempty"`
+	CanPostStories          bool `json:"can_post_stories"`
+	CanSendWelcomeMessages  bool `json:"can_send_welcome_messages"`
 }
 
 // ChatMemberUpdated represents changes in the status of a chat member.
@@ -89,4 +97,5 @@ type ChatJoinRequest struct {
 	Date       int64           `json:"date"`
 	Bio        string          `json:"bio,omitempty"`
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
+	QueryID    string          `json:"query_id,omitempty"`
 }

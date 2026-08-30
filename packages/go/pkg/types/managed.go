@@ -10,6 +10,7 @@ type BotAccessSettings struct {
 	// Identifiers of users that are allowed to communicate with the bot when
 	// its access is restricted; empty when access isn't restricted.
 	AddedUserIDs []int64 `json:"added_user_ids,omitempty"`
+	AddedUsers   []User  `json:"added_users,omitempty"`
 }
 
 // SetManagedBotAccessSettingsOptions represents parameters for the setManagedBotAccessSettings method.

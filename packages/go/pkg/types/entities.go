@@ -4,13 +4,15 @@ package types
 //
 // Telegram API: https://core.telegram.org/bots/api#messageentity
 type MessageEntity struct {
-	Type          string `json:"type"`
-	Offset        int    `json:"offset"`
-	Length        int    `json:"length"`
-	URL           string `json:"url,omitempty"`
-	User          *User  `json:"user,omitempty"`
-	Language      string `json:"language,omitempty"`
-	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
+	Type           string `json:"type"`
+	Offset         int    `json:"offset"`
+	Length         int    `json:"length"`
+	URL            string `json:"url,omitempty"`
+	User           *User  `json:"user,omitempty"`
+	Language       string `json:"language,omitempty"`
+	CustomEmojiID  string `json:"custom_emoji_id,omitempty"`
+	DateTimeFormat string `json:"date_time_format,omitempty"`
+	UnixTime       int64  `json:"unix_time,omitempty"`
 }
 
 // WebAppInfo describes a Web App that can be launched from a button.
@@ -87,6 +89,8 @@ type InputMediaVideo struct {
 	Duration              int             `json:"duration,omitempty"`
 	SupportsStreaming     bool            `json:"supports_streaming,omitempty"`
 	HasSpoiler            bool            `json:"has_spoiler,omitempty"`
+	Cover                 string          `json:"cover,omitempty"`
+	StartTimestamp        int64           `json:"start_timestamp,omitempty"`
 }
 
 func (InputMediaVideo) inputMedia() {}

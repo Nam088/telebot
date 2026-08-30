@@ -8,6 +8,7 @@ type ForumTopic struct {
 	Name              string `json:"name"`
 	IconColor         int    `json:"icon_color"`
 	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+	IsNameImplicit    bool   `json:"is_name_implicit,omitempty"`
 }
 
 // BotCommand represents a bot command.
@@ -16,6 +17,7 @@ type ForumTopic struct {
 type BotCommand struct {
 	Command     string `json:"command"`
 	Description string `json:"description"`
+	IsEphemeral bool   `json:"is_ephemeral,omitempty"`
 }
 
 // BotName represents the bot's name.
