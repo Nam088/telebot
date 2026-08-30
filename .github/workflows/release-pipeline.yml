@@ -21,6 +21,9 @@ permissions:
   issues: write
   pull-requests: write
   id-token: write
+  # Required so the "Dispatch Python release workflow" step can call the
+  # workflow_dispatch API with GITHUB_TOKEN.
+  actions: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
