@@ -36,7 +36,7 @@ The `Bot` client in `packages/node/src/client/` uses modular domain submodules:
    - `messages/`: Message sending (`send-basic.ts`, `send-media.ts`), editing and reactions (`edit.ts`).
    - `chats/`: Moderation (`members.ts`), metadata and settings (`management.ts`).
    - `topics/`: Bot identity/commands (`profile.ts`), forum topics (`topics.ts`).
-   - `business/`: Queries (`queries.ts`), games (`games-passport.ts`), stories (`stories-boosts.ts`), gifts (`gifts.ts`), ephemeral (`ephemeral.ts`).
+   - `business/`: Queries (`queries.ts`), games (`games-passport.ts`), stories (`stories-boosts.ts`), business accounts & managed bots (`business-account.ts`), gifts and stars (`gifts.ts`), ephemeral (`ephemeral.ts`).
    - `stickers.ts`: Sticker sets, custom emojis, uploads.
    - `payments.ts`: Invoices, Telegram Stars, payments, subscriptions.
 3. **Step 3: Add complete TSDoc**
