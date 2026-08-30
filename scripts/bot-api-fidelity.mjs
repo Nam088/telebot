@@ -39,127 +39,12 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 import { DOCS_URL, REPO_ROOT, formatCounts, oraclePath, parseDocs } from './bot-api-docs.mjs';
-
-/**
- * Replaces the contents of comments and string literals with spaces while
- * preserving line structure, so structural regexes cannot be fooled by markup
- * living inside a doc comment or a docstring.
- *
- * This matters more than it looks: the Python `Message` docstring lists every
- * field under an `Attributes:` section in text that is otherwise identical to a
- * real field declaration, and the TypeScript interfaces carry a one-line doc
- * comment above every property.
- *
- * @param {string} source File text.
- * @param {{hashComments?: boolean, templateLiterals?: boolean, keepStrings?: boolean}} [options]
- *   `hashComments` selects `#` comments and triple-quoted strings (Python);
- *   `templateLiterals` decides whether backticks open a string (TypeScript yes,
- *   Go no); `keepStrings` skips over string bodies without blanking them, which
- *   Go needs because a struct tag *is* the data being read.
- * @returns {string} Same length and same line breaks, with comments/strings blanked.
- */
-export function maskCommentsAndStrings(source, options = {}) {
-  const { hashComments = false, templateLiterals = true, keepStrings = false } = options;
-  const out = source.split('');
-
-  const blank = (from, to) => {
-    for (let i = from; i < to && i < out.length; i += 1) {
-      if (out[i] !== '\n') out[i] = ' ';
-    }
-  };
-
-  let i = 0;
-  while (i < source.length) {
-    const ch = source[i];
-    const next = source[i + 1];
-
-    if (hashComments) {
-      if (ch === '#') {
-        let end = source.indexOf('\n', i);
-        if (end === -1) end = source.length;
-        blank(i, end);
-        i = end;
-        continue;
-      }
-      if ((ch === '"' || ch === "'") && source.startsWith(ch.repeat(3), i)) {
-        const fence = ch.repeat(3);
-        let end = source.indexOf(fence, i + 3);
-        // Backslash escapes work inside triple quotes; honour them so an
-        // embedded quote does not close the docstring early.
-        while (end !== -1 && source[end - 1] === '\\') {
-          end = source.indexOf(fence, end + 3);
-        }
-        blank(i, end === -1 ? source.length : end + 3);
-        i = end === -1 ? source.length : end + 3;
-        continue;
-      }
-    } else {
-      if (ch === '/' && next === '/') {
-        let end = source.indexOf('\n', i);
-        if (end === -1) end = source.length;
-        blank(i, end);
-        i = end;
-        continue;
-      }
-      if (ch === '/' && next === '*') {
-        let end = source.indexOf('*/', i + 2);
-        blank(i, end === -1 ? source.length : end + 2);
-        i = end === -1 ? source.length : end + 2;
-        continue;
-      }
-    }
-
-    if (ch === '"' || ch === "'" || (templateLiterals && ch === '`')) {
-      let j = i + 1;
-      while (j < source.length) {
-        if (source[j] === '\\') {
-          j += 2;
-          continue;
-        }
-        if (source[j] === ch) break;
-        // A raw newline ends an ordinary string but not a template literal.
-        if (source[j] === '\n' && ch !== '`') break;
-        j += 1;
-      }
-      if (keepStrings) {
-        i = Math.min(j + 1, source.length);
-        continue;
-      }
-      blank(i + 1, j);
-      i = Math.min(j + 1, source.length);
-      continue;
-    }
-
-    i += 1;
-  }
-  return out.join('');
-}
-
-/**
- * Index of the brace that closes the block opened at `open`.
- *
- * @param {string} text Masked source text.
- * @param {number} open Index of the opening brace.
- * @returns {number} Index of the matching `}`, or -1 when unbalanced.
- */
-function matchBrace(text, open) {
-  let depth = 0;
-  for (let i = open; i < text.length; i += 1) {
-    if (text[i] === '{') depth += 1;
-    else if (text[i] === '}') {
-      depth -= 1;
-      if (depth === 0) return i;
-    }
-  }
-  return -1;
-}
-
-/** Net bracket/brace/paren delta of one line. */
-function bracketDelta(line) {
-  const opened = (line.match(/[{[(]/g) || []).length;
-  const closed = (line.match(/[}\])]/g) || []).length;
-  return opened - closed;
-}
+import { bracketDelta, maskCommentsAndStrings, matchBrace } from './bot-api-source.mjs';
+import {
+  extractGoMethodParams,
+  extractPythonMethodParams,
+  extractTypeScriptMethodParams,
+} from './bot-api-params.mjs';
 
 /**
  * Parses `export interface X { ... }` declarations into wire-key sets.
@@ -320,6 +205,11 @@ const PACKAGES = {
     // node declares under a different identifier.
     rename: { RawUpdate: 'Update' },
     extract: (masked) => extractTypeScript(masked),
+    methodsDir: 'packages/node/src',
+    // The wire name a method issues is a string literal, so unlike the type
+    // audit this must not blank string bodies.
+    paramMask: { keepStrings: true },
+    extractMethods: extractTypeScriptMethodParams,
   },
   go: {
     label: 'Go structs',
@@ -331,6 +221,9 @@ const PACKAGES = {
     mask: { templateLiterals: false, keepStrings: true },
     skipFile: (name) => name.endsWith('_test.go'),
     extract: (masked) => extractGo(masked),
+    methodsDir: 'packages/go/pkg/bot',
+    paramMask: { templateLiterals: false, keepStrings: true },
+    extractMethods: extractGoMethodParams,
   },
   python: {
     label: 'Python dataclasses',
@@ -339,6 +232,10 @@ const PACKAGES = {
     mask: { hashComments: true },
     skipFile: (name) => name === '__init__.py',
     extract: (masked, raw) => extractPython(masked, raw),
+    // The `Bot` class is split across mixin modules beside `types/`.
+    methodsDir: 'packages/python/src/telebot_py/bot',
+    paramMask: { hashComments: true, keepStrings: true },
+    extractMethods: extractPythonMethodParams,
   },
 };
 
@@ -448,6 +345,56 @@ export async function collectDeclaredTypes(key, root = REPO_ROOT) {
 }
 
 /**
+ * Collects what params each documented method can actually send.
+ *
+ * @param {string} key Package key (`node` | `go` | `python`).
+ * @param {string} root Repository root.
+ * @param {Map<string, Array<{fields: Set<string>}>>} declaredTypes Output of
+ *   {@link collectDeclaredTypes}, used to resolve a named options type.
+ * @param {string[]} [wires] Documented method names to watch for as literals.
+ * @returns {Promise<{methods: Map<string, {keys: Set<string>, partial: boolean, file: string}>, seen: Set<string>}>}
+ *   `methods` is keyed by documented method name; `seen` holds every wire name
+ *   issued somewhere in the package, whether or not a method was attributed.
+ */
+export async function collectDeclaredMethods(key, root, declaredTypes, wires = []) {
+  const pkg = PACKAGES[key];
+  if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
+
+  // Same rule as the type audit: a name with several declarations is judged by
+  // its widest one, so a `SendMessageOptions` split over files is not short-changed.
+  const resolve = (type) => {
+    const candidates = declaredTypes.get(type);
+    if (!candidates || candidates.length === 0) return null;
+    return candidates[0].fields;
+  };
+
+  const watch = wires.map((wire) => new RegExp(`["'\`]${wire}["'\`]`)).filter(Boolean);
+  const merged = new Map();
+  const seen = new Set();
+  for (const file of await walk(path.join(root, pkg.methodsDir ?? pkg.dir), pkg.extension)) {
+    if (pkg.skipFile && pkg.skipFile(path.basename(file))) continue;
+    const raw = await readFile(file, 'utf-8');
+    const masked = maskCommentsAndStrings(raw, pkg.paramMask ?? pkg.mask);
+    const relative = path.relative(root, file);
+    for (let i = 0; i < watch.length; i += 1) {
+      if (watch[i].test(masked)) seen.add(wires[i]);
+    }
+    for (const [wire, read] of pkg.extractMethods(masked, resolve)) {
+      const existing = merged.get(wire);
+      if (!existing) {
+        merged.set(wire, { keys: new Set(read.keys), partial: read.partial, file: relative });
+        continue;
+      }
+      // Reachable from either file, so union the keys and only stay "partial"
+      // while every path is partial.
+      for (const k of read.keys) existing.keys.add(k);
+      existing.partial = existing.partial && read.partial;
+    }
+  }
+  return { methods: merged, seen };
+}
+
+/**
  * Compares one package against the oracle.
  *
  * @param {string} key Package key (`node` | `go` | `python`).
@@ -514,6 +461,60 @@ export async function auditPackage(key, oracle, root = REPO_ROOT) {
       a.name.localeCompare(b.name),
   );
 
+  // Method parameters: a separate question from the type audit above. A
+  // package can decode every documented field of `Message` and still refuse to
+  // accept a documented argument of `sendMessage`.
+  const { methods, seen } = await collectDeclaredMethods(key, root, declared, Object.keys(oracle.methods ?? {}));
+  const methodRows = [];
+  const methodsUnresolved = [];
+  for (const [wire, def] of Object.entries(oracle.methods ?? {})) {
+    const params = Object.entries(def.params ?? {});
+    const declaredMethod = methods.get(wire);
+    if (declaredMethod === undefined) {
+      // Issued somewhere but not attributed to a method means the extractor
+      // met a shape it could not read; that is a tool gap, not a library gap.
+      if (seen.has(wire)) methodsUnresolved.push(wire);
+      else {
+        methodRows.push({
+          name: wire,
+          file: '',
+          required: params.filter(([, meta]) => !meta.optional).map(([name]) => name),
+          optional: params.filter(([, meta]) => meta.optional).map(([name]) => name),
+          total: params.length,
+          absent: true,
+        });
+      }
+      continue;
+    }
+    if (declaredMethod.partial) {
+      methodsUnresolved.push(wire);
+      continue;
+    }
+    const required = [];
+    const optional = [];
+    for (const [name, meta] of params) {
+      if (declaredMethod.keys.has(name)) continue;
+      if (meta.optional) optional.push(name);
+      else required.push(name);
+    }
+    if (required.length > 0 || optional.length > 0) {
+      methodRows.push({
+        name: wire,
+        file: declaredMethod.file,
+        required,
+        optional,
+        total: params.length,
+        absent: false,
+      });
+    }
+  }
+  methodRows.sort(
+    (a, b) =>
+      b.required.length - a.required.length ||
+      b.optional.length - a.optional.length ||
+      a.name.localeCompare(b.name),
+  );
+
   return {
     key,
     label: pkg.label,
@@ -525,6 +526,12 @@ export async function auditPackage(key, oracle, root = REPO_ROOT) {
     typesWithMissing: rows.length,
     missingRequired: rows.reduce((sum, row) => sum + row.required.length, 0),
     missingOptional: rows.reduce((sum, row) => sum + row.optional.length, 0),
+    documentMethods: Object.keys(oracle.methods ?? {}).length,
+    methodRows,
+    methodsUnresolved: methodsUnresolved.sort(),
+    methodsWithMissing: methodRows.length,
+    missingMethodRequired: methodRows.reduce((sum, row) => sum + row.required.length, 0),
+    missingMethodOptional: methodRows.reduce((sum, row) => sum + row.optional.length, 0),
   };
 }
 

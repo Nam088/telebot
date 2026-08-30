@@ -21,10 +21,10 @@ import {
   extractTypeScript,
   heritageNames,
   main,
-  maskCommentsAndStrings,
   renderMarkdown,
   renderTable,
 } from './bot-api-fidelity.mjs';
+import { maskCommentsAndStrings } from './bot-api-source.mjs';
 
 /** A two-field docs type: `a` is required on the wire, `b` is optional. */
 const ORACLE = {
