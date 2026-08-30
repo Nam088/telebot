@@ -162,16 +162,19 @@ function bracketDelta(line) {
  * Parses `export interface X { ... }` declarations into wire-key sets.
  *
  * Only depth-0 property keys inside the body count, so nested object literals
- * and index signatures are never mistaken for Bot API fields.
+ * and index signatures are never mistaken for Bot API fields. Inherited keys are
+ * NOT folded in here: the body is the only place they can be resolved once
+ * every file has been read, so the heritage names travel in `parents` and
+ * `collectDeclaredTypes` expands them.
  *
  * @param {string} masked Masked file text.
- * @returns {Array<{name: string, fields: Set<string>}>} One entry per interface.
+ * @returns {Array<{name: string, fields: Set<string>, parents: string[]>}> One entry per interface.
  */
 export function extractTypeScript(masked) {
   const declarations = [];
-  const re = /^export\s+(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)[^{]*\{/gm;
+  const header = /^export\s+(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)\s*([^{}]*)\{/gm;
   let match;
-  while ((match = re.exec(masked)) !== null) {
+  while ((match = header.exec(masked)) !== null) {
     const open = match.index + match[0].length - 1;
     const close = matchBrace(masked, open);
     if (close === -1) break;
@@ -184,10 +187,26 @@ export function extractTypeScript(masked) {
       }
       depth = Math.max(0, depth + bracketDelta(line));
     }
-    declarations.push({ name: match[1], fields });
-    re.lastIndex = close;
+    declarations.push({ name: match[1], fields, parents: heritageNames(match[2]) });
+    header.lastIndex = close;
   }
   return declarations;
+}
+
+/**
+ * Reads an interface heritage clause (`extends Chat, Poll`, possibly a
+ * generic-qualified or dotted name) into the parent type names.
+ *
+ * @param {string} clause Text between the interface name and its opening brace.
+ * @returns {string[]} Parent names, empty for a bare interface.
+ */
+export function heritageNames(clause) {
+  const extends_ = /\bextends\b([\s\S]*)$/.exec(clause ?? '');
+  if (!extends_) return [];
+  return extends_[1]
+    .split(',')
+    .map((part) => part.trim().replace(/<[\s\S]*$/, '').trim())
+    .filter((part) => /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(part));
 }
 
 /**
@@ -359,17 +378,17 @@ export async function collectDeclaredTypes(key, root = REPO_ROOT) {
   const pkg = PACKAGES[key];
   if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
   const declared = new Map();
-  const push = (name, fields) => {
+  const push = (name, fields, parents = []) => {
     const candidates = declared.get(name);
-    if (candidates) candidates.push(fields);
-    else declared.set(name, [fields]);
+    if (candidates) candidates.push({ fields, parents });
+    else declared.set(name, [{ fields, parents }]);
   };
 
   for (const file of await walk(path.join(root, pkg.dir), pkg.extension)) {
     if (pkg.skipFile && pkg.skipFile(path.basename(file))) continue;
     const raw = await readFile(file, 'utf-8');
     const masked = maskCommentsAndStrings(raw, pkg.mask);
-    for (const entry of pkg.extract(masked, raw)) push(entry.name, entry.fields);
+    for (const entry of pkg.extract(masked, raw)) push(entry.name, entry.fields, entry.parents);
   }
 
   // node models the documented `Update` under the identifier `RawUpdate`; move
@@ -377,14 +396,38 @@ export async function collectDeclaredTypes(key, root = REPO_ROOT) {
   for (const [alias, docsName] of Object.entries(pkg.rename ?? {})) {
     const candidates = declared.get(alias);
     if (!candidates) continue;
-    for (const fields of candidates) push(docsName, fields);
+    for (const candidate of candidates) push(docsName, candidate.fields);
     declared.delete(alias);
   }
 
-  for (const candidates of declared.values()) {
-    candidates.sort((a, b) => b.size - a.size);
+  // An interface that extends a documented one really does carry the parent's
+  // keys, so credit them; otherwise every child has to re-declare the whole
+  // parent just to keep the audit happy.
+  const inherited = (parents, stack) => {
+    const out = new Set();
+    for (const parent of parents) {
+      if (stack.has(parent)) continue;
+      const candidates = declared.get(parent);
+      if (!candidates) continue;
+      const widest = candidates.reduce((a, b) => (b.fields.size > a.fields.size ? b : a));
+      stack.add(parent);
+      for (const field of widest.fields) out.add(field);
+      for (const field of inherited(widest.parents, stack)) out.add(field);
+      stack.delete(parent);
+    }
+    return out;
+  };
+
+  const resolved = new Map();
+  for (const [name, candidates] of declared) {
+    const sets = candidates.map((candidate) => {
+      if (candidate.parents.length === 0) return candidate.fields;
+      return new Set([...candidate.fields, ...inherited(candidate.parents, new Set([name]))]);
+    });
+    sets.sort((a, b) => b.size - a.size);
+    resolved.set(name, sets);
   }
-  return declared;
+  return resolved;
 }
 
 /**

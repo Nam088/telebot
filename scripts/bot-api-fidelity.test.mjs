@@ -18,6 +18,7 @@ import {
   extractGo,
   extractPython,
   extractTypeScript,
+  heritageNames,
   maskCommentsAndStrings,
   renderTable,
 } from './bot-api-fidelity.mjs';
@@ -237,4 +238,69 @@ test('renderTable prints one aligned row per package', () => {
   assert.ok(table.includes('go'));
   assert.ok(table.includes('452'));
   assert.ok(table.includes('18'));
+});
+
+test('heritageNames reads extends clauses the way TypeScript writes them', () => {
+  assert.deepEqual(heritageNames(''), []);
+  assert.deepEqual(heritageNames(' extends Base'), ['Base']);
+  assert.deepEqual(heritageNames(' extends A, B'), ['A', 'B']);
+  assert.deepEqual(heritageNames(' extends Record<string, never>'), ['Record']);
+  assert.deepEqual(heritageNames(' extends ns.Base'), ['ns.Base']);
+});
+
+test('extractTypeScript records parents without crediting inherited keys at parse time', () => {
+  const source = [
+    'export interface Base {',
+    '  a: number;',
+    '}',
+    'export interface Thing extends Base {',
+    '  b?: string;',
+    '}',
+  ].join('\n');
+  const parsed = extractTypeScript(maskCommentsAndStrings(source));
+  const byName = Object.fromEntries(parsed.map((entry) => [entry.name, entry]));
+  assert.deepEqual(byName.Base.parents, []);
+  assert.deepEqual(byName.Thing.parents, ['Base']);
+  assert.deepEqual([...byName.Thing.fields], ['b'], 'the body alone is counted here');
+});
+
+test('a child interface is audited with the fields it inherits', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  try {
+    await mkdir(path.join(root, 'packages/node/src'), { recursive: true });
+    await writeFile(
+      path.join(root, 'packages/node/src/base.ts'),
+      'export interface Base {\n  a: number;\n}\n',
+      'utf-8',
+    );
+    await writeFile(
+      path.join(root, 'packages/node/src/thing.ts'),
+      'import { Base } from "./base.js";\n\nexport interface Thing extends Base {\n  b?: string;\n}\n',
+      'utf-8',
+    );
+    const report = await auditPackage('node', ORACLE, root);
+    assert.equal(report.modelled, 1);
+    assert.deepEqual(report.unmodelled, []);
+    assert.equal(report.missingRequired, 0, 'inherited `a` must count as declared');
+    assert.equal(report.missingOptional, 0, 'inherited `b` must count as declared');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('heritage never credits a key the package does not actually declare', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  try {
+    await mkdir(path.join(root, 'packages/node/src'), { recursive: true });
+    await writeFile(
+      path.join(root, 'packages/node/src/thing.ts'),
+      'export interface Thing extends SomethingElse {\n  b?: string;\n}\n',
+      'utf-8',
+    );
+    const report = await auditPackage('node', ORACLE, root);
+    assert.equal(report.missingRequired, 1, '`a` is neither declared nor inherited');
+    assert.deepEqual(report.rows[0].required, ['a']);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });
