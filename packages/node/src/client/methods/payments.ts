@@ -38,6 +38,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   prices: [{ label: "1 Month", amount: 100 }],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendinvoice Telegram Bot API: sendInvoice}
    */
   public async sendInvoice(options: SendInvoiceOptions): Promise<Message> {
     return this.request<Message>("sendInvoice", options as unknown as Record<string, unknown>);
@@ -60,6 +62,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   prices: [{ label: "Stars", amount: 50 }],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#createinvoicelink Telegram Bot API: createInvoiceLink}
    */
   public async createInvoiceLink(options: Omit<SendInvoiceOptions, "chat_id">): Promise<string> {
     return this.request<string>("createInvoiceLink", options as unknown as Record<string, unknown>);
@@ -82,6 +86,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   ],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answershippingquery Telegram Bot API: answerShippingQuery}
    */
   public async answerShippingQuery(options: AnswerShippingQueryOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -104,6 +110,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   ok: true,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answerprecheckoutquery Telegram Bot API: answerPreCheckoutQuery}
    */
   public async answerPreCheckoutQuery(options: AnswerPreCheckoutQueryOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -124,6 +132,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```ts
    * await bot.refundStarPayment(123456, "tx_charge_123");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#refundstarpayment Telegram Bot API: refundStarPayment}
    */
   public async refundStarPayment(
     userId: number,
@@ -148,6 +158,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * const txs = await bot.getStarTransactions(0, 20);
    * console.log(`Total transactions returned: ${txs.transactions.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getstartransactions Telegram Bot API: getStarTransactions}
    */
   public async getStarTransactions(offset?: number, limit?: number): Promise<StarTransactions> {
     const payload: Record<string, unknown> = {};
@@ -169,6 +181,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```ts
    * await bot.editUserStarSubscription(123456, "sub_charge_123", true);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#edituserstarsubscription Telegram Bot API: editUserStarSubscription}
    */
   public async editUserStarSubscription(
     userId: number,
@@ -193,6 +207,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * const balance = await bot.getMyStarBalance();
    * console.log(`Current Stars: ${balance.amount}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmystarbalance Telegram Bot API: getMyStarBalance}
    */
   public async getMyStarBalance(): Promise<StarAmount> {
     return this.request<StarAmount>("getMyStarBalance");
@@ -209,6 +225,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * const gifts = await bot.getAvailableGifts();
    * console.log(`Available gifts count: ${gifts.gifts.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getavailablegifts Telegram Bot API: getAvailableGifts}
    */
   public async getAvailableGifts(): Promise<Gifts> {
     return this.request<Gifts>("getAvailableGifts");
@@ -237,6 +255,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * // Send to a channel chat instead of a user
    * await bot.sendGift({ chat_id: "@my_channel", gift_id: "gift_abc123" });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendgift Telegram Bot API: sendGift}
    */
   public async sendGift(options: SendGiftOptions): Promise<boolean> {
     return this.request<boolean>("sendGift", options as unknown as Record<string, unknown>);

@@ -187,6 +187,9 @@ export interface DeleteEphemeralMessageOptions {
   ephemeral_message_id: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageid Telegram Bot API: MessageId}
+ */
 export interface MessageId {
   /** Unique message identifier. */
   message_id: number;
@@ -224,6 +227,9 @@ export interface CopyMessagesOptions {
   remove_caption?: boolean;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#preparedinlinemessage Telegram Bot API: PreparedInlineMessage}
+ */
 export interface PreparedInlineMessage {
   /** Unique identifier of the prepared message. */
   id: string;

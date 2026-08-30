@@ -2,6 +2,9 @@ import type { User, Chat } from "../common/index.js";
 import type { Sticker } from "../stickers/index.js";
 import type { MessageEntity } from "../messages/index.js";
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#invoice Telegram Bot API: Invoice}
+ */
 export interface Invoice {
   /** Product name. */
   title: string;
@@ -15,6 +18,9 @@ export interface Invoice {
   total_amount: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#orderinfo Telegram Bot API: OrderInfo}
+ */
 export interface OrderInfo {
   /** User name. */
   name?: string;
@@ -26,6 +32,9 @@ export interface OrderInfo {
   shipping_address?: ShippingAddress;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#shippingaddress Telegram Bot API: ShippingAddress}
+ */
 export interface ShippingAddress {
   /** Two-letter ISO 3166-1 alpha-2 country code. */
   country_code: string;
@@ -41,6 +50,9 @@ export interface ShippingAddress {
   post_code: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#successfulpayment Telegram Bot API: SuccessfulPayment}
+ */
 export interface SuccessfulPayment {
   /** Three-letter ISO 4217 currency code or "XTR". */
   currency: string;
@@ -62,6 +74,9 @@ export interface SuccessfulPayment {
   is_first_recurring?: boolean;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#refundedpayment Telegram Bot API: RefundedPayment}
+ */
 export interface RefundedPayment {
   /** Three-letter ISO 4217 currency code or "XTR". */
   currency: string;
@@ -75,6 +90,9 @@ export interface RefundedPayment {
   provider_payment_charge_id?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#shippingquery Telegram Bot API: ShippingQuery}
+ */
 export interface ShippingQuery {
   /** Unique query identifier. */
   id: string;
@@ -86,6 +104,9 @@ export interface ShippingQuery {
   shipping_address: ShippingAddress;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#precheckoutquery Telegram Bot API: PreCheckoutQuery}
+ */
 export interface PreCheckoutQuery {
   /** Unique query identifier. */
   id: string;
@@ -103,6 +124,9 @@ export interface PreCheckoutQuery {
   order_info?: OrderInfo;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#labeledprice Telegram Bot API: LabeledPrice}
+ */
 export interface LabeledPrice {
   /** Portion label. */
   label: string;
@@ -110,6 +134,9 @@ export interface LabeledPrice {
   amount: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#shippingoption Telegram Bot API: ShippingOption}
+ */
 export interface ShippingOption {
   /** Shipping option identifier. */
   id: string;
@@ -119,6 +146,9 @@ export interface ShippingOption {
   prices: LabeledPrice[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#staramount Telegram Bot API: StarAmount}
+ */
 export interface StarAmount {
   /** The integer number of Telegram Stars. */
   amount: number;
@@ -126,11 +156,17 @@ export interface StarAmount {
   nanostar_amount?: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#startransactions Telegram Bot API: StarTransactions}
+ */
 export interface StarTransactions {
   /** List of transactions. */
   transactions: StarTransaction[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#startransaction Telegram Bot API: StarTransaction}
+ */
 export interface StarTransaction {
   /** Unique identifier of the transaction. */
   id: string;
@@ -153,7 +189,11 @@ export interface PurchasedPaidMedia {
   paid_media_payload: string;
 }
 
-/** Describes the background of a {@link Gift}. */
+/**
+ * Describes the background of a {@link Gift}.
+ *
+ * @see {@link https://core.telegram.org/bots/api#giftbackground Telegram Bot API: GiftBackground}
+ */
 export interface GiftBackground {
   /** Center color of the background in RGB format. */
   center_color: number;
@@ -163,6 +203,9 @@ export interface GiftBackground {
   text_color: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#gift Telegram Bot API: Gift}
+ */
 export interface Gift {
   /** Unique identifier of the gift. */
   id: string;
@@ -192,11 +235,17 @@ export interface Gift {
   publisher_chat?: Chat;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#gifts Telegram Bot API: Gifts}
+ */
 export interface Gifts {
   /** The list of gifts. */
   gifts: Gift[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftbackdropcolors Telegram Bot API: UniqueGiftBackdropColors}
+ */
 export interface UniqueGiftBackdropColors {
   /** The color in the center of the backdrop in RGB format. */
   center_color: number;
@@ -208,6 +257,9 @@ export interface UniqueGiftBackdropColors {
   text_color: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftbackdrop Telegram Bot API: UniqueGiftBackdrop}
+ */
 export interface UniqueGiftBackdrop {
   /** Name of the backdrop. */
   name: string;
@@ -217,6 +269,9 @@ export interface UniqueGiftBackdrop {
   rarity_per_mille: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftmodel Telegram Bot API: UniqueGiftModel}
+ */
 export interface UniqueGiftModel {
   /** Name of the model. */
   name: string;
@@ -228,6 +283,9 @@ export interface UniqueGiftModel {
   rarity?: "uncommon" | "rare" | "epic" | "legendary" | string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftsymbol Telegram Bot API: UniqueGiftSymbol}
+ */
 export interface UniqueGiftSymbol {
   /** Name of the symbol. */
   name: string;
@@ -237,6 +295,9 @@ export interface UniqueGiftSymbol {
   rarity_per_mille: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftcolors Telegram Bot API: UniqueGiftColors}
+ */
 export interface UniqueGiftColors {
   /** Custom emoji identifier of the unique gift's model. */
   model_custom_emoji_id: string;
@@ -252,6 +313,9 @@ export interface UniqueGiftColors {
   dark_theme_other_colors: number[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegift Telegram Bot API: UniqueGift}
+ */
 export interface UniqueGift {
   /** Identifier of the regular gift from which the gift was upgraded. */
   gift_id: string;
@@ -279,6 +343,9 @@ export interface UniqueGift {
   publisher_chat?: Chat;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#uniquegiftinfo Telegram Bot API: UniqueGiftInfo}
+ */
 export interface UniqueGiftInfo {
   /** Information about the gift. */
   gift: UniqueGift;

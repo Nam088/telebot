@@ -32,6 +32,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.banChatMember(chatId, userId, undefined, true);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#banchatmember Telegram Bot API: banChatMember}
    */
   public async banChatMember(
     chatId: number | string,
@@ -58,6 +60,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.unbanChatMember(chatId, userId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#unbanchatmember Telegram Bot API: unbanChatMember}
    */
   public async unbanChatMember(
     chatId: number | string,
@@ -81,6 +85,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.banChatSenderChat(chatId, channelId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#banchatsenderchat Telegram Bot API: banChatSenderChat}
    */
   public async banChatSenderChat(chatId: number | string, senderChatId: number): Promise<boolean> {
     return this.request<boolean>("banChatSenderChat", {
@@ -101,6 +107,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.unbanChatSenderChat(chatId, channelId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#unbanchatsenderchat Telegram Bot API: unbanChatSenderChat}
    */
   public async unbanChatSenderChat(
     chatId: number | string,
@@ -129,6 +137,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    *   can_send_messages: false,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#restrictchatmember Telegram Bot API: restrictChatMember}
    */
   public async restrictChatMember(
     chatId: number | string,
@@ -164,6 +174,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    *   can_invite_users: true,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#promotechatmember Telegram Bot API: promoteChatMember}
    */
   public async promoteChatMember(
     chatId: number | string,
@@ -190,6 +202,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.setChatAdministratorCustomTitle(chatId, userId, "Moderator");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatadministratorcustomtitle Telegram Bot API: setChatAdministratorCustomTitle}
    */
   public async setChatAdministratorCustomTitle(
     chatId: number | string,
@@ -219,6 +233,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    *   can_send_photos: false,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatpermissions Telegram Bot API: setChatPermissions}
    */
   public async setChatPermissions(
     chatId: number | string,
@@ -243,6 +259,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * const link = await bot.exportChatInviteLink(chatId);
    * console.log(`Primary invite link: ${link}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#exportchatinvitelink Telegram Bot API: exportChatInviteLink}
    */
   public async exportChatInviteLink(chatId: number | string): Promise<string> {
     return this.request<string>("exportChatInviteLink", { chat_id: chatId });
@@ -263,6 +281,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    *   member_limit: 10,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#createchatinvitelink Telegram Bot API: createChatInviteLink}
    */
   public async createChatInviteLink(
     chatId: number | string,
@@ -289,6 +309,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    *   member_limit: 20,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#editchatinvitelink Telegram Bot API: editChatInviteLink}
    */
   public async editChatInviteLink(
     chatId: number | string,
@@ -314,6 +336,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.revokeChatInviteLink(chatId, inviteLink);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#revokechatinvitelink Telegram Bot API: revokeChatInviteLink}
    */
   public async revokeChatInviteLink(
     chatId: number | string,
@@ -337,6 +361,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.approveChatJoinRequest(chatId, userId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#approvechatjoinrequest Telegram Bot API: approveChatJoinRequest}
    */
   public async approveChatJoinRequest(chatId: number | string, userId: number): Promise<boolean> {
     return this.request<boolean>("approveChatJoinRequest", { chat_id: chatId, user_id: userId });
@@ -354,6 +380,8 @@ export abstract class ChatMemberMethods extends MessageMethods {
    * ```ts
    * await bot.declineChatJoinRequest(chatId, userId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#declinechatjoinrequest Telegram Bot API: declineChatJoinRequest}
    */
   public async declineChatJoinRequest(chatId: number | string, userId: number): Promise<boolean> {
     return this.request<boolean>("declineChatJoinRequest", { chat_id: chatId, user_id: userId });

@@ -14,6 +14,8 @@ export type RichMessageButtonStyle = "danger" | "success" | "primary" | "link" |
 
 /**
  * Represents a button in a RichMessage.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richmessagebutton Telegram Bot API: RichMessageButton}
  */
 export interface RichMessageButton {
   /** Text of the button. May contain only plain text, RichTextCustomEmoji and RichTextDateTime entities. */
@@ -42,6 +44,8 @@ export interface RichMessageButton {
 
 /**
  * A rich formatted text button.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextbutton Telegram Bot API: RichTextButton}
  */
 export interface RichTextButton {
   /** Type of the rich text, always 'button'. */
@@ -52,6 +56,8 @@ export interface RichTextButton {
 
 /**
  * A bold formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextbold Telegram Bot API: RichTextBold}
  */
 export interface RichTextBold {
   /** Type of the rich text, always 'bold'. */
@@ -62,6 +68,8 @@ export interface RichTextBold {
 
 /**
  * An italicized formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextitalic Telegram Bot API: RichTextItalic}
  */
 export interface RichTextItalic {
   /** Type of the rich text, always 'italic'. */
@@ -72,6 +80,8 @@ export interface RichTextItalic {
 
 /**
  * An underlined formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextunderline Telegram Bot API: RichTextUnderline}
  */
 export interface RichTextUnderline {
   /** Type of the rich text, always 'underline'. */
@@ -82,6 +92,8 @@ export interface RichTextUnderline {
 
 /**
  * A strikethrough formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextstrikethrough Telegram Bot API: RichTextStrikethrough}
  */
 export interface RichTextStrikethrough {
   /** Type of the rich text, always 'strikethrough'. */
@@ -92,6 +104,8 @@ export interface RichTextStrikethrough {
 
 /**
  * A text covered by a spoiler.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextspoiler Telegram Bot API: RichTextSpoiler}
  */
 export interface RichTextSpoiler {
   /** Type of the rich text, always 'spoiler'. */
@@ -102,6 +116,8 @@ export interface RichTextSpoiler {
 
 /**
  * Formatted date and time.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextdatetime Telegram Bot API: RichTextDateTime}
  */
 export interface RichTextDateTime {
   /** Type of the rich text, always 'date_time'. */
@@ -116,6 +132,8 @@ export interface RichTextDateTime {
 
 /**
  * A mention of a user by their identifier.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtexttextmention Telegram Bot API: RichTextTextMention}
  */
 export interface RichTextTextMention {
   /** Type of the rich text, always 'text_mention'. */
@@ -128,6 +146,8 @@ export interface RichTextTextMention {
 
 /**
  * A subscript formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextsubscript Telegram Bot API: RichTextSubscript}
  */
 export interface RichTextSubscript {
   /** Type of the rich text, always 'subscript'. */
@@ -138,6 +158,8 @@ export interface RichTextSubscript {
 
 /**
  * A superscript formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextsuperscript Telegram Bot API: RichTextSuperscript}
  */
 export interface RichTextSuperscript {
   /** Type of the rich text, always 'superscript'. */
@@ -148,6 +170,8 @@ export interface RichTextSuperscript {
 
 /**
  * A marked formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextmarked Telegram Bot API: RichTextMarked}
  */
 export interface RichTextMarked {
   /** Type of the rich text, always 'marked'. */
@@ -158,6 +182,8 @@ export interface RichTextMarked {
 
 /**
  * A monowidth code formatted text entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextcode Telegram Bot API: RichTextCode}
  */
 export interface RichTextCode {
   /** Type of the rich text, always 'code'. */
@@ -168,6 +194,8 @@ export interface RichTextCode {
 
 /**
  * A custom emoji entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextcustomemoji Telegram Bot API: RichTextCustomEmoji}
  */
 export interface RichTextCustomEmoji {
   /** Type of the rich text, always 'custom_emoji'. */
@@ -180,6 +208,8 @@ export interface RichTextCustomEmoji {
 
 /**
  * A mathematical expression in LaTeX format.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextmathematicalexpression Telegram Bot API: RichTextMathematicalExpression}
  */
 export interface RichTextMathematicalExpression {
   /** Type of the rich text, always 'mathematical_expression'. */
@@ -190,6 +220,8 @@ export interface RichTextMathematicalExpression {
 
 /**
  * A text with a URL link.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtexturl Telegram Bot API: RichTextUrl}
  */
 export interface RichTextUrl {
   /** Type of the rich text, always 'url'. */
@@ -202,6 +234,8 @@ export interface RichTextUrl {
 
 /**
  * A text with an email address.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextemailaddress Telegram Bot API: RichTextEmailAddress}
  */
 export interface RichTextEmailAddress {
   /** Type of the rich text, always 'email_address'. */
@@ -214,6 +248,8 @@ export interface RichTextEmailAddress {
 
 /**
  * A text with a phone number.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextphonenumber Telegram Bot API: RichTextPhoneNumber}
  */
 export interface RichTextPhoneNumber {
   /** Type of the rich text, always 'phone_number'. */
@@ -226,6 +262,8 @@ export interface RichTextPhoneNumber {
 
 /**
  * A text with a bank card number.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextbankcardnumber Telegram Bot API: RichTextBankCardNumber}
  */
 export interface RichTextBankCardNumber {
   /** Type of the rich text, always 'bank_card_number'. */
@@ -238,6 +276,8 @@ export interface RichTextBankCardNumber {
 
 /**
  * A mention by a username.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextmention Telegram Bot API: RichTextMention}
  */
 export interface RichTextMention {
   /** Type of the rich text, always 'mention'. */
@@ -250,6 +290,8 @@ export interface RichTextMention {
 
 /**
  * A hashtag entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtexthashtag Telegram Bot API: RichTextHashtag}
  */
 export interface RichTextHashtag {
   /** Type of the rich text, always 'hashtag'. */
@@ -262,6 +304,8 @@ export interface RichTextHashtag {
 
 /**
  * A cashtag entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextcashtag Telegram Bot API: RichTextCashtag}
  */
 export interface RichTextCashtag {
   /** Type of the rich text, always 'cashtag'. */
@@ -274,6 +318,8 @@ export interface RichTextCashtag {
 
 /**
  * A bot command entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextbotcommand Telegram Bot API: RichTextBotCommand}
  */
 export interface RichTextBotCommand {
   /** Type of the rich text, always 'bot_command'. */
@@ -286,6 +332,8 @@ export interface RichTextBotCommand {
 
 /**
  * An anchor entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextanchor Telegram Bot API: RichTextAnchor}
  */
 export interface RichTextAnchor {
   /** Type of the rich text, always 'anchor'. */
@@ -296,6 +344,8 @@ export interface RichTextAnchor {
 
 /**
  * A link to an anchor.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextanchorlink Telegram Bot API: RichTextAnchorLink}
  */
 export interface RichTextAnchorLink {
   /** Type of the rich text, always 'anchor_link'. */
@@ -308,6 +358,8 @@ export interface RichTextAnchorLink {
 
 /**
  * A reference entity.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextreference Telegram Bot API: RichTextReference}
  */
 export interface RichTextReference {
   /** Type of the rich text, always 'reference'. */
@@ -320,6 +372,8 @@ export interface RichTextReference {
 
 /**
  * A link to a reference.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtextreferencelink Telegram Bot API: RichTextReferenceLink}
  */
 export interface RichTextReferenceLink {
   /** Type of the rich text, always 'reference_link'. */

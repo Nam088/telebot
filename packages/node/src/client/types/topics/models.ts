@@ -1,18 +1,30 @@
+/**
+ * @see {@link https://core.telegram.org/bots/api#botname Telegram Bot API: BotName}
+ */
 export interface BotName {
   /** The bot's name. */
   name: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#botdescription Telegram Bot API: BotDescription}
+ */
 export interface BotDescription {
   /** The bot's description. */
   description: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#botshortdescription Telegram Bot API: BotShortDescription}
+ */
 export interface BotShortDescription {
   /** The bot's short description. */
   short_description: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#forumtopic Telegram Bot API: ForumTopic}
+ */
 export interface ForumTopic {
   /** Unique identifier of the forum topic. */
   message_thread_id: number;
@@ -24,6 +36,9 @@ export interface ForumTopic {
   icon_custom_emoji_id?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#botcommand Telegram Bot API: BotCommand}
+ */
 export interface BotCommand {
   /** Text of the command; 1-32 characters. Can contain only lowercase English letters, digits and underscores. */
   command: string;

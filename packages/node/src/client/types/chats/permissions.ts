@@ -1,5 +1,7 @@
 /**
  * Describes actions that a non-administrator user is allowed to take in a chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatpermissions Telegram Bot API: ChatPermissions}
  */
 export interface ChatPermissions {
   /** True, if the user is allowed to send text messages, contacts, locations and venues. */
@@ -34,6 +36,8 @@ export interface ChatPermissions {
 
 /**
  * Represents the rights of an administrator in a chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatadministratorrights Telegram Bot API: ChatAdministratorRights}
  */
 export interface ChatAdministratorRights {
   /** True, if the user's presence in the chat is hidden. */
@@ -76,6 +80,8 @@ export interface ChatAdministratorRights {
 
 /**
  * Represents a community (a group of chats).
+ *
+ * @see {@link https://core.telegram.org/bots/api#community Telegram Bot API: Community}
  */
 export interface Community {
   /** Unique identifier for this community. */
@@ -86,6 +92,8 @@ export interface Community {
 
 /**
  * Describes a service message about a chat or a bot being added to a community.
+ *
+ * @see {@link https://core.telegram.org/bots/api#communitychatadded Telegram Bot API: CommunityChatAdded}
  */
 export interface CommunityChatAdded {
   /** The community to which the chat was added. */
@@ -94,6 +102,8 @@ export interface CommunityChatAdded {
 
 /**
  * Describes a service message about a chat or a bot being removed from a community.
+ *
+ * @see {@link https://core.telegram.org/bots/api#communitychatremoved Telegram Bot API: CommunityChatRemoved}
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CommunityChatRemoved {}

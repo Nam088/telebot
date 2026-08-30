@@ -19,6 +19,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
    * @param options - Additional parameters for sending game.
    * @returns The sent {@link Message}.
    * @throws {@link TelegramApiError} When sending game fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendgame Telegram Bot API: sendGame}
    */
   public async sendGame(
     chatId: number | string,
@@ -46,6 +48,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
    * @param options - Additional parameters including target message coordinates.
    * @returns The edited {@link Message} or `true`.
    * @throws {@link TelegramApiError} When setting score fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setgamescore Telegram Bot API: setGameScore}
    */
   public async setGameScore(
     userId: number,
@@ -72,6 +76,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
    * @param options - Target message coordinates.
    * @returns Array of {@link GameHighScore} objects.
    * @throws {@link TelegramApiError} When retrieving scores fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getgamehighscores Telegram Bot API: getGameHighScores}
    */
   public async getGameHighScores(
     userId: number,
@@ -94,6 +100,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
    * @param errors - Array describing the errors in the elements.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When reporting errors fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setpassportdataerrors Telegram Bot API: setPassportDataErrors}
    */
   public async setPassportDataErrors(
     userId: number,

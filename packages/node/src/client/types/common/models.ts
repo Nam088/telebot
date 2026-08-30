@@ -27,6 +27,9 @@ import type {
 } from "../messages/index.js";
 import type { ShippingQuery, PreCheckoutQuery, PurchasedPaidMedia } from "../payments/index.js";
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#user Telegram Bot API: User}
+ */
 export interface User {
   /** Unique identifier for this user or bot. */
   id: number;
@@ -56,6 +59,9 @@ export interface User {
   has_main_web_app?: boolean;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#birthdate Telegram Bot API: Birthdate}
+ */
 export interface Birthdate {
   /** Day of the user's birth; 1-31. */
   day: number;
@@ -65,6 +71,9 @@ export interface Birthdate {
   year?: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#chat Telegram Bot API: Chat}
+ */
 export interface Chat {
   /** Unique identifier for this chat (integer or channel username string). */
   id: number | string;
@@ -152,6 +161,9 @@ export interface Chat {
   location?: ChatLocation;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#chatphoto Telegram Bot API: ChatPhoto}
+ */
 export interface ChatPhoto {
   /** File identifier of small (160x160) chat photo. */
   small_file_id: string;
@@ -163,6 +175,9 @@ export interface ChatPhoto {
   big_file_unique_id: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#location Telegram Bot API: Location}
+ */
 export interface Location {
   /** Latitude as defined by sender. */
   latitude: number;
@@ -178,6 +193,9 @@ export interface Location {
   proximity_alert_radius?: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#userprofilephotos Telegram Bot API: UserProfilePhotos}
+ */
 export interface UserProfilePhotos {
   /** Total number of profile pictures the target user has. */
   total_count: number;
@@ -185,6 +203,9 @@ export interface UserProfilePhotos {
   photos: PhotoSize[][];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#file Telegram Bot API: File}
+ */
 export interface File {
   /** Identifier for this file, which can be used to download or reuse the file. */
   file_id: string;
@@ -196,6 +217,9 @@ export interface File {
   file_path?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#webhookinfo Telegram Bot API: WebhookInfo}
+ */
 export interface WebhookInfo {
   /** HTTPS URL to which Telegram sends updates. If empty, webhook is not set up. */
   url: string;
@@ -272,6 +296,8 @@ export interface RawUpdate {
 
 /**
  * Describes an update about a user stopping message generation (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#messagegenerationstopped Telegram Bot API: MessageGenerationStopped}
  */
 export interface MessageGenerationStopped {
   /** Chat in which the message is generated. */

@@ -6,6 +6,8 @@ export type { InputFile };
 
 /**
  * Represents one size of a photo or a file / sticker thumbnail.
+ *
+ * @see {@link https://core.telegram.org/bots/api#photosize Telegram Bot API: PhotoSize}
  */
 export interface PhotoSize {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -22,6 +24,8 @@ export interface PhotoSize {
 
 /**
  * Represents an audio file to be treated as music by the Telegram clients.
+ *
+ * @see {@link https://core.telegram.org/bots/api#audio Telegram Bot API: Audio}
  */
 export interface Audio {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -46,6 +50,8 @@ export interface Audio {
 
 /**
  * Represents a general file (as opposed for photos or audio files).
+ *
+ * @see {@link https://core.telegram.org/bots/api#document Telegram Bot API: Document}
  */
 export interface Document {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -64,6 +70,8 @@ export interface Document {
 
 /**
  * Represents a video file.
+ *
+ * @see {@link https://core.telegram.org/bots/api#video Telegram Bot API: Video}
  */
 export interface Video {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -88,6 +96,8 @@ export interface Video {
 
 /**
  * Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
+ *
+ * @see {@link https://core.telegram.org/bots/api#animation Telegram Bot API: Animation}
  */
 export interface Animation {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -112,6 +122,8 @@ export interface Animation {
 
 /**
  * Represents a voice note.
+ *
+ * @see {@link https://core.telegram.org/bots/api#voice Telegram Bot API: Voice}
  */
 export interface Voice {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -128,6 +140,8 @@ export interface Voice {
 
 /**
  * Represents a video message (round video).
+ *
+ * @see {@link https://core.telegram.org/bots/api#videonote Telegram Bot API: VideoNote}
  */
 export interface VideoNote {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -146,6 +160,8 @@ export interface VideoNote {
 
 /**
  * Represents a Live Photo message object (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#livephoto Telegram Bot API: LivePhoto}
  */
 export interface LivePhoto {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -164,6 +180,8 @@ export interface LivePhoto {
 
 /**
  * Represents a photo to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaphoto Telegram Bot API: InputMediaPhoto}
  */
 export interface InputMediaPhoto {
   /** Type of the result, must be 'photo'. */
@@ -184,6 +202,8 @@ export interface InputMediaPhoto {
 
 /**
  * Represents a video to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediavideo Telegram Bot API: InputMediaVideo}
  */
 export interface InputMediaVideo {
   /** Type of the result, must be 'video'. */
@@ -214,6 +234,8 @@ export interface InputMediaVideo {
 
 /**
  * Represents an animation file to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaanimation Telegram Bot API: InputMediaAnimation}
  */
 export interface InputMediaAnimation {
   /** Type of the result, must be 'animation'. */
@@ -242,6 +264,8 @@ export interface InputMediaAnimation {
 
 /**
  * Represents an audio file to be treated as music to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaaudio Telegram Bot API: InputMediaAudio}
  */
 export interface InputMediaAudio {
   /** Type of the result, must be 'audio'. */
@@ -266,6 +290,8 @@ export interface InputMediaAudio {
 
 /**
  * Represents a general file to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediadocument Telegram Bot API: InputMediaDocument}
  */
 export interface InputMediaDocument {
   /** Type of the result, must be 'document'. */

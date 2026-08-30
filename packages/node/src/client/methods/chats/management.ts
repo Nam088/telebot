@@ -19,6 +19,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param photo - File ID, URL, or {@link InputFile} object.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting chat photo fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatphoto Telegram Bot API: setChatPhoto}
    */
   public async setChatPhoto(
     chatId: number | string,
@@ -33,6 +35,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param chatId - Unique identifier for the target chat.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When deleting chat photo fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletechatphoto Telegram Bot API: deleteChatPhoto}
    */
   public async deleteChatPhoto(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("deleteChatPhoto", { chat_id: chatId });
@@ -45,6 +49,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param title - New chat title, 1-128 characters.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting title fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchattitle Telegram Bot API: setChatTitle}
    */
   public async setChatTitle(chatId: number | string, title: string): Promise<boolean> {
     return this.request<boolean>("setChatTitle", { chat_id: chatId, title });
@@ -57,6 +63,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param description - New chat description, 0-255 characters.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting description fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatdescription Telegram Bot API: setChatDescription}
    */
   public async setChatDescription(chatId: number | string, description?: string): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId };
@@ -72,6 +80,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param disableNotification - Pass `true` if it is not necessary to send a notification to all chat members.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When pinning message fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#pinchatmessage Telegram Bot API: pinChatMessage}
    */
   public async pinChatMessage(
     chatId: number | string,
@@ -90,6 +100,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param messageId - Identifier of a message to unpin. If not specified, the most recent pinned message is unpinned.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When unpinning fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#unpinchatmessage Telegram Bot API: unpinChatMessage}
    */
   public async unpinChatMessage(chatId: number | string, messageId?: number): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId };
@@ -103,6 +115,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param chatId - Unique identifier for the target chat.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When clearing pinned messages fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#unpinallchatmessages Telegram Bot API: unpinAllChatMessages}
    */
   public async unpinAllChatMessages(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("unpinAllChatMessages", { chat_id: chatId });
@@ -114,6 +128,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param chatId - Unique identifier for the target chat.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When leaving chat fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#leavechat Telegram Bot API: leaveChat}
    */
   public async leaveChat(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("leaveChat", { chat_id: chatId });
@@ -131,6 +147,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * const chat = await bot.getChat(chatId);
    * console.log(`Chat title: ${chat.title}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchat Telegram Bot API: getChat}
    */
   public async getChat(chatId: number | string): Promise<Chat> {
     return this.request<Chat>("getChat", { chat_id: chatId });
@@ -148,6 +166,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * const admins = await bot.getChatAdministrators(chatId);
    * console.log(`Found ${admins.length} administrators`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatadministrators Telegram Bot API: getChatAdministrators}
    */
   public async getChatAdministrators(chatId: number | string): Promise<ChatMember[]> {
     return this.request<ChatMember[]>("getChatAdministrators", { chat_id: chatId });
@@ -165,6 +185,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * const count = await bot.getChatMemberCount(chatId);
    * console.log(`Chat members: ${count}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatmembercount Telegram Bot API: getChatMemberCount}
    */
   public async getChatMemberCount(chatId: number | string): Promise<number> {
     return this.request<number>("getChatMemberCount", { chat_id: chatId });
@@ -183,6 +205,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * const member = await bot.getChatMember(chatId, userId);
    * console.log(`User status: ${member.status}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatmember Telegram Bot API: getChatMember}
    */
   public async getChatMember(chatId: number | string, userId: number): Promise<ChatMember> {
     return this.request<ChatMember>("getChatMember", { chat_id: chatId, user_id: userId });
@@ -195,6 +219,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param stickerSetName - Name of the sticker set to be set as the group sticker set.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting sticker set fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatstickerset Telegram Bot API: setChatStickerSet}
    */
   public async setChatStickerSet(
     chatId: number | string,
@@ -212,6 +238,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * @param chatId - Unique identifier for the target chat.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When deleting sticker set fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletechatstickerset Telegram Bot API: deleteChatStickerSet}
    */
   public async deleteChatStickerSet(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("deleteChatStickerSet", { chat_id: chatId });
@@ -229,6 +257,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * ```ts
    * await bot.verifyUser(123456, "Official Staff");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#verifyuser Telegram Bot API: verifyUser}
    */
   public async verifyUser(userId: number, customDescription?: string): Promise<boolean> {
     const payload: Record<string, unknown> = { user_id: userId };
@@ -248,6 +278,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * ```ts
    * await bot.verifyChat(chatId, "Verified Community");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#verifychat Telegram Bot API: verifyChat}
    */
   public async verifyChat(chatId: number | string, customDescription?: string): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId };
@@ -266,6 +298,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * ```ts
    * await bot.removeUserVerification(123456);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#removeuserverification Telegram Bot API: removeUserVerification}
    */
   public async removeUserVerification(userId: number): Promise<boolean> {
     return this.request<boolean>("removeUserVerification", { user_id: userId });
@@ -282,6 +316,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * ```ts
    * await bot.removeChatVerification(chatId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#removechatverification Telegram Bot API: removeChatVerification}
    */
   public async removeChatVerification(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("removeChatVerification", { chat_id: chatId });
@@ -300,6 +336,8 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    * const boosts = await bot.getUserChatBoosts(chatId, 123456);
    * console.log(`Total boosts: ${boosts.boosts.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getuserchatboosts Telegram Bot API: getUserChatBoosts}
    */
   public async getUserChatBoosts(chatId: number | string, userId: number): Promise<UserChatBoosts> {
     return this.request<UserChatBoosts>("getUserChatBoosts", { chat_id: chatId, user_id: userId });

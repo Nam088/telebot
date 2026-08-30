@@ -18,6 +18,9 @@ import type {
 } from "./media.js";
 import type { InlineKeyboardMarkup } from "./keyboards.js";
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageentity Telegram Bot API: MessageEntity}
+ */
 export interface MessageEntity {
   /** Type of the entity (e.g. 'mention', 'hashtag', 'bot_command', 'url', 'bold', 'italic', etc.). */
   type: MessageEntityType;
@@ -35,6 +38,9 @@ export interface MessageEntity {
   custom_emoji_id?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#contact Telegram Bot API: Contact}
+ */
 export interface Contact {
   /** Contact's phone number. */
   phone_number: string;
@@ -48,6 +54,9 @@ export interface Contact {
   vcard?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#dice Telegram Bot API: Dice}
+ */
 export interface Dice {
   /** Emoji on which the dice throw animation is based. */
   emoji: string;
@@ -55,6 +64,9 @@ export interface Dice {
   value: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#polloption Telegram Bot API: PollOption}
+ */
 export interface PollOption {
   /** Unique identifier of the option in the poll. */
   persistent_id?: string;
@@ -66,6 +78,9 @@ export interface PollOption {
   text_entities?: MessageEntity[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#poll Telegram Bot API: Poll}
+ */
 export interface Poll {
   /** Unique poll identifier. */
   id: string;
@@ -95,6 +110,9 @@ export interface Poll {
   close_date?: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#pollanswer Telegram Bot API: PollAnswer}
+ */
 export interface PollAnswer {
   /** Unique poll identifier. */
   poll_id: string;
@@ -106,6 +124,9 @@ export interface PollAnswer {
   option_ids: number[];
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#venue Telegram Bot API: Venue}
+ */
 export interface Venue {
   /** Venue location. */
   location: Location;
@@ -123,6 +144,9 @@ export interface Venue {
   google_place_type?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageoriginuser Telegram Bot API: MessageOriginUser}
+ */
 export interface MessageOriginUser {
   /** Type of the message origin, always 'user'. */
   type: "user";
@@ -132,6 +156,9 @@ export interface MessageOriginUser {
   sender_user: User;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageoriginhiddenuser Telegram Bot API: MessageOriginHiddenUser}
+ */
 export interface MessageOriginHiddenUser {
   /** Type of the message origin, always 'hidden_user'. */
   type: "hidden_user";
@@ -141,6 +168,9 @@ export interface MessageOriginHiddenUser {
   sender_user_name: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageoriginchat Telegram Bot API: MessageOriginChat}
+ */
 export interface MessageOriginChat {
   /** Type of the message origin, always 'chat'. */
   type: "chat";
@@ -152,6 +182,9 @@ export interface MessageOriginChat {
   author_signature?: string;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageoriginchannel Telegram Bot API: MessageOriginChannel}
+ */
 export interface MessageOriginChannel {
   /** Type of the message origin, always 'channel'. */
   type: "channel";
@@ -168,6 +201,9 @@ export interface MessageOriginChannel {
 export type MessageOrigin =
   MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel;
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#externalreplyinfo Telegram Bot API: ExternalReplyInfo}
+ */
 export interface ExternalReplyInfo {
   /** Origin of the message replied to. */
   origin: MessageOrigin;
@@ -217,6 +253,9 @@ export interface ExternalReplyInfo {
   venue?: Venue;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#textquote Telegram Bot API: TextQuote}
+ */
 export interface TextQuote {
   /** Text of the quoted part of a message that is replied to. */
   text: string;
@@ -230,6 +269,8 @@ export interface TextQuote {
 
 /**
  * Parameters for sending or replying with ephemeral messages (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#ephemeralmessageparameters Telegram Bot API: EphemeralMessageParameters}
  */
 export interface EphemeralMessageParameters {
   /** Identifier of the user who will receive the message. */
@@ -242,12 +283,17 @@ export interface EphemeralMessageParameters {
 
 /**
  * Describes a service message about a chat being joined by a user from a community (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#communitychatjoined Telegram Bot API: CommunityChatJoined}
  */
 export interface CommunityChatJoined {
   /** The community from which the chat was joined. */
   community: Community;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#message Telegram Bot API: Message}
+ */
 export interface Message {
   /** Unique message identifier inside this chat. */
   message_id: number;
@@ -429,6 +475,8 @@ export interface Message {
 
 /**
  * Describes reply parameters for a message to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#replyparameters Telegram Bot API: ReplyParameters}
  */
 export interface ReplyParameters {
   /** Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified. */

@@ -26,6 +26,8 @@ export abstract class BusinessQueriesMethods extends TopicAndProfileMethods {
    *   show_alert: false,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answercallbackquery Telegram Bot API: answerCallbackQuery}
    */
   public async answerCallbackQuery(options: AnswerCallbackQueryOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -58,6 +60,8 @@ export abstract class BusinessQueriesMethods extends TopicAndProfileMethods {
    *   ],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answerinlinequery Telegram Bot API: answerInlineQuery}
    */
   public async answerInlineQuery(options: AnswerInlineQueryOptions): Promise<boolean> {
     return this.request<boolean>(

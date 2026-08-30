@@ -12,6 +12,8 @@ import type { InputMediaVoiceNote, InputRichBlock } from "./input-blocks.js";
 
 /**
  * Represents a rich formatted message received from Telegram.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richmessage Telegram Bot API: RichMessage}
  */
 export interface RichMessage {
   /** Content of the message. */
@@ -22,6 +24,8 @@ export interface RichMessage {
 
 /**
  * Media embedded in an outgoing rich message via tg:// links.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichmessagemedia Telegram Bot API: InputRichMessageMedia}
  */
 export interface InputRichMessageMedia {
   /** Unique identifier of the media used in tg:// links (e.g. tg://document?id=doc1). */
@@ -38,6 +42,8 @@ export interface InputRichMessageMedia {
 
 /**
  * Outgoing rich message payload to send.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichmessage Telegram Bot API: InputRichMessage}
  */
 export interface InputRichMessage {
   /** Content of the rich message to send described as a list of blocks. */
@@ -56,6 +62,8 @@ export interface InputRichMessage {
 
 /**
  * Content of a rich message to be sent as the result of an inline query.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichmessagecontent Telegram Bot API: InputRichMessageContent}
  */
 export interface InputRichMessageContent {
   /** The message to be sent. Only previously uploaded files may be used in the message. */

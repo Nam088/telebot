@@ -24,6 +24,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param options - Premium gift parameters.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#giftpremiumsubscription Telegram Bot API: giftPremiumSubscription}
    */
   public async giftPremiumSubscription(options: Record<string, unknown>): Promise<boolean> {
     return this.request<boolean>("giftPremiumSubscription", options);
@@ -36,6 +38,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional exclusion, sorting and pagination filters.
    * @returns Owned gifts of the business account.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getbusinessaccountgifts Telegram Bot API: getBusinessAccountGifts}
    */
   public async getBusinessAccountGifts(
     businessConnectionId: string,
@@ -52,6 +56,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param businessConnectionId - Unique identifier of the business connection.
    * @returns Object containing the star `amount`.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getbusinessaccountstarbalance Telegram Bot API: getBusinessAccountStarBalance}
    */
   public async getBusinessAccountStarBalance(
     businessConnectionId: string,
@@ -69,6 +75,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param lastName - New last name of the business account; 0-64 characters.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountname Telegram Bot API: setBusinessAccountName}
    */
   public async setBusinessAccountName(
     businessConnectionId: string,
@@ -89,6 +97,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param businessConnectionId - Unique identifier of the business connection.
    * @param username - New username.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountusername Telegram Bot API: setBusinessAccountUsername}
    */
   public async setBusinessAccountUsername(
     businessConnectionId: string,
@@ -105,6 +115,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param businessConnectionId - Unique identifier of the business connection.
    * @param bio - New bio text.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountbio Telegram Bot API: setBusinessAccountBio}
    */
   public async setBusinessAccountBio(businessConnectionId: string, bio?: string): Promise<boolean> {
     const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
@@ -118,6 +130,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param businessConnectionId - Unique identifier of the business connection.
    * @param options - Gift settings parameters.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountgiftsettings Telegram Bot API: setBusinessAccountGiftSettings}
    */
   public async setBusinessAccountGiftSettings(
     businessConnectionId: string,
@@ -137,6 +151,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional `is_public` flag.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountprofilephoto Telegram Bot API: setBusinessAccountProfilePhoto}
    */
   public async setBusinessAccountProfilePhoto(
     businessConnectionId: string,
@@ -157,6 +173,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional `is_public` flag; pass True to remove the public photo.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#removebusinessaccountprofilephoto Telegram Bot API: removeBusinessAccountProfilePhoto}
    */
   public async removeBusinessAccountProfilePhoto(
     businessConnectionId: string,
@@ -175,6 +193,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param ownedGiftId - Unique identifier of the regular gift to convert.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#convertgifttostars Telegram Bot API: convertGiftToStars}
    */
   public async convertGiftToStars(
     businessConnectionId: string,
@@ -194,6 +214,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional `keep_original_details` and `star_count` parameters.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#upgradegift Telegram Bot API: upgradeGift}
    */
   public async upgradeGift(
     businessConnectionId: string,
@@ -216,6 +238,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional `star_count` paid for the transfer from the business account balance.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#transfergift Telegram Bot API: transferGift}
    */
   public async transferGift(
     businessConnectionId: string,
@@ -237,6 +261,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param businessConnectionId - Unique identifier of the business connection.
    * @param starCount - Number of stars to transfer.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#transferbusinessaccountstars Telegram Bot API: transferBusinessAccountStars}
    */
   public async transferBusinessAccountStars(
     businessConnectionId: string,
@@ -253,6 +279,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param botId - Target bot identifier.
    * @returns Access settings.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmanagedbotaccesssettings Telegram Bot API: getManagedBotAccessSettings}
    */
   public async getManagedBotAccessSettings(botId: number): Promise<unknown> {
     return this.request<unknown>("getManagedBotAccessSettings", { bot_id: botId });
@@ -264,6 +292,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param botId - Target bot identifier.
    * @param options - Updated access options.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmanagedbotaccesssettings Telegram Bot API: setManagedBotAccessSettings}
    */
   public async setManagedBotAccessSettings(
     botId: number,
@@ -278,6 +308,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param chatId - Target chat identifier.
    * @param options - Subscription parameters.
    * @returns Created link object.
+   *
+   * @see {@link https://core.telegram.org/bots/api#createchatsubscriptioninvitelink Telegram Bot API: createChatSubscriptionInviteLink}
    */
   public async createChatSubscriptionInviteLink(
     chatId: number | string,
@@ -296,6 +328,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param inviteLink - Invite link to edit.
    * @param options - Updated link parameters.
    * @returns Edited link object.
+   *
+   * @see {@link https://core.telegram.org/bots/api#editchatsubscriptioninvitelink Telegram Bot API: editChatSubscriptionInviteLink}
    */
   public async editChatSubscriptionInviteLink(
     chatId: number | string,
@@ -315,6 +349,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param chatId - Channel chat identifier.
    * @param messageId - Identifier of the suggested post message.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#approvesuggestedpost Telegram Bot API: approveSuggestedPost}
    */
   public async approveSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
     return this.request<boolean>("approveSuggestedPost", {
@@ -329,6 +365,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param chatId - Channel chat identifier.
    * @param messageId - Identifier of the suggested post message.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#declinesuggestedpost Telegram Bot API: declineSuggestedPost}
    */
   public async declineSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
     return this.request<boolean>("declineSuggestedPost", {
@@ -342,6 +380,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param options - Repost parameters.
    * @returns Repost result.
+   *
+   * @see {@link https://core.telegram.org/bots/api#repoststory Telegram Bot API: repostStory}
    */
   public async repostStory(options: Record<string, unknown>): Promise<unknown> {
     return this.request<unknown>("repostStory", options);
@@ -354,6 +394,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional exclusion, sorting and pagination filters.
    * @returns List of user gifts.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getusergifts Telegram Bot API: getUserGifts}
    */
   public async getUserGifts(userId: number, options: GetUserGiftsOptions = {}): Promise<unknown> {
     return this.request<unknown>("getUserGifts", { user_id: userId, ...options });
@@ -366,6 +408,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param options - Optional exclusion (including saved/unsaved), sorting and pagination filters.
    * @returns List of chat gifts.
    * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatgifts Telegram Bot API: getChatGifts}
    */
   public async getChatGifts(
     chatId: number | string,
@@ -379,6 +423,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param photo - Photo file to set.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmyprofilephoto Telegram Bot API: setMyProfilePhoto}
    */
   public async setMyProfilePhoto(photo: unknown): Promise<boolean> {
     return this.request<boolean>("setMyProfilePhoto", { photo });
@@ -388,6 +434,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * Removes the profile photo of the bot.
    *
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#removemyprofilephoto Telegram Bot API: removeMyProfilePhoto}
    */
   public async removeMyProfilePhoto(): Promise<boolean> {
     return this.request<boolean>("removeMyProfilePhoto");
@@ -400,6 +448,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param offset - Query offset.
    * @param limit - Maximum items to retrieve.
    * @returns Profile audio objects.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getuserprofileaudios Telegram Bot API: getUserProfileAudios}
    */
   public async getUserProfileAudios(
     userId: number,
@@ -419,6 +469,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * @param userId - Target user identifier.
    * @param tag - Tag name to set.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatmembertag Telegram Bot API: setChatMemberTag}
    */
   public async setChatMemberTag(
     chatId: number | string,
@@ -435,6 +487,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param botId - Target bot identifier.
    * @returns Object containing the bot `token`.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmanagedbottoken Telegram Bot API: getManagedBotToken}
    */
   public async getManagedBotToken(botId: number): Promise<{ token: string }> {
     return this.request<{ token: string }>("getManagedBotToken", { bot_id: botId });
@@ -445,6 +499,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param botId - Target bot identifier.
    * @returns Object containing the new bot `token`.
+   *
+   * @see {@link https://core.telegram.org/bots/api#replacemanagedbottoken Telegram Bot API: replaceManagedBotToken}
    */
   public async replaceManagedBotToken(botId: number): Promise<{ token: string }> {
     return this.request<{ token: string }>("replaceManagedBotToken", { bot_id: botId });
@@ -455,6 +511,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param options - Button options.
    * @returns Prepared button result.
+   *
+   * @see {@link https://core.telegram.org/bots/api#savepreparedkeyboardbutton Telegram Bot API: savePreparedKeyboardButton}
    */
   public async savePreparedKeyboardButton(options: Record<string, unknown>): Promise<unknown> {
     return this.request<unknown>("savePreparedKeyboardButton", options);

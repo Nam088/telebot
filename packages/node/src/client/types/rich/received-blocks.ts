@@ -4,6 +4,8 @@ import type { RichText, RichMessageButton } from "./text.js";
 
 /**
  * Caption of a rich formatted block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockcaption Telegram Bot API: RichBlockCaption}
  */
 export interface RichBlockCaption {
   /** Block caption. */
@@ -14,6 +16,8 @@ export interface RichBlockCaption {
 
 /**
  * Cell in a table.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblocktablecell Telegram Bot API: RichBlockTableCell}
  */
 export interface RichBlockTableCell {
   /** Text in the cell. If omitted, then the cell is invisible. */
@@ -32,6 +36,8 @@ export interface RichBlockTableCell {
 
 /**
  * An item of a list.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblocklistitem Telegram Bot API: RichBlockListItem}
  */
 export interface RichBlockListItem {
   /** Label of the item. */
@@ -50,6 +56,8 @@ export interface RichBlockListItem {
 
 /**
  * A text paragraph block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockparagraph Telegram Bot API: RichBlockParagraph}
  */
 export interface RichBlockParagraph {
   /** Type of the block, always 'paragraph'. */
@@ -60,6 +68,8 @@ export interface RichBlockParagraph {
 
 /**
  * A section heading block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblocksectionheading Telegram Bot API: RichBlockSectionHeading}
  */
 export interface RichBlockSectionHeading {
   /** Type of the block, always 'heading'. */
@@ -72,6 +82,8 @@ export interface RichBlockSectionHeading {
 
 /**
  * A preformatted text block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockpreformatted Telegram Bot API: RichBlockPreformatted}
  */
 export interface RichBlockPreformatted {
   /** Type of the block, always 'pre'. */
@@ -84,6 +96,8 @@ export interface RichBlockPreformatted {
 
 /**
  * A footer block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockfooter Telegram Bot API: RichBlockFooter}
  */
 export interface RichBlockFooter {
   /** Type of the block, always 'footer'. */
@@ -94,6 +108,8 @@ export interface RichBlockFooter {
 
 /**
  * A divider block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockdivider Telegram Bot API: RichBlockDivider}
  */
 export interface RichBlockDivider {
   /** Type of the block, always 'divider'. */
@@ -102,6 +118,8 @@ export interface RichBlockDivider {
 
 /**
  * A mathematical expression block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockmathematicalexpression Telegram Bot API: RichBlockMathematicalExpression}
  */
 export interface RichBlockMathematicalExpression {
   /** Type of the block, always 'mathematical_expression'. */
@@ -112,6 +130,8 @@ export interface RichBlockMathematicalExpression {
 
 /**
  * An anchor block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockanchor Telegram Bot API: RichBlockAnchor}
  */
 export interface RichBlockAnchor {
   /** Type of the block, always 'anchor'. */
@@ -122,6 +142,8 @@ export interface RichBlockAnchor {
 
 /**
  * A list of blocks.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblocklist Telegram Bot API: RichBlockList}
  */
 export interface RichBlockList {
   /** Type of the block, always 'list'. */
@@ -132,6 +154,8 @@ export interface RichBlockList {
 
 /**
  * A block quotation.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockblockquotation Telegram Bot API: RichBlockBlockQuotation}
  */
 export interface RichBlockBlockQuotation {
   /** Type of the block, always 'blockquote'. */
@@ -144,6 +168,8 @@ export interface RichBlockBlockQuotation {
 
 /**
  * An expandable block quotation (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockexpandableblockquotation Telegram Bot API: RichBlockExpandableBlockQuotation}
  */
 export interface RichBlockExpandableBlockQuotation {
   /** Type of the block, always 'expandable_blockquote'. */
@@ -156,6 +182,8 @@ export interface RichBlockExpandableBlockQuotation {
 
 /**
  * A pull quotation block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockpullquotation Telegram Bot API: RichBlockPullQuotation}
  */
 export interface RichBlockPullQuotation {
   /** Type of the block, always 'pullquote'. */
@@ -168,6 +196,8 @@ export interface RichBlockPullQuotation {
 
 /**
  * A collage block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockcollage Telegram Bot API: RichBlockCollage}
  */
 export interface RichBlockCollage {
   /** Type of the block, always 'collage'. */
@@ -180,6 +210,8 @@ export interface RichBlockCollage {
 
 /**
  * A slideshow block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockslideshow Telegram Bot API: RichBlockSlideshow}
  */
 export interface RichBlockSlideshow {
   /** Type of the block, always 'slideshow'. */
@@ -192,6 +224,8 @@ export interface RichBlockSlideshow {
 
 /**
  * A table block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblocktable Telegram Bot API: RichBlockTable}
  */
 export interface RichBlockTable {
   /** Type of the block, always 'table'. */
@@ -210,6 +244,8 @@ export interface RichBlockTable {
 
 /**
  * An expandable details block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockdetails Telegram Bot API: RichBlockDetails}
  */
 export interface RichBlockDetails {
   /** Type of the block, always 'details'. */
@@ -224,6 +260,8 @@ export interface RichBlockDetails {
 
 /**
  * A map block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockmap Telegram Bot API: RichBlockMap}
  */
 export interface RichBlockMap {
   /** Type of the block, always 'map'. */
@@ -242,6 +280,8 @@ export interface RichBlockMap {
 
 /**
  * A block containing buttons in one row (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockbuttons Telegram Bot API: RichBlockButtons}
  */
 export interface RichBlockButtons {
   /** Type of the block, always 'buttons'. */
@@ -254,6 +294,8 @@ export interface RichBlockButtons {
 
 /**
  * An animation media block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockanimation Telegram Bot API: RichBlockAnimation}
  */
 export interface RichBlockAnimation {
   /** Type of the block, always 'animation'. */
@@ -268,6 +310,8 @@ export interface RichBlockAnimation {
 
 /**
  * An audio media block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockaudio Telegram Bot API: RichBlockAudio}
  */
 export interface RichBlockAudio {
   /** Type of the block, always 'audio'. */
@@ -280,6 +324,8 @@ export interface RichBlockAudio {
 
 /**
  * A document file block (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockdocument Telegram Bot API: RichBlockDocument}
  */
 export interface RichBlockDocument {
   /** Type of the block, always 'document'. */
@@ -292,6 +338,8 @@ export interface RichBlockDocument {
 
 /**
  * A photo media block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockphoto Telegram Bot API: RichBlockPhoto}
  */
 export interface RichBlockPhoto {
   /** Type of the block, always 'photo'. */
@@ -306,6 +354,8 @@ export interface RichBlockPhoto {
 
 /**
  * A video media block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockvideo Telegram Bot API: RichBlockVideo}
  */
 export interface RichBlockVideo {
   /** Type of the block, always 'video'. */
@@ -320,6 +370,8 @@ export interface RichBlockVideo {
 
 /**
  * A voice note media block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockvoicenote Telegram Bot API: RichBlockVoiceNote}
  */
 export interface RichBlockVoiceNote {
   /** Type of the block, always 'voice_note'. */
@@ -332,6 +384,8 @@ export interface RichBlockVoiceNote {
 
 /**
  * A thinking placeholder block.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richblockthinking Telegram Bot API: RichBlockThinking}
  */
 export interface RichBlockThinking {
   /** Type of the block, always 'thinking'. */

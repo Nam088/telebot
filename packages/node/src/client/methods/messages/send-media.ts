@@ -38,6 +38,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   caption: "Example image",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendphoto Telegram Bot API: sendPhoto}
    */
   public async sendPhoto(options: SendPhotoOptions): Promise<Message> {
     return this.request<Message>("sendPhoto", options as unknown as Record<string, unknown>);
@@ -59,6 +61,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   title: "Track Title",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendaudio Telegram Bot API: sendAudio}
    */
   public async sendAudio(options: SendAudioOptions): Promise<Message> {
     return this.request<Message>("sendAudio", options as unknown as Record<string, unknown>);
@@ -79,6 +83,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   caption: "Monthly report",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#senddocument Telegram Bot API: sendDocument}
    */
   public async sendDocument(options: SendDocumentOptions): Promise<Message> {
     return this.request<Message>("sendDocument", options as unknown as Record<string, unknown>);
@@ -99,6 +105,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   caption: "Watch this video",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendvideo Telegram Bot API: sendVideo}
    */
   public async sendVideo(options: SendVideoOptions): Promise<Message> {
     return this.request<Message>("sendVideo", options as unknown as Record<string, unknown>);
@@ -118,6 +126,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   animation: "https://example.com/clip.gif",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendanimation Telegram Bot API: sendAnimation}
    */
   public async sendAnimation(options: SendAnimationOptions): Promise<Message> {
     return this.request<Message>("sendAnimation", options as unknown as Record<string, unknown>);
@@ -137,6 +147,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   voice: voiceFileId,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendvoice Telegram Bot API: sendVoice}
    */
   public async sendVoice(options: SendVoiceOptions): Promise<Message> {
     return this.request<Message>("sendVoice", options as unknown as Record<string, unknown>);
@@ -156,6 +168,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   video_note: videoNoteId,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendvideonote Telegram Bot API: sendVideoNote}
    */
   public async sendVideoNote(options: SendVideoNoteOptions): Promise<Message> {
     return this.request<Message>("sendVideoNote", options as unknown as Record<string, unknown>);
@@ -178,6 +192,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *   ],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendmediagroup Telegram Bot API: sendMediaGroup}
    */
   public async sendMediaGroup(options: SendMediaGroupOptions): Promise<Message[]> {
     return this.request<Message[]>("sendMediaGroup", options as unknown as Record<string, unknown>);
@@ -188,6 +204,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *
    * @param options - Paid media parameters including `chat_id`, `star_count`, and `media` array.
    * @returns The sent {@link Message}.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendpaidmedia Telegram Bot API: sendPaidMedia}
    */
   public async sendPaidMedia(options: Record<string, unknown>): Promise<Message> {
     return this.request<Message>("sendPaidMedia", options);
@@ -198,6 +216,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *
    * @param options - Live photo options.
    * @returns Sent {@link Message}.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendlivephoto Telegram Bot API: sendLivePhoto}
    */
   public async sendLivePhoto(options: SendLivePhotoOptions): Promise<Message> {
     return this.request<Message>("sendLivePhoto", options as unknown as Record<string, unknown>);

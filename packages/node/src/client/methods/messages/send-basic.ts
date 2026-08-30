@@ -42,6 +42,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * const me = await bot.getMe();
    * console.log(`Logged in as @${me.username} (${me.id})`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getme Telegram Bot API: getMe}
    */
   public async getMe(): Promise<User> {
     return this.request<User>("getMe");
@@ -59,6 +61,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * const updates = await bot.getUpdates({ timeout: 10, offset: 0 });
    * console.log(`Received ${updates.length} updates`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getupdates Telegram Bot API: getUpdates}
    */
   public async getUpdates(options: GetUpdatesOptions = {}): Promise<RawUpdate[]> {
     return this.request<RawUpdate[]>("getUpdates", options as unknown as Record<string, unknown>);
@@ -79,6 +83,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   parse_mode: ParseMode.MARKDOWN_V2,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendmessage Telegram Bot API: sendMessage}
    */
   public async sendMessage(options: SendMessageOptions): Promise<Message> {
     return this.request<Message>("sendMessage", options as unknown as Record<string, unknown>);
@@ -96,6 +102,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * ```ts
    * await bot.deleteMessage(chatId, messageId);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletemessage Telegram Bot API: deleteMessage}
    */
   public async deleteMessage(chatId: number | string, messageId: number): Promise<boolean> {
     return this.request<boolean>("deleteMessage", { chat_id: chatId, message_id: messageId });
@@ -113,6 +121,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * ```ts
    * await bot.deleteMessages(chatId, [101, 102, 103]);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletemessages Telegram Bot API: deleteMessages}
    */
   public async deleteMessages(chatId: number | string, messageIds: number[]): Promise<boolean> {
     return this.request<boolean>("deleteMessages", { chat_id: chatId, message_ids: messageIds });
@@ -133,6 +143,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   message_id: 123,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#forwardmessage Telegram Bot API: forwardMessage}
    */
   public async forwardMessage(options: {
     chat_id: number | string;
@@ -161,6 +173,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * });
    * console.log(`Forwarded ${sent.length} messages`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#forwardmessages Telegram Bot API: forwardMessages}
    */
   public async forwardMessages(options: ForwardMessagesOptions): Promise<MessageId[]> {
     return this.request<MessageId[]>(
@@ -185,6 +199,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   caption: "Here is your copy!",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#copymessage Telegram Bot API: copyMessage}
    */
   public async copyMessage(options: {
     chat_id: number | string;
@@ -221,6 +237,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * });
    * console.log(`Copied ${copies.length} messages`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#copymessages Telegram Bot API: copyMessages}
    */
   public async copyMessages(options: CopyMessagesOptions): Promise<MessageId[]> {
     return this.request<MessageId[]>("copyMessages", options as unknown as Record<string, unknown>);
@@ -241,6 +259,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   longitude: -122.4194,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendlocation Telegram Bot API: sendLocation}
    */
   public async sendLocation(options: SendLocationOptions): Promise<Message> {
     return this.request<Message>("sendLocation", options as unknown as Record<string, unknown>);
@@ -262,6 +282,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   longitude: -122.4195,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#editmessagelivelocation Telegram Bot API: editMessageLiveLocation}
    */
   public async editMessageLiveLocation(
     options: EditMessageLiveLocationOptions,
@@ -286,6 +308,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   message_id: 456,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#stopmessagelivelocation Telegram Bot API: stopMessageLiveLocation}
    */
   public async stopMessageLiveLocation(
     options: StopMessageLiveLocationOptions,
@@ -313,6 +337,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   address: "Manhattan, NY 10036",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendvenue Telegram Bot API: sendVenue}
    */
   public async sendVenue(options: SendVenueOptions): Promise<Message> {
     return this.request<Message>("sendVenue", options as unknown as Record<string, unknown>);
@@ -333,6 +359,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   first_name: "Alice",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendcontact Telegram Bot API: sendContact}
    */
   public async sendContact(options: SendContactOptions): Promise<Message> {
     return this.request<Message>("sendContact", options as unknown as Record<string, unknown>);
@@ -354,6 +382,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    *   is_anonymous: false,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendpoll Telegram Bot API: sendPoll}
    */
   public async sendPoll(options: SendPollOptions): Promise<Message> {
     return this.request<Message>("sendPoll", options as unknown as Record<string, unknown>);
@@ -365,6 +395,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * @param chatId - Chat identifier.
    * @param limit - Maximum messages to return.
    * @returns Array of {@link Message} objects.
+   *
+   * @see {@link https://core.telegram.org/bots/api#getuserpersonalchatmessages Telegram Bot API: getUserPersonalChatMessages}
    */
   public async getUserPersonalChatMessages(
     chatId: number | string,
@@ -397,6 +429,8 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
    * });
    * console.log(`Prepared message ID: ${prepared.id}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#savepreparedinlinemessage Telegram Bot API: savePreparedInlineMessage}
    */
   public async savePreparedInlineMessage(
     options: SavePreparedInlineMessageOptions,
