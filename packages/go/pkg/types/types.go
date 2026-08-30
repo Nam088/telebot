@@ -6,6 +6,7 @@ package types
 type Message struct {
 	MessageID             int64                 `json:"message_id"`
 	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
+	BusinessConnectionID  string                `json:"business_connection_id,omitempty"`
 	From                  *User                 `json:"from,omitempty"`
 	SenderChat            *Chat                 `json:"sender_chat,omitempty"`
 	Date                  int64                 `json:"date"`
@@ -94,19 +95,34 @@ type InlineQuery struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#update
 type Update struct {
-	UpdateID           int64               `json:"update_id"`
-	Message            *Message            `json:"message,omitempty"`
-	EditedMessage      *Message            `json:"edited_message,omitempty"`
-	ChannelPost        *Message            `json:"channel_post,omitempty"`
-	EditedChannelPost  *Message            `json:"edited_channel_post,omitempty"`
-	InlineQuery        *InlineQuery        `json:"inline_query,omitempty"`
-	CallbackQuery      *CallbackQuery      `json:"callback_query,omitempty"`
-	Poll               *Poll               `json:"poll,omitempty"`
-	PollAnswer         *PollAnswer         `json:"poll_answer,omitempty"`
-	MyChatMember       *ChatMemberUpdated  `json:"my_chat_member,omitempty"`
-	ChatMember         *ChatMemberUpdated  `json:"chat_member,omitempty"`
-	ChatJoinRequest    *ChatJoinRequest    `json:"chat_join_request,omitempty"`
-	BusinessConnection *BusinessConnection `json:"business_connection,omitempty"`
+	UpdateID                 int64                        `json:"update_id"`
+	Message                  *Message                     `json:"message,omitempty"`
+	EditedMessage            *Message                     `json:"edited_message,omitempty"`
+	ChannelPost              *Message                     `json:"channel_post,omitempty"`
+	EditedChannelPost        *Message                     `json:"edited_channel_post,omitempty"`
+	BusinessConnection       *BusinessConnection          `json:"business_connection,omitempty"`
+	BusinessMessage          *Message                     `json:"business_message,omitempty"`
+	EditedBusinessMessage    *Message                     `json:"edited_business_message,omitempty"`
+	DeletedBusinessMessages  *BusinessMessagesDeleted     `json:"deleted_business_messages,omitempty"`
+	MessageReaction          *MessageReactionUpdated      `json:"message_reaction,omitempty"`
+	MessageReactionCount     *MessageReactionCountUpdated `json:"message_reaction_count,omitempty"`
+	ChatBoost                *ChatBoostUpdated            `json:"chat_boost,omitempty"`
+	RemovedChatBoost         *ChatBoostRemoved            `json:"removed_chat_boost,omitempty"`
+	InlineQuery              *InlineQuery                 `json:"inline_query,omitempty"`
+	ChosenInlineResult       *ChosenInlineResult          `json:"chosen_inline_result,omitempty"`
+	CallbackQuery            *CallbackQuery               `json:"callback_query,omitempty"`
+	ShippingQuery            *ShippingQuery               `json:"shipping_query,omitempty"`
+	PreCheckoutQuery         *PreCheckoutQuery            `json:"pre_checkout_query,omitempty"`
+	PurchasedPaidMedia       *PaidMediaPurchased          `json:"purchased_paid_media,omitempty"`
+	Poll                     *Poll                        `json:"poll,omitempty"`
+	PollAnswer               *PollAnswer                  `json:"poll_answer,omitempty"`
+	MyChatMember             *ChatMemberUpdated           `json:"my_chat_member,omitempty"`
+	ChatMember               *ChatMemberUpdated           `json:"chat_member,omitempty"`
+	ChatJoinRequest          *ChatJoinRequest             `json:"chat_join_request,omitempty"`
+	Subscription             *BotSubscriptionUpdated      `json:"subscription,omitempty"`
+	StoppedMessageGeneration *MessageGenerationStopped    `json:"stopped_message_generation,omitempty"`
+	ManagedBot               *ManagedBotUpdated           `json:"managed_bot,omitempty"`
+	GuestMessage             *Message                     `json:"guest_message,omitempty"`
 }
 
 // EffectiveUser extracts the sender User from an Update regardless of update type.
@@ -134,6 +150,42 @@ func (u *Update) EffectiveUser() *User {
 	}
 	if u.ChatJoinRequest != nil && u.ChatJoinRequest.From != nil {
 		return u.ChatJoinRequest.From
+	}
+	if u.BusinessMessage != nil && u.BusinessMessage.From != nil {
+		return u.BusinessMessage.From
+	}
+	if u.EditedBusinessMessage != nil && u.EditedBusinessMessage.From != nil {
+		return u.EditedBusinessMessage.From
+	}
+	if u.GuestMessage != nil && u.GuestMessage.From != nil {
+		return u.GuestMessage.From
+	}
+	if u.ChosenInlineResult != nil && u.ChosenInlineResult.From != nil {
+		return u.ChosenInlineResult.From
+	}
+	if u.ShippingQuery != nil && u.ShippingQuery.From != nil {
+		return u.ShippingQuery.From
+	}
+	if u.PreCheckoutQuery != nil && u.PreCheckoutQuery.From != nil {
+		return u.PreCheckoutQuery.From
+	}
+	if u.PurchasedPaidMedia != nil && u.PurchasedPaidMedia.From != nil {
+		return u.PurchasedPaidMedia.From
+	}
+	if u.Subscription != nil && u.Subscription.User != nil {
+		return u.Subscription.User
+	}
+	if u.ManagedBot != nil && u.ManagedBot.User != nil {
+		return u.ManagedBot.User
+	}
+	if u.MessageReaction != nil && u.MessageReaction.User != nil {
+		return u.MessageReaction.User
+	}
+	if u.ChatBoost != nil && u.ChatBoost.Boost != nil && u.ChatBoost.Boost.Source.User != nil {
+		return u.ChatBoost.Boost.Source.User
+	}
+	if u.RemovedChatBoost != nil && u.RemovedChatBoost.Source != nil {
+		return u.RemovedChatBoost.Source.User
 	}
 	return nil
 }
@@ -163,6 +215,33 @@ func (u *Update) EffectiveChat() *Chat {
 	}
 	if u.PollAnswer != nil && u.PollAnswer.VoterChat != nil {
 		return u.PollAnswer.VoterChat
+	}
+	if u.BusinessMessage != nil && u.BusinessMessage.Chat != nil {
+		return u.BusinessMessage.Chat
+	}
+	if u.EditedBusinessMessage != nil && u.EditedBusinessMessage.Chat != nil {
+		return u.EditedBusinessMessage.Chat
+	}
+	if u.GuestMessage != nil && u.GuestMessage.Chat != nil {
+		return u.GuestMessage.Chat
+	}
+	if u.DeletedBusinessMessages != nil && u.DeletedBusinessMessages.Chat != nil {
+		return u.DeletedBusinessMessages.Chat
+	}
+	if u.MessageReaction != nil && u.MessageReaction.Chat != nil {
+		return u.MessageReaction.Chat
+	}
+	if u.MessageReactionCount != nil && u.MessageReactionCount.Chat != nil {
+		return u.MessageReactionCount.Chat
+	}
+	if u.ChatBoost != nil && u.ChatBoost.Chat != nil {
+		return u.ChatBoost.Chat
+	}
+	if u.RemovedChatBoost != nil && u.RemovedChatBoost.Chat != nil {
+		return u.RemovedChatBoost.Chat
+	}
+	if u.StoppedMessageGeneration != nil && u.StoppedMessageGeneration.Chat != nil {
+		return u.StoppedMessageGeneration.Chat
 	}
 	return nil
 }
