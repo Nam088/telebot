@@ -15,10 +15,8 @@ from telebot_py.bot.base import (
     Requester,
     clean_payload,
     parse_flag,
-    parse_message_or_true,
     to_wire,
 )
-from telebot_py.types.message import Message
 
 
 class EphemeralMixin(Requester):
@@ -36,7 +34,7 @@ class EphemeralMixin(Requester):
         rich_message: MarkupLike | None = None,
         link_preview_options: MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
-    ) -> Message | bool:
+    ) -> bool:
         """Edit the text of an ephemeral message.
 
         Example:
@@ -58,8 +56,8 @@ class EphemeralMixin(Requester):
             reply_markup: InlineKeyboardMarkup for the message.
 
         Returns:
-            The edited Message, or True when the message was edited but the new
-            content is identical to the previous one.
+            True on success. Unlike the ``edit_message_*`` family, this method
+            never returns the edited Message.
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -77,7 +75,7 @@ class EphemeralMixin(Requester):
             link_preview_options=to_wire(link_preview_options),
             reply_markup=to_wire(reply_markup),
         )
-        return parse_message_or_true(await self.request("editEphemeralMessageText", payload))
+        return parse_flag(await self.request("editEphemeralMessageText", payload))
 
     async def edit_ephemeral_message_caption(
         self,
@@ -90,7 +88,7 @@ class EphemeralMixin(Requester):
         caption_entities: Sequence[MarkupLike] | None = None,
         show_caption_above_media: bool | None = None,
         reply_markup: MarkupLike | None = None,
-    ) -> Message | bool:
+    ) -> bool:
         """Edit the caption of an ephemeral media message.
 
         Example:
@@ -113,7 +111,7 @@ class EphemeralMixin(Requester):
             reply_markup: InlineKeyboardMarkup for the message.
 
         Returns:
-            The edited Message, or True when nothing changed.
+            True on success.
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -132,7 +130,7 @@ class EphemeralMixin(Requester):
             show_caption_above_media=show_caption_above_media,
             reply_markup=to_wire(reply_markup),
         )
-        return parse_message_or_true(await self.request("editEphemeralMessageCaption", payload))
+        return parse_flag(await self.request("editEphemeralMessageCaption", payload))
 
     async def edit_ephemeral_message_media(
         self,
@@ -142,7 +140,7 @@ class EphemeralMixin(Requester):
         media: MarkupLike,
         *,
         reply_markup: MarkupLike | None = None,
-    ) -> Message | bool:
+    ) -> bool:
         """Edit the media of an ephemeral message.
 
         Example:
@@ -160,7 +158,7 @@ class EphemeralMixin(Requester):
             reply_markup: InlineKeyboardMarkup for the message.
 
         Returns:
-            The edited Message, or True when nothing changed.
+            True on success.
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -174,7 +172,7 @@ class EphemeralMixin(Requester):
             media=to_wire(media),
             reply_markup=to_wire(reply_markup),
         )
-        return parse_message_or_true(await self.request("editEphemeralMessageMedia", payload))
+        return parse_flag(await self.request("editEphemeralMessageMedia", payload))
 
     async def edit_ephemeral_message_reply_markup(
         self,
@@ -183,7 +181,7 @@ class EphemeralMixin(Requester):
         ephemeral_message_id: int,
         *,
         reply_markup: MarkupLike | None = None,
-    ) -> Message | bool:
+    ) -> bool:
         """Edit the inline keyboard of an ephemeral message.
 
         Example:
@@ -200,7 +198,7 @@ class EphemeralMixin(Requester):
                 according to Telegram's semantics to remove the keyboard.
 
         Returns:
-            The edited Message, or True when nothing changed.
+            True on success.
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -213,7 +211,7 @@ class EphemeralMixin(Requester):
             ephemeral_message_id=ephemeral_message_id,
             reply_markup=to_wire(reply_markup),
         )
-        return parse_message_or_true(await self.request("editEphemeralMessageReplyMarkup", payload))
+        return parse_flag(await self.request("editEphemeralMessageReplyMarkup", payload))
 
     async def delete_ephemeral_message(
         self, chat_id: int | str, receiver_user_id: int, ephemeral_message_id: int

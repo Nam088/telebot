@@ -47,15 +47,19 @@ class BusinessAccountMixin(Requester):
             BusinessConnection, await self.request("getBusinessConnection", payload)
         )
 
-    async def read_business_message(self, business_connection_id: str, message_id: int) -> bool:
+    async def read_business_message(
+        self, business_connection_id: str, chat_id: int, message_id: int
+    ) -> bool:
         """Mark an incoming message in a business account as read.
 
         Example:
-            >>> ok = await bot.read_business_message("bc1", 100)
+            >>> ok = await bot.read_business_message("bc1", 42, 100)
 
         Args:
             business_connection_id: Unique identifier of the business
-                connection.
+                connection on behalf of which to read the message.
+            chat_id: Unique identifier of the chat in which the message was
+                received. The chat must have been active in the last 24 hours.
             message_id: Identifier of the message to mark as read.
 
         Returns:
@@ -67,7 +71,7 @@ class BusinessAccountMixin(Requester):
             NetworkError: If the transport keeps failing after retries.
         """
         payload = clean_payload(
-            business_connection_id=business_connection_id, message_id=message_id
+            business_connection_id=business_connection_id, chat_id=chat_id, message_id=message_id
         )
         return parse_flag(await self.request("readBusinessMessage", payload))
 
@@ -121,16 +125,28 @@ class BusinessAccountMixin(Requester):
             StarAmount, await self.request("getBusinessAccountStarBalance", payload)
         )
 
-    async def set_business_account_name(self, business_connection_id: str, name: str) -> bool:
-        """Change the business name of a connected business account.
+    async def set_business_account_name(
+        self,
+        business_connection_id: str,
+        first_name: str,
+        *,
+        last_name: str | None = None,
+    ) -> bool:
+        """Change the first and last name of a connected business account.
+
+        Remarks:
+            Requires the ``can_edit_name`` business bot right.
 
         Example:
-            >>> ok = await bot.set_business_account_name("bc1", "Acme")
+            >>> ok = await bot.set_business_account_name("bc1", "Acme", last_name="Parts")
 
         Args:
             business_connection_id: Unique identifier of the business
                 connection.
-            name: New business name; 1-64 characters.
+            first_name: The new value of the first name for the business
+                account; 1-64 characters.
+            last_name: The new value of the last name for the business account;
+                0-64 characters. Omit to leave it unset.
 
         Returns:
             True on success.
@@ -140,7 +156,11 @@ class BusinessAccountMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
         """
-        payload = clean_payload(business_connection_id=business_connection_id, name=name)
+        payload = clean_payload(
+            business_connection_id=business_connection_id,
+            first_name=first_name,
+            last_name=last_name,
+        )
         return parse_flag(await self.request("setBusinessAccountName", payload))
 
     async def set_business_account_username(
@@ -235,7 +255,11 @@ class BusinessAccountMixin(Requester):
         return parse_flag(await self.request("setBusinessAccountGiftSettings", payload))
 
     async def set_business_account_profile_photo(
-        self, business_connection_id: str, photo: MarkupLike
+        self,
+        business_connection_id: str,
+        photo: MarkupLike,
+        *,
+        is_public: bool | None = None,
     ) -> bool:
         """Change the profile photo of a connected business account.
 
@@ -243,6 +267,7 @@ class BusinessAccountMixin(Requester):
             ``photo`` must be an InputProfilePhoto object (dict or ``to_dict``
             object) referencing an already-uploaded ``file_id`` or a URL;
             multipart uploads are out of scope for the JSON-only client.
+            Requires the ``can_edit_profile_photo`` business bot right.
 
         Example:
             >>> ok = await bot.set_business_account_profile_photo(
@@ -253,6 +278,9 @@ class BusinessAccountMixin(Requester):
             business_connection_id: Unique identifier of the business
                 connection.
             photo: InputProfilePhoto describing the new profile photo.
+            is_public: Pass True to set the public photo, which will be visible
+                even if the main photo is hidden by the business account's
+                privacy settings. An account can have only one public photo.
 
         Returns:
             True on success.
@@ -262,11 +290,20 @@ class BusinessAccountMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
         """
-        payload = clean_payload(business_connection_id=business_connection_id, photo=to_wire(photo))
+        payload = clean_payload(
+            business_connection_id=business_connection_id,
+            photo=to_wire(photo),
+            is_public=is_public,
+        )
         return parse_flag(await self.request("setBusinessAccountProfilePhoto", payload))
 
-    async def remove_business_account_profile_photo(self, business_connection_id: str) -> bool:
+    async def remove_business_account_profile_photo(
+        self, business_connection_id: str, *, is_public: bool | None = None
+    ) -> bool:
         """Remove the current profile photo of a connected business account.
+
+        Remarks:
+            Requires the ``can_edit_profile_photo`` business bot right.
 
         Example:
             >>> ok = await bot.remove_business_account_profile_photo("bc1")
@@ -274,6 +311,10 @@ class BusinessAccountMixin(Requester):
         Args:
             business_connection_id: Unique identifier of the business
                 connection.
+            is_public: Pass True to remove the public photo, which is visible
+                even if the main photo is hidden by the business account's
+                privacy settings. After the main photo is removed, the previous
+                profile photo (if present) becomes the main photo.
 
         Returns:
             True on success.
@@ -283,7 +324,7 @@ class BusinessAccountMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
         """
-        payload = clean_payload(business_connection_id=business_connection_id)
+        payload = clean_payload(business_connection_id=business_connection_id, is_public=is_public)
         return parse_flag(await self.request("removeBusinessAccountProfilePhoto", payload))
 
     async def transfer_business_account_stars(

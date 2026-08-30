@@ -181,6 +181,8 @@ class OwnedGiftsMixin(Requester):
         self,
         chat_id: int | str,
         *,
+        exclude_unsaved: bool | None = None,
+        exclude_saved: bool | None = None,
         exclude_unlimited: bool | None = None,
         exclude_limited_upgradable: bool | None = None,
         exclude_limited_non_upgradable: bool | None = None,
@@ -198,6 +200,12 @@ class OwnedGiftsMixin(Requester):
         Args:
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
+            exclude_unsaved: Omit gifts that aren't saved to the chat's profile
+                page. Always True unless the bot has the ``can_post_messages``
+                administrator right in the channel.
+            exclude_saved: Omit gifts that are saved to the chat's profile page.
+                Always False unless the bot has the ``can_post_messages``
+                administrator right in the channel.
             exclude_unlimited: Omit unlimited gifts.
             exclude_limited_upgradable: Omit limited gifts upgradable to unique.
             exclude_limited_non_upgradable: Omit limited gifts not upgradable to
@@ -220,6 +228,8 @@ class OwnedGiftsMixin(Requester):
         payload: dict[str, object] = {
             "chat_id": chat_id,
             **_owned_gift_filters(
+                exclude_unsaved=exclude_unsaved,
+                exclude_saved=exclude_saved,
                 exclude_unlimited=exclude_unlimited,
                 exclude_limited_upgradable=exclude_limited_upgradable,
                 exclude_limited_non_upgradable=exclude_limited_non_upgradable,

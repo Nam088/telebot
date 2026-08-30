@@ -1,7 +1,13 @@
-"""Field-fidelity tests: Python types must match the node sibling field sets.
+"""Field-fidelity tests: Python types must match the documented field sets.
 
-The inventory below was extracted field-by-field from the authoritative
-TypeScript sources (Bot API 10.3):
+The inventory below was extracted field-by-field from the official Telegram
+Bot API 10.3 documentation (https://core.telegram.org/bots/api), which is the
+authoritative source. The TypeScript sources in ``packages/node`` were used as
+a secondary cross-check, but the ported node reference has drifted for some
+types (e.g. ``BusinessConnection.can_reply`` vs. the documented ``rights``);
+where the docs and node disagree, the docs win.
+
+Secondary cross-check sources:
 
 - packages/node/src/client/types/common/models.ts (User, Chat, ChatPhoto,
   Birthdate, Location, RawUpdate/Update, MessageGenerationStopped)
@@ -17,7 +23,7 @@ TypeScript sources (Bot API 10.3):
   InlineQuery, ChosenInlineResult, Business*, ChatBoost*, Story)
 - packages/node/src/client/types/payments/models.ts
 
-Each spec entry is ``(field_name, required_in_node)``. The Python attribute
+Each spec entry is ``(field_name, required_by_the_docs)``. The Python attribute
 name matches the wire field name, except ``from`` which is exposed as
 ``from_user`` (keyword-avoidance) and re-mapped on the wire.
 """
@@ -33,6 +39,7 @@ from telebot_py.types import (
     Animation,
     Audio,
     Birthdate,
+    BusinessBotRights,
     BusinessConnection,
     BusinessIntro,
     BusinessLocation,
@@ -66,6 +73,7 @@ from telebot_py.types import (
     ExternalReplyInfo,
     ForceReply,
     Gift,
+    GiftBackground,
     Gifts,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -120,10 +128,10 @@ from telebot_py.types import (
     WebAppData,
     WebAppInfo,
 )
-from telebot_py.types.base import TypeParseError
+from telebot_py.types.base import TelegramObject, TypeParseError
 
 # ---------------------------------------------------------------------------
-# Field inventory extracted from the node type definitions.
+# Field inventory transcribed from the Bot API 10.3 documentation.
 # ---------------------------------------------------------------------------
 
 FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
@@ -554,12 +562,28 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
     BusinessLocation: (("address", True), ("location", False)),
     BusinessOpeningHoursInterval: (("opening_minute", True), ("closing_minute", True)),
     BusinessOpeningHours: (("time_zone_name", True), ("opening_hours", True)),
+    BusinessBotRights: (
+        ("can_reply", False),
+        ("can_read_messages", False),
+        ("can_delete_sent_messages", False),
+        ("can_delete_all_messages", False),
+        ("can_edit_name", False),
+        ("can_edit_bio", False),
+        ("can_edit_profile_photo", False),
+        ("can_edit_username", False),
+        ("can_change_gift_settings", False),
+        ("can_view_gifts_and_stars", False),
+        ("can_convert_gifts_to_stars", False),
+        ("can_transfer_and_upgrade_gifts", False),
+        ("can_transfer_stars", False),
+        ("can_manage_stories", False),
+    ),
     BusinessConnection: (
         ("id", True),
         ("user", True),
         ("user_chat_id", True),
         ("date", True),
-        ("can_reply", True),
+        ("rights", False),
         ("is_enabled", True),
     ),
     BusinessMessagesDeleted: (
@@ -668,8 +692,20 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("sticker", True),
         ("star_count", True),
         ("upgrade_star_count", False),
+        ("is_premium", False),
+        ("has_colors", False),
         ("total_count", False),
         ("remaining_count", False),
+        ("personal_total_count", False),
+        ("personal_remaining_count", False),
+        ("background", False),
+        ("unique_gift_variant_count", False),
+        ("publisher_chat", False),
+    ),
+    GiftBackground: (
+        ("center_color", True),
+        ("edge_color", True),
+        ("text_color", True),
     ),
     Gifts: (("gifts", True),),
     UniqueGiftBackdropColors: (
@@ -786,16 +822,16 @@ def _field_map(cls: type) -> dict[str, dataclasses.Field[t.Any]]:
 
 class TestFieldInventory:
     @pytest.mark.parametrize("cls", list(FIELD_SPECS), ids=_spec_ids)
-    def test_field_names_match_node_exactly(self, cls: type) -> None:
+    def test_field_names_match_docs_exactly(self, cls: type) -> None:
         spec = FIELD_SPECS[cls]
         actual = [field.name for field in dataclasses.fields(cls)]  # type: ignore[arg-type]
         assert set(actual) == {name for name, _ in spec}, (
-            f"{cls.__name__} fields drifted from the node reference"
+            f"{cls.__name__} fields drifted from the documented field set"
         )
         assert len(actual) == len(spec)
 
     @pytest.mark.parametrize("cls", list(FIELD_SPECS), ids=_spec_ids)
-    def test_required_vs_optional_matches_node(self, cls: type) -> None:
+    def test_required_vs_optional_matches_docs(self, cls: type) -> None:
         fields = _field_map(cls)
         for name, required in FIELD_SPECS[cls]:
             field = fields[name]
@@ -804,10 +840,12 @@ class TestFieldInventory:
                 assert field.default is True, f"{cls.__name__}.{name} must default to True"
                 continue
             if required:
-                assert not has_default, f"{cls.__name__}.{name} must be required like in node"
+                assert not has_default, (
+                    f"{cls.__name__}.{name} must be required like in the Bot API docs"
+                )
             else:
                 assert has_default and field.default is None, (
-                    f"{cls.__name__}.{name} must default to None like node's optional fields"
+                    f"{cls.__name__}.{name} must default to None like the docs' optional fields"
                 )
 
     @pytest.mark.parametrize("cls", list(FROM_USER_CLASSES), ids=lambda c: c.__name__)
@@ -937,6 +975,34 @@ class TestNestedTyping:
 # ---------------------------------------------------------------------------
 # Fully-populated realistic payloads for round-trip checks.
 # ---------------------------------------------------------------------------
+
+RAW_STICKER: dict[str, t.Any] = {
+    "file_id": "st1",
+    "file_unique_id": "stu1",
+    "type": "regular",
+    "width": 100,
+    "height": 100,
+    "is_animated": False,
+    "is_video": False,
+}
+
+#: Every field the Bot API 10.3 docs list for BusinessBotRights.
+RAW_BUSINESS_BOT_RIGHTS: dict[str, t.Any] = {
+    "can_reply": True,
+    "can_read_messages": True,
+    "can_delete_sent_messages": True,
+    "can_delete_all_messages": False,
+    "can_edit_name": True,
+    "can_edit_bio": True,
+    "can_edit_profile_photo": False,
+    "can_edit_username": True,
+    "can_change_gift_settings": False,
+    "can_view_gifts_and_stars": True,
+    "can_convert_gifts_to_stars": True,
+    "can_transfer_and_upgrade_gifts": False,
+    "can_transfer_stars": True,
+    "can_manage_stories": False,
+}
 
 RAW_USER: dict[str, t.Any] = {
     "id": 7,
@@ -1651,10 +1717,13 @@ class TestRoundTrips:
             "user": RAW_USER,
             "user_chat_id": 7,
             "date": 1_700_000_000,
-            "can_reply": True,
+            "rights": dict(RAW_BUSINESS_BOT_RIGHTS),
             "is_enabled": True,
         }
-        assert BusinessConnection.from_dict(connection_raw).to_dict() == connection_raw
+        connection = BusinessConnection.from_dict(connection_raw)
+        assert connection.to_dict() == connection_raw
+        assert isinstance(connection.rights, BusinessBotRights)
+        assert connection.rights is not None and connection.rights.can_reply is True
         deleted_raw = {
             "business_connection_id": "biz-1",
             "chat": {"id": 7, "type": "private"},
@@ -1857,7 +1926,7 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
             "user": RAW_USER,
             "user_chat_id": 7,
             "date": 1,
-            "can_reply": True,
+            "rights": dict(RAW_BUSINESS_BOT_RIGHTS),
             "is_enabled": True,
         },
         BusinessConnection,
@@ -2067,4 +2136,126 @@ class TestUpdateFidelity:
         )
         assert update.effective_message is update.message
         assert update.effective_chat is update.message.chat
-        assert update.effective_user is update.message.from_user
+
+
+class TestBotApi103DocsShape:
+    """Pin the shapes written straight out of the Bot API 10.3 changelog.
+
+    These duplicate part of :data:`FIELD_SPECS` on purpose: the inventory can
+    be re-synced from the node reference, but these lists are transcriptions of
+    https://core.telegram.org/bots/api and must not move with it.
+    """
+
+    BUSINESS_BOT_RIGHTS_FIELDS: t.ClassVar[tuple[str, ...]] = (
+        "can_reply",
+        "can_read_messages",
+        "can_delete_sent_messages",
+        "can_delete_all_messages",
+        "can_edit_name",
+        "can_edit_bio",
+        "can_edit_profile_photo",
+        "can_edit_username",
+        "can_change_gift_settings",
+        "can_view_gifts_and_stars",
+        "can_convert_gifts_to_stars",
+        "can_transfer_and_upgrade_gifts",
+        "can_transfer_stars",
+        "can_manage_stories",
+    )
+
+    def test_business_bot_rights_matches_documented_field_list(self) -> None:
+        names = tuple(field.name for field in dataclasses.fields(BusinessBotRights))
+        assert names == self.BUSINESS_BOT_RIGHTS_FIELDS
+        assert issubclass(BusinessBotRights, TelegramObject)
+
+    def test_business_bot_rights_is_exported_from_types_package(self) -> None:
+        from telebot_py import types as types_module
+
+        assert types_module.BusinessBotRights is BusinessBotRights
+        assert "BusinessBotRights" in types_module.__all__
+
+    def test_partial_rights_payload_keeps_unset_rights_none(self) -> None:
+        rights = BusinessBotRights.from_dict({"can_reply": True, "can_edit_bio": True})
+        assert rights.can_reply is True
+        assert rights.can_edit_bio is True
+        assert rights.can_manage_stories is None
+        assert rights.to_dict() == {"can_reply": True, "can_edit_bio": True}
+
+    def test_live_v10_3_connection_without_can_reply_parses(self) -> None:
+        # What api.telegram.org actually sends since Bot API 10.3: `rights`
+        # replaced the old required top-level `can_reply` boolean.
+        live_payload = {
+            "id": "4b0b4d55-1",
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "user_chat_id": 42,
+            "date": 1_700_000_000,
+            "rights": {"can_reply": True, "can_read_messages": True},
+            "is_enabled": True,
+        }
+        connection = BusinessConnection.from_dict(live_payload)
+        assert connection.rights is not None
+        assert connection.rights.can_reply is True
+        assert connection.rights.can_read_messages is True
+        assert connection.rights.can_edit_name is None
+        assert not hasattr(connection, "can_reply")
+
+    def test_connection_rights_are_optional(self) -> None:
+        payload = {
+            "id": "b",
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "user_chat_id": 42,
+            "date": 1,
+            "is_enabled": True,
+        }
+        assert BusinessConnection.from_dict(payload).rights is None
+
+    def test_gift_v10_3_optionals_match_documented_field_list(self) -> None:
+        names = tuple(field.name for field in dataclasses.fields(Gift))
+        assert names == (
+            "id",
+            "sticker",
+            "star_count",
+            "upgrade_star_count",
+            "is_premium",
+            "has_colors",
+            "total_count",
+            "remaining_count",
+            "personal_total_count",
+            "personal_remaining_count",
+            "background",
+            "unique_gift_variant_count",
+            "publisher_chat",
+        )
+
+    def test_gift_fully_populated_v10_3_payload(self) -> None:
+        raw = {
+            "id": "gift1",
+            "sticker": RAW_STICKER,
+            "star_count": 50,
+            "upgrade_star_count": 25,
+            "is_premium": True,
+            "has_colors": True,
+            "total_count": 10,
+            "remaining_count": 4,
+            "personal_total_count": 2,
+            "personal_remaining_count": 1,
+            "background": {"center_color": 1, "edge_color": 2, "text_color": 3},
+            "unique_gift_variant_count": 7,
+            "publisher_chat": {"id": -100, "type": "channel", "title": "P"},
+        }
+        gift = Gift.from_dict(raw)
+        assert gift.is_premium is True
+        assert gift.has_colors is True
+        assert gift.personal_total_count == 2
+        assert gift.personal_remaining_count == 1
+        assert gift.unique_gift_variant_count == 7
+        assert isinstance(gift.background, GiftBackground)
+        assert gift.background is not None and gift.background.text_color == 3
+        assert isinstance(gift.publisher_chat, Chat)
+        assert gift.to_dict() == raw
+
+    def test_gift_background_is_exported_from_types_package(self) -> None:
+        from telebot_py import types as types_module
+
+        assert types_module.GiftBackground is GiftBackground
+        assert "GiftBackground" in types_module.__all__

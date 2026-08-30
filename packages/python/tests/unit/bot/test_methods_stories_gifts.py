@@ -74,10 +74,24 @@ class TestSetUserEmojiStatus:
             is True
         )
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setUserEmojiStatus"
+        payload = sent_payload(seen[0])
+        assert payload == {
+            "user_id": 42,
+            "emoji_status_custom_emoji_id": "emoji-1",
+            "emoji_status_expiration_date": 1_700_000_000,
+        }
+        assert "custom_emoji_id" not in payload
+
+    async def test_accepts_documented_keyword_name(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_user_emoji_status(42, emoji_status_custom_emoji_id="emoji-2") is True
         assert sent_payload(seen[0]) == {
             "user_id": 42,
-            "custom_emoji_id": "emoji-1",
-            "emoji_status_expiration_date": 1_700_000_000,
+            "emoji_status_custom_emoji_id": "emoji-2",
         }
 
     async def test_omits_unset_optional_fields(self, bot_transport: Any, ok_response: Any) -> None:
@@ -88,6 +102,7 @@ class TestSetUserEmojiStatus:
         payload = sent_payload(seen[0])
         assert payload == {"user_id": 42}
         assert "custom_emoji_id" not in payload
+        assert "emoji_status_custom_emoji_id" not in payload
         assert "emoji_status_expiration_date" not in payload
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:

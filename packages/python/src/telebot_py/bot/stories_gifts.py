@@ -63,25 +63,25 @@ class StoriesGiftsMixin(Requester):
     async def set_user_emoji_status(
         self,
         user_id: int,
-        custom_emoji_id: str | None = None,
+        emoji_status_custom_emoji_id: str | None = None,
         *,
         emoji_status_expiration_date: int | None = None,
     ) -> bool:
         """Change the emoji status of a user who allowed the bot to do so.
 
         Remarks:
-            The keyword names follow Telegram's wire fields (``custom_emoji_id``
-            and ``emoji_status_expiration_date``) rather than
-            python-telegram-bot's ``emoji_status_custom_emoji_id`` alias, so the
-            payload stays a direct mirror of the documented parameters.
+            The user must previously have allowed the bot to manage their emoji
+            status via the Mini App method ``requestEmojiStatusAccess``. Pass an
+            empty string as ``emoji_status_custom_emoji_id`` to remove the
+            status.
 
         Example:
             >>> ok = await bot.set_user_emoji_status(42, "custom-emoji-id")
 
         Args:
             user_id: Unique identifier of the target user.
-            custom_emoji_id: Identifier of the custom emoji to show as the
-                status; omit to clear the emoji while keeping the duration.
+            emoji_status_custom_emoji_id: Custom emoji identifier of the emoji
+                status to set. Pass an empty string to remove the status.
             emoji_status_expiration_date: Point in time (Unix timestamp) when
                 the emoji status will be cleared.
 
@@ -95,7 +95,7 @@ class StoriesGiftsMixin(Requester):
         """
         payload = clean_payload(
             user_id=user_id,
-            custom_emoji_id=custom_emoji_id,
+            emoji_status_custom_emoji_id=emoji_status_custom_emoji_id,
             emoji_status_expiration_date=emoji_status_expiration_date,
         )
         return parse_flag(await self.request("setUserEmojiStatus", payload))

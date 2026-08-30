@@ -15,7 +15,9 @@ import pytest
 
 from telebot_py.bot.errors import TelegramApiError
 from telebot_py.types import (
+    Chat,
     Gift,
+    GiftBackground,
     Gifts,
     MessageEntity,
     OwnedGiftRegular,
@@ -41,8 +43,15 @@ RAW_GIFT = {
     "sticker": RAW_STICKER,
     "star_count": 50,
     "upgrade_star_count": 25,
+    "is_premium": True,
+    "has_colors": True,
     "total_count": 10,
     "remaining_count": 4,
+    "personal_total_count": 2,
+    "personal_remaining_count": 1,
+    "background": {"center_color": 16711680, "edge_color": 65280, "text_color": 16777215},
+    "unique_gift_variant_count": 7,
+    "publisher_chat": {"id": -100, "type": "channel", "title": "Publisher"},
 }
 
 RAW_UNIQUE_GIFT = {
@@ -101,6 +110,14 @@ class TestGetAvailableGifts:
         assert gift.star_count == 50
         assert gift.upgrade_star_count == 25
         assert gift.sticker.file_id == "st1"
+        assert gift.is_premium is True
+        assert gift.has_colors is True
+        assert gift.personal_total_count == 2
+        assert gift.personal_remaining_count == 1
+        assert gift.unique_gift_variant_count == 7
+        assert isinstance(gift.background, GiftBackground)
+        assert gift.background is not None and gift.background.center_color == 16711680
+        assert isinstance(gift.publisher_chat, Chat)
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getAvailableGifts"
         assert sent_payload(seen[0]) == {}
 
@@ -155,6 +172,31 @@ class TestSendGift:
         assert "text" not in payload
         assert "pay_for_upgrade" not in payload
         assert "text_entities" not in payload
+        assert "chat_id" not in payload
+
+    async def test_sends_gift_to_a_channel_chat(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.send_gift(chat_id="@my_channel", gift_id="gift1") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/sendGift"
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": "@my_channel", "gift_id": "gift1"}
+        assert "user_id" not in payload
+
+    async def test_requires_exactly_one_recipient(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(ValueError, match="user_id.*chat_id|chat_id.*user_id"):
+            await bot.send_gift(gift_id="gift1")
+        with pytest.raises(ValueError, match="mutually exclusive"):
+            await bot.send_gift(123, "gift1", chat_id=-100)
+
+    async def test_requires_gift_id(self, bot_transport: Any, ok_response: Any) -> None:
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(ValueError, match="gift_id"):
+            await bot.send_gift(123)
 
 
 class TestGiftPremiumSubscription:
@@ -194,9 +236,11 @@ class TestConvertGiftToStars:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        assert await bot.convert_gift_to_stars(123, "own1") is True
+        assert await bot.convert_gift_to_stars("bc1", "own1") is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/convertGiftToStars"
-        assert sent_payload(seen[0]) == {"user_id": 123, "owned_gift_id": "own1"}
+        payload = sent_payload(seen[0])
+        assert payload == {"business_connection_id": "bc1", "owned_gift_id": "own1"}
+        assert "user_id" not in payload
 
 
 class TestUpgradeGift:
@@ -204,15 +248,36 @@ class TestUpgradeGift:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        assert await bot.upgrade_gift(123, "own1") is True
+        assert await bot.upgrade_gift("bc1", "own1") is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/upgradeGift"
-        assert sent_payload(seen[0]) == {"user_id": 123, "owned_gift_id": "own1"}
+        payload = sent_payload(seen[0])
+        assert payload == {"business_connection_id": "bc1", "owned_gift_id": "own1"}
+        assert "user_id" not in payload
+        assert "keep_original_details" not in payload
+        assert "star_count" not in payload
+
+    async def test_sends_optional_upgrade_fields(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert (
+            await bot.upgrade_gift("bc1", "own1", keep_original_details=True, star_count=100)
+            is True
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "owned_gift_id": "own1",
+            "keep_original_details": True,
+            "star_count": 100,
+        }
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: gift not upgradable"), [])
         bot = make_bot(bot_transport, step, max_retries=0)
         with pytest.raises(TelegramApiError) as excinfo:
-            await bot.upgrade_gift(123, "own1")
+            await bot.upgrade_gift("bc1", "own1")
         assert excinfo.value.error_code == 400
 
 
@@ -221,12 +286,26 @@ class TestTransferGift:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        assert await bot.transfer_gift(123, "own1", -1001234567890) is True
+        assert await bot.transfer_gift("bc1", "own1", -1001234567890) is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/transferGift"
-        assert sent_payload(seen[0]) == {
-            "user_id": 123,
+        payload = sent_payload(seen[0])
+        assert payload == {
+            "business_connection_id": "bc1",
             "owned_gift_id": "own1",
             "new_owner_chat_id": -1001234567890,
+        }
+        assert "user_id" not in payload
+
+    async def test_sends_optional_star_count(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.transfer_gift("bc1", "own1", 42, star_count=50) is True
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "owned_gift_id": "own1",
+            "new_owner_chat_id": 42,
+            "star_count": 50,
         }
 
 
@@ -306,6 +385,17 @@ class TestGetChatGifts:
         bot = make_bot(bot_transport, step)
         await bot.get_chat_gifts("@my_channel")
         assert sent_payload(seen[0]) == {"chat_id": "@my_channel"}
+
+    async def test_sends_saved_filters(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(RAW_OWNED_GIFTS), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.get_chat_gifts(-100, exclude_unsaved=True, exclude_saved=False)
+        assert sent_payload(seen[0]) == {
+            "chat_id": -100,
+            "exclude_unsaved": True,
+            "exclude_saved": False,
+        }
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: chat not found"), [])

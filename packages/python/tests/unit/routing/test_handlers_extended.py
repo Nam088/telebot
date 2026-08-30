@@ -22,6 +22,7 @@ from telebot_py.routing import (
     TypeHandler,
 )
 from telebot_py.types import (
+    BusinessBotRights,
     BusinessConnection,
     BusinessMessagesDeleted,
     Chat,
@@ -252,7 +253,7 @@ def business_connection_update() -> Update:
             user=_user(),
             user_chat_id=42,
             date=1_700_000_000,
-            can_reply=True,
+            rights=BusinessBotRights(can_reply=True),
             is_enabled=True,
         ),
     )

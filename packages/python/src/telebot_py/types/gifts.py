@@ -18,6 +18,21 @@ from telebot_py.types.user import User
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class GiftBackground(TelegramObject):
+    """This object describes the background of a gift.
+
+    Attributes:
+        center_color: Center color of the background in RGB format.
+        edge_color: Edge color of the background in RGB format.
+        text_color: Text color of the background in RGB format.
+    """
+
+    center_color: int
+    edge_color: int
+    text_color: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class Gift(TelegramObject):
     """This object represents a gift that can be sent by the bot.
 
@@ -28,18 +43,37 @@ class Gift(TelegramObject):
             sticker.
         upgrade_star_count: Number of Telegram Stars that must be paid to
             upgrade the gift to a unique one.
+        is_premium: True, if the gift can only be purchased by Telegram Premium
+            subscribers.
+        has_colors: True, if the gift can be used (after being upgraded) to
+            customize a user's appearance.
         total_count: The total number of the gifts of this type that can be
             sent; for limited gifts only.
         remaining_count: The number of remaining gifts of this type that can
             be sent; for limited gifts only.
+        personal_total_count: The total number of gifts of this type that can be
+            sent by the bot; for limited gifts only.
+        personal_remaining_count: The number of remaining gifts of this type
+            that can be sent by the bot; for limited gifts only.
+        background: Background of the gift.
+        unique_gift_variant_count: The total number of different unique gifts
+            that can be obtained by upgrading the gift.
+        publisher_chat: Information about the chat that published the gift.
     """
 
     id: str
     sticker: Sticker
     star_count: int
     upgrade_star_count: int | None = None
+    is_premium: bool | None = None
+    has_colors: bool | None = None
     total_count: int | None = None
     remaining_count: int | None = None
+    personal_total_count: int | None = None
+    personal_remaining_count: int | None = None
+    background: GiftBackground | None = None
+    unique_gift_variant_count: int | None = None
+    publisher_chat: Chat | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

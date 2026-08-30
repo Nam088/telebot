@@ -10,6 +10,62 @@ from telebot_py.types.user import User
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class BusinessBotRights(TelegramObject):
+    """Represents the rights of a business bot.
+
+    Every field is optional and only present when Telegram grants it; the set
+    of rights a bot actually holds is reported by the ``rights`` field of a
+    :class:`BusinessConnection` since Bot API 10.3.
+
+    Attributes:
+        can_reply: True, if the bot can send and edit messages in the private
+            chats that had incoming messages in the last 24 hours.
+        can_read_messages: True, if the bot can mark incoming private messages
+            as read.
+        can_delete_sent_messages: True, if the bot can delete messages sent by
+            the bot.
+        can_delete_all_messages: True, if the bot can delete all private
+            messages in managed chats.
+        can_edit_name: True, if the bot can edit the first and last name of the
+            business account.
+        can_edit_bio: True, if the bot can edit the bio of the business
+            account.
+        can_edit_profile_photo: True, if the bot can edit the profile photo of
+            the business account.
+        can_edit_username: True, if the bot can edit the username of the
+            business account.
+        can_change_gift_settings: True, if the bot can change the privacy
+            settings pertaining to gifts for the business account.
+        can_view_gifts_and_stars: True, if the bot can view gifts and the amount
+            of Telegram Stars owned by the business account.
+        can_convert_gifts_to_stars: True, if the bot can convert regular gifts
+            owned by the business account to Telegram Stars.
+        can_transfer_and_upgrade_gifts: True, if the bot can transfer and
+            upgrade gifts owned by the business account.
+        can_transfer_stars: True, if the bot can transfer Telegram Stars
+            received by the business account to its own account, or use them to
+            upgrade and transfer gifts.
+        can_manage_stories: True, if the bot can post, edit and delete stories
+            on behalf of the business account.
+    """
+
+    can_reply: bool | None = None
+    can_read_messages: bool | None = None
+    can_delete_sent_messages: bool | None = None
+    can_delete_all_messages: bool | None = None
+    can_edit_name: bool | None = None
+    can_edit_bio: bool | None = None
+    can_edit_profile_photo: bool | None = None
+    can_edit_username: bool | None = None
+    can_change_gift_settings: bool | None = None
+    can_view_gifts_and_stars: bool | None = None
+    can_convert_gifts_to_stars: bool | None = None
+    can_transfer_and_upgrade_gifts: bool | None = None
+    can_transfer_stars: bool | None = None
+    can_manage_stories: bool | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class BusinessConnection(TelegramObject):
     """The bot's connection to a Telegram Business account.
 
@@ -19,8 +75,7 @@ class BusinessConnection(TelegramObject):
         user_chat_id: Identifier of a private chat with the user who created
             the business connection.
         date: Date the connection was established in Unix time.
-        can_reply: Whether the bot can act on behalf of the business account
-            in chats that were active in the last 24 hours.
+        rights: Rights of the business bot, if Telegram reported any.
         is_enabled: Whether the connection is active.
     """
 
@@ -28,8 +83,8 @@ class BusinessConnection(TelegramObject):
     user: User
     user_chat_id: int
     date: int
-    can_reply: bool
     is_enabled: bool
+    rights: BusinessBotRights | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

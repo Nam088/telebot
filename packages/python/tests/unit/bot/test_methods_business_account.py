@@ -13,7 +13,7 @@ import httpx
 import pytest
 
 from telebot_py.bot.errors import TelegramApiError
-from telebot_py.types import AcceptedGiftTypes, BusinessConnection, StarAmount
+from telebot_py.types import AcceptedGiftTypes, BusinessBotRights, BusinessConnection, StarAmount
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 RAW_CONNECTION = {
@@ -21,7 +21,11 @@ RAW_CONNECTION = {
     "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
     "user_chat_id": 42,
     "date": 1_700_000_000,
-    "can_reply": True,
+    "rights": {
+        "can_reply": True,
+        "can_read_messages": True,
+        "can_transfer_and_upgrade_gifts": True,
+    },
     "is_enabled": True,
 }
 
@@ -35,8 +39,21 @@ class TestGetBusinessConnection:
         assert isinstance(connection, BusinessConnection)
         assert connection.id == "bc1"
         assert connection.user.first_name == "Ada"
+        assert isinstance(connection.rights, BusinessBotRights)
+        assert connection.rights is not None
+        assert connection.rights.can_reply is True
+        assert connection.rights.can_read_messages is True
+        assert connection.rights.can_edit_bio is None
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getBusinessConnection"
         assert sent_payload(seen[0]) == {"business_connection_id": "bc1"}
+        assert connection.to_dict() == RAW_CONNECTION
+
+    async def test_omitted_rights_parse_as_none(self, bot_transport: Any, ok_response: Any) -> None:
+        raw = {key: value for key, value in RAW_CONNECTION.items() if key != "rights"}
+        step = record_into(ok_response(raw), [])
+        bot = make_bot(bot_transport, step)
+        connection = await bot.get_business_connection("bc1")
+        assert connection.rights is None
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: connection not found"), [])
@@ -51,9 +68,18 @@ class TestReadBusinessMessage:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        assert await bot.read_business_message("bc1", 100) is True
+        assert await bot.read_business_message("bc1", 42, 100) is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/readBusinessMessage"
-        assert sent_payload(seen[0]) == {"business_connection_id": "bc1", "message_id": 100}
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "chat_id": 42,
+            "message_id": 100,
+        }
+
+    async def test_chat_id_is_required(self, bot_transport: Any, ok_response: Any) -> None:
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(TypeError):
+            await bot.read_business_message("bc1")  # type: ignore[call-arg]
 
 
 class TestDeleteBusinessMessages:
@@ -97,13 +123,27 @@ class TestGetBusinessAccountStarBalance:
 
 
 class TestSetBusinessAccountName:
-    async def test_sets_name(self, bot_transport: Any, ok_response: Any) -> None:
+    async def test_sets_first_and_last_name(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_business_account_name("bc1", "Acme", last_name="Parts") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setBusinessAccountName"
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "first_name": "Acme",
+            "last_name": "Parts",
+        }
+
+    async def test_omits_unset_last_name(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
         assert await bot.set_business_account_name("bc1", "Acme") is True
-        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setBusinessAccountName"
-        assert sent_payload(seen[0]) == {"business_connection_id": "bc1", "name": "Acme"}
+        payload = sent_payload(seen[0])
+        assert payload == {"business_connection_id": "bc1", "first_name": "Acme"}
+        assert "last_name" not in payload
+        assert "name" not in payload
 
 
 class TestSetBusinessAccountUsername:
@@ -217,6 +257,25 @@ class TestSetBusinessAccountProfilePhoto:
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setBusinessAccountProfilePhoto"
         assert sent_payload(seen[0]) == {"business_connection_id": "bc1", "photo": photo}
 
+    async def test_sends_optional_is_public(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        photo = {"type": "photo", "photo": "file-id-1"}
+        assert await bot.set_business_account_profile_photo("bc1", photo, is_public=True) is True
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "photo": photo,
+            "is_public": True,
+        }
+
+    async def test_omits_unset_is_public(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.set_business_account_profile_photo("bc1", {"type": "photo", "photo": "f"})
+        assert "is_public" not in sent_payload(seen[0])
+
 
 class TestRemoveBusinessAccountProfilePhoto:
     async def test_removes_photo(self, bot_transport: Any, ok_response: Any) -> None:
@@ -226,6 +285,16 @@ class TestRemoveBusinessAccountProfilePhoto:
         assert await bot.remove_business_account_profile_photo("bc1") is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/removeBusinessAccountProfilePhoto"
         assert sent_payload(seen[0]) == {"business_connection_id": "bc1"}
+
+    async def test_sends_optional_is_public(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.remove_business_account_profile_photo("bc1", is_public=True) is True
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "is_public": True,
+        }
 
 
 class TestTransferBusinessAccountStars:

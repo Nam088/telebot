@@ -2,6 +2,7 @@
 
 from telebot_py.types.base import TelegramObject, TypeParseError
 from telebot_py.types.business import (
+    BusinessBotRights,
     BusinessConnection,
     BusinessMessagesDeleted,
     ChatBoost,
@@ -59,6 +60,7 @@ from telebot_py.types.games import Game, GameHighScore
 from telebot_py.types.gifts import (
     AcceptedGiftTypes,
     Gift,
+    GiftBackground,
     Gifts,
     OwnedGift,
     OwnedGiftRegular,
@@ -177,6 +179,7 @@ __all__ = [
     "BotDescription",
     "BotName",
     "BotShortDescription",
+    "BusinessBotRights",
     "BusinessConnection",
     "BusinessIntro",
     "BusinessLocation",
@@ -217,6 +220,7 @@ __all__ = [
     "Game",
     "GameHighScore",
     "Gift",
+    "GiftBackground",
     "Gifts",
     "InlineKeyboardButton",
     "InlineKeyboardMarkup",
