@@ -69,6 +69,7 @@ The tree shows representative responsibilities, not an inventory: `pkg/bot/` hol
 2. **Step 2: Implement Method on `*Bot` in `packages/go/pkg/bot/`**:
    - Add method signature taking `ctx context.Context` as the first parameter.
    - Use `b.Request(ctx, "methodName", payload, &result)`.
+   - **A documented method argument counts as sendable only if it is enumerable**: the fidelity audit (`scripts/bot-api-params.mjs`) reads `json:"name"` tags on `types.XOptions`, keys in the `map[string]any` payload, or keys in an anonymous payload struct — every documented param of that method must appear in one of those shapes. An untyped payload makes the method *unmeasurable*, which the gate treats as a regression, not a shortcut.
 3. **Step 3: Add Comprehensive GoDoc Comments**:
    - Provide summary, `Parameters:` list, `Returns:` list, and `Example:` snippet.
    - End the GoDoc block with `// Telegram API: https://core.telegram.org/bots/api#<slug>` for every documented method/type, where `<slug>` is the wire method name (from the `b.Request` literal) or type name, fully lowercased. The slug MUST exist in the oracle's anchor list — `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(o.anchors.includes('sendmessage'))"` — never recalled from memory; fetch the live page only if you suspect the oracle is stale, then `npm run audit:docs`. Skip the line for framework extensions and non-API helpers.
