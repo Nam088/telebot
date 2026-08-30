@@ -62,63 +62,31 @@ _NODE_ONLY_DEFERRED = frozenset(
         "answer_chat_join_request_query",
         "answer_guest_query",
         "approve_suggested_post",
-        "convert_gift_to_stars",
         "decline_suggested_post",
-        "delete_business_messages",
-        "delete_ephemeral_message",
         "delete_story",
-        "edit_ephemeral_message_caption",
-        "edit_ephemeral_message_media",
-        "edit_ephemeral_message_reply_markup",
-        "edit_ephemeral_message_text",
         "edit_message_checklist",
         "edit_story",
-        "get_available_gifts",
-        "get_business_account_gifts",
-        "get_business_account_star_balance",
-        "get_business_connection",
-        "get_chat_gifts",
         "get_managed_bot_access_settings",
         "get_managed_bot_token",
-        "get_user_gifts",
         "get_user_personal_chat_messages",
         "get_user_profile_audios",
-        "gift_premium_subscription",
-        "read_business_message",
-        "remove_business_account_profile_photo",
         "replace_managed_bot_token",
         "repost_story",
         "save_prepared_keyboard_button",
         "send_chat_join_request_web_app",
         "send_checklist",
-        "send_gift",
         "send_live_photo",
         "send_message_draft",
         "send_paid_media",
         "send_rich_message",
         "send_rich_message_draft",
-        "set_business_account_bio",
-        "set_business_account_gift_settings",
-        "set_business_account_name",
-        "set_business_account_username",
         "set_managed_bot_access_settings",
-        "transfer_business_account_stars",
-        "transfer_gift",
-        "upgrade_gift",
     }
 )
 
 #: Intentional parity gaps: node/go methods deliberately absent from python.
 #: Every entry must carry a reason; stale entries are flagged as errors.
 ALLOWLIST: dict[str, str] = {
-    # Upload-only method: the Bot API accepts a fresh InputFile upload only
-    # (no file_id/URL alternative), unlike setMyProfilePhoto which telebot_py
-    # implements with a ``photo`` file_id string. Multipart file uploads are
-    # deferred for this phase — see MessagesMixin.send_document ("file uploads
-    # are out of scope").
-    "set_business_account_profile_photo": (
-        "multipart-upload-only method; file uploads deferred for this phase"
-    ),
     **dict.fromkeys(_NODE_ONLY_DEFERRED, NODE_ONLY_GAP_REASON),
 }
 

@@ -44,6 +44,11 @@ telebot_py.types.games
 
 .. automodule:: telebot_py.types.games
 
+telebot_py.types.gifts
+----------------------
+
+.. automodule:: telebot_py.types.gifts
+
 telebot_py.types.keyboards
 --------------------------
 

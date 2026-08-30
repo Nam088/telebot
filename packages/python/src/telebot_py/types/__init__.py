@@ -50,6 +50,22 @@ from telebot_py.types.common import (
 )
 from telebot_py.types.files import File, UserProfilePhotos
 from telebot_py.types.games import Game, GameHighScore
+from telebot_py.types.gifts import (
+    AcceptedGiftTypes,
+    Gift,
+    Gifts,
+    OwnedGift,
+    OwnedGiftRegular,
+    OwnedGifts,
+    OwnedGiftUnique,
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
+)
 from telebot_py.types.keyboards import (
     CopyTextButton,
     ForceReply,
@@ -125,6 +141,7 @@ from telebot_py.types.update import MessageGenerationStopped, Update
 from telebot_py.types.user import User
 
 __all__ = [
+    "AcceptedGiftTypes",
     "Animation",
     "Audio",
     "Birthdate",
@@ -169,6 +186,8 @@ __all__ = [
     "ForumTopic",
     "Game",
     "GameHighScore",
+    "Gift",
+    "Gifts",
     "InlineKeyboardButton",
     "InlineKeyboardMarkup",
     "InlineQuery",
@@ -196,6 +215,10 @@ __all__ = [
     "MessageReactionCountUpdated",
     "MessageReactionUpdated",
     "OrderInfo",
+    "OwnedGift",
+    "OwnedGiftRegular",
+    "OwnedGifts",
+    "OwnedGiftUnique",
     "PassportElementError",
     "PhotoSize",
     "Poll",
@@ -224,6 +247,13 @@ __all__ = [
     "TelegramObject",
     "TextQuote",
     "TypeParseError",
+    "UniqueGift",
+    "UniqueGiftBackdrop",
+    "UniqueGiftBackdropColors",
+    "UniqueGiftColors",
+    "UniqueGiftInfo",
+    "UniqueGiftModel",
+    "UniqueGiftSymbol",
     "Update",
     "User",
     "UserProfilePhotos",
