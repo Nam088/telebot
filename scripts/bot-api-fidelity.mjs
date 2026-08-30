@@ -621,9 +621,49 @@ export function compareBaseline(reports, baseline) {
       .sort();
     const closed = [...beforeRows.keys()].filter((name) => !afterNames.has(name)).sort();
 
-    regressions += newGaps.length + newlyUnmodelled.length;
-    improvements += closed.length + nowModelled.length;
-    entries.push({ key: report.key, newGaps, newlyUnmodelled, closed, nowModelled });
+    // Same ratchet logic one layer up. A baseline written before the param
+    // layer existed has no `methodRows` key, which correctly makes every
+    // measured param gap new drift until it is deliberately refreshed.
+    const beforeMethodRows = new Map((before.methodRows ?? []).map((row) => [row.name, row]));
+    const afterMethodNames = new Set((report.methodRows ?? []).map((row) => row.name));
+    const newMethodGaps = [];
+    for (const row of report.methodRows ?? []) {
+      const known = beforeMethodRows.get(row.name);
+      const knownRequired = new Set(known?.required ?? []);
+      const knownOptional = new Set(known?.optional ?? []);
+      const required = row.required.filter((field) => !knownRequired.has(field));
+      const optional = row.optional.filter((field) => !knownOptional.has(field));
+      if (required.length > 0 || optional.length > 0) {
+        newMethodGaps.push({ name: row.name, required, optional });
+      }
+    }
+    const beforeUnresolved = new Set(before.methodsUnresolved ?? []);
+    const afterUnresolved = new Set(report.methodsUnresolved ?? []);
+    const newlyUnresolved = (report.methodsUnresolved ?? []).filter(
+      (name) => !beforeUnresolved.has(name),
+    );
+    const nowResolved = [...beforeUnresolved]
+      .filter((name) => !afterUnresolved.has(name))
+      .sort();
+    const closedMethods = [...beforeMethodRows.keys()]
+      .filter((name) => !afterMethodNames.has(name))
+      .sort();
+
+    regressions +=
+      newGaps.length + newlyUnmodelled.length + newMethodGaps.length + newlyUnresolved.length;
+    improvements +=
+      closed.length + nowModelled.length + closedMethods.length + nowResolved.length;
+    entries.push({
+      key: report.key,
+      newGaps,
+      newlyUnmodelled,
+      closed,
+      nowModelled,
+      newMethodGaps,
+      newlyUnresolved,
+      closedMethods,
+      nowResolved,
+    });
   }
 
   return { entries, unbaselined, regressions, improvements };
