@@ -1,11 +1,11 @@
 ---
 name: telegram-api-updater
-description: Check open Telegram Bot API update issues on GitHub, read official Bot API documentation, and execute the end-to-end implementation workflow for both TypeScript (packages/node) and Golang (packages/go) frameworks (TDD, domain types, methods, unit tests, TypeDoc/GoDoc, and issue checklist resolution). Use whenever implementing newly released Telegram Bot API features or resolving API update issues.
+description: Check open Telegram Bot API update issues on GitHub, read official Bot API documentation, and execute the end-to-end implementation workflow for all three frameworks — TypeScript (packages/node), Golang (packages/go), and Python (packages/python) — (TDD, domain types, methods, unit tests, TypeDoc/GoDoc/Sphinx docstrings, and issue checklist resolution); follow telebot-node-conventions, telebot-go-conventions, and telebot-python-conventions respectively. Use whenever implementing newly released Telegram Bot API features or resolving API update issues.
 ---
 
 # Telegram Bot API Issue Resolver & Monorepo Updater Skill
 
-This skill provides an authoritative, end-to-end guide for an AI Agent to autonomously scan open Telegram API update issues, inspect official Telegram Bot API specs, implement types and methods across both **`packages/node/` (TypeScript)** and **`packages/go/` (Golang)**, verify Monorepo quality gates, and update GitHub Issues.
+This skill provides an authoritative, end-to-end guide for an AI Agent to autonomously scan open Telegram API update issues, inspect official Telegram Bot API specs, implement types and methods across **`packages/node/` (TypeScript)**, **`packages/go/` (Golang)**, and **`packages/python/` (Python — see the telebot-python-conventions skill for its mixin/TDD conventions)**, verify Monorepo quality gates, and update GitHub Issues.
 
 ---
 

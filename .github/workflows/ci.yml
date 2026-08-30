@@ -66,3 +66,45 @@ jobs:
       - name: Compile Go Packages
         working-directory: packages/go
         run: go build ./...
+
+  test-python:
+    name: Python Test & Lint (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: packages/python/pyproject.toml
+
+      - name: Install Dependencies
+        working-directory: packages/python
+        run: pip install -e ".[dev]"
+
+      - name: Run Linter (ruff)
+        working-directory: packages/python
+        run: ruff check src tests
+
+      - name: Check Formatting (ruff)
+        working-directory: packages/python
+        run: ruff format --check src tests
+
+      - name: Type Check (mypy --strict)
+        working-directory: packages/python
+        run: mypy --strict src
+
+      - name: Run Unit & Integration Tests (Coverage)
+        working-directory: packages/python
+        run: pytest --cov=telebot_py --cov-report=term-missing --cov-fail-under=80
+
+      - name: Parity Audit (node/go/python)
+        working-directory: packages/python
+        run: python scripts/parity_audit.py

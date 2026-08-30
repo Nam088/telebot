@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'packages/node/**'
+      - 'packages/python/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/pages/**'
@@ -43,10 +44,26 @@ jobs:
       - name: Generate TypeDoc documentation
         run: npm run docs
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install telebot-py docs dependencies
+        working-directory: packages/python
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Generate Sphinx documentation
+        working-directory: packages/python
+        run: sphinx-build -W --keep-going docs docs/_build/html
+
       - name: Assemble combined docs site
         run: |
-          mkdir -p site/node
+          mkdir -p site/node site/python
           cp -r packages/node/docs/. site/node/
+          cp -r packages/python/docs/_build/html/. site/python/
           cp -r .github/pages/plugins site/plugins
           cp .github/pages/index.html site/index.html
 

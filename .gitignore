@@ -24,3 +24,24 @@ python-telegram-bot/
 # Release pipeline artifact (written by semantic-release successCmd in CI)
 RELEASE_VERSION
 
+# Python (packages/python)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+# Sphinx output is ignored, but the docs SOURCE must stay tracked
+!packages/python/docs/
+packages/python/docs/_build/
+
+# Go (packages/go)
+*.exe
+*.test
+*.out
+
