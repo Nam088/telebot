@@ -63,6 +63,8 @@ class EphemeralMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editephemeralmessagetext
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -117,6 +119,8 @@ class EphemeralMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editephemeralmessagecaption
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -164,6 +168,8 @@ class EphemeralMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editephemeralmessagemedia
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -204,6 +210,8 @@ class EphemeralMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editephemeralmessagereplymarkup
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -235,6 +243,8 @@ class EphemeralMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deleteephemeralmessage
         """
         payload = clean_payload(
             chat_id=chat_id,

@@ -105,6 +105,8 @@ class OwnedGiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getbusinessaccountgifts
         """
         payload: dict[str, object] = {
             "business_connection_id": business_connection_id,
@@ -161,6 +163,8 @@ class OwnedGiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getusergifts
         """
         payload: dict[str, object] = {
             "user_id": user_id,
@@ -224,6 +228,8 @@ class OwnedGiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatgifts
         """
         payload: dict[str, object] = {
             "chat_id": chat_id,

@@ -13,6 +13,8 @@ class WebAppInfo(TelegramObject):
 
     Attributes:
         url: An HTTPS URL of a Web App to be opened.
+
+    Telegram API: https://core.telegram.org/bots/api#webappinfo
     """
 
     url: str
@@ -28,6 +30,8 @@ class LoginUrl(TelegramObject):
         bot_username: Username of a bot which will be used for authorization.
         request_write_access: Whether to request permission for the bot to
             send messages to the user.
+
+    Telegram API: https://core.telegram.org/bots/api#loginurl
     """
 
     url: str
@@ -46,6 +50,8 @@ class SwitchInlineQueryChosenChat(TelegramObject):
         allow_bot_chats: Whether private chats with bots can be chosen.
         allow_group_chats: Whether group and supergroup chats can be chosen.
         allow_channel_chats: Whether channel chats can be chosen.
+
+    Telegram API: https://core.telegram.org/bots/api#switchinlinequerychosenchat
     """
 
     query: str | None = None
@@ -61,6 +67,8 @@ class CopyTextButton(TelegramObject):
 
     Attributes:
         text: The text to be copied to the clipboard; 1-256 characters.
+
+    Telegram API: https://core.telegram.org/bots/api#copytextbutton
     """
 
     text: str
@@ -91,6 +99,8 @@ class InlineKeyboardButton(TelegramObject):
         pay: Whether to send a Pay button.
         disabled: If set, the button is disabled and does nothing
             (Bot API 10.3+; the node DisabledButton is an empty object).
+
+    Telegram API: https://core.telegram.org/bots/api#inlinekeyboardbutton
     """
 
     text: str
@@ -118,6 +128,8 @@ class InlineKeyboardMarkup(TelegramObject):
             InlineKeyboardButton objects.
         force_reply: Whether the reply interface must be shown to the user
             (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#inlinekeyboardmarkup
     """
 
     inline_keyboard: list[list[InlineKeyboardButton]]
@@ -130,6 +142,8 @@ class KeyboardButtonPollType(TelegramObject):
 
     Attributes:
         type: If 'quiz', the user can only create a poll in quiz mode.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonpolltype
     """
 
     type: str | None = None
@@ -148,6 +162,8 @@ class KeyboardButtonRequestUsers(TelegramObject):
         request_name: Whether to request the users' first and last name.
         request_username: Whether to request the users' username.
         request_photo: Whether to request the users' photo.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonrequestusers
     """
 
     request_id: int
@@ -179,6 +195,8 @@ class KeyboardButtonRequestChat(TelegramObject):
         request_title: Whether to request the chat's title.
         request_username: Whether to request the chat's username.
         request_photo: Whether to request the chat's photo.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonrequestchat
     """
 
     request_id: int
@@ -210,6 +228,8 @@ class KeyboardButton(TelegramObject):
         request_poll: If specified, the user is asked to create a poll.
             Available in private chats only.
         web_app: If specified, the described Web App launches when pressed.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbutton
     """
 
     text: str
@@ -239,6 +259,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: Whether to show the keyboard to specific users only.
         force_reply: Whether the reply interface must be shown to the user
             (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#replykeyboardmarkup
     """
 
     keyboard: list[list[KeyboardButton]]
@@ -258,6 +280,8 @@ class ReplyKeyboardRemove(TelegramObject):
         remove_keyboard: Requests clients to remove the custom keyboard;
             always True on the wire.
         selective: Whether to remove the keyboard for specific users only.
+
+    Telegram API: https://core.telegram.org/bots/api#replykeyboardremove
     """
 
     remove_keyboard: bool = True
@@ -273,6 +297,8 @@ class ForceReply(TelegramObject):
         input_field_placeholder: Placeholder shown in the input field when the
             reply is active; 1-64 characters.
         selective: Whether to force reply from specific users only.
+
+    Telegram API: https://core.telegram.org/bots/api#forcereply
     """
 
     force_reply: bool = True
@@ -286,6 +312,8 @@ class PreparedKeyboardButton(TelegramObject):
 
     Attributes:
         id: Unique identifier of the keyboard button.
+
+    Telegram API: https://core.telegram.org/bots/api#preparedkeyboardbutton
     """
 
     id: str

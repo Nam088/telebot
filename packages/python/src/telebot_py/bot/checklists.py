@@ -72,6 +72,8 @@ class ChecklistsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendchecklist
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -123,6 +125,8 @@ class ChecklistsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagechecklist
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,

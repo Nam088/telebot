@@ -17,6 +17,8 @@ class PhotoSize(TelegramObject):
         width: Photo width.
         height: Photo height.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#photosize
     """
 
     file_id: str
@@ -40,6 +42,8 @@ class Audio(TelegramObject):
         mime_type: MIME type of the file as defined by sender.
         file_size: File size in bytes, when known.
         thumbnail: Thumbnail of the album cover the music file belongs to.
+
+    Telegram API: https://core.telegram.org/bots/api#audio
     """
 
     file_id: str
@@ -64,6 +68,8 @@ class Document(TelegramObject):
         file_name: Original filename as defined by sender.
         mime_type: MIME type of the file as defined by sender.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#document
     """
 
     file_id: str
@@ -88,6 +94,8 @@ class Video(TelegramObject):
         file_name: Original filename as defined by sender.
         mime_type: MIME type of the file as defined by sender.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#video
     """
 
     file_id: str
@@ -115,6 +123,8 @@ class Animation(TelegramObject):
         file_name: Original animation filename as defined by sender.
         mime_type: MIME type of the file as defined by sender.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#animation
     """
 
     file_id: str
@@ -138,6 +148,8 @@ class Voice(TelegramObject):
         duration: Duration of the audio in seconds as defined by sender.
         mime_type: MIME type of the audio as defined by sender.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#voice
     """
 
     file_id: str
@@ -158,6 +170,8 @@ class VideoNote(TelegramObject):
         duration: Duration of the video in seconds as defined by sender.
         thumbnail: Video thumbnail.
         file_size: File size in bytes, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#videonote
     """
 
     file_id: str
@@ -179,6 +193,8 @@ class LivePhoto(TelegramObject):
         height: Photo height.
         photo: Available sizes of the photo.
         video: Video file associated with the live photo.
+
+    Telegram API: https://core.telegram.org/bots/api#livephoto
     """
 
     file_id: str

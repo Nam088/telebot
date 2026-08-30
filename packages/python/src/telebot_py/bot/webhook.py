@@ -29,6 +29,8 @@ class WebhookMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getwebhookinfo
         """
         return parse_result(WebhookInfo, await self.request("getWebhookInfo"))
 
@@ -62,6 +64,8 @@ class WebhookMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setwebhook
         """
         payload = clean_payload(
             url=url,
@@ -88,6 +92,8 @@ class WebhookMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletewebhook
         """
         payload = clean_payload(drop_pending_updates=drop_pending_updates)
         return parse_flag(await self.request("deleteWebhook", payload))

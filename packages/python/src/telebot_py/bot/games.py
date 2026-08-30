@@ -54,6 +54,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendgame
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -105,6 +107,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setgamescore
         """
         payload = clean_payload(
             user_id=user_id,
@@ -147,6 +151,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getgamehighscores
         """
         payload = clean_payload(
             user_id=user_id,
@@ -187,6 +193,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setpassportdataerrors
         """
         payload = clean_payload(
             user_id=user_id,

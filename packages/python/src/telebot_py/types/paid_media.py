@@ -22,6 +22,8 @@ class PaidMediaPreview(TelegramObject):
         width: Media width as defined by the sender.
         height: Media height as defined by the sender.
         duration: Duration of the media in seconds as defined by the sender.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediapreview
     """
 
     type: str
@@ -39,6 +41,8 @@ class PaidMediaPhoto(TelegramObject):
     Attributes:
         type: Type of the paid media, always 'photo'.
         photo: Available sizes of the photo.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediaphoto
     """
 
     type: str
@@ -54,6 +58,8 @@ class PaidMediaVideo(TelegramObject):
     Attributes:
         type: Type of the paid media, always 'video'.
         video: The video.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediavideo
     """
 
     type: str
@@ -74,6 +80,8 @@ class PaidMediaInfo(TelegramObject):
         star_count: Number of Telegram Stars that must be paid to buy access
             to the media.
         paid_media: Information about the paid media.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediainfo
     """
 
     star_count: int
@@ -88,6 +96,8 @@ class InputPaidMediaPhoto(TelegramObject):
         type: Type of the media, always 'photo'.
         media: File to send: a ``file_id``, an HTTP URL, or an
             ``attach://<file_attach_name>`` reference.
+
+    Telegram API: https://core.telegram.org/bots/api#inputpaidmediaphoto
     """
 
     type: str
@@ -112,6 +122,8 @@ class InputPaidMediaVideo(TelegramObject):
         duration: Video duration in seconds.
         supports_streaming: Whether the uploaded video is suitable for
             streaming.
+
+    Telegram API: https://core.telegram.org/bots/api#inputpaidmediavideo
     """
 
     type: str

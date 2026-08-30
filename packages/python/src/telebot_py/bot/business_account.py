@@ -41,6 +41,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getbusinessconnection
         """
         payload = clean_payload(business_connection_id=business_connection_id)
         return parse_result(
@@ -69,6 +71,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#readbusinessmessage
         """
         payload = clean_payload(
             business_connection_id=business_connection_id, chat_id=chat_id, message_id=message_id
@@ -95,6 +99,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletebusinessmessages
         """
         payload = clean_payload(
             business_connection_id=business_connection_id, message_ids=list(message_ids)
@@ -119,6 +125,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getbusinessaccountstarbalance
         """
         payload = clean_payload(business_connection_id=business_connection_id)
         return parse_result(
@@ -155,6 +163,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setbusinessaccountname
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -188,6 +198,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setbusinessaccountusername
         """
         payload = clean_payload(business_connection_id=business_connection_id, username=username)
         return parse_flag(await self.request("setBusinessAccountUsername", payload))
@@ -213,6 +225,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setbusinessaccountbio
         """
         payload = clean_payload(business_connection_id=business_connection_id, bio=bio)
         return parse_flag(await self.request("setBusinessAccountBio", payload))
@@ -246,6 +260,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setbusinessaccountgiftsettings
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -289,6 +305,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setbusinessaccountprofilephoto
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -323,6 +341,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#removebusinessaccountprofilephoto
         """
         payload = clean_payload(business_connection_id=business_connection_id, is_public=is_public)
         return parse_flag(await self.request("removeBusinessAccountProfilePhoto", payload))
@@ -347,6 +367,8 @@ class BusinessAccountMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#transferbusinessaccountstars
         """
         payload = clean_payload(
             business_connection_id=business_connection_id, star_count=star_count

@@ -37,6 +37,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getavailablegifts
         """
         return parse_result(Gifts, await self.request("getAvailableGifts"))
 
@@ -89,6 +91,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendgift
         """
         if gift_id is None:
             msg = "send_gift() requires gift_id"
@@ -147,6 +151,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#giftpremiumsubscription
         """
         payload = clean_payload(
             user_id=user_id,
@@ -182,6 +188,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#convertgifttostars
         """
         payload = clean_payload(
             business_connection_id=business_connection_id, owned_gift_id=owned_gift_id
@@ -226,6 +234,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#upgradegift
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -271,6 +281,8 @@ class GiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#transfergift
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,

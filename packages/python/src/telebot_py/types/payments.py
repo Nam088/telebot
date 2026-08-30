@@ -20,6 +20,8 @@ class ShippingAddress(TelegramObject):
         post_code: Address post code.
         state: State, if applicable.
         street_line2: Second line for the address.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingaddress
     """
 
     country_code: str
@@ -39,6 +41,8 @@ class OrderInfo(TelegramObject):
         phone_number: User's phone number.
         email: User's email.
         shipping_address: User's shipping address.
+
+    Telegram API: https://core.telegram.org/bots/api#orderinfo
     """
 
     name: str | None = None
@@ -56,6 +60,8 @@ class ShippingQuery(TelegramObject):
         from_user: User who sent the query.
         invoice_payload: Bot-specified invoice payload.
         shipping_address: User-specified shipping address.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingquery
     """
 
     id: str
@@ -79,6 +85,8 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id: Identifier of the shipping option chosen by the
             user, when applicable.
         order_info: Order info provided by the user, when applicable.
+
+    Telegram API: https://core.telegram.org/bots/api#precheckoutquery
     """
 
     id: str
@@ -119,6 +127,8 @@ class RefundedPayment(TelegramObject):
         invoice_payload: Bot-specified invoice payload.
         telegram_payment_charge_id: Telegram payment identifier.
         provider_payment_charge_id: Provider payment identifier.
+
+    Telegram API: https://core.telegram.org/bots/api#refundedpayment
     """
 
     currency: str
@@ -135,6 +145,8 @@ class LabeledPrice(TelegramObject):
     Attributes:
         label: Portion label.
         amount: Price of the product in the smallest units of the currency.
+
+    Telegram API: https://core.telegram.org/bots/api#labeledprice
     """
 
     label: str
@@ -149,6 +161,8 @@ class ShippingOption(TelegramObject):
         id: Shipping option identifier.
         title: Option title.
         prices: List of price portions.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingoption
     """
 
     id: str
@@ -169,6 +183,8 @@ class StarTransaction(TelegramObject):
         source: Source of the transaction; shape depends on the partner type.
         receiver: Receiver of the transaction; shape depends on the partner
             type.
+
+    Telegram API: https://core.telegram.org/bots/api#startransaction
     """
 
     id: str
@@ -188,6 +204,8 @@ class StarAmount(TelegramObject):
     Attributes:
         amount: The integer number of Telegram Stars.
         nanostar_amount: The number of 1/1000000000 shares of Telegram Stars.
+
+    Telegram API: https://core.telegram.org/bots/api#staramount
     """
 
     amount: int
@@ -200,6 +218,8 @@ class StarTransactions(TelegramObject):
 
     Attributes:
         transactions: List of transactions.
+
+    Telegram API: https://core.telegram.org/bots/api#startransactions
     """
 
     transactions: list[StarTransaction]

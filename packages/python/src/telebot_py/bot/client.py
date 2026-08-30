@@ -237,6 +237,8 @@ class Bot(
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getme
         """
         return parse_result(User, await self.request("getMe"))
 
@@ -270,6 +272,8 @@ class Bot(
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getupdates
         """
         payload = clean_payload(
             offset=offset,

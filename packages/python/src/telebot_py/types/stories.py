@@ -34,6 +34,8 @@ class StoryAreaPosition(TelegramObject):
             degrees; 0-360.
         corner_radius_percentage: The radius of the rectangle corner rounding,
             as a percentage of the media width.
+
+    Telegram API: https://core.telegram.org/bots/api#storyareaposition
     """
 
     x_percentage: float
@@ -54,6 +56,8 @@ class StoryAreaTypeLocation(TelegramObject):
         longitude: Location longitude in degrees.
         address: Address of the location, kept as a raw mapping (node leaves
             ``LocationAddress`` untyped).
+
+    Telegram API: https://core.telegram.org/bots/api#storyareatypelocation
     """
 
     type: str
@@ -73,6 +77,8 @@ class StoryAreaTypeSuggestedReaction(TelegramObject):
         reaction_type: Type of the reaction.
         is_dark: Whether the reaction area has a dark background.
         is_flipped: Whether the reaction area corner is flipped.
+
+    Telegram API: https://core.telegram.org/bots/api#storyareatypesuggestedreaction
     """
 
     type: str
@@ -90,6 +96,8 @@ class StoryAreaTypeLink(TelegramObject):
     Attributes:
         type: Type of the area, always 'link'.
         url: HTTP or tg:// URL opened when the area is clicked.
+
+    Telegram API: https://core.telegram.org/bots/api#storyareatypelink
     """
 
     type: str
@@ -113,6 +121,8 @@ class StoryAreaTypeWeather(TelegramObject):
         temperature: Temperature, in degrees Celsius.
         emoji: Emoji representing the weather.
         background_color: A color of the area background in the ARGB format.
+
+    Telegram API: https://core.telegram.org/bots/api#storyareatypeweather
     """
 
     type: str
@@ -130,6 +140,8 @@ class StoryAreaTypeUniqueGift(TelegramObject):
     Attributes:
         type: Type of the area, always 'unique_gift'.
         name: Unique name of the gift.
+
+    Telegram API: https://core.telegram.org/bots/api#storyareatypeuniquegift
     """
 
     type: str
@@ -155,6 +167,8 @@ class StoryArea(TelegramObject):
     Attributes:
         position: Position of the area.
         type: Type of the area.
+
+    Telegram API: https://core.telegram.org/bots/api#storyarea
     """
 
     position: StoryAreaPosition
@@ -169,6 +183,8 @@ class InputStoryContentPhoto(TelegramObject):
         type: Type of the content, always 'photo'.
         photo: Photo to post; 1080x1920 and at most 10 MB. Accepts an
             ``attach://<file_attach_name>`` reference for multipart uploads.
+
+    Telegram API: https://core.telegram.org/bots/api#inputstorycontentphoto
     """
 
     type: str
@@ -195,6 +211,8 @@ class InputStoryContentVideo(TelegramObject):
         cover_frame_timestamp: Timestamp in seconds of the frame used as the
             static cover; defaults to 0.
         is_animation: Whether the video has no sound.
+
+    Telegram API: https://core.telegram.org/bots/api#inputstorycontentvideo
     """
 
     type: str

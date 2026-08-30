@@ -41,6 +41,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createchatinvitelink
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -85,6 +87,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editchatinvitelink
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -117,6 +121,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#revokechatinvitelink
         """
         payload = clean_payload(chat_id=chat_id, invite_link=invite_link)
         return parse_result(ChatInviteLink, await self.request("revokeChatInviteLink", payload))
@@ -152,6 +158,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createchatsubscriptioninvitelink
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -191,6 +199,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editchatsubscriptioninvitelink
         """
         payload = clean_payload(chat_id=chat_id, invite_link=invite_link, name=name)
         return parse_result(

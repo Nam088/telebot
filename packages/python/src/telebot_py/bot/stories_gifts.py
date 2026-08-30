@@ -50,6 +50,8 @@ class StoriesGiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#poststory
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -92,6 +94,8 @@ class StoriesGiftsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setuseremojistatus
         """
         payload = clean_payload(
             user_id=user_id,

@@ -22,6 +22,8 @@ class Game(TelegramObject):
         text_entities: Special entities that appear in ``text``.
         animation: Animation that will be displayed in the game message in
             chats.
+
+    Telegram API: https://core.telegram.org/bots/api#game
     """
 
     title: str
@@ -40,6 +42,8 @@ class GameHighScore(TelegramObject):
         position: Position in the high score table for the game.
         user: User who scored the points.
         score: Score value.
+
+    Telegram API: https://core.telegram.org/bots/api#gamehighscore
     """
 
     position: int

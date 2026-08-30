@@ -177,6 +177,8 @@ class Message(TelegramObject):
         rich_message: Rich formatted message content (payload kept raw; the
             node rich domain is out of scope here).
         live_photo: Live photo attachment.
+
+    Telegram API: https://core.telegram.org/bots/api#message
     """
 
     message_id: int

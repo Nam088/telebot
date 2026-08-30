@@ -54,6 +54,8 @@ class ReactionsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmessagereaction
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -86,6 +88,8 @@ class ReactionsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmessagereaction
         """
         payload: dict[str, object] = {
             "chat_id": chat_id,
@@ -116,6 +120,8 @@ class ReactionsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmessagereaction
         """
         payload: dict[str, object] = {
             "chat_id": chat_id,

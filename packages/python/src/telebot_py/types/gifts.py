@@ -25,6 +25,8 @@ class GiftBackground(TelegramObject):
         center_color: Center color of the background in RGB format.
         edge_color: Edge color of the background in RGB format.
         text_color: Text color of the background in RGB format.
+
+    Telegram API: https://core.telegram.org/bots/api#giftbackground
     """
 
     center_color: int
@@ -59,6 +61,8 @@ class Gift(TelegramObject):
         unique_gift_variant_count: The total number of different unique gifts
             that can be obtained by upgrading the gift.
         publisher_chat: Information about the chat that published the gift.
+
+    Telegram API: https://core.telegram.org/bots/api#gift
     """
 
     id: str
@@ -84,6 +88,8 @@ class Gifts(TelegramObject):
 
     Attributes:
         gifts: The list of gifts.
+
+    Telegram API: https://core.telegram.org/bots/api#gifts
     """
 
     gifts: list[Gift]
@@ -101,6 +107,8 @@ class AcceptedGiftTypes(TelegramObject):
         premium_subscription: True, if a Telegram Premium subscription is
             accepted.
         gifts_from_channels: True, if gifts from channels are accepted.
+
+    Telegram API: https://core.telegram.org/bots/api#acceptedgifttypes
     """
 
     unlimited_gifts: bool
@@ -119,6 +127,8 @@ class UniqueGiftBackdropColors(TelegramObject):
         edge_color: The color on the edges of the backdrop in RGB format.
         symbol_color: The color to be applied to the symbol in RGB format.
         text_color: The color for the text on the backdrop in RGB format.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftbackdropcolors
     """
 
     center_color: int
@@ -136,6 +146,8 @@ class UniqueGiftBackdrop(TelegramObject):
         colors: The colors of the backdrop.
         rarity_per_mille: The number of unique gifts that receive this backdrop
             for every 1000 gifts upgraded.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftbackdrop
     """
 
     name: str
@@ -154,6 +166,8 @@ class UniqueGiftModel(TelegramObject):
             for every 1000 gifts upgraded.
         rarity: Rarity of the model if it is a crafted model, one of
             ``uncommon``, ``rare``, ``epic`` or ``legendary``.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftmodel
     """
 
     name: str
@@ -171,6 +185,8 @@ class UniqueGiftSymbol(TelegramObject):
         sticker: The sticker that represents the unique gift.
         rarity_per_mille: The number of unique gifts that receive this model
             for every 1000 gifts upgraded.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftsymbol
     """
 
     name: str
@@ -193,6 +209,8 @@ class UniqueGiftColors(TelegramObject):
         dark_theme_main_color: Main color used in dark themes, in RGB format.
         dark_theme_other_colors: List of 1-3 additional colors used in dark
             themes, in RGB format.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftcolors
     """
 
     model_custom_emoji_id: str
@@ -225,6 +243,8 @@ class UniqueGift(TelegramObject):
             blockchain.
         colors: The color scheme for user's name, replies, etc.
         publisher_chat: Information about the chat that published the gift.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegift
     """
 
     gift_id: str
@@ -263,6 +283,8 @@ class UniqueGiftInfo(TelegramObject):
             transfer the gift; omitted if the bot cannot transfer the gift.
         next_transfer_date: Point in time (Unix timestamp) when the gift can be
             transferred.
+
+    Telegram API: https://core.telegram.org/bots/api#uniquegiftinfo
     """
 
     gift: UniqueGift
@@ -305,6 +327,8 @@ class OwnedGiftRegular(TelegramObject):
             only after it is converted to stars.
         unique_gift_number: Unique number of the upgraded gift the regular gift
             was converted from.
+
+    Telegram API: https://core.telegram.org/bots/api#ownedgiftregular
     """
 
     type: str
@@ -344,6 +368,8 @@ class OwnedGiftUnique(TelegramObject):
             transfer the gift; omitted if the bot cannot transfer the gift.
         next_transfer_date: Point in time (Unix timestamp) when the gift can be
             transferred.
+
+    Telegram API: https://core.telegram.org/bots/api#ownedgiftunique
     """
 
     type: str
@@ -377,6 +403,8 @@ class OwnedGifts(TelegramObject):
         gifts: The list of gifts.
         next_offset: Offset for the next request; if omitted, then this is the
             final result.
+
+    Telegram API: https://core.telegram.org/bots/api#ownedgifts
     """
 
     total_count: int

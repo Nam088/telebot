@@ -29,6 +29,8 @@ class PassportElementError(TelegramObject):
             ``utility_bill``, ``bank_statement``, ``rental_agreement``,
             ``passport_registration``, ``temporary_registration``.
         message: Human-readable error message.
+
+    Telegram API: https://core.telegram.org/bots/api#passportelementerror
     """
 
     source: str

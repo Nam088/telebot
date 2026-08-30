@@ -74,6 +74,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendaudio
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -155,6 +157,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendvideo
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -236,6 +240,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendanimation
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -307,6 +313,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendvoice
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -370,6 +378,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendvideonote
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -423,6 +433,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendmediagroup
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -486,6 +498,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendlocation
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -556,6 +570,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendvenue
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -620,6 +636,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendcontact
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -697,6 +715,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendpoll
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -761,6 +781,8 @@ class MediaMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#senddice
         """
         payload = clean_payload(
             chat_id=chat_id,

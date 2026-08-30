@@ -38,6 +38,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#logout
         """
         return parse_flag(await self.request("logOut", {}))
 
@@ -54,6 +56,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#close
         """
         return parse_flag(await self.request("close", {}))
 
@@ -76,6 +80,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyname
         """
         payload = clean_payload(name=name, language_code=language_code)
         return parse_flag(await self.request("setMyName", payload))
@@ -96,6 +102,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmyname
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(BotName, await self.request("getMyName", payload))
@@ -119,6 +127,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmydescription
         """
         payload = clean_payload(description=description, language_code=language_code)
         return parse_flag(await self.request("setMyDescription", payload))
@@ -139,6 +149,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmydescription
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(BotDescription, await self.request("getMyDescription", payload))
@@ -162,6 +174,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyshortdescription
         """
         payload = clean_payload(short_description=short_description, language_code=language_code)
         return parse_flag(await self.request("setMyShortDescription", payload))
@@ -184,6 +198,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmyshortdescription
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(
@@ -214,6 +230,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmycommands
         """
         payload = clean_payload(
             commands=[to_wire(command) for command in commands],
@@ -241,6 +259,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmycommands
         """
         payload = clean_payload(scope=to_wire(scope), language_code=language_code)
         return parse_list_result(BotCommand, await self.request("getMyCommands", payload))
@@ -264,6 +284,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemycommands
         """
         payload = clean_payload(scope=to_wire(scope), language_code=language_code)
         return parse_flag(await self.request("deleteMyCommands", payload))
@@ -287,6 +309,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyprofilephoto
         """
         payload = clean_payload(photo=photo)
         return parse_flag(await self.request("setMyProfilePhoto", payload))
@@ -304,6 +328,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#removemyprofilephoto
         """
         return parse_flag(await self.request("removeMyProfilePhoto"))
 
@@ -330,6 +356,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getuserprofileaudios
         """
         payload = clean_payload(user_id=user_id, offset=offset, limit=limit)
         return parse_result(UserProfileAudios, await self.request("getUserProfileAudios", payload))

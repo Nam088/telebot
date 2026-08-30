@@ -16,6 +16,8 @@ class ReactionTypeEmoji(TelegramObject):
     Attributes:
         type: Type of the reaction, always 'emoji'.
         emoji: Reaction emoji.
+
+    Telegram API: https://core.telegram.org/bots/api#reactiontypeemoji
     """
 
     type: str
@@ -31,6 +33,8 @@ class ReactionTypeCustomEmoji(TelegramObject):
     Attributes:
         type: Type of the reaction, always 'custom_emoji'.
         custom_emoji_id: Custom emoji identifier.
+
+    Telegram API: https://core.telegram.org/bots/api#reactiontypecustomemoji
     """
 
     type: str
@@ -45,6 +49,8 @@ class ReactionTypePaid(TelegramObject):
 
     Attributes:
         type: Type of the reaction, always 'paid'.
+
+    Telegram API: https://core.telegram.org/bots/api#reactiontypepaid
     """
 
     type: str
@@ -59,6 +65,8 @@ class ReactionCount(TelegramObject):
     Attributes:
         type: Type of the reaction.
         total_count: Number of times the reaction was added.
+
+    Telegram API: https://core.telegram.org/bots/api#reactioncount
     """
 
     type: ReactionTypeEmoji | ReactionTypeCustomEmoji | ReactionTypePaid
@@ -78,6 +86,8 @@ class MessageReactionUpdated(TelegramObject):
         user: The user that changed the reaction, if not anonymous.
         actor_chat: The chat on behalf of which the reaction was changed, if
             the user is anonymous.
+
+    Telegram API: https://core.telegram.org/bots/api#messagereactionupdated
     """
 
     chat: Chat
@@ -98,6 +108,8 @@ class MessageReactionCountUpdated(TelegramObject):
         message_id: Unique message identifier inside the chat.
         date: Date of the change in Unix time.
         reactions: List of reactions that are present on the message.
+
+    Telegram API: https://core.telegram.org/bots/api#messagereactioncountupdated
     """
 
     chat: Chat

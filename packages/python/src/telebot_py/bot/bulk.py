@@ -45,6 +45,8 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#forwardmessages
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -93,6 +95,8 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#copymessages
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -131,6 +135,8 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemessages
         """
         payload = clean_payload(
             chat_id=chat_id,

@@ -97,6 +97,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendinvoice
         """
         wire = clean_payload(
             chat_id=chat_id,
@@ -197,6 +199,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createinvoicelink
         """
         wire = clean_payload(
             title=title,
@@ -253,6 +257,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answershippingquery
         """
         payload = clean_payload(
             shipping_query_id=shipping_query_id,
@@ -289,6 +295,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerprecheckoutquery
         """
         payload = clean_payload(
             pre_checkout_query_id=pre_checkout_query_id,
@@ -316,6 +324,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getstartransactions
         """
         payload = clean_payload(offset=offset, limit=limit)
         return parse_result(StarTransactions, await self.request("getStarTransactions", payload))
@@ -337,6 +347,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#refundstarpayment
         """
         payload = clean_payload(
             user_id=user_id, telegram_payment_charge_id=telegram_payment_charge_id
@@ -364,6 +376,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#edituserstarsubscription
         """
         payload = clean_payload(
             user_id=user_id,
@@ -386,5 +400,7 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmystarbalance
         """
         return parse_result(StarAmount, await self.request("getMyStarBalance"))

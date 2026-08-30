@@ -39,6 +39,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createforumtopic
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -80,6 +82,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editforumtopic
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -107,6 +111,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#closeforumtopic
         """
         payload = clean_payload(chat_id=chat_id, message_thread_id=message_thread_id)
         return parse_flag(await self.request("closeForumTopic", payload))
@@ -133,6 +139,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#reopenforumtopic
         """
         payload = clean_payload(chat_id=chat_id, message_thread_id=message_thread_id)
         return parse_flag(await self.request("reopenForumTopic", payload))
@@ -159,6 +167,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deleteforumtopic
         """
         payload = clean_payload(chat_id=chat_id, message_thread_id=message_thread_id)
         return parse_flag(await self.request("deleteForumTopic", payload))
@@ -187,6 +197,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unpinallforumtopicmessages
         """
         payload = clean_payload(chat_id=chat_id, message_thread_id=message_thread_id)
         return parse_flag(await self.request("unpinAllForumTopicMessages", payload))
@@ -212,6 +224,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editgeneralforumtopic
         """
         payload = clean_payload(chat_id=chat_id, name=name)
         return parse_flag(await self.request("editGeneralForumTopic", payload))
@@ -235,6 +249,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#closegeneralforumtopic
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("closeGeneralForumTopic", payload))
@@ -258,6 +274,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#reopengeneralforumtopic
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("reopenGeneralForumTopic", payload))
@@ -283,6 +301,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#hidegeneralforumtopic
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("hideGeneralForumTopic", payload))
@@ -306,6 +326,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unhidegeneralforumtopic
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("unhideGeneralForumTopic", payload))
@@ -330,6 +352,8 @@ class TopicsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unpinallgeneralforumtopicmessages
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("unpinAllGeneralForumTopicMessages", payload))

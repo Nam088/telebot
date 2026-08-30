@@ -27,6 +27,8 @@ class FilesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getfile
         """
         payload = clean_payload(file_id=file_id)
         return parse_result(File, await self.request("getFile", payload))
@@ -51,6 +53,8 @@ class FilesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getuserprofilephotos
         """
         payload = clean_payload(user_id=user_id, offset=offset, limit=limit)
         return parse_result(UserProfilePhotos, await self.request("getUserProfilePhotos", payload))

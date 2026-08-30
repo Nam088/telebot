@@ -15,6 +15,8 @@ class BotName(TelegramObject):
 
     Attributes:
         name: The bot's name.
+
+    Telegram API: https://core.telegram.org/bots/api#botname
     """
 
     name: str
@@ -26,6 +28,8 @@ class BotDescription(TelegramObject):
 
     Attributes:
         description: The bot's description.
+
+    Telegram API: https://core.telegram.org/bots/api#botdescription
     """
 
     description: str
@@ -37,6 +41,8 @@ class BotShortDescription(TelegramObject):
 
     Attributes:
         short_description: The bot's short description.
+
+    Telegram API: https://core.telegram.org/bots/api#botshortdescription
     """
 
     short_description: str
@@ -52,6 +58,8 @@ class ForumTopic(TelegramObject):
         icon_color: Color of the topic icon in RGB format.
         icon_custom_emoji_id: Unique identifier of the custom emoji shown as
             the topic icon.
+
+    Telegram API: https://core.telegram.org/bots/api#forumtopic
     """
 
     message_thread_id: int
@@ -68,6 +76,8 @@ class BotCommand(TelegramObject):
         command: Text of the command; 1-32 characters, lowercase English
             letters, digits and underscores only.
         description: Description of the command; 1-256 characters.
+
+    Telegram API: https://core.telegram.org/bots/api#botcommand
     """
 
     command: str
@@ -80,6 +90,8 @@ class MenuButtonDefault(TelegramObject):
 
     Attributes:
         type: Type of the menu button, always ``default``.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttondefault
     """
 
     type: str
@@ -93,6 +105,8 @@ class MenuButtonCommands(TelegramObject):
 
     Attributes:
         type: Type of the menu button, always ``commands``.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttoncommands
     """
 
     type: str
@@ -109,6 +123,8 @@ class MenuButtonWebApp(TelegramObject):
         text: Text on the button.
         web_app: Description of the Web App that will be launched when the
             user presses the button.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttonwebapp
     """
 
     type: str

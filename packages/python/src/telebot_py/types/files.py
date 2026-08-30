@@ -21,6 +21,8 @@ class File(TelegramObject):
         file_path: File path. Use
             ``https://api.telegram.org/file/bot<token>/<file_path>`` to get
             the file.
+
+    Telegram API: https://core.telegram.org/bots/api#file
     """
 
     file_id: str
@@ -36,6 +38,8 @@ class UserProfilePhotos(TelegramObject):
     Attributes:
         total_count: Total number of profile pictures the target user has.
         photos: Requested profile pictures (in up to 4 sizes each).
+
+    Telegram API: https://core.telegram.org/bots/api#userprofilephotos
     """
 
     total_count: int
@@ -49,6 +53,8 @@ class UserProfileAudios(TelegramObject):
     Attributes:
         total_count: Total number of profile audios for the target user.
         audios: Requested profile audios.
+
+    Telegram API: https://core.telegram.org/bots/api#userprofileaudios
     """
 
     total_count: int

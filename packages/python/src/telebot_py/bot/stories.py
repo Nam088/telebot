@@ -68,6 +68,8 @@ class StoriesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editstory
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -103,6 +105,8 @@ class StoriesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletestory
         """
         payload = clean_payload(business_connection_id=business_connection_id, story_id=story_id)
         return parse_flag(await self.request("deleteStory", payload))
@@ -146,6 +150,8 @@ class StoriesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#repoststory
         """
         payload = clean_payload(
             business_connection_id=business_connection_id,
@@ -184,6 +190,8 @@ class StoriesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#approvesuggestedpost
         """
         payload = clean_payload(chat_id=chat_id, message_id=message_id, send_date=send_date)
         return parse_flag(await self.request("approveSuggestedPost", payload))
@@ -213,6 +221,8 @@ class StoriesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#declinesuggestedpost
         """
         payload = clean_payload(chat_id=chat_id, message_id=message_id, comment=comment)
         return parse_flag(await self.request("declineSuggestedPost", payload))

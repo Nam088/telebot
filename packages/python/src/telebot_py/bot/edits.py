@@ -60,6 +60,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagetext
         """
         payload = clean_payload(
             text=text,
@@ -111,6 +113,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagecaption
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -164,6 +168,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagemedia
         """
         payload = clean_payload(
             media=to_wire(media),
@@ -218,6 +224,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagelivelocation
         """
         payload = clean_payload(
             latitude=latitude,
@@ -263,6 +271,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#stopmessagelivelocation
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -299,6 +309,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#stoppoll
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -337,6 +349,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagereplymarkup
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -366,6 +380,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemessage
         """
         payload = {"chat_id": chat_id, "message_id": message_id}
         return parse_flag(await self.request("deleteMessage", payload))
@@ -414,6 +430,8 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendmessagedraft
         """
         payload = clean_payload(
             chat_id=chat_id,

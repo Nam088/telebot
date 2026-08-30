@@ -65,6 +65,8 @@ class MessageGenerationStopped(TelegramObject):
         draft_id: Unique identifier of the message draft which was stopped.
         message_thread_id: Unique identifier of the message thread in which
             the message is generated.
+
+    Telegram API: https://core.telegram.org/bots/api#messagegenerationstopped
     """
 
     chat: Chat
@@ -111,6 +113,8 @@ class Update(TelegramObject):
         purchased_paid_media: A user purchased paid media with Telegram Stars.
         stopped_message_generation: A user asked the bot to stop the
             generation of a message (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#update
     """
 
     update_id: int

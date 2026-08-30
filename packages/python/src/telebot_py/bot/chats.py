@@ -34,6 +34,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchat
         """
         return parse_result(Chat, await self.request("getChat", {"chat_id": chat_id}))
 
@@ -54,6 +56,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatadministrators
         """
         result = await self.request("getChatAdministrators", {"chat_id": chat_id})
         return parse_list_result(ChatMember, result)
@@ -74,6 +78,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatmembercount
         """
         return parse_count(await self.request("getChatMemberCount", {"chat_id": chat_id}))
 
@@ -93,6 +99,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#leavechat
         """
         return parse_flag(await self.request("leaveChat", {"chat_id": chat_id}))
 
@@ -124,6 +132,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#banchatmember
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -157,6 +167,8 @@ class ChatsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unbanchatmember
         """
         payload = clean_payload(
             chat_id=chat_id,

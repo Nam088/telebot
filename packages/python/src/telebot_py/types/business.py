@@ -47,6 +47,8 @@ class BusinessBotRights(TelegramObject):
             upgrade and transfer gifts.
         can_manage_stories: True, if the bot can post, edit and delete stories
             on behalf of the business account.
+
+    Telegram API: https://core.telegram.org/bots/api#businessbotrights
     """
 
     can_reply: bool | None = None
@@ -77,6 +79,8 @@ class BusinessConnection(TelegramObject):
         date: Date the connection was established in Unix time.
         rights: Rights of the business bot, if Telegram reported any.
         is_enabled: Whether the connection is active.
+
+    Telegram API: https://core.telegram.org/bots/api#businessconnection
     """
 
     id: str
@@ -97,6 +101,8 @@ class BusinessMessagesDeleted(TelegramObject):
             messages were deleted.
         message_ids: The list of identifiers of deleted messages in the chat
             of the business account.
+
+    Telegram API: https://core.telegram.org/bots/api#businessmessagesdeleted
     """
 
     business_connection_id: str
@@ -110,6 +116,8 @@ class ChatBoostAdded(TelegramObject):
 
     Attributes:
         boost_count: Number of boosts added by the user.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostadded
     """
 
     boost_count: int
@@ -122,6 +130,8 @@ class ChatBoostSourcePremium(TelegramObject):
     Attributes:
         source: Source of the boost, always 'premium'.
         user: User that boosted the chat.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostsourcepremium
     """
 
     source: str
@@ -137,6 +147,8 @@ class ChatBoostSourceGiftCode(TelegramObject):
     Attributes:
         source: Source of the boost, always 'gift_code'.
         user: User for which the gift code was created.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostsourcegiftcode
     """
 
     source: str
@@ -157,6 +169,8 @@ class ChatBoostSourceGiveaway(TelegramObject):
         prize_star_count: Number of Telegram Stars to be split among giveaway
             winners.
         is_unclaimed: Whether the giveaway was completed but no user won.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostsourcegiveaway
     """
 
     source: str
@@ -177,6 +191,8 @@ class ChatBoost(TelegramObject):
         add_date: Unix time when the chat was boosted.
         expiration_date: Unix time when the boost will automatically expire.
         source: Source of the added boost.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboost
     """
 
     boost_id: str
@@ -192,6 +208,8 @@ class ChatBoostUpdated(TelegramObject):
     Attributes:
         chat: Chat which was boosted.
         boost: Information about the chat boost.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostupdated
     """
 
     chat: Chat
@@ -207,6 +225,8 @@ class ChatBoostRemoved(TelegramObject):
         boost_id: Unique identifier of the boost.
         remove_date: Unix time when the boost was removed.
         source: Source of the removed boost.
+
+    Telegram API: https://core.telegram.org/bots/api#chatboostremoved
     """
 
     chat: Chat
@@ -223,6 +243,8 @@ class UserChatBoosts(TelegramObject):
 
     Attributes:
         boosts: The list of boosts added to the chat by the user.
+
+    Telegram API: https://core.telegram.org/bots/api#userchatboosts
     """
 
     boosts: list[ChatBoost]

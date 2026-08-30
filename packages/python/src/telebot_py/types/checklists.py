@@ -29,6 +29,8 @@ class ChecklistTask(TelegramObject):
             wasn't completed by a chat.
         completion_date: Point in time (Unix timestamp) when the task was
             completed; 0 if the task wasn't completed.
+
+    Telegram API: https://core.telegram.org/bots/api#checklisttask
     """
 
     id: int
@@ -51,6 +53,8 @@ class Checklist(TelegramObject):
             tasks to the list.
         others_can_mark_tasks_as_done: Whether users other than the creator
             can mark tasks as done or not done.
+
+    Telegram API: https://core.telegram.org/bots/api#checklist
     """
 
     title: str
@@ -71,6 +75,8 @@ class InputChecklistTask(TelegramObject):
         parse_mode: Mode for parsing entities in the text.
         text_entities: Special entities that appear in the text, which can be
             specified instead of ``parse_mode``.
+
+    Telegram API: https://core.telegram.org/bots/api#inputchecklisttask
     """
 
     id: int
@@ -94,6 +100,8 @@ class InputChecklist(TelegramObject):
             checklist.
         others_can_mark_tasks_as_done: Whether other users can mark tasks as
             done or not done in the checklist.
+
+    Telegram API: https://core.telegram.org/bots/api#inputchecklist
     """
 
     title: str

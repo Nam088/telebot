@@ -64,6 +64,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendsticker
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -95,6 +97,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getstickerset
         """
         payload = clean_payload(name=name)
         return parse_result(StickerSet, await self.request("getStickerSet", payload))
@@ -115,6 +119,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getcustomemojistickers
         """
         payload = clean_payload(custom_emoji_ids=list(custom_emoji_ids))
         return parse_list_result(Sticker, await self.request("getCustomEmojiStickers", payload))
@@ -138,6 +144,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#uploadstickerfile
         """
         payload = clean_payload(user_id=user_id, sticker=sticker, sticker_format=sticker_format)
         return parse_result(File, await self.request("uploadStickerFile", payload))
@@ -173,6 +181,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createnewstickerset
         """
         payload = clean_payload(
             user_id=user_id,
@@ -202,6 +212,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#addstickertoset
         """
         payload = clean_payload(user_id=user_id, name=name, sticker=to_wire(sticker))
         return parse_flag(await self.request("addStickerToSet", payload))
@@ -223,6 +235,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickerpositioninset
         """
         payload = clean_payload(sticker=sticker, position=position)
         return parse_flag(await self.request("setStickerPositionInSet", payload))
@@ -243,6 +257,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletestickerfromset
         """
         payload = clean_payload(sticker=sticker)
         return parse_flag(await self.request("deleteStickerFromSet", payload))
@@ -268,6 +284,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#replacestickerinset
         """
         payload = clean_payload(
             user_id=user_id, name=name, old_sticker=old_sticker, sticker=to_wire(sticker)
@@ -291,6 +309,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickeremojilist
         """
         payload = clean_payload(sticker=sticker, emoji_list=list(emoji_list))
         return parse_flag(await self.request("setStickerEmojiList", payload))
@@ -313,6 +333,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickerkeywords
         """
         payload = clean_payload(sticker=sticker, keywords=list(keywords))
         return parse_flag(await self.request("setStickerKeywords", payload))
@@ -334,6 +356,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickermaskposition
         """
         payload = clean_payload(sticker=sticker, mask_position=to_wire(mask_position))
         return parse_flag(await self.request("setStickerMaskPosition", payload))
@@ -354,6 +378,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletestickerset
         """
         payload = clean_payload(name=name)
         return parse_flag(await self.request("deleteStickerSet", payload))
@@ -381,6 +407,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setcustomemojistickersetthumbnail
         """
         payload = clean_payload(name=name, custom_emoji_id=custom_emoji_id or None)
         return parse_flag(await self.request("setCustomEmojiStickerSetThumbnail", payload))
@@ -413,6 +441,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickersetthumbnail
         """
         payload = clean_payload(name=name, user_id=user_id, format=format, thumbnail=thumbnail)
         return parse_flag(await self.request("setStickerSetThumbnail", payload))
@@ -434,6 +464,8 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setstickersettitle
         """
         payload = clean_payload(name=name, title=title)
         return parse_flag(await self.request("setStickerSetTitle", payload))
@@ -451,5 +483,7 @@ class StickersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getforumtopiciconstickers
         """
         return parse_list_result(Sticker, await self.request("getForumTopicIconStickers", {}))

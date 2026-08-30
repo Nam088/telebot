@@ -33,6 +33,8 @@ class Story(TelegramObject):
     Attributes:
         chat: Chat that posted the story.
         id: Unique identifier of the story in the chat.
+
+    Telegram API: https://core.telegram.org/bots/api#story
     """
 
     chat: Chat
@@ -47,6 +49,8 @@ class MessageOriginUser(TelegramObject):
         type: Type of the message origin, always 'user'.
         date: Date the message was sent originally in Unix time.
         sender_user: User that sent the message originally.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginuser
     """
 
     type: str
@@ -64,6 +68,8 @@ class MessageOriginHiddenUser(TelegramObject):
         type: Type of the message origin, always 'hidden_user'.
         date: Date the message was sent originally in Unix time.
         sender_user_name: Name of the user that sent the message originally.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginhiddenuser
     """
 
     type: str
@@ -83,6 +89,8 @@ class MessageOriginChat(TelegramObject):
         sender_chat: Chat that sent the message originally.
         author_signature: For messages originally sent by an anonymous chat
             administrator, the original message author signature.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginchat
     """
 
     type: str
@@ -103,6 +111,8 @@ class MessageOriginChannel(TelegramObject):
         chat: Channel chat to which the message was originally sent.
         message_id: Identifier of the original message in the channel.
         author_signature: Signature of the original post author, if present.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginchannel
     """
 
     type: str
@@ -124,6 +134,8 @@ class TextQuote(TelegramObject):
             UTF-16 code units.
         entities: Special entities that appear in the quote.
         is_manual: Whether the quote was chosen manually by the sender.
+
+    Telegram API: https://core.telegram.org/bots/api#textquote
     """
 
     text: str
@@ -164,6 +176,8 @@ class ExternalReplyInfo(TelegramObject):
         location: The message is a shared location, information about it.
         poll: The message is a native poll, information about the poll.
         venue: The message is a venue, information about the venue.
+
+    Telegram API: https://core.telegram.org/bots/api#externalreplyinfo
     """
 
     origin: MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel
@@ -199,6 +213,8 @@ class WebAppData(TelegramObject):
         data: The data. Be aware that a bad client can send arbitrary data.
         button_text: Text of the web_app keyboard button from which the Web
             App was opened.
+
+    Telegram API: https://core.telegram.org/bots/api#webappdata
     """
 
     data: str
@@ -216,6 +232,8 @@ class PollAnswer(TelegramObject):
         voter_chat: The chat that changed the answer to the poll, if the
             voter is anonymous.
         user: The user who changed the answer to the poll, if not anonymous.
+
+    Telegram API: https://core.telegram.org/bots/api#pollanswer
     """
 
     poll_id: str
@@ -231,6 +249,8 @@ class SentWebAppMessage(TelegramObject):
     Attributes:
         inline_message_id: Identifier of the sent inline message, available
             only if there is an inline message attached to the Web App.
+
+    Telegram API: https://core.telegram.org/bots/api#sentwebappmessage
     """
 
     inline_message_id: str | None = None
@@ -244,6 +264,8 @@ class PreparedInlineMessage(TelegramObject):
         id: Unique identifier of the prepared message.
         expiration_date: Expiration date of the prepared message, in Unix
             time. Expired prepared messages can no longer be used.
+
+    Telegram API: https://core.telegram.org/bots/api#preparedinlinemessage
     """
 
     id: str
@@ -257,6 +279,8 @@ class SentGuestMessage(TelegramObject):
     Attributes:
         inline_message_id: Identifier of the sent inline message, available
             only if there is an inline message attached to the guest query.
+
+    Telegram API: https://core.telegram.org/bots/api#sentguestmessage
     """
 
     inline_message_id: str | None = None

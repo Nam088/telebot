@@ -26,6 +26,8 @@ class CallbackQuery(TelegramObject):
         data: Data associated with the callback button.
         game_short_name: Short name of the Game to be returned, which serves
             as the unique identifier for the game.
+
+    Telegram API: https://core.telegram.org/bots/api#callbackquery
     """
 
     id: str

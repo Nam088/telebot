@@ -22,6 +22,8 @@ class Location(TelegramObject):
         heading: Direction in which the user is moving, in degrees; 1-360.
         proximity_alert_radius: Maximum distance in meters for proximity
             alerts about approaching another chat member.
+
+    Telegram API: https://core.telegram.org/bots/api#location
     """
 
     latitude: float
@@ -44,6 +46,8 @@ class Venue(TelegramObject):
         foursquare_type: Foursquare type of the venue.
         google_place_id: Google Places identifier of the venue.
         google_place_type: Google Places type of the venue.
+
+    Telegram API: https://core.telegram.org/bots/api#venue
     """
 
     location: Location
@@ -65,6 +69,8 @@ class Contact(TelegramObject):
         last_name: Contact's last name, when present.
         user_id: Contact's user identifier in Telegram, when present.
         vcard: Additional data about the contact in the form of a vCard.
+
+    Telegram API: https://core.telegram.org/bots/api#contact
     """
 
     phone_number: str
@@ -82,6 +88,8 @@ class Dice(TelegramObject):
         emoji: Emoji on which the dice throw animation is based.
         value: Value of the dice (e.g. 1-6 for dice/darts, 1-5 for
             basketball/football, 1-64 for the slot machine).
+
+    Telegram API: https://core.telegram.org/bots/api#dice
     """
 
     emoji: str
@@ -101,6 +109,8 @@ class MessageEntity(TelegramObject):
         language: For ``pre`` only, the programming language of the entity.
         custom_emoji_id: For ``custom_emoji`` only, unique identifier of the
             custom emoji.
+
+    Telegram API: https://core.telegram.org/bots/api#messageentity
     """
 
     type: str
@@ -121,6 +131,8 @@ class PollOption(TelegramObject):
         voter_count: Number of users that voted for this option.
         persistent_id: Unique identifier of the option in the poll.
         text_entities: Special entities that appear in the option text.
+
+    Telegram API: https://core.telegram.org/bots/api#polloption
     """
 
     text: str
@@ -149,6 +161,8 @@ class Poll(TelegramObject):
         explanation_entities: Special entities that appear in the explanation.
         open_period: Seconds the poll will be active after creation.
         close_date: Unix time when the poll will be automatically closed.
+
+    Telegram API: https://core.telegram.org/bots/api#poll
     """
 
     id: str
@@ -172,6 +186,8 @@ class MessageId(TelegramObject):
 
     Attributes:
         message_id: Unique message identifier.
+
+    Telegram API: https://core.telegram.org/bots/api#messageid
     """
 
     message_id: int
@@ -192,6 +208,8 @@ class WebhookInfo(TelegramObject):
             automatic synchronization error.
         max_connections: Maximum allowed simultaneous connections, when set.
         allowed_updates: Update types the bot subscribed to, when restricted.
+
+    Telegram API: https://core.telegram.org/bots/api#webhookinfo
     """
 
     url: str
@@ -217,6 +235,8 @@ class InlineQuery(TelegramObject):
         chat_type: Type of the chat from which the inline query was sent
             ('sender', 'private', 'group', 'supergroup', or 'channel').
         location: Sender location, only for bots that request user location.
+
+    Telegram API: https://core.telegram.org/bots/api#inlinequery
     """
 
     id: str
@@ -240,6 +260,8 @@ class ChosenInlineResult(TelegramObject):
         location: Sender location, only for bots that require user location.
         inline_message_id: Identifier of the sent inline message, available
             only if there is an inline keyboard attached to the message.
+
+    Telegram API: https://core.telegram.org/bots/api#choseninlineresult
     """
 
     result_id: str

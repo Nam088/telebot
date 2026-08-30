@@ -33,6 +33,8 @@ class VerificationMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#verifyuser
         """
         payload = clean_payload(user_id=user_id, custom_description=custom_description)
         return parse_flag(await self.request("verifyUser", payload))
@@ -56,6 +58,8 @@ class VerificationMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#verifychat
         """
         payload = clean_payload(chat_id=chat_id, custom_description=custom_description)
         return parse_flag(await self.request("verifyChat", payload))
@@ -76,6 +80,8 @@ class VerificationMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#removeuserverification
         """
         payload = clean_payload(user_id=user_id)
         return parse_flag(await self.request("removeUserVerification", payload))
@@ -97,6 +103,8 @@ class VerificationMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#removechatverification
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("removeChatVerification", payload))

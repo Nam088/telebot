@@ -53,6 +53,8 @@ class MiniAppsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerguestquery
         """
         payload = clean_payload(guest_query_id=guest_query_id, result=to_wire(result))
         return parse_result(SentGuestMessage, await self.request("answerGuestQuery", payload))
@@ -85,6 +87,8 @@ class MiniAppsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
         """
         payload = clean_payload(
             chat_join_request_query_id=chat_join_request_query_id, web_app_url=web_app_url
@@ -119,6 +123,8 @@ class MiniAppsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#savepreparedkeyboardbutton
         """
         payload = clean_payload(user_id=user_id, button=to_wire(button))
         return parse_result(

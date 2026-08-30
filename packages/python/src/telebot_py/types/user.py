@@ -29,6 +29,8 @@ class User(TelegramObject):
         can_connect_to_business: Whether the bot can be connected to a
             Telegram Business account (getMe only).
         has_main_web_app: Whether the bot has a main Web App (getMe only).
+
+    Telegram API: https://core.telegram.org/bots/api#user
     """
 
     id: int
