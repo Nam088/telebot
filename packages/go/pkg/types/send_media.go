@@ -200,3 +200,46 @@ type SendMediaGroupOptions struct {
 	ReplyParameters      *ReplyParameters `json:"reply_parameters,omitempty"`
 	MessageThreadID      int64            `json:"message_thread_id,omitempty"`
 }
+
+// SendLivePhotoOptions represents parameters for the sendLivePhoto method
+// (Bot API 10.3+).
+//
+// Port of SendLivePhotoOptions in
+// packages/node/src/client/types/messages/send-options.ts.
+//
+// See https://core.telegram.org/bots/api#sendlivephoto
+type SendLivePhotoOptions struct {
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	// Unique identifier for the target chat or username of the target channel.
+	ChatID any `json:"chat_id"`
+	// Photo to send: a file_id, an HTTP URL, or an InputFile for an upload.
+	Photo any `json:"photo"`
+	// Video to send along with the photo: a file_id, an HTTP URL, or an
+	// InputFile for an upload.
+	Video any `json:"video"`
+	// Live photo caption, 0-1024 characters after entities parsing.
+	Caption string `json:"caption,omitempty"`
+	// Mode for parsing entities in the photo caption.
+	ParseMode string `json:"parse_mode,omitempty"`
+	// A list of special entities that appear in the caption.
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+	// True, if the caption must be shown above the message media.
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+	// True, if the photo needs to be covered with a spoiler animation.
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+	// Sends the message silently.
+	DisableNotification bool `json:"disable_notification,omitempty"`
+	// Protects the contents of the sent message from forwarding and saving.
+	ProtectContent bool `json:"protect_content,omitempty"`
+	// Unique identifier of the message effect to be added to the message.
+	MessageEffectID string `json:"message_effect_id,omitempty"`
+	// Description of the message to reply to.
+	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
+	// ReplyMarkup accepts *InlineKeyboardMarkup, *keyboard.ReplyKeyboardMarkup,
+	// or any other Telegram reply_markup value.
+	ReplyMarkup any `json:"reply_markup,omitempty"`
+	// Unique identifier for the target message thread (topic) of the forum.
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+	// Ephemeral message parameters (Bot API 10.3+).
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+}

@@ -98,3 +98,22 @@ type DeleteEphemeralMessageOptions struct {
 	// Identifier of the ephemeral message to delete.
 	EphemeralMessageID int64 `json:"ephemeral_message_id"`
 }
+
+// EphemeralMessageParameters describes the recipient of an ephemeral message
+// sent by the bot (Bot API 10.3+).
+//
+// Port of EphemeralMessageParameters in
+// packages/node/src/client/types/messages/core.ts; send methods such as
+// sendLivePhoto embed it under the ephemeral_message_parameters key.
+//
+// See https://core.telegram.org/bots/api#ephemeralmessageparameters
+type EphemeralMessageParameters struct {
+	// Identifier of the user who will receive the message.
+	ReceiverUserID int64 `json:"receiver_user_id"`
+	// Identifier of the callback query which triggered the sending of the
+	// message, if any.
+	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// True, if the ephemeral message must be shown in place of the original
+	// message sent in response to CallbackQueryID.
+	ReplaceCallbackQueryMessage bool `json:"replace_callback_query_message,omitempty"`
+}

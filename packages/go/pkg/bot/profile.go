@@ -168,3 +168,34 @@ func (b *Bot) RemoveMyProfilePhoto(ctx context.Context) (bool, error) {
 	}
 	return ok, nil
 }
+
+// GetUserProfileAudios retrieves the profile audio files of a user.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: Unique identifier of the target user.
+//   - offset: Sequential number of the first audio to return; pass 0 to omit
+//     the field, reproducing node's call with an undefined offset.
+//   - limit: Maximum number of audios to return; pass 0 to omit the field for
+//     the same reason.
+//
+// Returns:
+//   - any: The raw result returned by Telegram — node types it as unknown, so
+//     the audios object (`total_count` plus the `audios` list) and a bare bool
+//     both decode.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	audios, err := b.GetUserProfileAudios(ctx, 123456, 0, 10)
+//	fmt.Printf("profile audios: %v\n", audios)
+func (b *Bot) GetUserProfileAudios(ctx context.Context, userID int64, offset int, limit int) (any, error) {
+	payload := map[string]any{"user_id": userID}
+	if offset > 0 {
+		payload["offset"] = offset
+	}
+	if limit > 0 {
+		payload["limit"] = limit
+	}
+	return b.requestUnknown(ctx, "getUserProfileAudios", payload)
+}

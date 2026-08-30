@@ -38,3 +38,18 @@ func (b *Bot) SavePreparedInlineMessage(ctx context.Context, opts *types.SavePre
 	}
 	return &msg, nil
 }
+
+// SavePreparedKeyboardButton saves a prepared keyboard button for a Mini App.
+//
+// Returns the raw result node types as unknown — both an object and a bare bool
+// decode — or an error if the API call fails. Pass nil options for an empty
+// object payload.
+//
+// Example:
+//
+//	result, err := b.SavePreparedKeyboardButton(ctx, map[string]any{
+//		"user_id": 123456,
+//	})
+func (b *Bot) SavePreparedKeyboardButton(ctx context.Context, options map[string]any) (any, error) {
+	return b.requestUnknown(ctx, "savePreparedKeyboardButton", payloadOrEmpty(options))
+}

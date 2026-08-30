@@ -290,3 +290,43 @@ func (b *Bot) DeleteMessage(ctx context.Context, chatID any, messageID int64) (b
 	}
 	return ok, nil
 }
+
+// requestUnknown sends a Bot API method whose result node types as `unknown`
+// and decodes whatever Telegram returned into an `any`, so both the bare
+// boolean and object-shaped results decode without a type assertion at the
+// call site.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - method: Bot API method name.
+//   - payload: Request payload; may be nil.
+//
+// Returns:
+//   - any: The decoded result — a bool, a map[string]any, a slice, or a scalar.
+//   - error: TelegramError if the API returns an error.
+func (b *Bot) requestUnknown(ctx context.Context, method string, payload any) (any, error) {
+	var result any
+	if err := b.Request(ctx, method, payload, &result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// payloadOrEmpty normalizes an optional map payload for methods whose only
+// argument is node's `Record<string, unknown>` options object.
+//
+// node always sends a JSON body for those methods (`{}` when the caller passes
+// no fields), while a nil payload in Go produces the parameterless request
+// shape with no body at all, so the nil case is mapped to an empty map.
+//
+// Parameters:
+//   - options: Caller-supplied payload; may be nil.
+//
+// Returns:
+//   - map[string]any: options itself, or an empty map when options is nil.
+func payloadOrEmpty(options map[string]any) map[string]any {
+	if options == nil {
+		return map[string]any{}
+	}
+	return options
+}

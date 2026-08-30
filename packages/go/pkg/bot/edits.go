@@ -134,3 +134,30 @@ func (b *Bot) StopPoll(ctx context.Context, opts *types.StopPollOptions) (*types
 	}
 	return &poll, nil
 }
+
+// SendMessageDraft sets a message draft in a personal chat (Bot API 10.1+).
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - opts: Options carrying chat_id and draft_id plus the optional text,
+//     parse mode, entities and stop-button flags.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SendMessageDraft(ctx, &types.SendMessageDraftOptions{
+//		ChatID:  int64(123456),
+//		DraftID: 7,
+//		Text:    "Final answer",
+//		CanStop: true,
+//	})
+func (b *Bot) SendMessageDraft(ctx context.Context, opts *types.SendMessageDraftOptions) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "sendMessageDraft", opts, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
