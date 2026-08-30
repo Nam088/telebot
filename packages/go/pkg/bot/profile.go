@@ -153,8 +153,10 @@ func (b *Bot) DeleteMyCommands(ctx context.Context, opts *types.DeleteMyCommands
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - photo: Profile photo to set, e.g. an InputProfilePhoto object encoded as
-//     a map or any other JSON payload accepted by the Bot API.
+//   - photo: Profile photo to set. The Bot API types this parameter as the
+//     InputProfilePhoto union, so pass a types.InputProfilePhotoStatic or a
+//     types.InputProfilePhotoAnimated. The parameter stays `any` because
+//     narrowing it would break callers that pass a raw map.
 //
 // Returns:
 //   - bool: True on success.
@@ -162,7 +164,10 @@ func (b *Bot) DeleteMyCommands(ctx context.Context, opts *types.DeleteMyCommands
 //
 // Example:
 //
-//	ok, err := b.SetMyProfilePhoto(ctx, map[string]any{"type": "photo", "id": "12345"})
+//	ok, err := b.SetMyProfilePhoto(ctx, &types.InputProfilePhotoStatic{
+//		Type:  "static",
+//		Photo: "attach://photo",
+//	})
 //
 // Telegram API: https://core.telegram.org/bots/api#setmyprofilephoto
 func (b *Bot) SetMyProfilePhoto(ctx context.Context, photo any) (bool, error) {
@@ -206,18 +211,17 @@ func (b *Bot) RemoveMyProfilePhoto(ctx context.Context) (bool, error) {
 //     the same reason.
 //
 // Returns:
-//   - any: The raw result returned by Telegram — node types it as unknown, so
-//     the audios object (`total_count` plus the `audios` list) and a bare bool
-//     both decode.
+//   - *types.UserProfileAudios: The total count plus the requested audios, which
+//     is exactly the object the docs declare as this method's result.
 //   - error: TelegramError if the API returns an error.
 //
 // Example:
 //
 //	audios, err := b.GetUserProfileAudios(ctx, 123456, 0, 10)
-//	fmt.Printf("profile audios: %v\n", audios)
+//	fmt.Printf("profile audios: %d of %d\n", len(audios.Audios), audios.TotalCount)
 //
 // Telegram API: https://core.telegram.org/bots/api#getuserprofileaudios
-func (b *Bot) GetUserProfileAudios(ctx context.Context, userID int64, offset int, limit int) (any, error) {
+func (b *Bot) GetUserProfileAudios(ctx context.Context, userID int64, offset int, limit int) (*types.UserProfileAudios, error) {
 	payload := map[string]any{"user_id": userID}
 	if offset > 0 {
 		payload["offset"] = offset
@@ -225,5 +229,9 @@ func (b *Bot) GetUserProfileAudios(ctx context.Context, userID int64, offset int
 	if limit > 0 {
 		payload["limit"] = limit
 	}
-	return b.requestUnknown(ctx, "getUserProfileAudios", payload)
+	var audios types.UserProfileAudios
+	if err := b.Request(ctx, "getUserProfileAudios", payload, &audios); err != nil {
+		return nil, err
+	}
+	return &audios, nil
 }

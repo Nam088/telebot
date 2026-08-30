@@ -8,6 +8,16 @@ type UserProfilePhotos struct {
 	Photos     [][]PhotoSize `json:"photos"`
 }
 
+// UserProfileAudios represents the audios displayed on a user's profile.
+//
+// Telegram API: https://core.telegram.org/bots/api#userprofileaudios
+type UserProfileAudios struct {
+	// Total number of profile audios for the target user.
+	TotalCount int64 `json:"total_count"`
+	// Requested profile audios.
+	Audios []Audio `json:"audios"`
+}
+
 // GetFileOptions represents parameters for the getFile method.
 type GetFileOptions struct {
 	FileID string `json:"file_id"`

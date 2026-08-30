@@ -18,6 +18,42 @@ func (b *Bot) GetChat(ctx context.Context, chatID any) (*types.Chat, error) {
 	return &chat, nil
 }
 
+// GetChatFullInfo gets up to date information about the chat, decoded into the
+// full chat shape.
+//
+// The Bot API declares getChat to return a ChatFullInfo object, which carries
+// every field GetChat's plain Chat omits: photo, active usernames, birthdate,
+// business intro, location and opening hours, accent colors, bio, permissions,
+// accepted gift types, rating, first profile audio, unique gift colors, guard
+// bot and community. This method calls the same endpoint and decodes that shape;
+// GetChat keeps returning *types.Chat so existing callers are unaffected.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat or username of the target
+//     channel; accepts int64 or string.
+//
+// Returns:
+//   - *types.ChatFullInfo: The full chat information on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	info, err := b.GetChatFullInfo(ctx, int64(-1001234567890))
+//	if err == nil && info.Photo != nil {
+//		fmt.Println(info.Photo.BigFileID)
+//	}
+//
+// Telegram API: https://core.telegram.org/bots/api#getchat
+func (b *Bot) GetChatFullInfo(ctx context.Context, chatID any) (*types.ChatFullInfo, error) {
+	payload := map[string]any{"chat_id": chatID}
+	var chat types.ChatFullInfo
+	if err := b.Request(ctx, "getChat", payload, &chat); err != nil {
+		return nil, err
+	}
+	return &chat, nil
+}
+
 // GetChatAdministrators gets a list of administrators in a chat.
 //
 // Telegram API: https://core.telegram.org/bots/api#getchatadministrators

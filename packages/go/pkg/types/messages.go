@@ -205,3 +205,23 @@ type EditMessageReplyMarkupOptions struct {
 	InlineMessageID string                `json:"inline_message_id,omitempty"`
 	ReplyMarkup     *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
+
+// InaccessibleMessage describes a message that was deleted or is otherwise
+// inaccessible to the bot.
+//
+// Telegram declares several fields whose type is the MaybeInaccessibleMessage
+// union of Message and this object. This package keeps those fields typed
+// *Message, which decodes an inaccessible message as a Message whose Date is 0,
+// so a zero Date plus a non-nil Chat is the discriminator; use this struct when
+// a caller wants the inaccessible arm named explicitly.
+//
+// Telegram API: https://core.telegram.org/bots/api#inaccessiblemessage
+type InaccessibleMessage struct {
+	// Chat the message belonged to.
+	Chat *Chat `json:"chat"`
+	// Unique message identifier inside the chat.
+	MessageID int64 `json:"message_id"`
+	// Always 0. The field can be used to differentiate regular and inaccessible
+	// messages.
+	Date int64 `json:"date"`
+}

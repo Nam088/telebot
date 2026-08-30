@@ -9,18 +9,18 @@ import (
 )
 
 // TestChecklist_SendChecklist covers sendChecklist ported from
-// packages/node/src/client/methods/messages/edit.ts, where the checklist object
-// node types as a record must reach the wire with its nested snake_case keys.
+// packages/node/src/client/methods/messages/edit.ts, where the typed
+// InputChecklist must reach the wire with its docs field names.
 func TestChecklist_SendChecklist(t *testing.T) {
 	srv := profileServer(t, "sendChecklist", map[string]any{
 		"business_connection_id": "bc1",
 		"chat_id":                int64(123456),
 		"checklist": map[string]any{
-			"items": []map[string]any{
-				{"id": "i1", "text": "Pack the bag"},
-				{"id": "i2", "text": "Check in"},
+			"title": "Departure",
+			"tasks": []map[string]any{
+				{"id": 1, "text": "Pack the bag"},
+				{"id": 2, "text": "Check in"},
 			},
-			"max_selected_count": float64(1),
 		},
 	}, types.Message{MessageID: 71, Chat: &types.Chat{ID: 123456}})
 	defer srv.Close()
@@ -29,12 +29,12 @@ func TestChecklist_SendChecklist(t *testing.T) {
 	msg, err := b.SendChecklist(context.Background(), &types.SendChecklistOptions{
 		BusinessConnectionID: "bc1",
 		ChatID:               int64(123456),
-		Checklist: map[string]any{
-			"items": []map[string]any{
-				{"id": "i1", "text": "Pack the bag"},
-				{"id": "i2", "text": "Check in"},
+		Checklist: &types.InputChecklist{
+			Title: "Departure",
+			Tasks: []types.InputChecklistTask{
+				{ID: 1, Text: "Pack the bag"},
+				{ID: 2, Text: "Check in"},
 			},
-			"max_selected_count": 1,
 		},
 	})
 	if err != nil {
@@ -54,7 +54,10 @@ func TestChecklist_SendChecklistOmitsOptionalFields(t *testing.T) {
 		map[string]any{
 			"business_connection_id": "bc1",
 			"chat_id":                int64(1),
-			"checklist":              map[string]any{"items": []map[string]any{{"id": "i1", "text": "t"}}},
+			"checklist": map[string]any{
+				"title": "T",
+				"tasks": []map[string]any{{"id": 1, "text": "t"}},
+			},
 		}, types.Message{MessageID: 1, Chat: &types.Chat{ID: 1}})
 	defer srv.Close()
 
@@ -62,7 +65,10 @@ func TestChecklist_SendChecklistOmitsOptionalFields(t *testing.T) {
 	if _, err := b.SendChecklist(context.Background(), &types.SendChecklistOptions{
 		BusinessConnectionID: "bc1",
 		ChatID:               int64(1),
-		Checklist:            map[string]any{"items": []map[string]any{{"id": "i1", "text": "t"}}},
+		Checklist: &types.InputChecklist{
+			Title: "T",
+			Tasks: []types.InputChecklistTask{{ID: 1, Text: "t"}},
+		},
 	}); err != nil {
 		t.Fatalf("SendChecklist error: %v", err)
 	}
@@ -76,15 +82,17 @@ func TestChecklist_EditMessageChecklist(t *testing.T) {
 		"chat_id":                int64(123456),
 		"message_id":             int64(71),
 		"checklist": map[string]any{
-			"items": []map[string]any{{"id": "i1", "text": "Pack the bag", "is_selected": true}},
+			"title": "Departure",
+			"tasks": []map[string]any{{"id": 1, "text": "Pack the bag"}},
 		},
 	}
 	opts := &types.EditMessageChecklistOptions{
 		BusinessConnectionID: "bc1",
 		ChatID:               int64(123456),
 		MessageID:            int64(71),
-		Checklist: map[string]any{
-			"items": []any{map[string]any{"id": "i1", "text": "Pack the bag", "is_selected": true}},
+		Checklist: &types.InputChecklist{
+			Title: "Departure",
+			Tasks: []types.InputChecklistTask{{ID: 1, Text: "Pack the bag"}},
 		},
 	}
 

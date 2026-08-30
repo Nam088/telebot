@@ -40,9 +40,7 @@ type SendRichMessageOptions struct {
 	// private chats only.
 	MessageEffectID string `json:"message_effect_id,omitempty"`
 	// Parameters of the suggested post to send; for direct messages chats only.
-	// Telegram types this field as SuggestedPostParameters, which is not part of
-	// the rich-message models in this package, so Go passes the object through.
-	SuggestedPostParameters any `json:"suggested_post_parameters,omitempty"`
+	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
 	// Description of the message to reply to.
 	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
 	// Additional interface options: an *InlineKeyboardMarkup,

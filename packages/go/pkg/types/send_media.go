@@ -277,7 +277,7 @@ type SendPaidMediaOptions struct {
 	// simultaneously sent messages.
 	AllowPaidBroadcast bool `json:"allow_paid_broadcast,omitempty"`
 	// Object describing the suggested post parameters; only for business bots.
-	SuggestedPostParameters any `json:"suggested_post_parameters,omitempty"`
+	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
 	// Description of the message to reply to.
 	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
 	// Additional interface options for a keyboard.

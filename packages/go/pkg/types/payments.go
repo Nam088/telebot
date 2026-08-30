@@ -88,3 +88,29 @@ type SendGiftOptions struct {
 	// A list of special entities that appear in the gift text.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
+
+// AffiliateInfo contains information about the affiliate that received a
+// commission via this transaction.
+//
+// Telegram sends it as the "affiliate" field of the "user" variant of
+// TransactionPartner. This package does not declare TransactionPartner yet, so
+// the struct is currently reached only by callers decoding star-transaction
+// payloads themselves.
+//
+// Telegram API: https://core.telegram.org/bots/api#affiliateinfo
+type AffiliateInfo struct {
+	// The bot or the user that received an affiliate commission if it was received
+	// by a bot or a user.
+	AffiliateUser *User `json:"affiliate_user,omitempty"`
+	// The chat that received an affiliate commission if it was received by a chat.
+	AffiliateChat *Chat `json:"affiliate_chat,omitempty"`
+	// The number of Telegram Stars received by the affiliate for each 1000
+	// Telegram Stars received by the bot from referred users.
+	CommissionPerMille int64 `json:"commission_per_mille"`
+	// Integer amount of Telegram Stars received by the affiliate from the
+	// transaction, rounded to 0; can be negative for refunds.
+	Amount int64 `json:"amount"`
+	// The number of 1/1000000000 shares of Telegram Stars received by the
+	// affiliate; from -999999999 to 999999999; can be negative for refunds.
+	NanostarAmount int64 `json:"nanostar_amount,omitempty"`
+}

@@ -11,11 +11,29 @@ type Response[T any] struct {
 	Parameters  *Parameters `json:"parameters,omitempty"`
 }
 
-// Parameters contains information about why a request failed.
-type Parameters struct {
+// ResponseParameters describes why a request was unsuccessful.
+//
+// Telegram attaches it as the optional "parameters" node of an error response,
+// where it helps a caller decide whether to retarget a migrated chat or wait out
+// flood control before retrying.
+//
+// Telegram API: https://core.telegram.org/bots/api#responseparameters
+type ResponseParameters struct {
+	// The group has been migrated to a supergroup with the specified identifier.
 	MigrateToChatID int64 `json:"migrate_to_chat_id,omitempty"`
-	RetryAfter      int   `json:"retry_after,omitempty"`
+	// In case of exceeding flood control, the number of seconds left to wait
+	// before the request can be repeated.
+	//
+	// Retained as `int` rather than the package-wide int64-for-Integer convention
+	// because this field was already exported under the alias below.
+	RetryAfter int `json:"retry_after,omitempty"`
 }
+
+// Parameters is the historical name of ResponseParameters.
+//
+// It is a type alias, not a second struct, so *Parameters and
+// *ResponseParameters are the same type and existing call sites are unaffected.
+type Parameters = ResponseParameters
 
 // TelegramError represents an API error returned by Telegram.
 type TelegramError struct {

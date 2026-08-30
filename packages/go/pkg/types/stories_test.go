@@ -27,7 +27,7 @@ func TestStoryArea_WireShape(t *testing.T) {
 			Type: types.StoryAreaTypeLocation{
 				Type:     "location",
 				Location: types.Location{Latitude: 10.5, Longitude: 20.5},
-				Address:  map[string]any{"city": "Hanoi"},
+				Address:  &types.LocationAddress{CountryCode: "VN", City: "Hanoi"},
 			},
 		},
 		{
@@ -48,6 +48,10 @@ func TestStoryArea_WireShape(t *testing.T) {
 				BackgroundColor: 0x112233,
 			},
 		},
+		{
+			Position: position,
+			Type:     types.StoryAreaTypeUniqueGift{Type: "unique_gift", Name: "Bear"},
+		},
 	}
 
 	raw, err := json.Marshal(areas)
@@ -66,7 +70,7 @@ func TestStoryArea_WireShape(t *testing.T) {
 		`"type":"location"`,
 		`"latitude":10.5`,
 		`"longitude":20.5`,
-		`"address":{"city":"Hanoi"}`,
+		`"address":{"country_code":"VN","city":"Hanoi"}`,
 		`"type":"suggested_reaction"`,
 		`"reaction_type":{"type":"emoji","emoji":"👍"}`,
 		`"is_dark":true`,
@@ -75,6 +79,8 @@ func TestStoryArea_WireShape(t *testing.T) {
 		`"type":"weather"`,
 		`"temperature_c":-3.5`,
 		`"background_color":1122867`,
+		`"type":"unique_gift"`,
+		`"name":"Bear"`,
 	}
 	for _, want := range wantKeys {
 		if !strings.Contains(body, want) {

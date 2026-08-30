@@ -133,12 +133,12 @@ func TestMessages_GetUserPersonalChatMessagesSendsBothRequired(t *testing.T) {
 
 // TestProfile_GetUserProfileAudios covers getUserProfileAudios ported from
 // packages/node/src/client/methods/business/gifts.ts, including its optional
-// offset/limit paging pair and the raw audios object decode.
+// offset/limit paging pair and the UserProfileAudios decode the docs declare.
 func TestProfile_GetUserProfileAudios(t *testing.T) {
 	audios := map[string]any{
 		"total_count": float64(1),
 		"audios": []map[string]any{
-			{"file_id": "AfAC", "file_unique_id": "u1", "duration": float64(12)},
+			{"file_id": "AfAC", "file_unique_id": "u1", "duration": float64(12), "title": "Theme"},
 		},
 	}
 	srv := profileServer(t, "getUserProfileAudios", map[string]any{
@@ -153,16 +153,14 @@ func TestProfile_GetUserProfileAudios(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetUserProfileAudios error: %v", err)
 	}
-	got, ok := result.(map[string]any)
-	if !ok {
-		t.Fatalf("expected map result, got %#v", result)
+	if result.TotalCount != 1 {
+		t.Errorf("unexpected total_count: %d", result.TotalCount)
 	}
-	if got["total_count"] != float64(1) {
-		t.Errorf("unexpected total_count: %v", got["total_count"])
+	if len(result.Audios) != 1 {
+		t.Fatalf("unexpected audios list: %+v", result.Audios)
 	}
-	list, ok := got["audios"].([]any)
-	if !ok || len(list) != 1 {
-		t.Fatalf("unexpected audios list: %#v", got["audios"])
+	if result.Audios[0].FileID != "AfAC" || result.Audios[0].Title != "Theme" {
+		t.Errorf("unexpected decoded audio: %+v", result.Audios[0])
 	}
 }
 
@@ -170,7 +168,8 @@ func TestProfile_GetUserProfileAudios(t *testing.T) {
 // dropped when both are 0.
 func TestProfile_GetUserProfileAudiosOmitsPaging(t *testing.T) {
 	srv := omittingServer(t, "getUserProfileAudios", []string{"offset", "limit"},
-		map[string]any{"user_id": float64(123456)}, true)
+		map[string]any{"user_id": float64(123456)},
+		map[string]any{"total_count": float64(0), "audios": []map[string]any{}})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
@@ -178,8 +177,8 @@ func TestProfile_GetUserProfileAudiosOmitsPaging(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetUserProfileAudios error: %v", err)
 	}
-	if result != true {
-		t.Errorf("expected the bare true result to decode, got %#v", result)
+	if result == nil || result.TotalCount != 0 || len(result.Audios) != 0 {
+		t.Errorf("expected an empty audios result, got %+v", result)
 	}
 }
 
@@ -189,7 +188,7 @@ func TestInline_SavePreparedKeyboardButton(t *testing.T) {
 	srv := profileServer(t, "savePreparedKeyboardButton", map[string]any{
 		"user_id": float64(123456),
 		"button":  map[string]any{"text": "Open", "type": "web_app"},
-	}, map[string]any{"id": "pk1", "expiration_date": float64(1702592000)})
+	}, map[string]any{"id": "pk1"})
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
@@ -200,12 +199,8 @@ func TestInline_SavePreparedKeyboardButton(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SavePreparedKeyboardButton error: %v", err)
 	}
-	got, ok := result.(map[string]any)
-	if !ok {
-		t.Fatalf("expected map result, got %#v", result)
-	}
-	if got["id"] != "pk1" || got["expiration_date"] != float64(1702592000) {
-		t.Errorf("unexpected prepared button: %#v", got)
+	if result.ID != "pk1" {
+		t.Errorf("unexpected prepared button: %+v", result)
 	}
 }
 

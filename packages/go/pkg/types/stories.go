@@ -22,14 +22,29 @@ type StoryAreaPosition struct {
 	CornerRadiusPercentage float64 `json:"corner_radius_percentage"`
 }
 
+// LocationAddress describes the physical address of a location.
+//
+// Telegram API: https://core.telegram.org/bots/api#locationaddress
+type LocationAddress struct {
+	// The two-letter ISO 3166-1 alpha-2 country code of the country where the
+	// location is located.
+	CountryCode string `json:"country_code"`
+	// State of the location.
+	State string `json:"state,omitempty"`
+	// City of the location.
+	City string `json:"city,omitempty"`
+	// Street address of the location.
+	Street string `json:"street,omitempty"`
+}
+
 // StoryAreaType is the union of story area types that can be added to a story.
 //
 // Node models this as a discriminated union of object literals
 // (packages/node/src/client/types/business/models.ts, "StoryAreaType"); Go
 // expresses the same union as an interface implemented by
-// StoryAreaTypeLocation, StoryAreaTypeSuggestedReaction, StoryAreaTypeLink and
-// StoryAreaTypeWeather. The concrete type's Type field carries the wire
-// discriminator.
+// StoryAreaTypeLocation, StoryAreaTypeSuggestedReaction, StoryAreaTypeLink,
+// StoryAreaTypeWeather and StoryAreaTypeUniqueGift. The concrete type's Type
+// field carries the wire discriminator.
 //
 // Telegram API: https://core.telegram.org/bots/api#storyareatype
 type StoryAreaType interface {
@@ -44,12 +59,11 @@ type StoryAreaTypeLocation struct {
 	Type string `json:"type"`
 	// The location that is tagged by the area.
 	Location Location `json:"location"`
-	// Address of the location; node types it as unknown, so Go passes the raw
-	// LocationAddress object through. Requires a story privacy context that
-	// allows addresses.
-	Address   any     `json:"address,omitempty"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	// Address of the location. Requires a story privacy context that allows
+	// addresses.
+	Address   *LocationAddress `json:"address,omitempty"`
+	Latitude  float64          `json:"latitude"`
+	Longitude float64          `json:"longitude"`
 }
 
 func (StoryAreaTypeLocation) storyAreaType() {}
@@ -98,6 +112,19 @@ type StoryAreaTypeWeather struct {
 }
 
 func (StoryAreaTypeWeather) storyAreaType() {}
+
+// StoryAreaTypeUniqueGift points a story area at a unique gift. Currently, a
+// story can have at most 1 unique gift area.
+//
+// Telegram API: https://core.telegram.org/bots/api#storyareatypeuniquegift
+type StoryAreaTypeUniqueGift struct {
+	// Type of the area, always "unique_gift".
+	Type string `json:"type"`
+	// Unique name of the gift.
+	Name string `json:"name"`
+}
+
+func (StoryAreaTypeUniqueGift) storyAreaType() {}
 
 // StoryArea describes an interactive area added to a story.
 //

@@ -47,17 +47,22 @@ func (b *Bot) SavePreparedInlineMessage(ctx context.Context, opts *types.SavePre
 
 // SavePreparedKeyboardButton saves a prepared keyboard button for a Mini App.
 //
-// Returns the raw result node types as unknown — both an object and a bare bool
-// decode — or an error if the API call fails.
+// Returns the PreparedKeyboardButton the docs declare as this method's result,
+// which carries the identifier callers reuse to attach the button, or an error
+// if the API call fails.
 //
 // Example:
 //
-//	result, err := b.SavePreparedKeyboardButton(ctx, &types.SavePreparedKeyboardButtonOptions{
+//	button, err := b.SavePreparedKeyboardButton(ctx, &types.SavePreparedKeyboardButtonOptions{
 //		UserID: int64(123456),
 //		Button: map[string]any{"text": "Pay", "pay_for_access": true},
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#savepreparedkeyboardbutton
-func (b *Bot) SavePreparedKeyboardButton(ctx context.Context, opts *types.SavePreparedKeyboardButtonOptions) (any, error) {
-	return b.requestUnknown(ctx, "savePreparedKeyboardButton", opts)
+func (b *Bot) SavePreparedKeyboardButton(ctx context.Context, opts *types.SavePreparedKeyboardButtonOptions) (*types.PreparedKeyboardButton, error) {
+	var button types.PreparedKeyboardButton
+	if err := b.Request(ctx, "savePreparedKeyboardButton", opts, &button); err != nil {
+		return nil, err
+	}
+	return &button, nil
 }

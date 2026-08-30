@@ -9,8 +9,8 @@ type SendChecklistOptions struct {
 	BusinessConnectionID string `json:"business_connection_id"`
 	// Unique identifier for the target chat or username of the target channel.
 	ChatID any `json:"chat_id"`
-	// The checklist to send; an InputChecklist object serialized as-is.
-	Checklist any `json:"checklist"`
+	// The checklist to send.
+	Checklist *InputChecklist `json:"checklist"`
 	// Sends the message silently.
 	DisableNotification bool `json:"disable_notification,omitempty"`
 	// Protects the contents of the sent message from forwarding and saving.
@@ -35,8 +35,8 @@ type EditMessageChecklistOptions struct {
 	ChatID any `json:"chat_id"`
 	// Identifier of the target message.
 	MessageID int64 `json:"message_id"`
-	// The new checklist; an InputChecklist object serialized as-is.
-	Checklist any `json:"checklist"`
+	// The new checklist.
+	Checklist *InputChecklist `json:"checklist"`
 	// A JSON-serialized object for a new inline keyboard.
 	ReplyMarkup any `json:"reply_markup,omitempty"`
 }

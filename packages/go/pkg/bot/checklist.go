@@ -23,12 +23,12 @@ import (
 //	msg, err := b.SendChecklist(ctx, &types.SendChecklistOptions{
 //		BusinessConnectionID: "423778511293324225",
 //		ChatID:               int64(123456),
-//		Checklist: map[string]any{
-//			"items": []any{
-//				map[string]any{"id": "i1", "text": "Pack the bag"},
-//				map[string]any{"id": "i2", "text": "Check in"},
+//		Checklist: &types.InputChecklist{
+//			Title: "Departure",
+//			Tasks: []types.InputChecklistTask{
+//				{ID: 1, Text: "Pack the bag"},
+//				{ID: 2, Text: "Check in"},
 //			},
-//			"max_selected_count": 1,
 //		},
 //	})
 //
