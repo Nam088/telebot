@@ -199,7 +199,7 @@ export abstract class PaymentMethods extends StickerMethods {
   }
 
   /**
-   * Returns the list of gifts that can be sent by the bot to users.
+   * Returns the list of gifts that can be sent by the bot to users and channel chats.
    *
    * @returns A {@link Gifts} object containing the available gifts.
    * @throws {@link TelegramApiError} When retrieving gifts fails.
@@ -215,10 +215,11 @@ export abstract class PaymentMethods extends StickerMethods {
   }
 
   /**
-   * Sends a gift to the given user.
+   * Sends a gift to the given user or channel chat.
    *
-   * @param options - Options including `user_id`, `gift_id`, and optional message `text`, `text_parse_mode`, `text_entities`, and `pay_for_upgrade`.
+   * @param options - Options including `gift_id` and either `user_id` or `chat_id`, plus optional message `text`, `text_parse_mode`, `text_entities` and `pay_for_upgrade`.
    * @returns `true` on success.
+   * @remarks Exactly one of `user_id` and `chat_id` must be provided. The gift can't be converted to Telegram Stars by the receiver.
    * @throws {@link TelegramApiError} When sending gift fails.
    *
    * @example
@@ -229,6 +230,12 @@ export abstract class PaymentMethods extends StickerMethods {
    *   text: "Enjoy your gift!",
    *   pay_for_upgrade: true,
    * });
+   * ```
+   *
+   * @example
+   * ```ts
+   * // Send to a channel chat instead of a user
+   * await bot.sendGift({ chat_id: "@my_channel", gift_id: "gift_abc123" });
    * ```
    */
   public async sendGift(options: SendGiftOptions): Promise<boolean> {

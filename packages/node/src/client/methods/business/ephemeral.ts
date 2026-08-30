@@ -47,12 +47,12 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message text (Bot API 10.2+).
    *
    * @param options - Ephemeral message edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
    */
   public async editEphemeralMessageText(
     options: EditEphemeralMessageTextOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageText",
       options as unknown as Record<string, unknown>,
     );
@@ -62,12 +62,12 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message media (Bot API 10.3+).
    *
    * @param options - Ephemeral message media edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
    */
   public async editEphemeralMessageMedia(
     options: EditEphemeralMessageMediaOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageMedia",
       options as unknown as Record<string, unknown>,
     );
@@ -77,12 +77,12 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message caption (Bot API 10.3+).
    *
    * @param options - Ephemeral message caption edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
    */
   public async editEphemeralMessageCaption(
     options: EditEphemeralMessageCaptionOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageCaption",
       options as unknown as Record<string, unknown>,
     );
@@ -92,12 +92,12 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message reply markup (Bot API 10.3+).
    *
    * @param options - Ephemeral message reply markup edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
    */
   public async editEphemeralMessageReplyMarkup(
     options: EditEphemeralMessageReplyMarkupOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageReplyMarkup",
       options as unknown as Record<string, unknown>,
     );

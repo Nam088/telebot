@@ -444,7 +444,7 @@ describe("TypeHandler", () => {
           user: { id: 123, is_bot: false, first_name: "Alice" },
           user_chat_id: 123,
           date: 123456,
-          can_reply: true,
+          rights: { can_reply: true, can_read_messages: true },
           is_enabled: true,
         },
       },
@@ -662,7 +662,7 @@ describe("Business Handlers", () => {
         user: { id: 123, is_bot: false, first_name: "Alice" },
         user_chat_id: 123,
         date: 123456,
-        can_reply: true,
+        rights: { can_reply: true, can_manage_stories: true },
         is_enabled: true,
       },
     });

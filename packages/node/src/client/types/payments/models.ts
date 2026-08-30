@@ -153,6 +153,16 @@ export interface PurchasedPaidMedia {
   paid_media_payload: string;
 }
 
+/** Describes the background of a {@link Gift}. */
+export interface GiftBackground {
+  /** Center color of the background in RGB format. */
+  center_color: number;
+  /** Edge color of the background in RGB format. */
+  edge_color: number;
+  /** Text color of the background in RGB format. */
+  text_color: number;
+}
+
 export interface Gift {
   /** Unique identifier of the gift. */
   id: string;
@@ -166,6 +176,20 @@ export interface Gift {
   remaining_count?: number;
   /** Number of Telegram Stars that must be paid to upgrade the gift to a unique one. */
   upgrade_star_count?: number;
+  /** True, if the gift can only be purchased by Telegram Premium subscribers. */
+  is_premium?: boolean;
+  /** True, if the gift can be used (after being upgraded) to customize a user's appearance. */
+  has_colors?: boolean;
+  /** Background of the gift. */
+  background?: GiftBackground;
+  /** The total number of gifts of this type that can be sent by the bot; for limited gifts only. */
+  personal_total_count?: number;
+  /** The number of remaining gifts of this type that can be sent by the bot; for limited gifts only. */
+  personal_remaining_count?: number;
+  /** The total number of different unique gifts that can be obtained by upgrading the gift. */
+  unique_gift_variant_count?: number;
+  /** Information about the chat that published the gift. */
+  publisher_chat?: Chat;
 }
 
 export interface Gifts {

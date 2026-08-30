@@ -88,16 +88,19 @@ export abstract class BusinessStoriesBoostsMethods extends BusinessGamesPassport
    * Marks incoming messages in a business account as read.
    *
    * @param businessConnectionId - Unique identifier of the business connection.
+   * @param chatId - Unique identifier of the chat in which the message was received.
    * @param messageId - Identifier of the message to mark as read.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When marking message fails.
    */
   public async readBusinessMessage(
     businessConnectionId: string,
+    chatId: number,
     messageId: number,
   ): Promise<boolean> {
     return this.request<boolean>("readBusinessMessage", {
       business_connection_id: businessConnectionId,
+      chat_id: chatId,
       message_id: messageId,
     });
   }
@@ -124,18 +127,21 @@ export abstract class BusinessStoriesBoostsMethods extends BusinessGamesPassport
    * Changes the emoji status for a given user that granted permission to the bot.
    *
    * @param userId - Unique identifier of the target user.
-   * @param customEmojiId - Custom emoji identifier to set as status.
-   * @param options - Expiration options.
+   * @param emojiStatusCustomEmojiId - Custom emoji identifier of the emoji status to set; pass an empty string to remove the status.
+   * @param options - Optional `emoji_status_expiration_date`.
    * @returns `true` on success.
+   * @remarks Serialized as the documented `emoji_status_custom_emoji_id` and `emoji_status_expiration_date` fields.
    * @throws {@link TelegramApiError} When setting emoji status fails.
    */
   public async setUserEmojiStatus(
     userId: number,
-    customEmojiId?: string,
+    emojiStatusCustomEmojiId?: string,
     options: { emoji_status_expiration_date?: number } = {},
   ): Promise<boolean> {
     const payload: Record<string, unknown> = { user_id: userId, ...options };
-    if (customEmojiId !== undefined) payload["custom_emoji_id"] = customEmojiId;
+    if (emojiStatusCustomEmojiId !== undefined) {
+      payload["emoji_status_custom_emoji_id"] = emojiStatusCustomEmojiId;
+    }
     return this.request<boolean>("setUserEmojiStatus", payload);
   }
 

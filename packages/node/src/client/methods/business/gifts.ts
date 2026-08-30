@@ -5,6 +5,15 @@
  */
 
 import { BusinessStoriesBoostsMethods } from "./stories-boosts.js";
+import type {
+  GetBusinessAccountGiftsOptions,
+  GetChatGiftsOptions,
+  GetUserGiftsOptions,
+  RemoveBusinessAccountProfilePhotoOptions,
+  SetBusinessAccountProfilePhotoOptions,
+  TransferGiftOptions,
+  UpgradeGiftOptions,
+} from "../../types/index.js";
 
 /**
  * Mixin providing gifts, star transfers, and managed bot operations.
@@ -21,14 +30,20 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   }
 
   /**
-   * Retrieves gifts received by a business account.
+   * Retrieves the gifts received and owned by a connected business account.
    *
    * @param businessConnectionId - Unique identifier of the business connection.
-   * @returns Business account gifts.
+   * @param options - Optional exclusion, sorting and pagination filters.
+   * @returns Owned gifts of the business account.
+   * @throws {@link TelegramApiError} When the request fails.
    */
-  public async getBusinessAccountGifts(businessConnectionId: string): Promise<unknown> {
+  public async getBusinessAccountGifts(
+    businessConnectionId: string,
+    options: GetBusinessAccountGiftsOptions = {},
+  ): Promise<unknown> {
     return this.request<unknown>("getBusinessAccountGifts", {
       business_connection_id: businessConnectionId,
+      ...options,
     });
   }
 
@@ -47,20 +62,25 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   }
 
   /**
-   * Changes the business name of a connected business account.
+   * Changes the first and last name of a managed business account.
    *
    * @param businessConnectionId - Unique identifier of the business connection.
-   * @param name - New business name.
+   * @param firstName - New first name of the business account; 1-64 characters.
+   * @param lastName - New last name of the business account; 0-64 characters.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
   public async setBusinessAccountName(
     businessConnectionId: string,
-    name: string,
+    firstName: string,
+    lastName?: string,
   ): Promise<boolean> {
-    return this.request<boolean>("setBusinessAccountName", {
+    const payload: Record<string, unknown> = {
       business_connection_id: businessConnectionId,
-      name,
-    });
+      first_name: firstName,
+    };
+    if (lastName !== undefined) payload["last_name"] = lastName;
+    return this.request<boolean>("setBusinessAccountName", payload);
   }
 
   /**
@@ -113,16 +133,20 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * Sets the profile photo for a connected business account.
    *
    * @param businessConnectionId - Unique identifier of the business connection.
-   * @param photo - Profile photo to set.
+   * @param photo - The new profile photo to set.
+   * @param options - Optional `is_public` flag.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
   public async setBusinessAccountProfilePhoto(
     businessConnectionId: string,
     photo: unknown,
+    options: SetBusinessAccountProfilePhotoOptions = {},
   ): Promise<boolean> {
     return this.request<boolean>("setBusinessAccountProfilePhoto", {
       business_connection_id: businessConnectionId,
       photo,
+      ...options,
     });
   }
 
@@ -130,56 +154,80 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    * Removes the profile photo of a connected business account.
    *
    * @param businessConnectionId - Unique identifier of the business connection.
+   * @param options - Optional `is_public` flag; pass True to remove the public photo.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
-  public async removeBusinessAccountProfilePhoto(businessConnectionId: string): Promise<boolean> {
+  public async removeBusinessAccountProfilePhoto(
+    businessConnectionId: string,
+    options: RemoveBusinessAccountProfilePhotoOptions = {},
+  ): Promise<boolean> {
     return this.request<boolean>("removeBusinessAccountProfilePhoto", {
       business_connection_id: businessConnectionId,
+      ...options,
     });
   }
 
   /**
-   * Converts an owned gift to Telegram Stars for a user.
+   * Converts a regular gift owned by a managed business account to Telegram Stars.
    *
-   * @param userId - User identifier.
-   * @param ownedGiftId - Owned gift identifier.
+   * @param businessConnectionId - Unique identifier of the business connection.
+   * @param ownedGiftId - Unique identifier of the regular gift to convert.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
-  public async convertGiftToStars(userId: number, ownedGiftId: string): Promise<boolean> {
+  public async convertGiftToStars(
+    businessConnectionId: string,
+    ownedGiftId: string,
+  ): Promise<boolean> {
     return this.request<boolean>("convertGiftToStars", {
-      user_id: userId,
+      business_connection_id: businessConnectionId,
       owned_gift_id: ownedGiftId,
     });
   }
 
   /**
-   * Upgrades a received gift to a unique collectible gift.
+   * Upgrades a regular gift owned by a managed business account to a unique gift.
    *
-   * @param userId - User identifier.
-   * @param ownedGiftId - Identifier of the owned gift.
+   * @param businessConnectionId - Unique identifier of the business connection.
+   * @param ownedGiftId - Unique identifier of the regular gift to upgrade.
+   * @param options - Optional `keep_original_details` and `star_count` parameters.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
-  public async upgradeGift(userId: number, ownedGiftId: string): Promise<boolean> {
-    return this.request<boolean>("upgradeGift", { user_id: userId, owned_gift_id: ownedGiftId });
+  public async upgradeGift(
+    businessConnectionId: string,
+    ownedGiftId: string,
+    options: UpgradeGiftOptions = {},
+  ): Promise<boolean> {
+    return this.request<boolean>("upgradeGift", {
+      business_connection_id: businessConnectionId,
+      owned_gift_id: ownedGiftId,
+      ...options,
+    });
   }
 
   /**
-   * Transfers an upgraded gift to another user or chat.
+   * Transfers an owned unique gift to another user or chat.
    *
-   * @param userId - User identifier.
-   * @param ownedGiftId - Upgraded gift identifier.
-   * @param newOwnerChatId - Target user or channel chat identifier.
+   * @param businessConnectionId - Unique identifier of the business connection.
+   * @param ownedGiftId - Unique identifier of the gift to transfer.
+   * @param newOwnerChatId - Unique identifier of the chat which will own the gift.
+   * @param options - Optional `star_count` paid for the transfer from the business account balance.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    */
   public async transferGift(
-    userId: number,
+    businessConnectionId: string,
     ownedGiftId: string,
-    newOwnerChatId: number | string,
+    newOwnerChatId: number,
+    options: TransferGiftOptions = {},
   ): Promise<boolean> {
     return this.request<boolean>("transferGift", {
-      user_id: userId,
+      business_connection_id: businessConnectionId,
       owned_gift_id: ownedGiftId,
       new_owner_chat_id: newOwnerChatId,
+      ...options,
     });
   }
 
@@ -300,29 +348,28 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   }
 
   /**
-   * Retrieves the list of gifts received by a user.
+   * Retrieves the gifts owned and hosted by a user.
    *
    * @param userId - Target user identifier.
-   * @param options - Query options.
+   * @param options - Optional exclusion, sorting and pagination filters.
    * @returns List of user gifts.
+   * @throws {@link TelegramApiError} When the request fails.
    */
-  public async getUserGifts(
-    userId: number,
-    options: Record<string, unknown> = {},
-  ): Promise<unknown> {
+  public async getUserGifts(userId: number, options: GetUserGiftsOptions = {}): Promise<unknown> {
     return this.request<unknown>("getUserGifts", { user_id: userId, ...options });
   }
 
   /**
-   * Retrieves the list of gifts received by a chat.
+   * Retrieves the gifts owned by a chat.
    *
-   * @param chatId - Target chat identifier.
-   * @param options - Query options.
+   * @param chatId - Target chat identifier or channel `@username`.
+   * @param options - Optional exclusion (including saved/unsaved), sorting and pagination filters.
    * @returns List of chat gifts.
+   * @throws {@link TelegramApiError} When the request fails.
    */
   public async getChatGifts(
     chatId: number | string,
-    options: Record<string, unknown> = {},
+    options: GetChatGiftsOptions = {},
   ): Promise<unknown> {
     return this.request<unknown>("getChatGifts", { chat_id: chatId, ...options });
   }
