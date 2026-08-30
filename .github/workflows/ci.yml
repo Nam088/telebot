@@ -109,13 +109,14 @@ jobs:
         working-directory: packages/python
         run: python scripts/parity_audit.py
 
-  # Advisory only: this job reports Bot API coverage drift but cannot fail the
-  # build while the three packages still close gaps. Remove the continue-on-error
-  # flags once `npm run audit:fidelity` exits 0 on every package.
+  # Gates the declared type surface against the documented Bot API shape: a
+  # missing REQUIRED field means incoming updates silently lose data, so this
+  # fails the build. Runs against the committed oracle, never the live site, so
+  # a Telegram docs hiccup cannot redden CI. Refresh the oracle with
+  # `npm run audit:docs -- --refresh` and commit the diff when the API changes.
   bot-api-fidelity:
-    name: Bot API Docs Fidelity (advisory)
+    name: Bot API Docs Fidelity
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Checkout Code
@@ -129,9 +130,17 @@ jobs:
       - name: Run Docs Parser Self-Tests (offline fixtures)
         run: npm run test:scripts
 
-      - name: Build Bot API Oracle From Live Docs
-        run: npm run audit:docs
+      - name: Audit Declared Types Against the Committed Oracle
+        run: npm run audit:fidelity
 
       - name: Report Per-Package Coverage
+        run: npm run audit:fidelity:report
+
+      # Advisory: re-runs the same audit against a freshly fetched oracle, so a
+      # Bot API change shows up as a diff here without reddening CI while the
+      # three packages catch up. The committed-oracle step above is the gate.
+      - name: Check Oracle Freshness Against Live Docs
         continue-on-error: true
-        run: npm run audit:fidelity
+        run: |
+          npm run audit:docs -- --out "${RUNNER_TEMP}/live-oracle.json"
+          node scripts/bot-api-fidelity.mjs --oracle "${RUNNER_TEMP}/live-oracle.json"

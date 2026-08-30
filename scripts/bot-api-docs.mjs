@@ -368,6 +368,43 @@ export async function loadOracle(options = {}) {
 }
 
 /**
+ * Strips the prose that the fidelity audit never compares.
+ *
+ * `scripts/bot-api-oracle.json` is committed to the repo, so it has to stay
+ * small enough for a Bot API update to produce a reviewable diff. The field
+ * names, types and requiredness are what the audit reads; the `desc` prose is
+ * ~60% of the full oracle's bytes and is only useful when reading the live page.
+ *
+ * @param {object} oracle Oracle as produced by `parseDocs`.
+ * @returns {object} A copy carrying `anchor`, `type` and `optional` only.
+ */
+export function trimOracle(oracle) {
+  const dropDesc = (entries) =>
+    Object.fromEntries(
+      Object.entries(entries).map(([name, value]) => {
+        const { desc, ...rest } = value;
+        void desc;
+        return [name, rest];
+      }),
+    );
+  return {
+    ...oracle,
+    methods: Object.fromEntries(
+      Object.entries(oracle.methods).map(([name, method]) => [
+        name,
+        { ...method, params: dropDesc(method.params ?? {}) },
+      ]),
+    ),
+    types: Object.fromEntries(
+      Object.entries(oracle.types).map(([name, type]) => [
+        name,
+        { anchor: type.anchor, fields: dropDesc(type.fields ?? {}) },
+      ]),
+    ),
+  };
+}
+
+/**
  * Formats the sanity baseline so parser drift is visible in one line.
  *
  * @param {object} counts `oracle.counts`.
@@ -390,6 +427,8 @@ export async function main(argv = process.argv.slice(2)) {
     if (flag === '--html' || flag === '--out' || flag === '--url') {
       options[flag.slice(2)] = argv[i + 1];
       i += 1;
+    } else if (flag === '--trim') {
+      options.trim = true;
     } else if (flag === '--help' || flag === '-h') {
       options.help = true;
     } else {
@@ -402,11 +441,13 @@ export async function main(argv = process.argv.slice(2)) {
   if (options.help) {
     console.log(
       [
-        'Usage: node scripts/bot-api-docs.mjs [--html <path>] [--out <path>] [--url <url>]',
+        'Usage: node scripts/bot-api-docs.mjs [--html <path>] [--out <path>] [--url <url>] [--trim]',
         '',
         'Fetches the official Bot API page, parses every method/type declaration',
         'and writes the JSON oracle used by scripts/bot-api-fidelity.mjs.',
         'Without --html the live page is fetched over the network.',
+        '--trim drops the doc prose so the result can be committed:',
+        '  node scripts/bot-api-docs.mjs --out scripts/bot-api-oracle.json --trim',
         `Default output: ${DEFAULT_ORACLE_PATH}`,
       ].join('\n'),
     );
@@ -420,7 +461,8 @@ export async function main(argv = process.argv.slice(2)) {
   }
 
   const html = source !== undefined ? await readFile(source, 'utf-8') : await fetchHtml(options.url ?? DOCS_URL);
-  const oracle = parseDocs(html, source !== undefined ? path.resolve(source) : (options.url ?? DOCS_URL));
+  let oracle = parseDocs(html, source !== undefined ? path.resolve(source) : (options.url ?? DOCS_URL));
+  if (options.trim) oracle = trimOracle(oracle);
 
   const target = options.out ? path.resolve(options.out) : oraclePath();
   await mkdir(path.dirname(target), { recursive: true });

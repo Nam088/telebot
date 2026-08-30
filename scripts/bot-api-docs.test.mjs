@@ -17,7 +17,7 @@ import test from 'node:test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { classifyHeading, parseDocs } from './bot-api-docs.mjs';
+import { classifyHeading, parseDocs, trimOracle } from './bot-api-docs.mjs';
 
 const FIXTURE = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -134,4 +134,49 @@ test('classifyHeading only accepts h4 and splits on case + word count', () => {
   assert.equal(classifyHeading('Stickers', 3), 'prose');
   assert.equal(classifyHeading('Payments', 3), 'prose');
   assert.equal(classifyHeading('Games', 3), 'prose');
+});
+
+test('trimOracle drops the prose the audit never reads and keeps what it compares', () => {
+  const before = JSON.stringify(oracle);
+  const trimmed = trimOracle(oracle);
+
+  // Everything the audit gates on survives, in the same schema.
+  assert.deepEqual(trimmed.counts, oracle.counts);
+  assert.deepEqual(trimmed.anchors, oracle.anchors);
+  assert.deepEqual(
+    Object.keys(trimmed.types),
+    Object.keys(oracle.types),
+    'trimming must not drop or rename a type',
+  );
+  assert.deepEqual(trimmed.types.TestType.fields.identifier, {
+    type: 'Integer',
+    optional: false,
+  });
+  assert.deepEqual(trimmed.methods.sendMessage.params.chat_id, {
+    type: 'Integer or String',
+    optional: false,
+  });
+
+  // Everything it ignores is gone — that is why the repo commits the trimmed
+  // file instead of the ~700 KB live parse.
+  assert.equal('desc' in trimmed.types.TestType, false);
+  assert.equal(
+    Object.values(trimmed.types).some((type) => 'desc' in type),
+    false,
+  );
+  assert.equal(
+    Object.values(trimmed.methods).some((method) =>
+      Object.values(method.params).some((param) => 'desc' in param),
+    ),
+    false,
+  );
+  assert.ok(
+    JSON.stringify(trimmed).length < before.length,
+    'trimmed oracle must be smaller',
+  );
+
+  // Deterministic and non-destructive, so `--trim` can be re-run to produce a
+  // reviewable diff instead of noise.
+  assert.equal(JSON.stringify(trimOracle(oracle)), JSON.stringify(trimmed));
+  assert.equal(JSON.stringify(oracle), before, 'trimOracle must not mutate its input');
 });
