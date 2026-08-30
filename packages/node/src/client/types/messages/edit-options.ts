@@ -33,6 +33,8 @@ export interface EditMessageTextOptions {
   link_preview_options?: unknown;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageCaptionOptions {
@@ -217,6 +219,8 @@ export interface ForwardMessagesOptions {
   disable_notification?: boolean;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the messages will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Protects the contents of the forwarded messages from forwarding and saving. */
   protect_content?: boolean;
 }
@@ -232,6 +236,8 @@ export interface CopyMessagesOptions {
   disable_notification?: boolean;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the messages will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Protects the contents of the sent messages from forwarding and saving. */
   protect_content?: boolean;
   /** Pass True to copy the messages without their captions. */

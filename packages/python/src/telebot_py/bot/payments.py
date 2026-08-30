@@ -14,6 +14,7 @@ from telebot_py.bot.base import (
     to_wire,
 )
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 from telebot_py.types.payments import StarAmount, StarTransactions
 
 
@@ -48,7 +49,7 @@ class PaymentsMixin(Requester):
         is_flexible: bool | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an invoice.
@@ -86,7 +87,8 @@ class PaymentsMixin(Requester):
                 method.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -141,6 +143,7 @@ class PaymentsMixin(Requester):
         currency: str,
         prices: Sequence[MarkupLike],
         *,
+        business_connection_id: str | None = None,
         provider_token: str | None = None,
         subscription_period: int | None = None,
         max_tip_amount: int | None = None,
@@ -171,6 +174,9 @@ class PaymentsMixin(Requester):
             payload: Bot-defined invoice payload, 1-128 bytes.
             currency: Three-letter ISO 4217 currency code, or ``XTR``.
             prices: LabeledPrice items as dicts or ``to_dict`` objects.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message with the invoice will
+                be sent.
             provider_token: Payment provider token (omit for Telegram Stars).
             subscription_period: Subscription period in seconds for recurring
                 payments.
@@ -203,6 +209,7 @@ class PaymentsMixin(Requester):
         Telegram API: https://core.telegram.org/bots/api#createinvoicelink
         """
         wire = clean_payload(
+            business_connection_id=business_connection_id,
             title=title,
             description=description,
             payload=payload,

@@ -98,7 +98,7 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
   /**
    * Edits the text of a message previously sent by the bot or via inline queries.
    *
-   * @param options - Options including `text`, `chat_id`+`message_id` or `inline_message_id`, and `reply_markup`.
+   * @param options - Options including `text`, `chat_id`+`message_id` or `inline_message_id`, `reply_markup`, and the optional `business_connection_id`.
    * @returns The edited {@link Message} or `true` if inline message.
    * @throws {@link TelegramApiError} When editing text fails.
    *

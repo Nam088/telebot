@@ -33,6 +33,7 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
       message_ids: [10, 11],
       disable_notification: true,
       message_thread_id: 42,
+      direct_messages_topic_id: 7,
       protect_content: true,
     });
     expect(forwardBatch).toEqual([{ message_id: 101 }, { message_id: 102 }]);
@@ -47,6 +48,7 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
       message_ids: [10, 11],
       disable_notification: true,
       message_thread_id: 42,
+      direct_messages_topic_id: 7,
       protect_content: true,
       remove_caption: true,
     });
@@ -108,7 +110,14 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
 
   it("editMessageText, editMessageCaption, editMessageMedia, editMessageReplyMarkup", async () => {
     const { client } = createMock(true);
-    expect(await client.editMessageText({ chat_id: 1, message_id: 2, text: "T" })).toBe(true);
+    expect(
+      await client.editMessageText({
+        chat_id: 1,
+        message_id: 2,
+        text: "T",
+        business_connection_id: "bc1",
+      }),
+    ).toBe(true);
     expect(await client.editMessageCaption({ chat_id: 1, message_id: 2, caption: "C" })).toBe(true);
     expect(
       await client.editMessageMedia({
@@ -136,7 +145,7 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.setWebhook({ url: "https://example.com" })).toBe(true);
     expect(await client.deleteWebhook()).toBe(true);
     expect(await client.getWebhookInfo()).toBe(true);
-    expect(await client.sendMessageDraft({ chat_id: 123 })).toBe(true);
+    expect(await client.sendMessageDraft({ chat_id: 123, draft_id: 1 })).toBe(true);
     expect(
       await client.sendChecklist({
         business_connection_id: "bc1",
@@ -212,5 +221,75 @@ describe("MessageMethods payloads match the official Bot API 10.3 parameter name
     for (const call of calls) {
       expect(call.method).not.toBe("setMessageReaction");
     }
+  });
+
+  it("bulk forward and copy send direct_messages_topic_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.forwardMessages({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10, 11],
+      message_thread_id: 42,
+      direct_messages_topic_id: 7,
+    });
+    await client.copyMessages({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10],
+      remove_caption: true,
+    });
+    await client.copyMessages({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10],
+      direct_messages_topic_id: 7,
+    });
+    expect(calls[0]?.payload).toEqual({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10, 11],
+      message_thread_id: 42,
+      direct_messages_topic_id: 7,
+    });
+    expect(calls[1]?.payload["direct_messages_topic_id"]).toBeUndefined();
+    expect(calls[2]?.payload).toEqual({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_ids: [10],
+      direct_messages_topic_id: 7,
+    });
+  });
+
+  it("editMessageText sends business_connection_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.editMessageText({
+      chat_id: 1,
+      message_id: 2,
+      text: "T",
+      business_connection_id: "bc1",
+    });
+    expect(calls[0]?.method).toBe("editMessageText");
+    expect(calls[0]?.payload).toEqual({
+      chat_id: 1,
+      message_id: 2,
+      text: "T",
+      business_connection_id: "bc1",
+    });
+  });
+
+  it("reply_parameters sends the documented checklist_task_id, never checklist_item_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.sendMessage({
+      chat_id: 1,
+      text: "T",
+      reply_parameters: { message_id: 2, checklist_task_id: 5 },
+    });
+    expect(calls[0]?.payload["reply_parameters"]).toEqual({
+      message_id: 2,
+      checklist_task_id: 5,
+    });
+    expect(
+      (calls[0]?.payload["reply_parameters"] as Record<string, unknown>)["checklist_item_id"],
+    ).toBeUndefined();
   });
 });

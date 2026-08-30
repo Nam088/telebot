@@ -284,3 +284,50 @@ class SentGuestMessage(TelegramObject):
     """
 
     inline_message_id: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class ReplyParameters(TelegramObject):
+    """Describes a message reply to apply.
+
+    Every field is optional on the wire; unset fields are omitted by
+    ``to_dict``, so ``ReplyParameters(message_id=5)`` serializes to exactly
+    ``{"message_id": 5}``.
+
+    Attributes:
+        chat_id: Unique identifier of the chat the message to reply to belongs
+            to; omit when the message to reply to is in the current chat.
+        message_id: Identifier of the message that will be replied to in the
+            current chat, or in ``chat_id`` if it is specified.
+        allow_sending_without_reply: Whether the message should be sent even if
+            the specified replied-to message is not found.
+        quote: Quoted part of the message to be replied to, 0-1024 characters
+            after entities parsing.
+        quote_parse_mode: Parse mode for the entities in the quote.
+        quote_entities: Special entities that appear in the quote, which can be
+            specified instead of ``quote_parse_mode``.
+        quote_position: Position of the quote in the original message in UTF-16
+            code units.
+        checklist_task_id: Identifier of the specific checklist item that the
+            message is replying to, relative to the first item in the checklist
+            in the replied message.
+        poll_option_id: Identifier of the specific answer option in the poll
+            that the message is replying to.
+        ephemeral_message_id: Identifier of the ephemeral message that will be
+            replied to, with an expiration date of at least 1 hour from now and
+            no more than 366 days from now. Ignored for messages having
+            ``chat_id``.
+
+    Telegram API: https://core.telegram.org/bots/api#replyparameters
+    """
+
+    chat_id: int | str | None = None
+    message_id: int | None = None
+    allow_sending_without_reply: bool | None = None
+    quote: str | None = None
+    quote_parse_mode: str | None = None
+    quote_entities: list[MessageEntity] | None = None
+    quote_position: int | None = None
+    checklist_task_id: int | None = None
+    poll_option_id: str | None = None
+    ephemeral_message_id: int | None = None

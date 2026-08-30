@@ -1,5 +1,6 @@
 import type { ParseMode } from "../../constants.js";
 import type { MessageEntity } from "../messages/index.js";
+import type { AcceptedGiftTypes } from "./models.js";
 
 /**
  * Options for {@link Bot.giftPremiumSubscription}.
@@ -33,8 +34,8 @@ export interface GiftPremiumSubscriptionOptions {
 export interface SetBusinessAccountGiftSettingsOptions {
   /** Pass True to show a button with the list of gifts and the Star balance on the business profile. */
   show_gift_button: boolean;
-  /** An AcceptedGiftTypes object describing which gifts the business account is willing to accept. */
-  accepted_gift_types: Record<string, unknown>;
+  /** An {@link AcceptedGiftTypes} object describing which gifts the business account is willing to accept. */
+  accepted_gift_types: AcceptedGiftTypes;
 }
 
 /**

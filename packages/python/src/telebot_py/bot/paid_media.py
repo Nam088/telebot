@@ -16,6 +16,7 @@ from telebot_py.bot.base import (
     to_wire,
 )
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 
 
 class PaidMediaMixin(Requester):
@@ -35,7 +36,7 @@ class PaidMediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
@@ -127,7 +128,7 @@ class PaidMediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,

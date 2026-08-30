@@ -173,10 +173,11 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 				"business_connection_id": "bc1",
 				"show_gift_button":       true,
 				"accepted_gift_types": map[string]any{
-					"unlimited_gifts": false,
-					"premium_gifts":   true,
-					"unique_gifts":    false,
-					"storable_gifts":  true,
+					"unlimited_gifts":      false,
+					"limited_gifts":        true,
+					"unique_gifts":         false,
+					"premium_subscription": true,
+					"gifts_from_channels":  true,
 				},
 			},
 			invoke: func(b *bot.Bot) (bool, error) {
@@ -184,8 +185,9 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 					BusinessConnectionID: "bc1",
 					ShowGiftButton:       true,
 					AcceptedGiftTypes: types.AcceptedGiftTypes{
-						PremiumGifts:  true,
-						StorableGifts: true,
+						LimitedGifts:        true,
+						PremiumSubscription: true,
+						GiftsFromChannels:   true,
 					},
 				})
 			},

@@ -294,6 +294,24 @@ export interface BusinessBotRights {
 }
 
 /**
+ * Describes which types of gifts the business account is willing to accept.
+ *
+ * @see {@link https://core.telegram.org/bots/api#acceptedgifttypes Telegram Bot API: AcceptedGiftTypes}
+ */
+export interface AcceptedGiftTypes {
+  /** True, if the business account is willing to accept unlimited gifts. */
+  unlimited_gifts: boolean;
+  /** True, if the business account is willing to accept limited gifts. */
+  limited_gifts: boolean;
+  /** True, if the business account is willing to accept unique gifts. */
+  unique_gifts: boolean;
+  /** True, if the business account is willing to accept Telegram Premium subscriptions. */
+  premium_subscription: boolean;
+  /** True, if the business account is willing to accept gifts from channels. */
+  gifts_from_channels: boolean;
+}
+
+/**
  * @see {@link https://core.telegram.org/bots/api#businessconnection Telegram Bot API: BusinessConnection}
  */
 export interface BusinessConnection {

@@ -1,32 +1,27 @@
 /**
- * Gifts, stars, and managed bot settings methods for Bot API.
+ * Gifts, stars, suggested posts, and bot profile methods for Bot API.
  *
  * @packageDocumentation
  */
 
-import { BusinessStoriesBoostsMethods } from "./stories-boosts.js";
+import { BusinessAccountMethods } from "./business-account.js";
 import type {
-  GetBusinessAccountGiftsOptions,
   GetChatGiftsOptions,
   GetUserGiftsOptions,
-  RemoveBusinessAccountProfilePhotoOptions,
-  SetBusinessAccountProfilePhotoOptions,
   TransferGiftOptions,
   UpgradeGiftOptions,
   GiftPremiumSubscriptionOptions,
-  SetBusinessAccountGiftSettingsOptions,
   CreateChatSubscriptionInviteLinkOptions,
   RepostStoryOptions,
   SavePreparedKeyboardButtonOptions,
-  SetManagedBotAccessSettingsOptions,
   Story,
   ChatInviteLink,
 } from "../../types/index.js";
 
 /**
- * Mixin providing gifts, star transfers, and managed bot operations.
+ * Mixin providing gifts, star transfers, and channel post operations.
  */
-export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods {
+export abstract class BusinessGiftsMethods extends BusinessAccountMethods {
   /**
    * Gifts a Telegram Premium subscription to a user.
    *
@@ -40,161 +35,6 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
       "giftPremiumSubscription",
       options as unknown as Record<string, unknown>,
     );
-  }
-
-  /**
-   * Retrieves the gifts received and owned by a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param options - Optional exclusion, sorting and pagination filters.
-   * @returns Owned gifts of the business account.
-   * @throws {@link TelegramApiError} When the request fails.
-   *
-   * @see {@link https://core.telegram.org/bots/api#getbusinessaccountgifts Telegram Bot API: getBusinessAccountGifts}
-   */
-  public async getBusinessAccountGifts(
-    businessConnectionId: string,
-    options: GetBusinessAccountGiftsOptions = {},
-  ): Promise<unknown> {
-    return this.request<unknown>("getBusinessAccountGifts", {
-      business_connection_id: businessConnectionId,
-      ...options,
-    });
-  }
-
-  /**
-   * Retrieves the Telegram Star balance of a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @returns Object containing the star `amount`.
-   *
-   * @see {@link https://core.telegram.org/bots/api#getbusinessaccountstarbalance Telegram Bot API: getBusinessAccountStarBalance}
-   */
-  public async getBusinessAccountStarBalance(
-    businessConnectionId: string,
-  ): Promise<{ amount: number }> {
-    return this.request<{ amount: number }>("getBusinessAccountStarBalance", {
-      business_connection_id: businessConnectionId,
-    });
-  }
-
-  /**
-   * Changes the first and last name of a managed business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param firstName - New first name of the business account; 1-64 characters.
-   * @param lastName - New last name of the business account; 0-64 characters.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When the request fails.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountname Telegram Bot API: setBusinessAccountName}
-   */
-  public async setBusinessAccountName(
-    businessConnectionId: string,
-    firstName: string,
-    lastName?: string,
-  ): Promise<boolean> {
-    const payload: Record<string, unknown> = {
-      business_connection_id: businessConnectionId,
-      first_name: firstName,
-    };
-    if (lastName !== undefined) payload["last_name"] = lastName;
-    return this.request<boolean>("setBusinessAccountName", payload);
-  }
-
-  /**
-   * Changes the username of a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param username - New username.
-   * @returns `true` on success.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountusername Telegram Bot API: setBusinessAccountUsername}
-   */
-  public async setBusinessAccountUsername(
-    businessConnectionId: string,
-    username?: string,
-  ): Promise<boolean> {
-    const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
-    if (username !== undefined) payload["username"] = username;
-    return this.request<boolean>("setBusinessAccountUsername", payload);
-  }
-
-  /**
-   * Changes the bio description of a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param bio - New bio text.
-   * @returns `true` on success.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountbio Telegram Bot API: setBusinessAccountBio}
-   */
-  public async setBusinessAccountBio(businessConnectionId: string, bio?: string): Promise<boolean> {
-    const payload: Record<string, unknown> = { business_connection_id: businessConnectionId };
-    if (bio !== undefined) payload["bio"] = bio;
-    return this.request<boolean>("setBusinessAccountBio", payload);
-  }
-
-  /**
-   * Configures gift settings for a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param options - Gift settings parameters.
-   * @returns `true` on success.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountgiftsettings Telegram Bot API: setBusinessAccountGiftSettings}
-   */
-  public async setBusinessAccountGiftSettings(
-    businessConnectionId: string,
-    options: SetBusinessAccountGiftSettingsOptions,
-  ): Promise<boolean> {
-    return this.request<boolean>("setBusinessAccountGiftSettings", {
-      business_connection_id: businessConnectionId,
-      ...options,
-    });
-  }
-
-  /**
-   * Sets the profile photo for a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param photo - The new profile photo to set.
-   * @param options - Optional `is_public` flag.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When the request fails.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setbusinessaccountprofilephoto Telegram Bot API: setBusinessAccountProfilePhoto}
-   */
-  public async setBusinessAccountProfilePhoto(
-    businessConnectionId: string,
-    photo: unknown,
-    options: SetBusinessAccountProfilePhotoOptions = {},
-  ): Promise<boolean> {
-    return this.request<boolean>("setBusinessAccountProfilePhoto", {
-      business_connection_id: businessConnectionId,
-      photo,
-      ...options,
-    });
-  }
-
-  /**
-   * Removes the profile photo of a connected business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param options - Optional `is_public` flag; pass True to remove the public photo.
-   * @returns `true` on success.
-   * @throws {@link TelegramApiError} When the request fails.
-   *
-   * @see {@link https://core.telegram.org/bots/api#removebusinessaccountprofilephoto Telegram Bot API: removeBusinessAccountProfilePhoto}
-   */
-  public async removeBusinessAccountProfilePhoto(
-    businessConnectionId: string,
-    options: RemoveBusinessAccountProfilePhotoOptions = {},
-  ): Promise<boolean> {
-    return this.request<boolean>("removeBusinessAccountProfilePhoto", {
-      business_connection_id: businessConnectionId,
-      ...options,
-    });
   }
 
   /**
@@ -267,53 +107,6 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   }
 
   /**
-   * Transfers Telegram Stars from a business account.
-   *
-   * @param businessConnectionId - Unique identifier of the business connection.
-   * @param starCount - Number of stars to transfer.
-   * @returns `true` on success.
-   *
-   * @see {@link https://core.telegram.org/bots/api#transferbusinessaccountstars Telegram Bot API: transferBusinessAccountStars}
-   */
-  public async transferBusinessAccountStars(
-    businessConnectionId: string,
-    starCount: number,
-  ): Promise<boolean> {
-    return this.request<boolean>("transferBusinessAccountStars", {
-      business_connection_id: businessConnectionId,
-      star_count: starCount,
-    });
-  }
-
-  /**
-   * Retrieves access settings for a managed bot.
-   *
-   * @param userId - Unique identifier of the target user that owns the managed bot.
-   * @returns Access settings.
-   *
-   * @see {@link https://core.telegram.org/bots/api#getmanagedbotaccesssettings Telegram Bot API: getManagedBotAccessSettings}
-   */
-  public async getManagedBotAccessSettings(userId: number): Promise<unknown> {
-    return this.request<unknown>("getManagedBotAccessSettings", { user_id: userId });
-  }
-
-  /**
-   * Updates access settings for a managed bot.
-   *
-   * @param userId - Unique identifier of the target user that owns the managed bot.
-   * @param options - Updated access options including the required `is_access_restricted` flag.
-   * @returns `true` on success.
-   *
-   * @see {@link https://core.telegram.org/bots/api#setmanagedbotaccesssettings Telegram Bot API: setManagedBotAccessSettings}
-   */
-  public async setManagedBotAccessSettings(
-    userId: number,
-    options: SetManagedBotAccessSettingsOptions,
-  ): Promise<boolean> {
-    return this.request<boolean>("setManagedBotAccessSettings", { user_id: userId, ...options });
-  }
-
-  /**
    * Creates a subscription invite link for a channel or group.
    *
    * @param chatId - Target chat identifier.
@@ -359,15 +152,21 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param chatId - Channel chat identifier.
    * @param messageId - Identifier of the suggested post message.
+   * @param sendDate - Point in time (Unix timestamp) when the post will be published; defaults to the
+   *   current date and time when omitted.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    *
    * @see {@link https://core.telegram.org/bots/api#approvesuggestedpost Telegram Bot API: approveSuggestedPost}
    */
-  public async approveSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
-    return this.request<boolean>("approveSuggestedPost", {
-      chat_id: chatId,
-      message_id: messageId,
-    });
+  public async approveSuggestedPost(
+    chatId: number | string,
+    messageId: number,
+    sendDate?: number,
+  ): Promise<boolean> {
+    const payload: Record<string, unknown> = { chat_id: chatId, message_id: messageId };
+    if (sendDate !== undefined) payload["send_date"] = sendDate;
+    return this.request<boolean>("approveSuggestedPost", payload);
   }
 
   /**
@@ -375,15 +174,20 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @param chatId - Channel chat identifier.
    * @param messageId - Identifier of the suggested post message.
+   * @param comment - Comment for the post author; pass an empty string for no comment.
    * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
    *
    * @see {@link https://core.telegram.org/bots/api#declinesuggestedpost Telegram Bot API: declineSuggestedPost}
    */
-  public async declineSuggestedPost(chatId: number | string, messageId: number): Promise<boolean> {
-    return this.request<boolean>("declineSuggestedPost", {
-      chat_id: chatId,
-      message_id: messageId,
-    });
+  public async declineSuggestedPost(
+    chatId: number | string,
+    messageId: number,
+    comment?: string,
+  ): Promise<boolean> {
+    const payload: Record<string, unknown> = { chat_id: chatId, message_id: messageId };
+    if (comment !== undefined) payload["comment"] = comment;
+    return this.request<boolean>("declineSuggestedPost", payload);
   }
 
   /**
@@ -491,30 +295,6 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
     const payload: Record<string, unknown> = { chat_id: chatId, user_id: userId };
     if (tag !== undefined) payload["tag"] = tag;
     return this.request<boolean>("setChatMemberTag", payload);
-  }
-
-  /**
-   * Retrieves the token of a managed bot.
-   *
-   * @param userId - Unique identifier of the target user that owns the managed bot.
-   * @returns Object containing the bot `token`.
-   *
-   * @see {@link https://core.telegram.org/bots/api#getmanagedbottoken Telegram Bot API: getManagedBotToken}
-   */
-  public async getManagedBotToken(userId: number): Promise<{ token: string }> {
-    return this.request<{ token: string }>("getManagedBotToken", { user_id: userId });
-  }
-
-  /**
-   * Generates a replacement token for a managed bot.
-   *
-   * @param userId - Unique identifier of the target user that owns the managed bot.
-   * @returns Object containing the new bot `token`.
-   *
-   * @see {@link https://core.telegram.org/bots/api#replacemanagedbottoken Telegram Bot API: replaceManagedBotToken}
-   */
-  public async replaceManagedBotToken(userId: number): Promise<{ token: string }> {
-    return this.request<{ token: string }>("replaceManagedBotToken", { user_id: userId });
   }
 
   /**

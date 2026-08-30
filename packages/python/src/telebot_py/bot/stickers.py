@@ -18,6 +18,7 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.files import File
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 from telebot_py.types.stickers import Sticker, StickerSet
 
 
@@ -39,7 +40,7 @@ class StickersMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a static, animated, or video sticker.
@@ -57,7 +58,8 @@ class StickersMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:

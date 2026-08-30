@@ -16,10 +16,12 @@ from telebot_py.types import (
     ChatMember,
     Message,
     MessageId,
+    ReplyParameters,
     Update,
     User,
     WebhookInfo,
 )
+from telebot_py.types.common import MessageEntity
 
 TEST_TOKEN = "123456:TEST"
 
@@ -530,3 +532,37 @@ class TestWebhookSurface:
         bot = make_bot(bot_transport, step)
         assert await bot.delete_webhook(drop_pending_updates=True) is True
         assert sent_payload(seen[0]) == {"drop_pending_updates": True}
+
+
+class TestSendMessageReplyParametersObject:
+    """send_message accepts the typed ReplyParameters dataclass, not just a dict."""
+
+    async def test_serializes_dataclass_snake_case_omitting_none(
+        self,
+        bot_transport: Any,
+        ok_response: ResponseFactory,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message()), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_message(
+            -100_500,
+            "hello",
+            reply_parameters=ReplyParameters(
+                message_id=5,
+                quote="hi",
+                quote_entities=[MessageEntity(type="bold", offset=0, length=2)],
+                checklist_task_id=9,
+            ),
+        )
+        assert sent_payload(seen[0]) == {
+            "chat_id": -100_500,
+            "text": "hello",
+            "reply_parameters": {
+                "message_id": 5,
+                "quote": "hi",
+                "quote_entities": [{"type": "bold", "offset": 0, "length": 2}],
+                "checklist_task_id": 9,
+            },
+        }

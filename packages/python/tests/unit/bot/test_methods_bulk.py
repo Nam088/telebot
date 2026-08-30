@@ -119,3 +119,36 @@ class TestDeleteMessages:
         bot = make_bot(bot_transport, step, max_retries=0)
         with pytest.raises(TelegramApiError):
             await bot.delete_messages(789, [999])
+
+
+class TestDirectMessagesTopicId:
+    """forwardMessages/copyMessages accept direct_messages_topic_id (Bot API docs)."""
+
+    async def test_forward_messages(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.forward_messages(123, 456, [1], direct_messages_topic_id=77)
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "from_chat_id": 456,
+            "message_ids": [1],
+            "direct_messages_topic_id": 77,
+        }
+
+    async def test_copy_messages(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.copy_messages(123, 456, [1], direct_messages_topic_id=77, remove_caption=True)
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "from_chat_id": 456,
+            "message_ids": [1],
+            "direct_messages_topic_id": 77,
+            "remove_caption": True,
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.forward_messages(123, 456, [1])
+        assert "direct_messages_topic_id" not in sent_payload(seen[0])

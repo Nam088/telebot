@@ -177,3 +177,32 @@ class TestGetMyStarBalance:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.get_my_star_balance()
         assert excinfo.value.error_code == 401
+
+
+class TestCreateInvoiceLinkBusinessConnectionId:
+    """createInvoiceLink accepts business_connection_id (Bot API docs)."""
+
+    async def test_serializes_business_connection_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response("https://t.me/invoice/x"), seen))
+        link = await bot.create_invoice_link(
+            "Coffee", "A fine coffee", "order-1", "XTR", PRICES, business_connection_id="bc1"
+        )
+        assert link == "https://t.me/invoice/x"
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/createInvoiceLink"
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "title": "Coffee",
+            "description": "A fine coffee",
+            "payload": "order-1",
+            "currency": "XTR",
+            "prices": PRICES,
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response("https://t.me/invoice/x"), seen))
+        await bot.create_invoice_link("Coffee", "A fine coffee", "order-1", "XTR", PRICES)
+        assert "business_connection_id" not in sent_payload(seen[0])

@@ -1,7 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
 import { BusinessAndEcosystemMethods } from "../../../../src/client/methods/index.js";
+import type { AcceptedGiftTypes } from "../../../../src/client/types/index.js";
 
 class ConcreteBusinessClient extends BusinessAndEcosystemMethods {}
+
+/** Every field of AcceptedGiftTypes is required by the Bot API. */
+const ALL_GIFT_TYPES: AcceptedGiftTypes = {
+  unlimited_gifts: true,
+  limited_gifts: false,
+  unique_gifts: true,
+  premium_subscription: true,
+  gifts_from_channels: false,
+};
 
 describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
   const createMock = (result: unknown) => {
@@ -82,7 +92,7 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
     expect(
       await client.setBusinessAccountGiftSettings("biz_1", {
         show_gift_button: true,
-        accepted_gift_types: { unique_gifts: true },
+        accepted_gift_types: ALL_GIFT_TYPES,
       }),
     ).toBe(true);
     expect(await client.setBusinessAccountProfilePhoto("biz_1", "p", { is_public: true })).toBe(
@@ -104,8 +114,8 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
       }),
     ).toBe(true);
     expect(await client.editChatSubscriptionInviteLink(123, "l", {})).toBe(true);
-    expect(await client.approveSuggestedPost(123, 456)).toBe(true);
-    expect(await client.declineSuggestedPost(123, 456)).toBe(true);
+    expect(await client.approveSuggestedPost(123, 456, 1700000000)).toBe(true);
+    expect(await client.declineSuggestedPost(123, 456, "not suitable")).toBe(true);
     expect(
       await client.repostStory({ from_chat_id: 200, from_story_id: 9, active_period: 86400 }),
     ).toBe(true);
@@ -277,5 +287,41 @@ describe("Business method payloads match the official Bot API 10.3 parameter nam
     for (const call of calls) {
       expect(call.payload["bot_id"]).toBeUndefined();
     }
+  });
+
+  it("setBusinessAccountGiftSettings sends the documented accepted_gift_types object", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.setBusinessAccountGiftSettings("biz_1", {
+      show_gift_button: true,
+      accepted_gift_types: ALL_GIFT_TYPES,
+    });
+    expect(calls[0]?.method).toBe("setBusinessAccountGiftSettings");
+    expect(calls[0]?.payload).toEqual({
+      business_connection_id: "biz_1",
+      show_gift_button: true,
+      accepted_gift_types: {
+        unlimited_gifts: true,
+        limited_gifts: false,
+        unique_gifts: true,
+        premium_subscription: true,
+        gifts_from_channels: false,
+      },
+    });
+  });
+
+  it("suggested post methods send send_date/comment and omit them when unset", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.approveSuggestedPost(123, 456, 1700000000);
+    await client.approveSuggestedPost(123, 456);
+    await client.declineSuggestedPost(123, 456, "not suitable");
+    await client.declineSuggestedPost(123, 456);
+    expect(calls[0]?.payload).toEqual({
+      chat_id: 123,
+      message_id: 456,
+      send_date: 1700000000,
+    });
+    expect(calls[1]?.payload).toEqual({ chat_id: 123, message_id: 456 });
+    expect(calls[2]?.payload).toEqual({ chat_id: 123, message_id: 456, comment: "not suitable" });
+    expect(calls[3]?.payload).toEqual({ chat_id: 123, message_id: 456 });
   });
 });

@@ -287,10 +287,11 @@ func (b *Bot) SetBusinessAccountBio(ctx context.Context, businessConnectionID, b
 //		BusinessConnectionID: "423778511293324225",
 //		ShowGiftButton:       true,
 //		AcceptedGiftTypes: types.AcceptedGiftTypes{
-//			UnlimitedGifts: true,
-//			PremiumGifts:   true,
-//			UniqueGifts:    false,
-//			StorableGifts:  true,
+//			UnlimitedGifts:      true,
+//			LimitedGifts:        false,
+//			UniqueGifts:         false,
+//			PremiumSubscription: true,
+//			GiftsFromChannels:   true,
 //		},
 //	})
 //

@@ -24,6 +24,7 @@ class EditsMixin(Requester):
         self,
         text: str,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -39,6 +40,9 @@ class EditsMixin(Requester):
 
         Args:
             text: New text of the message, 1-4096 characters.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -63,6 +67,7 @@ class EditsMixin(Requester):
         """
         payload = clean_payload(
             text=text,
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -76,6 +81,7 @@ class EditsMixin(Requester):
     async def edit_message_caption(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -90,6 +96,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_caption(chat_id=1, message_id=2, caption="new")
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -114,6 +123,7 @@ class EditsMixin(Requester):
         Telegram API: https://core.telegram.org/bots/api#editmessagecaption
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -130,6 +140,7 @@ class EditsMixin(Requester):
         self,
         media: MarkupLike,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -149,6 +160,9 @@ class EditsMixin(Requester):
                 ``type``, ``media``, and type-specific optionals) given as a
                 dict or ``to_dict`` object. Only ``file_id``/HTTP URL media
                 references are supported; file uploads are out of scope.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -170,6 +184,7 @@ class EditsMixin(Requester):
         """
         payload = clean_payload(
             media=to_wire(media),
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -182,6 +197,7 @@ class EditsMixin(Requester):
         latitude: float,
         longitude: float,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -199,6 +215,9 @@ class EditsMixin(Requester):
         Args:
             latitude: New latitude of the location, in degrees.
             longitude: New longitude of the location, in degrees.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -228,6 +247,7 @@ class EditsMixin(Requester):
         payload = clean_payload(
             latitude=latitude,
             longitude=longitude,
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -242,6 +262,7 @@ class EditsMixin(Requester):
     async def stop_message_live_location(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -253,6 +274,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.stop_message_live_location(chat_id=1, message_id=2)
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to stop; required unless
@@ -273,6 +297,7 @@ class EditsMixin(Requester):
         Telegram API: https://core.telegram.org/bots/api#stopmessagelivelocation
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -320,6 +345,7 @@ class EditsMixin(Requester):
     async def edit_message_reply_markup(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -331,6 +357,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_reply_markup(chat_id=1, message_id=2, reply_markup={})
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -351,6 +380,7 @@ class EditsMixin(Requester):
         Telegram API: https://core.telegram.org/bots/api#editmessagereplymarkup
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,

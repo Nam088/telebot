@@ -109,7 +109,7 @@ func TestPaidMedia_SendLivePhoto(t *testing.T) {
 		DisableNotification:   true,
 		ProtectContent:        true,
 		MessageEffectID:       "5368323575420792074",
-		ReplyParameters:       &types.ReplyParameters{ChatID: 123456, MessageID: 7},
+		ReplyParameters:       &types.ReplyParameters{ChatID: 123456, MessageID: types.Ptr(int64(7))},
 		MessageThreadID:       3,
 		EphemeralMessageParameters: &types.EphemeralMessageParameters{
 			ReceiverUserID:              654321,

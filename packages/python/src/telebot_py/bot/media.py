@@ -14,6 +14,7 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.common import MessageEntity
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 
 
 class MediaMixin(Requester):
@@ -40,7 +41,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an audio file by ``file_id`` or HTTP URL.
@@ -64,7 +65,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -119,7 +121,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a video file by ``file_id`` or HTTP URL.
@@ -147,7 +149,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -204,7 +207,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an animation (GIF or H.264/MPEG-4 AVC without sound).
@@ -230,7 +233,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -281,7 +285,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an audio file for display as a voice message.
@@ -303,7 +307,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -348,7 +353,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a square video message (video note).
@@ -368,7 +373,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -407,7 +413,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
     ) -> list[Message]:
         """Send a group of photos, videos, documents or audios as one message.
 
@@ -424,7 +430,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
 
         Returns:
             The sent Messages (one per album item).
@@ -463,7 +470,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a point on the map.
@@ -488,7 +495,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -536,7 +544,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send information about a venue.
@@ -560,7 +568,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -606,7 +615,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a phone contact.
@@ -626,7 +635,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -676,7 +686,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a native poll.
@@ -705,7 +715,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -754,7 +765,7 @@ class MediaMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an animated emoji message with a random value (dice).
@@ -771,7 +782,8 @@ class MediaMixin(Requester):
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:

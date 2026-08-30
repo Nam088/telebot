@@ -35,14 +35,16 @@ type LinkPreviewOptions struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#replyparameters
 type ReplyParameters struct {
-	MessageID                int64           `json:"message_id"`
+	// Identifier of the original message; optional, so a quote-only reply that
+	// carries just chat_id/quote omits it instead of sending 0.
+	MessageID                *int64          `json:"message_id,omitempty"`
 	ChatID                   any             `json:"chat_id,omitempty"`
 	AllowSendingWithoutReply bool            `json:"allow_sending_without_reply,omitempty"`
 	Quote                    string          `json:"quote,omitempty"`
 	QuoteParseMode           string          `json:"quote_parse_mode,omitempty"`
 	QuoteEntities            []MessageEntity `json:"quote_entities,omitempty"`
 	QuotePosition            int             `json:"quote_position,omitempty"`
-	ChecklistItemID          int             `json:"checklist_item_id,omitempty"`
+	ChecklistTaskID          int             `json:"checklist_task_id,omitempty"`
 	PollOptionID             string          `json:"poll_option_id,omitempty"`
 	EphemeralMessageID       int             `json:"ephemeral_message_id,omitempty"`
 }

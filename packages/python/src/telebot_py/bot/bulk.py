@@ -18,6 +18,7 @@ class BulkMixin(Requester):
         message_ids: Sequence[int],
         *,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
     ) -> list[MessageId]:
@@ -33,6 +34,9 @@ class BulkMixin(Requester):
                 the source channel.
             message_ids: Identifiers of the messages to forward, 1-100.
             message_thread_id: Target message thread identifier.
+            direct_messages_topic_id: Unique identifier of the direct messages
+                topic to which the messages are forwarded, for a direct
+                messages chat.
             disable_notification: Send silently.
             protect_content: Protect the forwarded content from saving.
 
@@ -51,6 +55,7 @@ class BulkMixin(Requester):
             from_chat_id=from_chat_id,
             message_ids=list(message_ids),
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
         )
@@ -63,6 +68,7 @@ class BulkMixin(Requester):
         message_ids: Sequence[int],
         *,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         remove_caption: bool | None = None,
@@ -79,6 +85,9 @@ class BulkMixin(Requester):
                 the source channel.
             message_ids: Identifiers of the messages to copy, 1-100.
             message_thread_id: Target message thread identifier.
+            direct_messages_topic_id: Unique identifier of the direct messages
+                topic to which the messages are copied, for a direct messages
+                chat.
             disable_notification: Send silently.
             protect_content: Protect the copied content from saving.
             remove_caption: Pass True to copy messages without their captions.
@@ -98,6 +107,7 @@ class BulkMixin(Requester):
             from_chat_id=from_chat_id,
             message_ids=list(message_ids),
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
             remove_caption=remove_caption,

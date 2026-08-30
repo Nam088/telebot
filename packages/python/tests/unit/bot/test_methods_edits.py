@@ -289,3 +289,85 @@ class TestSendMessageDraft:
             "can_stop": True,
             "keep_on_stop": False,
         }
+
+
+class TestEditMethodsBusinessConnectionId:
+    """All six edit/stop methods accept business_connection_id (Bot API docs)."""
+
+    async def test_edit_message_text(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        assert await bot.edit_message_text(
+            "new text", inline_message_id="abc", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "text": "new text",
+        }
+
+    async def test_edit_message_caption(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_caption(
+            inline_message_id="abc", caption="new", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "caption": "new",
+        }
+
+    async def test_edit_message_media(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        media = {"type": "photo", "media": "photo_file_id"}
+        await bot.edit_message_media(media, inline_message_id="abc", business_connection_id="bc1")
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "media": media,
+            "inline_message_id": "abc",
+        }
+
+    async def test_edit_message_reply_markup(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_reply_markup(
+            inline_message_id="abc", reply_markup={}, business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "reply_markup": {},
+        }
+
+    async def test_edit_message_live_location(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_live_location(
+            37.5, -122.5, inline_message_id="abc", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "latitude": 37.5,
+            "longitude": -122.5,
+            "inline_message_id": "abc",
+        }
+
+    async def test_stop_message_live_location(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.stop_message_live_location(inline_message_id="abc", business_connection_id="bc1")
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        """Unset business_connection_id must not appear on the wire."""
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_text("new text", chat_id=1, message_id=2)
+        payload = sent_payload(seen[0])
+        assert "business_connection_id" not in payload
+        assert payload == {"text": "new text", "chat_id": 1, "message_id": 2}

@@ -1,5 +1,6 @@
 import type { ParseMode } from "../../constants.js";
-import type { MessageEntity, ReplyParameters } from "./core.js";
+import type { MessageEntity } from "./core.js";
+import type { ReplyParameters } from "./reply-context.js";
 import type { ReplyMarkup } from "./keyboards.js";
 
 /**

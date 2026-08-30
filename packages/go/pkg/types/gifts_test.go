@@ -151,3 +151,39 @@ func TestEditEphemeralMessageOptionsPayload(t *testing.T) {
 		}
 	}
 }
+
+// TestAcceptedGiftTypes_WireShape pins AcceptedGiftTypes to the five documented
+// required booleans (https://core.telegram.org/bots/api#acceptedgifttypes):
+// every key must serialize even when false, and the invented premium_gifts /
+// storable_gifts keys must never reach the wire.
+func TestAcceptedGiftTypes_WireShape(t *testing.T) {
+	out, err := json.Marshal(&types.SetBusinessAccountGiftSettingsOptions{
+		BusinessConnectionID: "bc1",
+		AcceptedGiftTypes:    types.AcceptedGiftTypes{UniqueGifts: true},
+	})
+	if err != nil {
+		t.Fatalf("marshal SetBusinessAccountGiftSettingsOptions: %v", err)
+	}
+	var generic map[string]any
+	if err := json.Unmarshal(out, &generic); err != nil {
+		t.Fatalf("unmarshal payload: %v", err)
+	}
+
+	typesObj, present := generic["accepted_gift_types"].(map[string]any)
+	if !present {
+		t.Fatalf("expected nested accepted_gift_types object in %s", out)
+	}
+	for _, key := range []string{"unlimited_gifts", "limited_gifts", "unique_gifts", "premium_subscription", "gifts_from_channels"} {
+		if _, present := typesObj[key]; !present {
+			t.Errorf("expected required wire key %q in %s", key, out)
+		}
+	}
+	if typesObj["unique_gifts"] != true {
+		t.Errorf("expected unique_gifts true in %s", out)
+	}
+	for _, key := range []string{"premium_gifts", "storable_gifts"} {
+		if _, present := typesObj[key]; present {
+			t.Errorf("expected undocumented key %q to be absent in %s", key, out)
+		}
+	}
+}

@@ -15,6 +15,7 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.common import MessageEntity, MessageId
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 
 
 class MessagesMixin(Requester):
@@ -32,7 +33,7 @@ class MessagesMixin(Requester):
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a text message to a chat.
@@ -56,8 +57,8 @@ class MessagesMixin(Requester):
             protect_content: Protect the message content from forwarding and
                 saving.
             message_effect_id: Unique identifier of the message effect to add.
-            reply_parameters: Description of the message to reply to, e.g.
-                ``{"message_id": 5}``.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Inline keyboard, custom reply keyboard,
                 remove-keyboard instruction, or force-reply instruction; a
                 plain dict or any object with ``to_dict``.
@@ -222,7 +223,7 @@ class MessagesMixin(Requester):
         caption_entities: Sequence[MessageEntity] | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> MessageId:
         """Copy a message of any kind without linking to the original.
@@ -240,7 +241,8 @@ class MessagesMixin(Requester):
             caption_entities: Special entities for the new caption.
             disable_notification: Send the copy silently.
             protect_content: Protect the copied content.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the copied message; dict or ``to_dict``
                 object.
 
@@ -280,7 +282,7 @@ class MessagesMixin(Requester):
         parse_mode: str | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a photo by ``file_id`` or HTTP URL (file uploads are out of scope).
@@ -295,7 +297,8 @@ class MessagesMixin(Requester):
             parse_mode: Parse mode for the caption.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
@@ -329,7 +332,7 @@ class MessagesMixin(Requester):
         parse_mode: str | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a general file by ``file_id`` or HTTP URL (file uploads are out of scope).
@@ -344,7 +347,8 @@ class MessagesMixin(Requester):
             parse_mode: Parse mode for the caption.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Markup for the message; dict or ``to_dict`` object.
 
         Returns:
