@@ -108,7 +108,6 @@
           "file": "packages/node/src/client/methods/messages/send-basic.ts",
           "required": [],
           "optional": [
-            "business_connection_id",
             "question_parse_mode",
             "question_entities",
             "allows_revoting",
@@ -121,8 +120,7 @@
             "description",
             "description_parse_mode",
             "description_entities",
-            "media",
-            "allow_paid_broadcast"
+            "media"
           ],
           "total": 34,
           "absent": false
@@ -132,12 +130,8 @@
           "file": "packages/node/src/client/methods/messages/send-basic.ts",
           "required": [],
           "optional": [
-            "direct_messages_topic_id",
             "video_start_timestamp",
             "show_caption_above_media",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters",
             "reply_parameters"
           ],
           "total": 17,
@@ -148,12 +142,8 @@
           "file": "packages/node/src/client/methods/messages/send-media.ts",
           "required": [],
           "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
             "cover",
-            "start_timestamp",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
+            "start_timestamp"
           ],
           "total": 25,
           "absent": false
@@ -163,224 +153,9 @@
           "file": "packages/node/src/client/methods/messages/send-basic.ts",
           "required": [],
           "optional": [
-            "direct_messages_topic_id",
-            "video_start_timestamp",
-            "message_effect_id",
-            "suggested_post_parameters"
+            "video_start_timestamp"
           ],
           "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendAnimation",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 22,
-          "absent": false
-        },
-        {
-          "name": "sendAudio",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 20,
-          "absent": false
-        },
-        {
-          "name": "sendContact",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "sendDice",
-          "file": "packages/node/src/client/methods/messages/edit.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 12,
-          "absent": false
-        },
-        {
-          "name": "sendDocument",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
-          "name": "sendInvoice",
-          "file": "packages/node/src/client/methods/payments.ts",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "suggested_post_parameters"
-          ],
-          "total": 31,
-          "absent": false
-        },
-        {
-          "name": "sendLocation",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
-          "name": "sendMessage",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "sendPhoto",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
-          "name": "sendVenue",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 20,
-          "absent": false
-        },
-        {
-          "name": "sendVideoNote",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 16,
-          "absent": false
-        },
-        {
-          "name": "sendVoice",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 17,
-          "absent": false
-        },
-        {
-          "name": "sendGame",
-          "file": "packages/node/src/client/methods/business/games-passport.ts",
-          "required": [],
-          "optional": [
-            "allow_paid_broadcast",
-            "message_effect_id",
-            "reply_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendMediaGroup",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id",
-            "direct_messages_topic_id",
-            "allow_paid_broadcast"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "sendSticker",
-          "file": "packages/node/src/client/methods/stickers.ts",
-          "required": [],
-          "optional": [
-            "direct_messages_topic_id",
-            "allow_paid_broadcast",
-            "suggested_post_parameters"
-          ],
-          "total": 14,
-          "absent": false
-        },
-        {
-          "name": "editMessageCaption",
-          "file": "packages/node/src/client/methods/messages/edit.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 9,
-          "absent": false
-        },
-        {
-          "name": "editMessageReplyMarkup",
-          "file": "packages/node/src/client/methods/messages/edit.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 5,
           "absent": false
         },
         {
@@ -394,23 +169,13 @@
           "absent": false
         },
         {
-          "name": "pinChatMessage",
-          "file": "packages/node/src/client/methods/chats/management.ts",
+          "name": "sendGame",
+          "file": "packages/node/src/client/methods/business/games-passport.ts",
           "required": [],
           "optional": [
-            "business_connection_id"
+            "reply_parameters"
           ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "unpinChatMessage",
-          "file": "packages/node/src/client/methods/chats/management.ts",
-          "required": [],
-          "optional": [
-            "business_connection_id"
-          ],
-          "total": 3,
+          "total": 10,
           "absent": false
         }
       ],
@@ -419,9 +184,9 @@
         "editStory",
         "getUserGifts"
       ],
-      "methodsWithMissing": 24,
+      "methodsWithMissing": 6,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 94
+      "missingMethodOptional": 21
     },
     {
       "key": "go",
