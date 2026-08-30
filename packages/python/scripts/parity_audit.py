@@ -49,6 +49,89 @@ GO_INFRA = frozenset(
     {"token", "on_response", "on_error", "request", "run_webhook", "webhook_handler"}
 )
 
+#: Shared reason for node-only methods that Go has not implemented yet;
+#: telebot_py tracks Go parity, so these are deferred to a future
+#: cross-language parity pass rather than implemented python-first.
+NODE_ONLY_GAP_REASON = (
+    "node-only method (not yet implemented in Go); telebot_py tracks Go parity"
+    " — deferred to a future cross-language parity pass"
+)
+
+_NODE_ONLY_DEFERRED = frozenset(
+    {
+        "answer_chat_join_request_query",
+        "answer_guest_query",
+        "approve_suggested_post",
+        "close_general_forum_topic",
+        "convert_gift_to_stars",
+        "create_chat_subscription_invite_link",
+        "decline_suggested_post",
+        "delete_business_messages",
+        "delete_chat_sticker_set",
+        "delete_ephemeral_message",
+        "delete_forum_topic",
+        "delete_story",
+        "edit_chat_subscription_invite_link",
+        "edit_ephemeral_message_caption",
+        "edit_ephemeral_message_media",
+        "edit_ephemeral_message_reply_markup",
+        "edit_ephemeral_message_text",
+        "edit_forum_topic",
+        "edit_general_forum_topic",
+        "edit_message_checklist",
+        "edit_story",
+        "get_available_gifts",
+        "get_business_account_gifts",
+        "get_business_account_star_balance",
+        "get_business_connection",
+        "get_chat_gifts",
+        "get_managed_bot_access_settings",
+        "get_managed_bot_token",
+        "get_my_star_balance",
+        "get_user_chat_boosts",
+        "get_user_gifts",
+        "get_user_personal_chat_messages",
+        "get_user_profile_audios",
+        "gift_premium_subscription",
+        "hide_general_forum_topic",
+        "read_business_message",
+        "remove_business_account_profile_photo",
+        "remove_chat_verification",
+        "remove_my_profile_photo",
+        "remove_user_verification",
+        "reopen_forum_topic",
+        "reopen_general_forum_topic",
+        "replace_managed_bot_token",
+        "repost_story",
+        "save_prepared_keyboard_button",
+        "send_chat_join_request_web_app",
+        "send_checklist",
+        "send_gift",
+        "send_live_photo",
+        "send_message_draft",
+        "send_paid_media",
+        "send_rich_message",
+        "send_rich_message_draft",
+        "set_business_account_bio",
+        "set_business_account_gift_settings",
+        "set_business_account_name",
+        "set_business_account_username",
+        "set_chat_member_tag",
+        "set_chat_sticker_set",
+        "set_managed_bot_access_settings",
+        "set_passport_data_errors",
+        "set_user_emoji_status",
+        "transfer_business_account_stars",
+        "transfer_gift",
+        "unhide_general_forum_topic",
+        "unpin_all_forum_topic_messages",
+        "unpin_all_general_forum_topic_messages",
+        "upgrade_gift",
+        "verify_chat",
+        "verify_user",
+    }
+)
+
 #: Intentional parity gaps: node/go methods deliberately absent from python.
 #: Every entry must carry a reason; stale entries are flagged as errors.
 ALLOWLIST: dict[str, str] = {
@@ -61,6 +144,7 @@ ALLOWLIST: dict[str, str] = {
     "set_business_account_profile_photo": (
         "multipart-upload-only method; file uploads deferred for this phase"
     ),
+    **dict.fromkeys(_NODE_ONLY_DEFERRED, NODE_ONLY_GAP_REASON),
 }
 
 NODE_METHOD_RE = re.compile(r"public async (\w+)\(")
