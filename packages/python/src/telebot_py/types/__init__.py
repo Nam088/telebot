@@ -219,7 +219,7 @@ from telebot_py.types.payments import (
     StarTransactions,
     SuccessfulPayment,
 )
-from telebot_py.types.poll_types import Link, Poll, PollMedia, PollOption
+from telebot_py.types.poll_types import InputPollOption, Link, Poll, PollMedia, PollOption
 from telebot_py.types.reactions import (
     MessageReactionCountUpdated,
     MessageReactionUpdated,
@@ -370,6 +370,7 @@ __all__ = [
     "InputMediaVoiceNote",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
+    "InputPollOption",
     "InputSticker",
     "InputStoryContentPhoto",
     "InputStoryContentVideo",

@@ -8,7 +8,7 @@ import httpx
 import pytest
 
 from telebot_py.bot.errors import TelegramApiError
-from telebot_py.types import Message
+from telebot_py.types import InputMediaPhoto, InputPollOption, Message, MessageEntity
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 
@@ -271,13 +271,23 @@ class TestSendPoll:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(make_message(message_id=9, text=None)), seen)
         bot = make_bot(bot_transport, step)
-        message = await bot.send_poll(123, "Q?", ["A", "B"])
+        message = await bot.send_poll(123, "Q?", [InputPollOption("A"), InputPollOption("B")])
         assert isinstance(message, Message)
         assert message.message_id == 9
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/sendPoll"
         payload = sent_payload(seen[0])
-        assert payload == {"chat_id": 123, "question": "Q?", "options": ["A", "B"]}
+        assert payload == {
+            "chat_id": 123,
+            "question": "Q?",
+            "options": [{"text": "A"}, {"text": "B"}],
+        }
         assert "is_anonymous" not in payload
+        assert "question_parse_mode" not in payload
+        assert "allows_revoting" not in payload
+        assert "country_codes" not in payload
+        assert "description" not in payload
+        assert "explanation_media" not in payload
+        assert "media" not in payload
 
     async def test_sends_quiz_correct_option_ids_as_array(
         self,
@@ -288,11 +298,93 @@ class TestSendPoll:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(make_message(message_id=9, text=None)), seen)
         bot = make_bot(bot_transport, step)
-        await bot.send_poll(123, "Q?", ["A", "B", "C"], type="quiz", correct_option_ids=[0, 2])
+        await bot.send_poll(
+            123,
+            "Q?",
+            [InputPollOption("A"), InputPollOption("B"), InputPollOption("C")],
+            type="quiz",
+            correct_option_ids=[0, 2],
+        )
         payload = sent_payload(seen[0])
         assert payload["type"] == "quiz"
         assert payload["correct_option_ids"] == [0, 2]
         assert "correct_option_id" not in payload
+
+    async def test_serializes_input_poll_option_fields(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(message_id=9, text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_poll(
+            123,
+            "Q?",
+            [
+                InputPollOption("A", text_parse_mode="HTML"),
+                InputPollOption(
+                    "B",
+                    text_entities=[MessageEntity(type="bold", offset=0, length=1)],
+                    media=InputMediaPhoto("option_photo"),
+                ),
+            ],
+        )
+        assert sent_payload(seen[0])["options"] == [
+            {"text": "A", "text_parse_mode": "HTML"},
+            {
+                "text": "B",
+                "text_entities": [{"type": "bold", "offset": 0, "length": 1}],
+                "media": {"type": "photo", "media": "option_photo"},
+            },
+        ]
+
+    async def test_serializes_question_description_and_media_kwargs(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(message_id=9, text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        entity = MessageEntity(type="italic", offset=2, length=3)
+        await bot.send_poll(
+            123,
+            "Q?",
+            [InputPollOption("A"), InputPollOption("B")],
+            question_parse_mode="HTML",
+            question_entities=[entity],
+            allows_revoting=True,
+            shuffle_options=True,
+            allow_adding_options=True,
+            hide_results_until_closes=True,
+            members_only=True,
+            country_codes=["US", "DE"],
+            explanation_media=InputMediaPhoto("explanation_photo"),
+            description="Rules",
+            description_parse_mode="MarkdownV2",
+            description_entities=[entity],
+            media={"type": "video", "media": "poll_video"},
+        )
+        payload = sent_payload(seen[0])
+        assert payload["question_parse_mode"] == "HTML"
+        assert payload["question_entities"] == [{"type": "italic", "offset": 2, "length": 3}]
+        assert payload["allows_revoting"] is True
+        assert payload["shuffle_options"] is True
+        assert payload["allow_adding_options"] is True
+        assert payload["hide_results_until_closes"] is True
+        assert payload["members_only"] is True
+        assert payload["country_codes"] == ["US", "DE"]
+        assert payload["explanation_media"] == {
+            "type": "photo",
+            "media": "explanation_photo",
+        }
+        assert payload["description"] == "Rules"
+        assert payload["description_parse_mode"] == "MarkdownV2"
+        assert payload["description_entities"] == [{"type": "italic", "offset": 2, "length": 3}]
+        assert payload["media"] == {"type": "video", "media": "poll_video"}
 
 
 class TestSendDice:
@@ -349,3 +441,95 @@ class TestSendPhotoAndDocument:
             "document": "doc_file_id",
             "caption": "report",
         }
+
+    async def test_send_photo_serializes_media_kwargs(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_photo(
+            123,
+            "photo_file_id",
+            message_thread_id=7,
+            caption_entities=[MessageEntity(type="italic", offset=0, length=2)],
+            show_caption_above_media=True,
+            has_spoiler=True,
+        )
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "photo": "photo_file_id",
+            "message_thread_id": 7,
+            "caption_entities": [{"type": "italic", "offset": 0, "length": 2}],
+            "show_caption_above_media": True,
+            "has_spoiler": True,
+        }
+
+    async def test_send_photo_omits_unset_media_kwargs(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_photo(123, "photo_file_id")
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": 123, "photo": "photo_file_id"}
+        for key in (
+            "message_thread_id",
+            "caption_entities",
+            "show_caption_above_media",
+            "has_spoiler",
+        ):
+            assert key not in payload
+
+    async def test_send_document_serializes_file_kwargs(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_document(
+            123,
+            "doc_file_id",
+            message_thread_id=7,
+            thumbnail="thumb_file_id",
+            caption_entities=[MessageEntity(type="italic", offset=0, length=2)],
+            disable_content_type_detection=True,
+        )
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "document": "doc_file_id",
+            "message_thread_id": 7,
+            "thumbnail": "thumb_file_id",
+            "caption_entities": [{"type": "italic", "offset": 0, "length": 2}],
+            "disable_content_type_detection": True,
+        }
+
+    async def test_send_document_omits_unset_file_kwargs(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_document(123, "doc_file_id")
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": 123, "document": "doc_file_id"}
+        for key in (
+            "message_thread_id",
+            "thumbnail",
+            "caption_entities",
+            "disable_content_type_detection",
+        ):
+            assert key not in payload

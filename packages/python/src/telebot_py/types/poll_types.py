@@ -1,7 +1,8 @@
 """Poll and link payload objects.
 
-The docs ``Poll``, ``PollOption``, ``PollMedia`` and ``Link`` types live here
-rather than in :mod:`telebot_py.types.common` because ``PollOption.added_by_chat``
+The docs ``Poll``, ``PollOption``, ``PollMedia``, ``Link`` and
+``InputPollOption`` types live here rather than in
+:mod:`telebot_py.types.common` because ``PollOption.added_by_chat``
 references :class:`~telebot_py.types.chat.Chat`, which itself imports from
 ``common``.
 """
@@ -13,6 +14,7 @@ import dataclasses
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.chat import Chat
 from telebot_py.types.common import Location, MessageEntity, Venue
+from telebot_py.types.input_media import InputMediaLike
 from telebot_py.types.media import (
     Animation,
     Audio,
@@ -164,3 +166,25 @@ class Poll(TelegramObject):
     description_entities: list[MessageEntity] | None = None
     media: PollMedia | None = None
     correct_option_id: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class InputPollOption(TelegramObject):
+    """An option of a poll to send via ``sendPoll``.
+
+    Attributes:
+        text: Option text, 1-100 characters.
+        text_parse_mode: Mode for parsing entities in the option text.
+        text_entities: Special entities that appear in the option text; up to
+            50 entities.
+        media: Media to show when the option is chosen. The docs model
+            ``InputPollOptionMedia`` as an abstract union, so any input media
+            variant (typed object or raw mapping) is accepted here.
+
+    Telegram API: https://core.telegram.org/bots/api#inputpolloption
+    """
+
+    text: str
+    text_parse_mode: str | None = None
+    text_entities: list[MessageEntity] | None = None
+    media: InputMediaLike | None = None
