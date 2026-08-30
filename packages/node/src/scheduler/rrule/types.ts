@@ -98,8 +98,6 @@ export interface RRuleOptions {
   wkst?: RRuleWeekday;
 }
 
-const WEEKDAY_INTL_TO_CODE: string[] = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-
 /**
  * Zero-dependency RFC 5545 Recurrence Rule parser and next-date iterator.
  *

@@ -6,7 +6,6 @@
 
 import type { Update } from "../../kernel/update.js";
 import type { CallbackContext } from "../../kernel/context.js";
-import type { Message, CallbackQuery } from "../../client/types.js";
 import type { BaseFilter } from "../../filters/base.js";
 import type { AsyncConversation } from "./conversation.js";
 

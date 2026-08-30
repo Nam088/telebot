@@ -4,13 +4,7 @@
  * @packageDocumentation
  */
 
-import type {
-  ReplyKeyboardMarkup,
-  ReplyKeyboardRemove,
-  ForceReply,
-  KeyboardButton,
-  WebAppInfo,
-} from "../../client/types.js";
+import type { ReplyKeyboardMarkup, KeyboardButton } from "../../client/types.js";
 
 /**
  * Configuration options for {@link ReplyKeyboard}.

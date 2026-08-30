@@ -16,8 +16,6 @@ import type {
   SendVenueOptions,
   SendContactOptions,
   SendPollOptions,
-  SendDiceOptions,
-  SendChatActionOptions,
   PreparedInlineMessage,
   SavePreparedInlineMessageOptions,
   ForwardMessagesOptions,

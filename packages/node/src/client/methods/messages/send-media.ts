@@ -5,7 +5,6 @@
  */
 
 import { BaseBotClient } from "../base.js";
-import type { ParseMode } from "../../constants.js";
 import type {
   Message,
   SendPhotoOptions,

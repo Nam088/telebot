@@ -6,7 +6,6 @@
 
 import { MessageMethods } from "../messages/index.js";
 import type {
-  ChatMember,
   ChatPermissions,
   ChatInviteLink,
   PromoteChatMemberOptions,
