@@ -14,8 +14,8 @@
     {
       "key": "node",
       "label": "TypeScript interfaces",
-      "declared": 410,
-      "modelled": 287,
+      "declared": 413,
+      "modelled": 288,
       "unmodelled": [
         "BotAccessSettings",
         "BotCommandScopeAllChatAdministrators",
@@ -64,7 +64,6 @@
         "InputPaidMediaLivePhoto",
         "InputPaidMediaPhoto",
         "InputPaidMediaVideo",
-        "InputPollOption",
         "InputProfilePhotoAnimated",
         "InputProfilePhotoStatic",
         "InputTextMessageContent",
@@ -103,28 +102,6 @@
       "missingOptional": 0,
       "documentMethods": 185,
       "methodRows": [
-        {
-          "name": "sendPoll",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "question_parse_mode",
-            "question_entities",
-            "allows_revoting",
-            "shuffle_options",
-            "allow_adding_options",
-            "hide_results_until_closes",
-            "members_only",
-            "country_codes",
-            "explanation_media",
-            "description",
-            "description_parse_mode",
-            "description_entities",
-            "media"
-          ],
-          "total": 34,
-          "absent": false
-        },
         {
           "name": "copyMessage",
           "file": "packages/node/src/client/methods/messages/send-basic.ts",
@@ -179,19 +156,15 @@
           "absent": false
         }
       ],
-      "methodsUnresolved": [
-        "editChatSubscriptionInviteLink",
-        "editStory",
-        "getUserGifts"
-      ],
-      "methodsWithMissing": 6,
+      "methodsUnresolved": [],
+      "methodsWithMissing": 5,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 21
+      "missingMethodOptional": 8
     },
     {
       "key": "go",
       "label": "Go structs",
-      "declared": 452,
+      "declared": 455,
       "modelled": 301,
       "unmodelled": [
         "BackgroundFillFreeformGradient",
@@ -269,47 +242,6 @@
       "documentMethods": 185,
       "methodRows": [
         {
-          "name": "sendPoll",
-          "file": "packages/go/pkg/bot/media.go",
-          "required": [],
-          "optional": [
-            "question_parse_mode",
-            "question_entities",
-            "allows_revoting",
-            "shuffle_options",
-            "allow_adding_options",
-            "hide_results_until_closes",
-            "members_only",
-            "country_codes",
-            "explanation_media",
-            "description",
-            "description_parse_mode",
-            "description_entities",
-            "media"
-          ],
-          "total": 34,
-          "absent": false
-        },
-        {
-          "name": "copyMessage",
-          "file": "packages/go/pkg/bot/messages.go",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "video_start_timestamp",
-            "caption",
-            "parse_mode",
-            "caption_entities",
-            "show_caption_above_media",
-            "disable_notification",
-            "protect_content",
-            "reply_parameters",
-            "reply_markup"
-          ],
-          "total": 17,
-          "absent": false
-        },
-        {
           "name": "getBusinessAccountGifts",
           "file": "packages/go/pkg/bot/business.go",
           "required": [],
@@ -348,24 +280,6 @@
           "absent": false
         },
         {
-          "name": "sendDocument",
-          "file": "packages/go/pkg/bot/messages.go",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "thumbnail",
-            "parse_mode",
-            "caption_entities",
-            "disable_content_type_detection",
-            "disable_notification",
-            "protect_content",
-            "reply_parameters",
-            "reply_markup"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
           "name": "getUserGifts",
           "file": "packages/go/pkg/bot/gifts.go",
           "required": [],
@@ -380,23 +294,6 @@
             "limit"
           ],
           "total": 9,
-          "absent": false
-        },
-        {
-          "name": "sendPhoto",
-          "file": "packages/go/pkg/bot/messages.go",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "parse_mode",
-            "caption_entities",
-            "show_caption_above_media",
-            "has_spoiler",
-            "disable_notification",
-            "protect_content",
-            "reply_parameters"
-          ],
-          "total": 18,
           "absent": false
         },
         {
@@ -522,15 +419,15 @@
         }
       ],
       "methodsUnresolved": [],
-      "methodsWithMissing": 18,
+      "methodsWithMissing": 14,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 90
+      "missingMethodOptional": 50
     },
     {
       "key": "python",
       "label": "Python dataclasses",
-      "declared": 310,
-      "modelled": 298,
+      "declared": 311,
+      "modelled": 299,
       "unmodelled": [
         "BotCommandScopeAllChatAdministrators",
         "BotCommandScopeAllGroupChats",
@@ -574,7 +471,6 @@
         "InputMediaSticker",
         "InputMediaVenue",
         "InputPaidMediaLivePhoto",
-        "InputPollOption",
         "InputProfilePhotoAnimated",
         "InputProfilePhotoStatic",
         "InputTextMessageContent",
@@ -607,54 +503,6 @@
       "missingOptional": 0,
       "documentMethods": 185,
       "methodRows": [
-        {
-          "name": "sendPoll",
-          "file": "packages/python/src/telebot_py/bot/polls.py",
-          "required": [],
-          "optional": [
-            "question_parse_mode",
-            "question_entities",
-            "allows_revoting",
-            "shuffle_options",
-            "allow_adding_options",
-            "hide_results_until_closes",
-            "members_only",
-            "country_codes",
-            "explanation_media",
-            "description",
-            "description_parse_mode",
-            "description_entities",
-            "media"
-          ],
-          "total": 34,
-          "absent": false
-        },
-        {
-          "name": "sendDocument",
-          "file": "packages/python/src/telebot_py/bot/attachments.py",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "thumbnail",
-            "caption_entities",
-            "disable_content_type_detection"
-          ],
-          "total": 18,
-          "absent": false
-        },
-        {
-          "name": "sendPhoto",
-          "file": "packages/python/src/telebot_py/bot/attachments.py",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "caption_entities",
-            "show_caption_above_media",
-            "has_spoiler"
-          ],
-          "total": 18,
-          "absent": false
-        },
         {
           "name": "copyMessage",
           "file": "packages/python/src/telebot_py/bot/messages.py",
@@ -730,9 +578,9 @@
         }
       ],
       "methodsUnresolved": [],
-      "methodsWithMissing": 10,
+      "methodsWithMissing": 7,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 31
+      "missingMethodOptional": 10
     }
   ]
 }
