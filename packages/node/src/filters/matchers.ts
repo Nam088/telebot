@@ -267,7 +267,7 @@ const CASHTAG = createEntityFilter("cashtag");
  *
  * @example
  * ```ts
- * import { filters, MessageHandler } from "telegram-bot-node";
+ * import { filters, MessageHandler } from "telebot-ts";
  *
  * // Matches non-command text messages in private chats
  * const privateText = new MessageHandler(

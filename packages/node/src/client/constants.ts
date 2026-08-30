@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { ParseMode } from "telegram-bot-node";
+ * import { ParseMode } from "telebot-ts";
  *
  * await bot.sendMessage({
  *   chat_id: 123456,
@@ -54,7 +54,7 @@ export type ChatType = (typeof ChatType)[keyof typeof ChatType];
  *
  * @example
  * ```ts
- * import { ChatAction } from "telegram-bot-node";
+ * import { ChatAction } from "telebot-ts";
  *
  * await bot.sendChatAction({
  *   chat_id: 123456,

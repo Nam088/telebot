@@ -2,7 +2,7 @@
 
 **Feature**: `specs/004-python-framework` | **Date**: 2026-08-30
 
-Runnable scenarios proving the framework works end-to-end. Prerequisites for all: Python ≥ 3.10, repo root at `telegram-bot-node/`. See [contracts/public-api.md](contracts/public-api.md) for the API surface and [data-model.md](data-model.md) for entities.
+Runnable scenarios proving the framework works end-to-end. Prerequisites for all: Python ≥ 3.10, run from the repo root. See [contracts/public-api.md](contracts/public-api.md) for the API surface and [data-model.md](data-model.md) for entities.
 
 ## 0. Developer setup
 

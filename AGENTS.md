@@ -78,11 +78,11 @@ Before writing code against a library not already decided in `technical-context.
 
 ## Versioning & release parity (node = go = python)
 
-All three frameworks share ONE version number (currently `1.4.0`):
+All three frameworks share ONE version number (currently `1.5.0`):
 
 - **Node** — `packages/node/package.json`, published to npm as `telebot-ts` by semantic-release on pushes to `main`; tags are `vX.Y.Z`.
 - **Go** — no embedded version; tags `packages/go/vX.Y.Z` are mirrored by `.github/workflows/release-pipeline.yml` with the same version as the node release (GitHub Releases only).
-- **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py`; tags `packages/python/vX.Y.Z` are mirrored the same way and `python-release.yml` stamps the tag version into the package before building.
+- **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py`; tags `packages/python/vX.Y.Z` are mirrored the same way and `python-release.yml` stamps the tag version into the package before building. PyPI publishing uses trusted publishing (OIDC): the release job must declare `environment: pypi`, matching the Environment name registered in the PyPI trusted publisher.
 
 Rules: never bump one package without the others; never hand-push `packages/go/v*` or `packages/python/v*` tags ahead of the node release line; keep conventional-commit scopes per package (`feat(py)`, `fix(go)`, ...) so git-cliff release notes stay correct. Per-package details live in the `telebot-{node,go,python}-conventions` skills.
 

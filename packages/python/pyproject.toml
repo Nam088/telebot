@@ -41,10 +41,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Nam088/telegram-bot-node"
-Repository = "https://github.com/Nam088/telegram-bot-node"
-Issues = "https://github.com/Nam088/telegram-bot-node/issues"
-Changelog = "https://github.com/Nam088/telegram-bot-node/releases"
+Homepage = "https://github.com/Nam088/telebot"
+Repository = "https://github.com/Nam088/telebot"
+Issues = "https://github.com/Nam088/telebot/issues"
+Changelog = "https://github.com/Nam088/telebot/releases"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/telebot_py"]

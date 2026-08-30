@@ -16,7 +16,7 @@ export type { Persistence, PersistedJob };
  *
  * @example
  * ```ts
- * import { ApplicationBuilder, MemoryPersistence } from "telegram-bot-node";
+ * import { ApplicationBuilder, MemoryPersistence } from "telebot-ts";
  *
  * const app = new ApplicationBuilder()
  *   .token("BOT_TOKEN")

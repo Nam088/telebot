@@ -112,11 +112,11 @@ Every major feature keeps a runnable example in `packages/python/examples/` (ech
 
 ## 11. Versioning & Release Parity (node = go = python)
 
-All three frameworks share ONE version number (currently `1.4.0`):
+All three frameworks share ONE version number (currently `1.5.0`):
 
 - `packages/node/package.json` → npm (`telebot-ts`), released by semantic-release on pushes to `main`; node tags are `vX.Y.Z`.
 - `packages/go` → GitHub Releases only; tags `packages/go/vX.Y.Z` are mirrored by `.github/workflows/release-pipeline.yml` with the same version.
-- `packages/python/pyproject.toml` + `src/telebot_py/__init__.py` (`__version__`) → PyPI (`telebot-py`); tags `packages/python/vX.Y.Z` are mirrored the same way, and `python-release.yml` is dispatched at the mirrored tag to build, create the GitHub Release, and publish to PyPI via trusted publishing (OIDC).
+- `packages/python/pyproject.toml` + `src/telebot_py/__init__.py` (`__version__`) → PyPI (`telebot-py`); tags `packages/python/vX.Y.Z` are mirrored the same way, and `python-release.yml` is dispatched at the mirrored tag to build, create the GitHub Release, and publish to PyPI via trusted publishing (OIDC). The release job must declare `environment: pypi`, matching the Environment name registered in the PyPI trusted publisher — a missing/mismatched environment claim makes PyPI reject the publish with `invalid-publisher`.
 
 Rules:
 

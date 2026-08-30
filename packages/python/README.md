@@ -2,11 +2,9 @@
 
 > Async-first Telegram Bot Framework for Python, mirroring [python-telegram-bot](https://python-telegram-bot.org)'s public API.
 
-<!-- Badges: activate once the package is published and CI workflows are live.
 [![PyPI version](https://img.shields.io/pypi/v/telebot-py)](https://pypi.org/project/telebot-py/)
 [![Python](https://img.shields.io/pypi/pyversions/telebot-py)](https://pypi.org/project/telebot-py/)
-[![CI](https://github.com/Nam088/telegram-bot-node/actions/workflows/ci.yml/badge.svg)](https://github.com/Nam088/telegram-bot-node/actions/workflows/ci.yml)
--->
+[![CI](https://github.com/Nam088/telebot/actions/workflows/ci.yml/badge.svg)](https://github.com/Nam088/telebot/actions/workflows/ci.yml)
 
 `telebot-py` is the third language implementation of this repository's Telegram bot
 framework, alongside [`telebot-ts`](../node) (TypeScript) and
@@ -72,8 +70,8 @@ app.run_polling()
 Full API reference (kernel, bot, routing, filters, scheduler, storage, plugins,
 components, types) lives in [`docs/`](docs/) and is generated with Sphinx from
 the in-source docstrings. The published site is served by GitHub Pages at
-`https://nam088.github.io/telegram-bot-node/python/` (see the combined
-[docs site](https://nam088.github.io/telegram-bot-node/)).
+`https://nam088.github.io/telebot/python/` (see the combined
+[docs site](https://nam088.github.io/telebot/)).
 
 Build the docs locally (requires the `[dev]` extra):
 
