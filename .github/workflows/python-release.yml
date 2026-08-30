@@ -19,6 +19,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Must match the Environment name registered in the PyPI trusted
+    # publisher for telebot-py.
+    environment: pypi
     permissions:
       contents: write
       # Required by pypa/gh-action-pypi-publish for trusted publishing.
