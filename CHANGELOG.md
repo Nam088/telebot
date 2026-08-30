@@ -2,6 +2,18 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.5.0](https://github.com/Nam088/telebot/compare/v1.4.0...v1.5.0) (2026-08-30)
+
+
+### Bug Fixes
+
+* **ci:** restore parity allowlist and exempt python package from Prettier ([47f628f](https://github.com/Nam088/telebot/commit/47f628f4ce877f661f028e5ce51c6dc12208313e))
+
+
+### Features
+
+* **py:** add Python implementation of the Telegram bot framework (004) ([2606ec3](https://github.com/Nam088/telebot/commit/2606ec3dd5d62d59df192be92e70617dad4d83bb))
+
 # [1.4.0](https://github.com/Nam088/telebot/compare/v1.3.1...v1.4.0) (2026-08-29)
 
 
