@@ -22,6 +22,7 @@ import {
   heritageNames,
   main,
   maskCommentsAndStrings,
+  renderMarkdown,
   renderTable,
 } from './bot-api-fidelity.mjs';
 
@@ -489,4 +490,83 @@ test('compareBaseline refuses to let a package slip out of the baseline', () => 
   );
   assert.deepEqual(verdict.unbaselined, ['python']);
   assert.equal(verdict.regressions, 1, 'uncovered surface must fail the gate');
+});
+
+/** One full-shaped report for the markdown renderer tests. */
+const mdReport = (overrides = {}) => ({
+  key: 'node',
+  label: 'TypeScript interfaces',
+  declared: 410,
+  modelled: 287,
+  unmodelled: ['A', 'B'],
+  rows: [
+    {
+      name: 'Thing',
+      file: 'packages/node/src/thing.ts',
+      required: ['legacy_field'],
+      optional: [],
+      total: 3,
+      declarations: 1,
+    },
+  ],
+  ambiguous: [],
+  typesWithMissing: 1,
+  missingRequired: 1,
+  missingOptional: 0,
+  ...overrides,
+});
+
+test('renderMarkdown tabulates each package and folds the long lists away', () => {
+  const md = renderMarkdown([mdReport()], { oracleVersion: '10.3' });
+  assert.match(
+    md,
+    /\| package \| declared \| modelled \| missing REQUIRED \| missing optional \| unmodelled \|/,
+  );
+  assert.match(md, /\| node \| 410 \| 287 \| 1 \| 0 \| 2 \|/);
+  assert.match(md, /<details>/, 'the unmodelled list must not flood the summary');
+  assert.ok(md.includes('A, B'), 'but the names are still there, collapsed');
+});
+
+test('renderMarkdown shows only drift once a baseline verdict exists', () => {
+  const baseline = baselineOf([
+    reportOf('node', [{ name: 'Thing', file: 'x', required: ['legacy_field'], optional: [] }], []),
+  ]);
+  const current = [
+    mdReport({
+      rows: [
+        {
+          name: 'Thing',
+          file: 'packages/node/src/thing.ts',
+          required: ['legacy_field', 'fresh_field'],
+          optional: [],
+          total: 4,
+          declarations: 1,
+        },
+      ],
+    }),
+  ];
+  const md = renderMarkdown(current, {
+    verdict: compareBaseline(current, baseline),
+    oracleVersion: '10.3',
+  });
+  assert.match(md, /Thing/);
+  assert.match(md, /fresh_field/, 'the field that only just went missing is named');
+  assert.match(md, /packages\/node\/src\/thing\.ts/, 'with the file to fix');
+  assert.doesNotMatch(md, /legacy_field/, 'what the baseline already tolerated is not re-listed');
+});
+
+test('renderMarkdown states a drift-free tree in one line', () => {
+  const current = [mdReport()];
+  const baseline = baselineOf([
+    reportOf(
+      'node',
+      [{ name: 'Thing', file: 'x', required: ['legacy_field'], optional: [] }],
+      ['A', 'B'],
+    ),
+  ]);
+  const md = renderMarkdown(current, {
+    verdict: compareBaseline(current, baseline),
+    oracleVersion: '10.3',
+  });
+  assert.match(md, /no drift versus the baseline/i);
 });

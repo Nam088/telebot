@@ -623,6 +623,106 @@ export function compareBaseline(reports, baseline) {
 }
 
 /**
+ * Renders the audit as a GitHub-flavoured markdown document, for a job summary
+ * or a PR comment. Takes the same report objects the console prints — it never
+ * re-measures anything, so the prose cannot disagree with the gate.
+ *
+ * @param {object[]} reports Per-package audit results.
+ * @param {{oracleVersion?: string, baselineVersion?: string|null, verdict?: object|null}} [options]
+ *   `verdict` is a `compareBaseline` result; without one the full gap list is
+ *   shown, because there is no reference point to filter against.
+ * @returns {string} Markdown document.
+ */
+export function renderMarkdown(reports, options = {}) {
+  const { oracleVersion = 'unknown', baselineVersion = null, verdict = null } = options;
+  const lines = ['## Bot API field fidelity', ''];
+  lines.push(`Declared types vs the [official Bot API docs](${DOCS_URL}) — oracle ${oracleVersion}.`);
+  if (baselineVersion !== null && baselineVersion !== oracleVersion) {
+    lines.push('');
+    lines.push(
+      `> The baseline was recorded against Bot API ${baselineVersion}, so differing ` +
+        'counts are expected until it is refreshed.',
+    );
+  }
+
+  lines.push(
+    '',
+    '| package | declared | modelled | missing REQUIRED | missing optional | unmodelled |',
+    '| --- | --- | --- | --- | --- | --- |',
+  );
+  for (const report of reports) {
+    lines.push(
+      `| ${report.key} | ${report.declared} | ${report.modelled} | ` +
+        `${report.missingRequired} | ${report.missingOptional} | ${report.unmodelled.length} |`,
+    );
+  }
+
+  if (verdict !== null) {
+    lines.push('');
+    if (verdict.regressions > 0) {
+      lines.push(`**${verdict.regressions} regression(s) versus the baseline.**`);
+    } else if (verdict.improvements > 0) {
+      lines.push(
+        `**No drift versus the baseline**, plus ${verdict.improvements} improvement(s) — ` +
+          'refresh it with `npm run audit:baseline`.',
+      );
+    } else {
+      lines.push('**No drift versus the baseline.**');
+    }
+    const bullets = [];
+    for (const entry of verdict.entries) {
+      for (const gap of entry.newGaps) {
+        const marks = [
+          ...gap.required.map((field) => `\`${field}\` (required)`),
+          ...gap.optional.map((field) => `\`${field}\``),
+        ];
+        bullets.push(
+          `- ${entry.key} **${gap.name}** lost ${marks.join(', ')}` +
+            (gap.file ? ` — ${gap.file}` : ''),
+        );
+      }
+      for (const name of entry.newlyUnmodelled) {
+        bullets.push(`- ${entry.key} **${name}** is no longer modelled at all`);
+      }
+      for (const name of entry.closed) {
+        bullets.push(`- ${entry.key} **${name}** now carries every documented field`);
+      }
+      for (const name of entry.nowModelled) {
+        bullets.push(`- ${entry.key} **${name}** is modelled again`);
+      }
+    }
+    if (verdict.unbaselined.length > 0) {
+      bullets.push(`- no baseline entry for ${verdict.unbaselined.join(', ')} — regenerate it`);
+    }
+    if (bullets.length > 0) lines.push('', ...bullets);
+  } else if (reports.some((report) => report.rows.length > 0)) {
+    lines.push('', '<details>', '<summary>documented fields missing from modelled types</summary>', '');
+    for (const report of reports) {
+      for (const row of report.rows) {
+        const marks = [
+          ...row.required.map((field) => `\`${field}\` (required)`),
+          ...row.optional.map((field) => `\`${field}\``),
+        ];
+        lines.push(`- ${report.key} **${row.name}** — ${marks.join(', ')}`);
+        if (row.file) lines.push(`  - ${row.file}`);
+      }
+    }
+    lines.push('', '</details>');
+  }
+
+  if (reports.some((report) => report.unmodelled.length > 0)) {
+    lines.push('', '<details>', '<summary>concrete docs types not modelled at all</summary>', '');
+    for (const report of reports) {
+      if (report.unmodelled.length === 0) continue;
+      lines.push(`- **${report.key}** (${report.unmodelled.length}): ${report.unmodelled.join(', ')}`);
+    }
+    lines.push('', '</details>');
+  }
+
+  return `${lines.join('\n')}\n`;
+}
+
+/**
  * Resolves the oracle from the most specific source the CLI was given.
  *
  * @param {{offline?: string, oracle?: string, refresh?: boolean}} options Parsed flags.
@@ -668,6 +768,9 @@ export async function main(argv = process.argv.slice(2)) {
     else if (flag === '--oracle') [options.oracle, i] = [path.resolve(argv[i + 1]), i + 1];
     else if (flag === '--offline') [options.offline, i] = [path.resolve(argv[i + 1]), i + 1];
     else if (flag === '--json') [options.json, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--markdown-out') {
+      [options.markdown, i] = [path.resolve(argv[i + 1]), i + 1];
+    }
     else if (flag === '--baseline') [options.baseline, i] = [path.resolve(argv[i + 1]), i + 1];
     else if (flag === '--help' || flag === '-h') options.help = true;
     else {
@@ -683,6 +786,7 @@ export async function main(argv = process.argv.slice(2)) {
         'Usage: node scripts/bot-api-fidelity.mjs [--report] [--package node|go|python]',
         '                          [--oracle <path> | --offline <page.html>] [--refresh]',
         '                          [--json <report.json>] [--baseline <report.json>]',
+        '                          [--markdown-out <report.md>]',
         '',
         'Reports, per package, which documented Bot API types are not modelled at',
         'all and which documented fields are missing from the types that are.',
@@ -691,6 +795,8 @@ export async function main(argv = process.argv.slice(2)) {
         'type it declares. --report prints the same tables but never fails.',
         '--json writes that same report as JSON: oracle metadata plus one entry',
         'per audited package, every row stamped with the file declaring it.',
+        '--markdown-out renders it as markdown (drift only, when --baseline is',
+        'given) for a CI job summary; it never re-measures anything.',
         '--baseline compares against such a dump instead of failing absolutely:',
         'only drift away from it fails (a field that was not already missing, or a',
         'docs type that stopped being modelled). Use it once the tree is clean.',
@@ -761,6 +867,11 @@ export async function main(argv = process.argv.slice(2)) {
     }
   }
 
+  // Derived once: the markdown report, the console summary and the exit code
+  // must all describe the same drift.
+  const verdict = baseline === null ? null : compareBaseline(reports, baseline);
+  const baselineVersion = baseline?.oracle?.version ?? null;
+
   if (options.json !== undefined) {
     const payload = {
       oracle: {
@@ -782,9 +893,23 @@ export async function main(argv = process.argv.slice(2)) {
     }
   }
 
-  if (baseline !== null) {
-    const verdict = compareBaseline(reports, baseline);
-    const baselineVersion = baseline.oracle?.version ?? 'unknown';
+  if (options.markdown !== undefined) {
+    const doc = renderMarkdown(reports, {
+      oracleVersion: oracle.version,
+      baselineVersion,
+      verdict,
+    });
+    try {
+      await mkdir(path.dirname(options.markdown), { recursive: true });
+      await writeFile(options.markdown, doc, 'utf-8');
+      console.log(`Markdown report written to ${options.markdown}`);
+    } catch (error) {
+      console.error(`--markdown-out: ${error.message}`);
+      return 2;
+    }
+  }
+
+  if (verdict !== null) {
     console.log('');
     console.log(`Baseline: ${options.baseline} (Bot API ${baselineVersion})`);
     if (baselineVersion !== oracle.version) {

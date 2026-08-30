@@ -134,10 +134,20 @@ jobs:
         run: npm run test:scripts
 
       - name: Audit Declared Types Against the Committed Oracle
-        run: npm run audit:fidelity
+        run: npm run audit:fidelity -- --markdown-out "${RUNNER_TEMP}/fidelity.md"
 
       - name: Report Per-Package Coverage
         run: npm run audit:fidelity:report
+
+      # A failing step skips everything after it by default, so this one runs on
+      # always(): a failed audit is exactly when the table is worth reading. The
+      # file test covers a run that died before writing anything.
+      - name: Publish Fidelity Summary
+        if: always()
+        run: |
+          if [ -f "${RUNNER_TEMP}/fidelity.md" ]; then
+            cat "${RUNNER_TEMP}/fidelity.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # Advisory: re-runs the same audit against a freshly fetched oracle, so a
       # Bot API change shows up as a named diff here (which types the docs added)
