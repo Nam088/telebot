@@ -36,6 +36,8 @@ import typing as t
 import pytest
 
 from telebot_py.types import (
+    AcceptedGiftTypes,
+    AffiliateInfo,
     Animation,
     Audio,
     Birthdate,
@@ -57,6 +59,7 @@ from telebot_py.types import (
     ChatBoostSourceGiveaway,
     ChatBoostSourcePremium,
     ChatBoostUpdated,
+    ChatFullInfo,
     ChatInviteLink,
     ChatJoinRequest,
     ChatLocation,
@@ -82,6 +85,7 @@ from telebot_py.types import (
     DirectMessagePriceChanged,
     DirectMessagesTopic,
     Document,
+    EphemeralMessageParameters,
     ExternalReplyInfo,
     ForceReply,
     ForumTopicClosed,
@@ -98,6 +102,7 @@ from telebot_py.types import (
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InaccessibleMessage,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQuery,
@@ -110,6 +115,7 @@ from telebot_py.types import (
     LinkPreviewOptions,
     LivePhoto,
     Location,
+    LocationAddress,
     LoginUrl,
     ManagedBotCreated,
     ManagedBotUpdated,
@@ -143,6 +149,7 @@ from telebot_py.types import (
     RefundedPayment,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    ResponseParameters,
     SharedUser,
     ShippingAddress,
     ShippingQuery,
@@ -154,6 +161,7 @@ from telebot_py.types import (
     SuggestedPostDeclined,
     SuggestedPostInfo,
     SuggestedPostPaid,
+    SuggestedPostParameters,
     SuggestedPostPrice,
     SuggestedPostRefunded,
     SwitchInlineQueryChosenChat,
@@ -167,6 +175,7 @@ from telebot_py.types import (
     UniqueGiftSymbol,
     Update,
     User,
+    UserRating,
     UsersShared,
     Venue,
     Video,
@@ -259,6 +268,103 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("custom_emoji_sticker_set_name", False),
         ("linked_chat_id", False),
         ("location", False),
+    ),
+    # ChatFullInfo is what the docs' getChat method returns: the eight Chat
+    # identity fields plus the 45 fields Chat cannot carry. The five fields the
+    # docs mark required come first because Python dataclasses cannot interleave
+    # required fields after defaulted ones.
+    ChatFullInfo: (
+        ("id", True),
+        ("type", True),
+        ("accent_color_id", True),
+        ("max_reaction_count", True),
+        ("accepted_gift_types", True),
+        ("title", False),
+        ("username", False),
+        ("first_name", False),
+        ("last_name", False),
+        ("is_forum", False),
+        ("is_direct_messages", False),
+        ("photo", False),
+        ("active_usernames", False),
+        ("birthdate", False),
+        ("business_intro", False),
+        ("business_location", False),
+        ("business_opening_hours", False),
+        ("personal_chat", False),
+        ("parent_chat", False),
+        ("available_reactions", False),
+        ("background_custom_emoji_id", False),
+        ("profile_accent_color_id", False),
+        ("profile_background_custom_emoji_id", False),
+        ("emoji_status_custom_emoji_id", False),
+        ("emoji_status_expiration_date", False),
+        ("bio", False),
+        ("has_private_forwards", False),
+        ("has_restricted_voice_and_video_messages", False),
+        ("join_to_send_messages", False),
+        ("join_by_request", False),
+        ("description", False),
+        ("invite_link", False),
+        ("pinned_message", False),
+        ("permissions", False),
+        ("can_send_paid_media", False),
+        ("slow_mode_delay", False),
+        ("unrestrict_boost_count", False),
+        ("message_auto_delete_time", False),
+        ("has_aggressive_anti_spam_enabled", False),
+        ("has_hidden_members", False),
+        ("has_protected_content", False),
+        ("has_visible_history", False),
+        ("sticker_set_name", False),
+        ("can_set_sticker_set", False),
+        ("custom_emoji_sticker_set_name", False),
+        ("linked_chat_id", False),
+        ("location", False),
+        ("rating", False),
+        ("first_profile_audio", False),
+        ("unique_gift_colors", False),
+        ("paid_message_star_count", False),
+        ("guard_bot", False),
+        ("community", False),
+    ),
+    UserRating: (
+        ("level", True),
+        ("rating", True),
+        ("current_level_rating", True),
+        ("next_level_rating", False),
+    ),
+    # Docs types that had no Python counterpart before this inventory entry.
+    InaccessibleMessage: (
+        ("chat", True),
+        ("message_id", True),
+        ("date", True),
+    ),
+    ResponseParameters: (
+        ("migrate_to_chat_id", False),
+        ("retry_after", False),
+    ),
+    LocationAddress: (
+        ("country_code", True),
+        ("state", False),
+        ("city", False),
+        ("street", False),
+    ),
+    SuggestedPostParameters: (
+        ("price", False),
+        ("send_date", False),
+    ),
+    EphemeralMessageParameters: (
+        ("receiver_user_id", True),
+        ("callback_query_id", False),
+        ("replace_callback_query_message", False),
+    ),
+    AffiliateInfo: (
+        ("commission_per_mille", True),
+        ("amount", True),
+        ("affiliate_user", False),
+        ("affiliate_chat", False),
+        ("nanostar_amount", False),
     ),
     Location: (
         ("latitude", True),
@@ -1716,6 +1822,49 @@ RAW_MESSAGE_POPULATED: dict[str, t.Any] = {
 }
 
 
+# A realistic ``getChat`` response: a value for every one of the 53 documented
+# ChatFullInfo fields, so the decode test can prove none of them is dropped.
+RAW_CHAT_FULL_INFO: dict[str, t.Any] = {
+    **RAW_CHAT_POPULATED,
+    "first_name": "Ada",
+    "last_name": "Lovelace",
+    "is_direct_messages": False,
+    "max_reaction_count": 3,
+    "parent_chat": {"id": -100555, "type": "channel", "title": "Announcements"},
+    "accepted_gift_types": {
+        "unlimited_gifts": True,
+        "limited_gifts": False,
+        "unique_gifts": True,
+        "premium_subscription": True,
+        "gifts_from_channels": False,
+    },
+    "can_send_paid_media": True,
+    "rating": {
+        "level": 4,
+        "rating": 120,
+        "current_level_rating": 100,
+        "next_level_rating": 200,
+    },
+    "first_profile_audio": {
+        "file_id": "au1",
+        "file_unique_id": "au1u",
+        "duration": 42,
+        "title": "Hello",
+    },
+    "unique_gift_colors": {
+        "model_custom_emoji_id": "model-emoji",
+        "symbol_custom_emoji_id": "symbol-emoji",
+        "light_theme_main_color": 16_755_660,
+        "light_theme_other_colors": [16_711_680, 65_280],
+        "dark_theme_main_color": 2_241_860,
+        "dark_theme_other_colors": [1_122_834],
+    },
+    "paid_message_star_count": 250,
+    "guard_bot": RAW_USER,
+    "community": {"id": 77, "name": "Telebot"},
+}
+
+
 class TestRoundTrips:
     def test_user_full(self) -> None:
         assert User.from_dict(RAW_USER).to_dict() == RAW_USER
@@ -1730,6 +1879,41 @@ class TestRoundTrips:
         assert isinstance(chat.birthdate, Birthdate)
         assert isinstance(chat.business_opening_hours, BusinessOpeningHours)
         assert chat.to_dict() == RAW_CHAT_POPULATED
+
+    def test_chat_full_info_populates_every_documented_field(self) -> None:
+        names = [field.name for field in dataclasses.fields(ChatFullInfo)]
+        assert len(names) == 53, "ChatFullInfo must carry every documented field"
+        assert set(RAW_CHAT_FULL_INFO) == set(names)
+
+        info = ChatFullInfo.from_dict(RAW_CHAT_FULL_INFO)
+        assert [name for name in names if getattr(info, name) is None] == []
+        assert isinstance(info.photo, ChatPhoto)
+        assert isinstance(info.birthdate, Birthdate)
+        assert isinstance(info.permissions, ChatPermissions)
+        assert isinstance(info.accepted_gift_types, AcceptedGiftTypes)
+        assert isinstance(info.rating, UserRating)
+        assert isinstance(info.first_profile_audio, Audio)
+        assert isinstance(info.unique_gift_colors, UniqueGiftColors)
+        assert isinstance(info.guard_bot, User)
+        assert isinstance(info.community, Community)
+        assert isinstance(info.parent_chat, Chat)
+        assert isinstance(info.personal_chat, Chat)
+        assert isinstance(info.location, ChatLocation)
+        assert isinstance(info.pinned_message, Message)
+        assert isinstance(info.available_reactions[0], ReactionTypeEmoji)
+        assert info.to_dict() == RAW_CHAT_FULL_INFO
+
+    def test_chat_full_info_keeps_the_docs_required_fields_required(self) -> None:
+        for name in (
+            "id",
+            "type",
+            "accent_color_id",
+            "max_reaction_count",
+            "accepted_gift_types",
+        ):
+            payload = {k: v for k, v in RAW_CHAT_FULL_INFO.items() if k != name}
+            with pytest.raises(TypeParseError):
+                ChatFullInfo.from_dict(payload)
 
     def test_message_full(self) -> None:
         message = Message.from_dict(RAW_MESSAGE_POPULATED)

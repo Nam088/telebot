@@ -6,6 +6,7 @@ import dataclasses
 import typing as t
 
 from telebot_py.types.base import TelegramObject
+from telebot_py.types.chat import Chat
 from telebot_py.types.user import User
 
 
@@ -303,3 +304,34 @@ class StarTransactions(TelegramObject):
     """
 
     transactions: list[StarTransaction]
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class AffiliateInfo(TelegramObject):
+    """The affiliate that received a commission via a transaction.
+
+    Reached through the ``affiliate_info`` field of the docs'
+    ``TransactionPartnerUser`` object.
+
+    Attributes:
+        commission_per_mille: The number of Telegram Stars received by the
+            affiliate for each 1000 Telegram Stars received by the bot from
+            referred users.
+        amount: Integer amount of Telegram Stars received by the affiliate from
+            the transaction, rounded to 0; can be negative for refunds.
+        affiliate_user: The bot or the user that received an affiliate
+            commission if it was received by a bot or a user.
+        affiliate_chat: The chat that received an affiliate commission if it
+            was received by a chat.
+        nanostar_amount: The number of 1/1000000000 shares of Telegram Stars
+            received by the affiliate; from -999999999 to 999999999; can be
+            negative for refunds.
+
+    Telegram API: https://core.telegram.org/bots/api#affiliateinfo
+    """
+
+    commission_per_mille: int
+    amount: int
+    affiliate_user: User | None = None
+    affiliate_chat: Chat | None = None
+    nanostar_amount: int | None = None

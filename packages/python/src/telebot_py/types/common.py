@@ -142,6 +142,27 @@ class MessageId(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class ResponseParameters(TelegramObject):
+    """Why a request was unsuccessful.
+
+    Telegram puts this object in the ``parameters`` field of a failed response;
+    ``Bot`` already reads ``retry_after`` out of the error payload for its
+    retry schedule, and the type lets callers inspect the same data.
+
+    Attributes:
+        migrate_to_chat_id: The group has been migrated to a supergroup with
+            the specified identifier.
+        retry_after: In case of exceeding flood control, the number of seconds
+            left to wait before the request can be repeated.
+
+    Telegram API: https://core.telegram.org/bots/api#responseparameters
+    """
+
+    migrate_to_chat_id: int | None = None
+    retry_after: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class WebhookInfo(TelegramObject):
     """Current status of a webhook.
 

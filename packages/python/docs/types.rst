@@ -29,6 +29,11 @@ telebot_py.types.chat
 
 .. automodule:: telebot_py.types.chat
 
+telebot_py.types.chat_full_info
+-------------------------------
+
+.. automodule:: telebot_py.types.chat_full_info
+
 telebot_py.types.checklists
 ---------------------------
 

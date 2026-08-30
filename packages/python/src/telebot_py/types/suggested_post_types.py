@@ -17,6 +17,19 @@ from telebot_py.types.payments import StarAmount
 if t.TYPE_CHECKING:  # annotation-only; bound at runtime by message.py
     from telebot_py.types.message import Message as Message
 
+#: Drives the ``import *`` re-export in :mod:`telebot_py.types`, the same way
+#: :mod:`telebot_py.types.rich` fixes its own exported set.
+__all__ = [
+    "SuggestedPostPrice",
+    "SuggestedPostInfo",
+    "SuggestedPostParameters",
+    "SuggestedPostApproved",
+    "SuggestedPostApprovalFailed",
+    "SuggestedPostDeclined",
+    "SuggestedPostPaid",
+    "SuggestedPostRefunded",
+]
+
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class SuggestedPostPrice(TelegramObject):
@@ -50,6 +63,27 @@ class SuggestedPostInfo(TelegramObject):
     """
 
     state: str
+    price: SuggestedPostPrice | None = None
+    send_date: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class SuggestedPostParameters(TelegramObject):
+    """Parameters of a post that the bot suggests to publish in a channel.
+
+    Accepted by the ``suggested_post_parameters`` argument of the Bot API
+    ``send*`` methods, which take any ``to_dict`` object.
+
+    Attributes:
+        price: Proposed price for the post. If the field is omitted, then the
+            post is unpaid.
+        send_date: Proposed send date of the post, in Unix time. If specified,
+            the date must be between 300 and 2678400 seconds (30 days) in the
+            future.
+
+    Telegram API: https://core.telegram.org/bots/api#suggestedpostparameters
+    """
+
     price: SuggestedPostPrice | None = None
     send_date: int | None = None
 

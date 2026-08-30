@@ -51,7 +51,14 @@ GO_INFRA = frozenset(
 
 #: Intentional parity gaps: node/go methods deliberately absent from python.
 #: Every entry must carry a reason; stale entries are flagged as errors.
-ALLOWLIST: dict[str, str] = {}
+ALLOWLIST: dict[str, str] = {
+    "get_chat_full_info": (
+        "go-only convenience alias over the same getChat wire call; the Bot API "
+        "defines no getChatFullInfo method, and python's get_chat already decodes "
+        "the response into ChatFullInfo, so a second name would be a "
+        "docs-inaccurate duplicate."
+    )
+}
 
 NODE_METHOD_RE = re.compile(r"public async (\w+)\(")
 GO_METHOD_RE = re.compile(r"^func \(b \*Bot\) ([A-Z]\w*)\(", re.MULTILINE)

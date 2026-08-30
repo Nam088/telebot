@@ -43,6 +43,7 @@ from telebot_py.types.chat import (
     ChatPermissions,
     ChatPhoto,
 )
+from telebot_py.types.chat_full_info import ChatFullInfo, UserRating
 from telebot_py.types.chat_members import (
     ChatInviteLink,
     ChatJoinRequest,
@@ -67,6 +68,7 @@ from telebot_py.types.common import (
     Location,
     MessageEntity,
     MessageId,
+    ResponseParameters,
     Venue,
     WebhookInfo,
 )
@@ -135,7 +137,7 @@ from telebot_py.types.media import (
     VideoQuality,
     Voice,
 )
-from telebot_py.types.message import Message
+from telebot_py.types.message import InaccessibleMessage, Message
 from telebot_py.types.message_community import (
     ChatOwnerChanged,
     ChatOwnerLeft,
@@ -152,6 +154,7 @@ from telebot_py.types.message_community import (
     PollOptionDeleted,
 )
 from telebot_py.types.message_extras import (
+    EphemeralMessageParameters,
     ExternalReplyInfo,
     MessageOriginChannel,
     MessageOriginChat,
@@ -200,6 +203,7 @@ from telebot_py.types.passport import (
     PassportFile,
 )
 from telebot_py.types.payments import (
+    AffiliateInfo,
     BotSubscriptionUpdated,
     Invoice,
     LabeledPrice,
@@ -230,6 +234,7 @@ from telebot_py.types.stickers import InputSticker, MaskPosition, Sticker, Stick
 from telebot_py.types.stories import (
     InputStoryContentPhoto,
     InputStoryContentVideo,
+    LocationAddress,
     StoryArea,
     StoryAreaPosition,
     StoryAreaTypeLink,
@@ -238,15 +243,8 @@ from telebot_py.types.stories import (
     StoryAreaTypeUniqueGift,
     StoryAreaTypeWeather,
 )
-from telebot_py.types.suggested_post_types import (
-    SuggestedPostApprovalFailed,
-    SuggestedPostApproved,
-    SuggestedPostDeclined,
-    SuggestedPostInfo,
-    SuggestedPostPaid,
-    SuggestedPostPrice,
-    SuggestedPostRefunded,
-)
+from telebot_py.types.suggested_post_types import *  # __all__ fixes the exported set.
+from telebot_py.types.suggested_post_types import __all__ as _SUGGESTED_POST_NAMES
 from telebot_py.types.topics import (
     BotAccessSettings,
     BotCommand,
@@ -261,11 +259,14 @@ from telebot_py.types.topics import (
 from telebot_py.types.update import MessageGenerationStopped, Update
 from telebot_py.types.user import User
 
-# Merged with the rich-message names imported above, then kept alphabetical so
-# that ``from telebot_py.types import *`` exposes exactly the public surface.
+# Merged with the rich-message and suggested-post names imported above, then
+# kept alphabetical so that ``from telebot_py.types import *`` exposes exactly
+# the public surface.
 __all__ = [
     *_RICH_NAMES,
+    *_SUGGESTED_POST_NAMES,
     "AcceptedGiftTypes",
+    "AffiliateInfo",
     "Animation",
     "Audio",
     "BackgroundFill",
@@ -303,6 +304,7 @@ __all__ = [
     "ChatBoostSourceGiveaway",
     "ChatBoostSourcePremium",
     "ChatBoostUpdated",
+    "ChatFullInfo",
     "ChatInviteLink",
     "ChatJoinRequest",
     "ChatLocation",
@@ -331,6 +333,7 @@ __all__ = [
     "Document",
     "EncryptedCredentials",
     "EncryptedPassportElement",
+    "EphemeralMessageParameters",
     "ExternalReplyInfo",
     "File",
     "ForceReply",
@@ -351,6 +354,7 @@ __all__ = [
     "GiveawayCompleted",
     "GiveawayCreated",
     "GiveawayWinners",
+    "InaccessibleMessage",
     "InlineKeyboardButton",
     "InlineKeyboardMarkup",
     "InlineQuery",
@@ -380,6 +384,7 @@ __all__ = [
     "LinkPreviewOptions",
     "LivePhoto",
     "Location",
+    "LocationAddress",
     "LoginUrl",
     "ManagedBotCreated",
     "ManagedBotUpdated",
@@ -431,6 +436,7 @@ __all__ = [
     "ReplyKeyboardMarkup",
     "ReplyKeyboardRemove",
     "ReplyParameters",
+    "ResponseParameters",
     "SentGuestMessage",
     "SentWebAppMessage",
     "SharedUser",
@@ -451,13 +457,6 @@ __all__ = [
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
     "SuccessfulPayment",
-    "SuggestedPostApprovalFailed",
-    "SuggestedPostApproved",
-    "SuggestedPostDeclined",
-    "SuggestedPostInfo",
-    "SuggestedPostPaid",
-    "SuggestedPostPrice",
-    "SuggestedPostRefunded",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
@@ -474,6 +473,7 @@ __all__ = [
     "UserChatBoosts",
     "UserProfileAudios",
     "UserProfilePhotos",
+    "UserRating",
     "UsersShared",
     "Venue",
     "Video",

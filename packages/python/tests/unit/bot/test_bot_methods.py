@@ -12,13 +12,17 @@ import pytest
 from telebot_py.bot import Bot
 from telebot_py.bot.errors import InvalidTokenError, TelegramApiError
 from telebot_py.types import (
-    Chat,
+    AcceptedGiftTypes,
+    ChatFullInfo,
     ChatMember,
+    ChatPhoto,
+    Community,
     Message,
     MessageId,
     ReplyParameters,
     Update,
     User,
+    UserRating,
     WebhookInfo,
 )
 from telebot_py.types.common import MessageEntity
@@ -342,18 +346,49 @@ class TestMessagesSurface:
 
 
 class TestChatsSurface:
-    async def test_get_chat_returns_chat(
+    async def test_get_chat_returns_chat_full_info(
         self, bot_transport: Any, ok_response: ResponseFactory
     ) -> None:
         seen: list[httpx.Request] = []
-        response = ok_response({"id": -100_500, "type": "supergroup", "title": "devs"})
-        step = record_into(response, seen)
+        payload = {
+            "id": -100_500,
+            "type": "supergroup",
+            "title": "devs",
+            "accent_color_id": 3,
+            "max_reaction_count": 3,
+            "accepted_gift_types": {
+                "unlimited_gifts": True,
+                "limited_gifts": False,
+                "unique_gifts": False,
+                "premium_subscription": False,
+                "gifts_from_channels": False,
+            },
+            "photo": {
+                "small_file_id": "ps",
+                "small_file_unique_id": "psu",
+                "big_file_id": "pb",
+                "big_file_unique_id": "pbu",
+            },
+            "bio": "Engineer",
+            "rating": {"level": 4, "rating": 120, "current_level_rating": 100},
+            "community": {"id": 77, "name": "Telebot"},
+            "guard_bot": {"id": 9, "is_bot": True, "first_name": "Guard"},
+        }
+        step = record_into(ok_response(payload), seen)
         bot = make_bot(bot_transport, step)
         chat = await bot.get_chat(-100_500)
-        assert isinstance(chat, Chat)
+        assert isinstance(chat, ChatFullInfo)
         assert chat.id == -100_500
         assert chat.type == "supergroup"
         assert chat.title == "devs"
+        assert chat.max_reaction_count == 3
+        assert chat.bio == "Engineer"
+        assert isinstance(chat.photo, ChatPhoto)
+        assert isinstance(chat.accepted_gift_types, AcceptedGiftTypes)
+        assert isinstance(chat.rating, UserRating)
+        assert chat.rating.next_level_rating is None
+        assert isinstance(chat.community, Community)
+        assert isinstance(chat.guard_bot, User)
         assert sent_payload(seen[0]) == {"chat_id": -100_500}
 
     async def test_get_chat_administrators(

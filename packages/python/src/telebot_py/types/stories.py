@@ -47,6 +47,26 @@ class StoryAreaPosition(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class LocationAddress(TelegramObject):
+    """The physical address of a location.
+
+    Attributes:
+        country_code: The two-letter ISO 3166-1 alpha-2 country code of the
+            country where the location is located.
+        state: State of the location.
+        city: City of the location.
+        street: Street address of the location.
+
+    Telegram API: https://core.telegram.org/bots/api#locationaddress
+    """
+
+    country_code: str
+    state: str | None = None
+    city: str | None = None
+    street: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class StoryAreaTypeLocation(TelegramObject):
     """A story area pointing to a location; up to 10 per story.
 
@@ -54,8 +74,8 @@ class StoryAreaTypeLocation(TelegramObject):
         type: Type of the area, always 'location'.
         latitude: Location latitude in degrees.
         longitude: Location longitude in degrees.
-        address: Address of the location, kept as a raw mapping (node leaves
-            ``LocationAddress`` untyped).
+        address: Address of the location, decoded into a
+            :class:`~telebot_py.types.LocationAddress`.
 
     Telegram API: https://core.telegram.org/bots/api#storyareatypelocation
     """
@@ -63,7 +83,7 @@ class StoryAreaTypeLocation(TelegramObject):
     type: str
     latitude: float
     longitude: float
-    address: object | None = None
+    address: LocationAddress | None = None
 
     _DISCRIMINATOR = ("type", "location")
 

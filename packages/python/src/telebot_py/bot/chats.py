@@ -10,15 +10,15 @@ from telebot_py.bot.base import (
     parse_list_result,
     parse_result,
 )
-from telebot_py.types.chat import Chat
+from telebot_py.types.chat_full_info import ChatFullInfo
 from telebot_py.types.chat_members import ChatMember
 
 
 class ChatsMixin(Requester):
     """Bot methods for chat info, membership counts, and member moderation."""
 
-    async def get_chat(self, chat_id: int | str) -> Chat:
-        """Get up-to-date information about a chat.
+    async def get_chat(self, chat_id: int | str) -> ChatFullInfo:
+        """Get full up-to-date information about a chat.
 
         Example:
             >>> chat = await bot.get_chat(-1001234567890)
@@ -28,7 +28,9 @@ class ChatsMixin(Requester):
                 target supergroup or channel.
 
         Returns:
-            The Chat object with current chat information.
+            The ChatFullInfo object with current chat information, carrying the
+            full documented field set (photo, birthdate, business details,
+            permissions, reactions, rating, community, ...).
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -37,7 +39,7 @@ class ChatsMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#getchat
         """
-        return parse_result(Chat, await self.request("getChat", {"chat_id": chat_id}))
+        return parse_result(ChatFullInfo, await self.request("getChat", {"chat_id": chat_id}))
 
     async def get_chat_administrators(self, chat_id: int | str) -> list[ChatMember]:
         """Get a list of administrators in a chat.

@@ -347,3 +347,30 @@ class ReplyParameters(TelegramObject):
     checklist_task_id: int | None = None
     poll_option_id: str | None = None
     ephemeral_message_id: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class EphemeralMessageParameters(TelegramObject):
+    """Parameters for sending an ephemeral message to a specific user.
+
+    Accepted by the ``ephemeral_message_parameters`` argument of the Bot API
+    ``send*`` methods, which take any ``to_dict`` object. The message is
+    visible to the receiver only and disappears automatically after 1 hour by
+    default.
+
+    Attributes:
+        receiver_user_id: Identifier of the user who will receive the message.
+            It is not guaranteed that the user will receive the message,
+            especially if they are offline.
+        callback_query_id: Identifier of the callback query which triggered the
+            message, if any.
+        replace_callback_query_message: Pass True if the ephemeral message must
+            be shown in place of the original message. Must be False for
+            callback queries from ephemeral messages.
+
+    Telegram API: https://core.telegram.org/bots/api#ephemeralmessageparameters
+    """
+
+    receiver_user_id: int
+    callback_query_id: str | None = None
+    replace_callback_query_message: bool | None = None

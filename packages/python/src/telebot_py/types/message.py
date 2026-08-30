@@ -97,6 +97,28 @@ from telebot_py.types.user import User
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class InaccessibleMessage(TelegramObject):
+    """A message that was deleted or is otherwise inaccessible to the bot.
+
+    The docs reach this shape through ``MaybeInaccessibleMessage`` fields such
+    as ``Message.reply_to_message``; ``date`` is always 0, which is how clients
+    tell an inaccessible message from a regular one.
+
+    Attributes:
+        chat: Chat the message belonged to.
+        message_id: Unique message identifier inside the chat.
+        date: Always 0. The field can be used to differentiate regular and
+            inaccessible messages.
+
+    Telegram API: https://core.telegram.org/bots/api#inaccessiblemessage
+    """
+
+    chat: Chat
+    message_id: int
+    date: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class Message(TelegramObject):
     """A Telegram message, field-complete against Bot API 10.3.
 
@@ -419,11 +441,13 @@ class Message(TelegramObject):
 # dict because mypy forbids reassigning a class name on an imported module
 # ("Cannot assign to a type").
 import telebot_py.types.chat as _chat_module  # noqa: E402
+import telebot_py.types.chat_full_info as _chat_full_info_module  # noqa: E402
 import telebot_py.types.giveaway_types as _giveaway_module  # noqa: E402
 import telebot_py.types.message_community as _community_module  # noqa: E402
 import telebot_py.types.suggested_post_types as _suggested_module  # noqa: E402
 
 vars(_chat_module)["Message"] = Message
+vars(_chat_full_info_module)["Message"] = Message
 vars(_community_module)["Message"] = Message
 vars(_giveaway_module)["Message"] = Message
 vars(_suggested_module)["Message"] = Message
