@@ -2,9 +2,11 @@ package bot_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 
@@ -81,21 +83,21 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	setResult(`{"message_id":11,"text":"photo caption"}`)
 	msg, err := b.SendPhoto(ctx, int64(1), "https://example.com/cat.jpg", "photo caption", &types.InlineKeyboardMarkup{
 		InlineKeyboard: [][]types.InlineKeyboardButton{{{Text: "btn", CallbackData: "d"}}},
-	})
+	}, 0, nil, false, "", nil, "")
 	if err != nil || msg.MessageID != 11 {
 		t.Fatalf("SendPhoto = (%+v, %v)", msg, err)
 	}
 
 	// Branch without caption/markup.
-	if _, err := b.SendPhoto(ctx, "@channel", "file_id", "", nil); err != nil {
+	if _, err := b.SendPhoto(ctx, "@channel", "file_id", "", nil, 0, nil, false, "", nil, ""); err != nil {
 		t.Fatalf("SendPhoto minimal = %v", err)
 	}
 
 	setResult(`{"message_id":12}`)
-	if _, err := b.SendDocument(ctx, int64(1), "doc_id", ""); err != nil {
+	if _, err := b.SendDocument(ctx, int64(1), "doc_id", "", 0, nil, false, "", nil, ""); err != nil {
 		t.Fatalf("SendDocument minimal = %v", err)
 	}
-	if _, err := b.SendDocument(ctx, int64(1), "doc_id", "caption"); err != nil {
+	if _, err := b.SendDocument(ctx, int64(1), "doc_id", "caption", 0, nil, false, "", nil, ""); err != nil {
 		t.Fatalf("SendDocument with caption = %v", err)
 	}
 
@@ -108,19 +110,129 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	}
 
 	setResult(`{"message_id":14}`)
-	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14); err != nil {
+	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, 0, "", nil); err != nil {
 		t.Fatalf("ForwardMessage = %v", err)
 	}
 
 	setResult(`{"message_id":15}`)
-	mid, err := b.CopyMessage(ctx, int64(1), int64(2), 14)
+	mid, err := b.CopyMessage(ctx, int64(1), int64(2), 14, 0, false, "", nil)
 	if err != nil || mid.MessageID != 15 {
 		t.Fatalf("CopyMessage = (%+v, %v)", mid, err)
 	}
 
 	setResult(`true`)
-	if ok, err := b.SendChatAction(ctx, int64(1), "typing"); err != nil || !ok {
+	if ok, err := b.SendChatAction(ctx, int64(1), "typing", ""); err != nil || !ok {
 		t.Fatalf("SendChatAction = (%v, %v)", ok, err)
+	}
+}
+
+// TestBot_MessageMethods_OptionalParams verifies that the Bot API 10.3
+// optional params reach the wire when set and stay omitted at zero values.
+func TestBot_MessageMethods_OptionalParams(t *testing.T) {
+	var payload map[string]any
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		payload = map[string]any{}
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+			t.Errorf("decode payload: %v", err)
+		}
+		result := `{"message_id":30}`
+		if strings.HasSuffix(r.URL.Path, "/sendChatAction") {
+			result = `true`
+		}
+		fmt.Fprintf(w, `{"ok":true,"result":%s}`, result)
+	}))
+	defer server.Close()
+	b := bot.NewBot("token", bot.WithBaseURL(server.URL))
+	ctx := context.Background()
+
+	_, err := b.SendPhoto(ctx, int64(1), "photo_id", "cap", nil,
+		7, &types.EphemeralMessageParameters{ReceiverUserID: 9}, true, "effect-1",
+		&types.SuggestedPostParameters{SendDate: 1700000000}, "bc-1")
+	if err != nil {
+		t.Fatalf("SendPhoto with optional params = %v", err)
+	}
+	if payload["direct_messages_topic_id"] != float64(7) {
+		t.Errorf("direct_messages_topic_id = %v", payload["direct_messages_topic_id"])
+	}
+	if payload["allow_paid_broadcast"] != true {
+		t.Errorf("allow_paid_broadcast = %v", payload["allow_paid_broadcast"])
+	}
+	if payload["message_effect_id"] != "effect-1" {
+		t.Errorf("message_effect_id = %v", payload["message_effect_id"])
+	}
+	if payload["business_connection_id"] != "bc-1" {
+		t.Errorf("business_connection_id = %v", payload["business_connection_id"])
+	}
+	if _, ok := payload["ephemeral_message_parameters"].(map[string]any); !ok {
+		t.Errorf("ephemeral_message_parameters = %v", payload["ephemeral_message_parameters"])
+	}
+	if _, ok := payload["suggested_post_parameters"].(map[string]any); !ok {
+		t.Errorf("suggested_post_parameters = %v", payload["suggested_post_parameters"])
+	}
+
+	// Zero values must stay omitted on the wire.
+	if _, err := b.SendDocument(ctx, int64(1), "doc_id", "", 0, nil, false, "", nil, ""); err != nil {
+		t.Fatalf("SendDocument minimal = %v", err)
+	}
+	for _, key := range []string{"direct_messages_topic_id", "ephemeral_message_parameters", "allow_paid_broadcast", "message_effect_id", "suggested_post_parameters", "business_connection_id", "caption"} {
+		if _, present := payload[key]; present {
+			t.Errorf("expected %s to be omitted at zero value, got %v", key, payload[key])
+		}
+	}
+
+	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, 8, "effect-2", &types.SuggestedPostParameters{SendDate: 1700000000}); err != nil {
+		t.Fatalf("ForwardMessage with optional params = %v", err)
+	}
+	if payload["direct_messages_topic_id"] != float64(8) {
+		t.Errorf("forwardMessage direct_messages_topic_id = %v", payload["direct_messages_topic_id"])
+	}
+	if payload["message_effect_id"] != "effect-2" {
+		t.Errorf("forwardMessage message_effect_id = %v", payload["message_effect_id"])
+	}
+
+	if _, err := b.CopyMessage(ctx, int64(1), int64(2), 14, 9, true, "effect-3", nil); err != nil {
+		t.Fatalf("CopyMessage with optional params = %v", err)
+	}
+	if payload["direct_messages_topic_id"] != float64(9) {
+		t.Errorf("copyMessage direct_messages_topic_id = %v", payload["direct_messages_topic_id"])
+	}
+	if payload["allow_paid_broadcast"] != true {
+		t.Errorf("copyMessage allow_paid_broadcast = %v", payload["allow_paid_broadcast"])
+	}
+
+	if _, err := b.SendChatAction(ctx, int64(1), "typing", "bc-2"); err != nil {
+		t.Fatalf("SendChatAction with optional params = %v", err)
+	}
+	if payload["business_connection_id"] != "bc-2" {
+		t.Errorf("sendChatAction business_connection_id = %v", payload["business_connection_id"])
+	}
+
+	// Options-struct path: SendMessageOptions carries the same fields.
+	if _, err := b.SendMessage(ctx, &types.SendMessageOptions{
+		ChatID:                     int64(1),
+		Text:                       "hi",
+		DirectMessagesTopicID:      3,
+		AllowPaidBroadcast:         true,
+		MessageEffectID:            "effect-4",
+		SuggestedPostParameters:    &types.SuggestedPostParameters{SendDate: 1700000000},
+		EphemeralMessageParameters: &types.EphemeralMessageParameters{ReceiverUserID: 9},
+	}); err != nil {
+		t.Fatalf("SendMessage with optional params = %v", err)
+	}
+	if payload["direct_messages_topic_id"] != float64(3) {
+		t.Errorf("sendMessage direct_messages_topic_id = %v", payload["direct_messages_topic_id"])
+	}
+	if payload["allow_paid_broadcast"] != true {
+		t.Errorf("sendMessage allow_paid_broadcast = %v", payload["allow_paid_broadcast"])
+	}
+	if payload["message_effect_id"] != "effect-4" {
+		t.Errorf("sendMessage message_effect_id = %v", payload["message_effect_id"])
+	}
+	if _, ok := payload["suggested_post_parameters"].(map[string]any); !ok {
+		t.Errorf("sendMessage suggested_post_parameters = %v", payload["suggested_post_parameters"])
+	}
+	if _, ok := payload["ephemeral_message_parameters"].(map[string]any); !ok {
+		t.Errorf("sendMessage ephemeral_message_parameters = %v", payload["ephemeral_message_parameters"])
 	}
 }
 
@@ -185,10 +297,10 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.UnbanChatMember(ctx, 1, 2, false); err == nil {
 		t.Error("UnbanChatMember: expected error")
 	}
-	if _, err := b.SendPhoto(ctx, 1, "p", "", nil); err == nil {
+	if _, err := b.SendPhoto(ctx, 1, "p", "", nil, 0, nil, false, "", nil, ""); err == nil {
 		t.Error("SendPhoto: expected error")
 	}
-	if _, err := b.SendDocument(ctx, 1, "d", ""); err == nil {
+	if _, err := b.SendDocument(ctx, 1, "d", "", 0, nil, false, "", nil, ""); err == nil {
 		t.Error("SendDocument: expected error")
 	}
 	if _, err := b.EditMessageText(ctx, &types.EditMessageTextOptions{}); err == nil {
@@ -197,13 +309,13 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.EditMessageReplyMarkup(ctx, &types.EditMessageReplyMarkupOptions{}); err == nil {
 		t.Error("EditMessageReplyMarkup: expected error")
 	}
-	if _, err := b.ForwardMessage(ctx, 1, 2, 3); err == nil {
+	if _, err := b.ForwardMessage(ctx, 1, 2, 3, 0, "", nil); err == nil {
 		t.Error("ForwardMessage: expected error")
 	}
-	if _, err := b.CopyMessage(ctx, 1, 2, 3); err == nil {
+	if _, err := b.CopyMessage(ctx, 1, 2, 3, 0, false, "", nil); err == nil {
 		t.Error("CopyMessage: expected error")
 	}
-	if _, err := b.SendChatAction(ctx, 1, "typing"); err == nil {
+	if _, err := b.SendChatAction(ctx, 1, "typing", ""); err == nil {
 		t.Error("SendChatAction: expected error")
 	}
 	if _, err := b.CreateForumTopic(ctx, 1, "n", 0, ""); err == nil {

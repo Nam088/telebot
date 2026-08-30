@@ -200,10 +200,11 @@ type MessageId struct {
 
 // EditMessageReplyMarkupOptions parameters for editMessageReplyMarkup.
 type EditMessageReplyMarkupOptions struct {
-	ChatID          any                   `json:"chat_id,omitempty"`
-	MessageID       int64                 `json:"message_id,omitempty"`
-	InlineMessageID string                `json:"inline_message_id,omitempty"`
-	ReplyMarkup     *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
+	ChatID               any                   `json:"chat_id,omitempty"`
+	MessageID            int64                 `json:"message_id,omitempty"`
+	InlineMessageID      string                `json:"inline_message_id,omitempty"`
+	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // InaccessibleMessage describes a message that was deleted or is otherwise

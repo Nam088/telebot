@@ -61,15 +61,17 @@ type DeleteChatPhotoOptions struct {
 
 // PinChatMessageOptions represents parameters for the pinChatMessage method.
 type PinChatMessageOptions struct {
-	ChatID              any   `json:"chat_id"`
-	MessageID           int64 `json:"message_id"`
-	DisableNotification bool  `json:"disable_notification,omitempty"`
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	ChatID               any    `json:"chat_id"`
+	MessageID            int64  `json:"message_id"`
+	DisableNotification  bool   `json:"disable_notification,omitempty"`
 }
 
 // UnpinChatMessageOptions represents parameters for the unpinChatMessage method.
 type UnpinChatMessageOptions struct {
-	ChatID    any   `json:"chat_id"`
-	MessageID int64 `json:"message_id,omitempty"`
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	ChatID               any    `json:"chat_id"`
+	MessageID            int64  `json:"message_id,omitempty"`
 }
 
 // SetChatPermissionsOptions represents parameters for the setChatPermissions method.

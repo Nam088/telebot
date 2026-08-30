@@ -14,6 +14,12 @@ import (
 //   - photo: Photo to send. Pass a file_id string or HTTP URL.
 //   - caption: Optional photo caption (0-1024 characters).
 //   - replyMarkup: Optional inline keyboard markup.
+//   - directMessagesTopicID: Optional identifier of the topic the message will be sent to in a direct messages chat; 0 omits it.
+//   - ephemeralMessageParameters: Optional ephemeral message parameters; nil omits them.
+//   - allowPaidBroadcast: Pass true to allow paid broadcast of the message.
+//   - messageEffectID: Optional unique identifier of the message effect to be added to the message; empty omits it.
+//   - suggestedPostParameters: Optional suggested post parameters; nil omits them.
+//   - businessConnectionID: Optional unique identifier of the business connection on behalf of which the message will be sent; empty omits it.
 //
 // Returns:
 //   - *types.Message: The sent Message object on success.
@@ -21,10 +27,10 @@ import (
 //
 // Example:
 //
-//	msg, err := bot.SendPhoto(ctx, 123456, "https://example.com/cat.jpg", "Cute cat!", nil)
+//	msg, err := bot.SendPhoto(ctx, 123456, "https://example.com/cat.jpg", "Cute cat!", nil, 0, nil, false, "", nil, "")
 //
 // Telegram API: https://core.telegram.org/bots/api#sendphoto
-func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption string, replyMarkup *types.InlineKeyboardMarkup) (*types.Message, error) {
+func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption string, replyMarkup *types.InlineKeyboardMarkup, directMessagesTopicID int64, ephemeralMessageParameters *types.EphemeralMessageParameters, allowPaidBroadcast bool, messageEffectID string, suggestedPostParameters *types.SuggestedPostParameters, businessConnectionID string) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
 		"photo":   photo,
@@ -34,6 +40,24 @@ func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption stri
 	}
 	if replyMarkup != nil {
 		payload["reply_markup"] = replyMarkup
+	}
+	if directMessagesTopicID > 0 {
+		payload["direct_messages_topic_id"] = directMessagesTopicID
+	}
+	if ephemeralMessageParameters != nil {
+		payload["ephemeral_message_parameters"] = ephemeralMessageParameters
+	}
+	if allowPaidBroadcast {
+		payload["allow_paid_broadcast"] = true
+	}
+	if messageEffectID != "" {
+		payload["message_effect_id"] = messageEffectID
+	}
+	if suggestedPostParameters != nil {
+		payload["suggested_post_parameters"] = suggestedPostParameters
+	}
+	if businessConnectionID != "" {
+		payload["business_connection_id"] = businessConnectionID
 	}
 	var msg types.Message
 	if err := b.Request(ctx, "sendPhoto", payload, &msg); err != nil {
@@ -49,19 +73,43 @@ func (b *Bot) SendPhoto(ctx context.Context, chatID any, photo any, caption stri
 //   - chatID: Target chat identifier.
 //   - document: Document to send (file_id or URL string).
 //   - caption: Optional document caption.
+//   - directMessagesTopicID: Optional identifier of the topic the message will be sent to in a direct messages chat; 0 omits it.
+//   - ephemeralMessageParameters: Optional ephemeral message parameters; nil omits them.
+//   - allowPaidBroadcast: Pass true to allow paid broadcast of the message.
+//   - messageEffectID: Optional unique identifier of the message effect to be added to the message; empty omits it.
+//   - suggestedPostParameters: Optional suggested post parameters; nil omits them.
+//   - businessConnectionID: Optional unique identifier of the business connection on behalf of which the message will be sent; empty omits it.
 //
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: An error if the request failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#senddocument
-func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, caption string) (*types.Message, error) {
+func (b *Bot) SendDocument(ctx context.Context, chatID any, document any, caption string, directMessagesTopicID int64, ephemeralMessageParameters *types.EphemeralMessageParameters, allowPaidBroadcast bool, messageEffectID string, suggestedPostParameters *types.SuggestedPostParameters, businessConnectionID string) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":  chatID,
 		"document": document,
 	}
 	if caption != "" {
 		payload["caption"] = caption
+	}
+	if directMessagesTopicID > 0 {
+		payload["direct_messages_topic_id"] = directMessagesTopicID
+	}
+	if ephemeralMessageParameters != nil {
+		payload["ephemeral_message_parameters"] = ephemeralMessageParameters
+	}
+	if allowPaidBroadcast {
+		payload["allow_paid_broadcast"] = true
+	}
+	if messageEffectID != "" {
+		payload["message_effect_id"] = messageEffectID
+	}
+	if suggestedPostParameters != nil {
+		payload["suggested_post_parameters"] = suggestedPostParameters
+	}
+	if businessConnectionID != "" {
+		payload["business_connection_id"] = businessConnectionID
 	}
 	var msg types.Message
 	if err := b.Request(ctx, "sendDocument", payload, &msg); err != nil {
@@ -115,17 +163,29 @@ func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessag
 //   - chatID: Unique identifier for the destination chat.
 //   - fromChatID: Unique identifier for the chat where the original message was sent.
 //   - messageID: Message identifier in the chat specified in fromChatID.
+//   - directMessagesTopicID: Optional identifier of the topic the message will be sent to in a direct messages chat; 0 omits it.
+//   - messageEffectID: Optional unique identifier of the message effect to be added to the message; empty omits it.
+//   - suggestedPostParameters: Optional suggested post parameters; nil omits them.
 //
 // Returns:
 //   - *types.Message: The forwarded Message object on success.
 //   - error: An error if forwarding failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#forwardmessage
-func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.Message, error) {
+func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64, directMessagesTopicID int64, messageEffectID string, suggestedPostParameters *types.SuggestedPostParameters) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
 		"from_chat_id": fromChatID,
 		"message_id":   messageID,
+	}
+	if directMessagesTopicID > 0 {
+		payload["direct_messages_topic_id"] = directMessagesTopicID
+	}
+	if messageEffectID != "" {
+		payload["message_effect_id"] = messageEffectID
+	}
+	if suggestedPostParameters != nil {
+		payload["suggested_post_parameters"] = suggestedPostParameters
 	}
 	var msg types.Message
 	if err := b.Request(ctx, "forwardMessage", payload, &msg); err != nil {
@@ -141,17 +201,33 @@ func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messag
 //   - chatID: Unique identifier for the destination chat.
 //   - fromChatID: Chat identifier of the source message.
 //   - messageID: Message identifier to copy.
+//   - directMessagesTopicID: Optional identifier of the topic the message will be sent to in a direct messages chat; 0 omits it.
+//   - allowPaidBroadcast: Pass true to allow paid broadcast of the message.
+//   - messageEffectID: Optional unique identifier of the message effect to be added to the message; empty omits it.
+//   - suggestedPostParameters: Optional suggested post parameters; nil omits them.
 //
 // Returns:
 //   - *types.MessageId: Unique message identifier of the newly sent message.
 //   - error: An error if copying failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#copymessage
-func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID int64) (*types.MessageId, error) {
+func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID int64, directMessagesTopicID int64, allowPaidBroadcast bool, messageEffectID string, suggestedPostParameters *types.SuggestedPostParameters) (*types.MessageId, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
 		"from_chat_id": fromChatID,
 		"message_id":   messageID,
+	}
+	if directMessagesTopicID > 0 {
+		payload["direct_messages_topic_id"] = directMessagesTopicID
+	}
+	if allowPaidBroadcast {
+		payload["allow_paid_broadcast"] = true
+	}
+	if messageEffectID != "" {
+		payload["message_effect_id"] = messageEffectID
+	}
+	if suggestedPostParameters != nil {
+		payload["suggested_post_parameters"] = suggestedPostParameters
 	}
 	var msgID types.MessageId
 	if err := b.Request(ctx, "copyMessage", payload, &msgID); err != nil {
@@ -166,16 +242,20 @@ func (b *Bot) CopyMessage(ctx context.Context, chatID, fromChatID any, messageID
 //   - ctx: Cancellation context.
 //   - chatID: Target chat identifier.
 //   - action: Type of action to broadcast (e.g. "typing", "upload_photo", "find_location").
+//   - businessConnectionID: Optional unique identifier of the business connection on behalf of which the action will be sent; empty omits it.
 //
 // Returns:
 //   - bool: True on success.
 //   - error: An error if the action failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#sendchataction
-func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string) (bool, error) {
+func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string, businessConnectionID string) (bool, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
 		"action":  action,
+	}
+	if businessConnectionID != "" {
+		payload["business_connection_id"] = businessConnectionID
 	}
 	var ok bool
 	if err := b.Request(ctx, "sendChatAction", payload, &ok); err != nil {

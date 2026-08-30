@@ -250,7 +250,7 @@ func runChatScoped(ctx context.Context, b *bot.Bot, chatID any, iconStickers []t
 	} else {
 		skip("getChatMember", "needs numeric chat id")
 	}
-	if _, err := b.SendChatAction(ctx, chatID, "typing"); err != nil {
+	if _, err := b.SendChatAction(ctx, chatID, "typing", ""); err != nil {
 		check("sendChatAction", err)
 	} else {
 		record("sendChatAction", "PASS", "")
@@ -279,9 +279,9 @@ func runChatScoped(ctx context.Context, b *bot.Bot, chatID any, iconStickers []t
 	}
 
 	photoURL := "https://telegram.org/img/t_logo.png"
-	p1, err := b.SendPhoto(ctx, chatID, photoURL, "demo photo", nil)
+	p1, err := b.SendPhoto(ctx, chatID, photoURL, "demo photo", nil, 0, nil, false, "", nil, "")
 	photo := d.trackMsg("sendPhoto", p1, err)
-	doc1, err := b.SendDocument(ctx, chatID, photoURL, "demo document")
+	doc1, err := b.SendDocument(ctx, chatID, photoURL, "demo document", 0, nil, false, "", nil, "")
 	d.trackMsg("sendDocument", doc1, err)
 
 	if ms, err := b.SendMediaGroup(ctx, &types.SendMediaGroupOptions{
@@ -346,9 +346,9 @@ func runChatScoped(ctx context.Context, b *bot.Bot, chatID any, iconStickers []t
 			Reaction:  []types.ReactionType{types.ReactionTypeEmoji{Type: "emoji", Emoji: "👍"}},
 		})))
 
-		fwd1, err := b.ForwardMessage(ctx, chatID, chatID, msg.MessageID)
+		fwd1, err := b.ForwardMessage(ctx, chatID, chatID, msg.MessageID, 0, "", nil)
 		d.trackMsg("forwardMessage", fwd1, err)
-		if cp, err := b.CopyMessage(ctx, chatID, chatID, msg.MessageID); err != nil {
+		if cp, err := b.CopyMessage(ctx, chatID, chatID, msg.MessageID, 0, false, "", nil); err != nil {
 			check("copyMessage", err)
 		} else {
 			record("copyMessage", "PASS", "")

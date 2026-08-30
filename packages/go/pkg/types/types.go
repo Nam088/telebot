@@ -371,16 +371,21 @@ type InlineKeyboardMarkup struct {
 
 // SendMessageOptions represents parameters for the sendMessage method.
 type SendMessageOptions struct {
-	BusinessConnectionID string              `json:"business_connection_id,omitempty"`
-	ChatID               any                 `json:"chat_id"`
-	Text                 string              `json:"text"`
-	MessageThreadID      int64               `json:"message_thread_id,omitempty"`
-	ParseMode            string              `json:"parse_mode,omitempty"`
-	Entities             []MessageEntity     `json:"entities,omitempty"`
-	LinkPreviewOptions   *LinkPreviewOptions `json:"link_preview_options,omitempty"`
-	DisableNotification  bool                `json:"disable_notification,omitempty"`
-	ProtectContent       bool                `json:"protect_content,omitempty"`
-	ReplyParameters      *ReplyParameters    `json:"reply_parameters,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	Text                       string                      `json:"text"`
+	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	ParseMode                  string                      `json:"parse_mode,omitempty"`
+	Entities                   []MessageEntity             `json:"entities,omitempty"`
+	LinkPreviewOptions         *LinkPreviewOptions         `json:"link_preview_options,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
 	// ReplyMarkup accepts *InlineKeyboardMarkup, *keyboard.ReplyKeyboardMarkup,
 	// or any other Telegram reply_markup value.
 	ReplyMarkup any `json:"reply_markup,omitempty"`

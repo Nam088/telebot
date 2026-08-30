@@ -8,6 +8,8 @@ type SendGameOptions struct {
 	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
 	DisableNotification  bool                  `json:"disable_notification,omitempty"`
 	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	AllowPaidBroadcast   bool                  `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
 	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
