@@ -208,8 +208,33 @@ export interface GiftQueryOptions {
   limit?: number;
 }
 
-/** Options for {@link Bot.getUserGifts}. */
-export type GetUserGiftsOptions = GiftQueryOptions;
+/**
+ * Options for {@link Bot.getUserGifts} (excludes the positional `user_id`).
+ *
+ * @remarks Declared directly rather than aliased to {@link GiftQueryOptions}
+ * because the fidelity audit resolves only interface declarations, never type
+ * aliases, when measuring which params a method can send.
+ *
+ * @see {@link https://core.telegram.org/bots/api#getusergifts Telegram Bot API: getUserGifts}
+ */
+export interface GetUserGiftsOptions {
+  /** Pass True to exclude gifts that can be purchased an unlimited number of times. */
+  exclude_unlimited?: boolean;
+  /** Pass True to exclude gifts that can be purchased a limited number of times and can be upgraded to unique. */
+  exclude_limited_upgradable?: boolean;
+  /** Pass True to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique. */
+  exclude_limited_non_upgradable?: boolean;
+  /** Pass True to exclude unique gifts. */
+  exclude_unique?: boolean;
+  /** Pass True to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram. */
+  exclude_from_blockchain?: boolean;
+  /** Pass True to sort results by gift price instead of send date. Sorting is applied before pagination. */
+  sort_by_price?: boolean;
+  /** Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results. */
+  offset?: string;
+  /** The maximum number of gifts to be returned; 1-100. */
+  limit?: number;
+}
 
 /** Options for {@link Bot.getChatGifts}. */
 export interface GetChatGiftsOptions extends GiftQueryOptions {

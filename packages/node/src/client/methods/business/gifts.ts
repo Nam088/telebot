@@ -12,6 +12,7 @@ import type {
   UpgradeGiftOptions,
   GiftPremiumSubscriptionOptions,
   CreateChatSubscriptionInviteLinkOptions,
+  EditChatSubscriptionInviteLinkOptions,
   RepostStoryOptions,
   SavePreparedKeyboardButtonOptions,
   Story,
@@ -138,9 +139,9 @@ export abstract class BusinessGiftsMethods extends BusinessAccountMethods {
   public async editChatSubscriptionInviteLink(
     chatId: number | string,
     inviteLink: string,
-    options: Record<string, unknown>,
-  ): Promise<unknown> {
-    return this.request<unknown>("editChatSubscriptionInviteLink", {
+    options: EditChatSubscriptionInviteLinkOptions = {},
+  ): Promise<ChatInviteLink> {
+    return this.request<ChatInviteLink>("editChatSubscriptionInviteLink", {
       chat_id: chatId,
       invite_link: inviteLink,
       ...options,

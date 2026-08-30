@@ -53,6 +53,16 @@ export interface CreateChatSubscriptionInviteLinkOptions {
 }
 
 /**
+ * Options for {@link Bot.editChatSubscriptionInviteLink} (excludes the positional `chat_id` and `invite_link`).
+ *
+ * @see {@link https://core.telegram.org/bots/api#editchatsubscriptioninvitelink Telegram Bot API: editChatSubscriptionInviteLink}
+ */
+export interface EditChatSubscriptionInviteLinkOptions {
+  /** Invite link name; 0-32 characters. */
+  name?: string;
+}
+
+/**
  * Options for {@link Bot.repostStory}.
  *
  * @remarks
