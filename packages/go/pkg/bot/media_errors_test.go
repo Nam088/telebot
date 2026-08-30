@@ -64,7 +64,7 @@ func TestMediaMethods_TelegramError(t *testing.T) {
 			return err
 		}},
 		{"SendPoll", func() error {
-			_, err := b.SendPoll(ctx, &types.SendPollOptions{ChatID: int64(1), Question: "Q", Options: []string{"A"}})
+			_, err := b.SendPoll(ctx, &types.SendPollOptions{ChatID: int64(1), Question: "Q", Options: []types.InputPollOption{{Text: "A"}}})
 			return err
 		}},
 		{"SendDice", func() error {

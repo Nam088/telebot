@@ -184,29 +184,92 @@ type SendContactOptions struct {
 	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 }
 
+// SendPhotoOptions represents parameters for the sendPhoto method.
+type SendPhotoOptions struct {
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	Photo                      any                         `json:"photo"`
+	Caption                    string                      `json:"caption,omitempty"`
+	ParseMode                  string                      `json:"parse_mode,omitempty"`
+	CaptionEntities            []MessageEntity             `json:"caption_entities,omitempty"`
+	ShowCaptionAboveMedia      bool                        `json:"show_caption_above_media,omitempty"`
+	HasSpoiler                 bool                        `json:"has_spoiler,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                *InlineKeyboardMarkup       `json:"reply_markup,omitempty"`
+}
+
+// SendDocumentOptions represents parameters for the sendDocument method.
+type SendDocumentOptions struct {
+	BusinessConnectionID        string                      `json:"business_connection_id,omitempty"`
+	ChatID                      any                         `json:"chat_id"`
+	MessageThreadID             int64                       `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID       int64                       `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters  *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	Document                    any                         `json:"document"`
+	Thumbnail                   any                         `json:"thumbnail,omitempty"`
+	Caption                     string                      `json:"caption,omitempty"`
+	ParseMode                   string                      `json:"parse_mode,omitempty"`
+	CaptionEntities             []MessageEntity             `json:"caption_entities,omitempty"`
+	DisableContentTypeDetection bool                        `json:"disable_content_type_detection,omitempty"`
+	DisableNotification         bool                        `json:"disable_notification,omitempty"`
+	ProtectContent              bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast          bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID             string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters     *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters             *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                 *InlineKeyboardMarkup       `json:"reply_markup,omitempty"`
+}
+
 // SendPollOptions represents parameters for the sendPoll method.
 type SendPollOptions struct {
-	BusinessConnectionID  string                `json:"business_connection_id,omitempty"`
-	ChatID                any                   `json:"chat_id"`
-	Question              string                `json:"question"`
-	Options               []string              `json:"options"`
-	IsAnonymous           bool                  `json:"is_anonymous,omitempty"`
-	Type                  string                `json:"type,omitempty"`
-	AllowsMultipleAnswers bool                  `json:"allows_multiple_answers,omitempty"`
-	CorrectOptionIDs      []int                 `json:"correct_option_ids,omitempty"`
-	Explanation           string                `json:"explanation,omitempty"`
-	ExplanationParseMode  string                `json:"explanation_parse_mode,omitempty"`
-	ExplanationEntities   []MessageEntity       `json:"explanation_entities,omitempty"`
-	OpenPeriod            int                   `json:"open_period,omitempty"`
-	CloseDate             int64                 `json:"close_date,omitempty"`
-	IsClosed              bool                  `json:"is_closed,omitempty"`
-	DisableNotification   bool                  `json:"disable_notification,omitempty"`
-	ProtectContent        bool                  `json:"protect_content,omitempty"`
-	AllowPaidBroadcast    bool                  `json:"allow_paid_broadcast,omitempty"`
-	MessageEffectID       string                `json:"message_effect_id,omitempty"`
-	ReplyParameters       *ReplyParameters      `json:"reply_parameters,omitempty"`
-	ReplyMarkup           *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	MessageThreadID       int64                 `json:"message_thread_id,omitempty"`
+	BusinessConnectionID   string            `json:"business_connection_id,omitempty"`
+	ChatID                 any               `json:"chat_id"`
+	MessageThreadID        int64             `json:"message_thread_id,omitempty"`
+	Question               string            `json:"question"`
+	QuestionParseMode      string            `json:"question_parse_mode,omitempty"`
+	QuestionEntities       []MessageEntity   `json:"question_entities,omitempty"`
+	Options                []InputPollOption `json:"options"`
+	IsAnonymous            bool              `json:"is_anonymous,omitempty"`
+	Type                   string            `json:"type,omitempty"`
+	AllowsMultipleAnswers  bool              `json:"allows_multiple_answers,omitempty"`
+	AllowsRevoting         bool              `json:"allows_revoting,omitempty"`
+	ShuffleOptions         bool              `json:"shuffle_options,omitempty"`
+	AllowAddingOptions     bool              `json:"allow_adding_options,omitempty"`
+	HideResultsUntilCloses bool              `json:"hide_results_until_closes,omitempty"`
+	MembersOnly            bool              `json:"members_only,omitempty"`
+	CountryCodes           []string          `json:"country_codes,omitempty"`
+	CorrectOptionIDs       []int             `json:"correct_option_ids,omitempty"`
+	Explanation            string            `json:"explanation,omitempty"`
+	ExplanationParseMode   string            `json:"explanation_parse_mode,omitempty"`
+	ExplanationEntities    []MessageEntity   `json:"explanation_entities,omitempty"`
+	// ExplanationMedia is typed InputPollMedia in the docs, an abstract union
+	// of the InputMedia* classes. This package models that union through the
+	// InputMedia interface, so any InputMedia* value satisfies it.
+	ExplanationMedia     InputMedia      `json:"explanation_media,omitempty"`
+	OpenPeriod           int             `json:"open_period,omitempty"`
+	CloseDate            int64           `json:"close_date,omitempty"`
+	IsClosed             bool            `json:"is_closed,omitempty"`
+	Description          string          `json:"description,omitempty"`
+	DescriptionParseMode string          `json:"description_parse_mode,omitempty"`
+	DescriptionEntities  []MessageEntity `json:"description_entities,omitempty"`
+	// Media is typed InputPollMedia in the docs, an abstract union of the
+	// InputMedia* classes. This package models that union through the
+	// InputMedia interface, so any InputMedia* value satisfies it.
+	Media               InputMedia            `json:"media,omitempty"`
+	DisableNotification bool                  `json:"disable_notification,omitempty"`
+	ProtectContent      bool                  `json:"protect_content,omitempty"`
+	AllowPaidBroadcast  bool                  `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID     string                `json:"message_effect_id,omitempty"`
+	ReplyParameters     *ReplyParameters      `json:"reply_parameters,omitempty"`
+	ReplyMarkup         *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 // SendDiceOptions represents parameters for the sendDice method.

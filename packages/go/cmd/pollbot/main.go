@@ -78,9 +78,12 @@ func buildRouter(b *bot.Bot) *routing.Router {
 
 	router.Command("poll", func(c *routing.Context) error {
 		msg, err := b.SendPoll(c.Ctx(), &types.SendPollOptions{
-			ChatID:      c.Chat().ID,
-			Question:    "Which Go feature do you use most?",
-			Options:     []string{"Goroutines", "Channels", "Interfaces", "Generics"},
+			ChatID:   c.Chat().ID,
+			Question: "Which Go feature do you use most?",
+			Options: []types.InputPollOption{
+				{Text: "Goroutines"}, {Text: "Channels"},
+				{Text: "Interfaces"}, {Text: "Generics"},
+			},
 			IsAnonymous: false,
 		})
 		if err != nil {
@@ -92,9 +95,13 @@ func buildRouter(b *bot.Bot) *routing.Router {
 
 	router.Command("quiz", func(c *routing.Context) error {
 		msg, err := b.SendPoll(c.Ctx(), &types.SendPollOptions{
-			ChatID:           c.Chat().ID,
-			Question:         "What does the Go scheduler use to run goroutines?",
-			Options:          []string{"One OS thread per goroutine", "M:N scheduling on OS threads", "A single global event loop"},
+			ChatID:   c.Chat().ID,
+			Question: "What does the Go scheduler use to run goroutines?",
+			Options: []types.InputPollOption{
+				{Text: "One OS thread per goroutine"},
+				{Text: "M:N scheduling on OS threads"},
+				{Text: "A single global event loop"},
+			},
 			Type:             "quiz",
 			CorrectOptionIDs: []int{1},
 			Explanation:      "Go uses M:N scheduling: many goroutines are multiplexed onto a smaller number of OS threads.",

@@ -103,13 +103,101 @@ func TestSendMediaOptionsSerialization(t *testing.T) {
 	assertContains(t, string(b), `"first_name":"Alice"`)
 
 	poll := &types.SendPollOptions{
-		ChatID:   int64(1),
-		Question: "Q?",
-		Options:  []string{"A", "B"},
+		ChatID:            int64(1),
+		Question:          "Q?",
+		QuestionParseMode: "HTML",
+		Options:           []types.InputPollOption{{Text: "A"}, {Text: "B"}},
+		CountryCodes:      []string{"DE", "FR"},
+		Description:       "pick one",
+		Media:             &types.InputMediaPhoto{Type: "photo", Media: "p1"},
 	}
 	b, _ = json.Marshal(poll)
 	assertContains(t, string(b), `"question":"Q?"`)
-	assertContains(t, string(b), `"options":["A","B"]`)
+	assertContains(t, string(b), `"question_parse_mode":"HTML"`)
+	assertContains(t, string(b), `"options":[{"text":"A"},{"text":"B"}]`)
+	assertContains(t, string(b), `"country_codes":["DE","FR"]`)
+	assertContains(t, string(b), `"description":"pick one"`)
+	assertContains(t, string(b), `"media":{"type":"photo","media":"p1"}`)
+
+	photo := &types.SendPhotoOptions{
+		ChatID:                int64(1),
+		Photo:                 "photo_id",
+		Caption:               "cap",
+		ParseMode:             "HTML",
+		CaptionEntities:       []types.MessageEntity{{Type: "bold", Offset: 0, Length: 3}},
+		MessageThreadID:       4,
+		HasSpoiler:            true,
+		ShowCaptionAboveMedia: true,
+		DisableNotification:   true,
+		ProtectContent:        true,
+		ReplyParameters:       &types.ReplyParameters{MessageID: types.Ptr(int64(7))},
+		ReplyMarkup:           &types.InlineKeyboardMarkup{},
+	}
+	b, err = json.Marshal(photo)
+	if err != nil {
+		t.Fatalf("marshal SendPhotoOptions: %v", err)
+	}
+	assertContains(t, string(b), `"photo":"photo_id"`)
+	assertContains(t, string(b), `"parse_mode":"HTML"`)
+	assertContains(t, string(b), `"caption_entities":[{"type":"bold"`)
+	assertContains(t, string(b), `"message_thread_id":4`)
+	assertContains(t, string(b), `"has_spoiler":true`)
+	assertContains(t, string(b), `"show_caption_above_media":true`)
+	assertContains(t, string(b), `"disable_notification":true`)
+	assertContains(t, string(b), `"protect_content":true`)
+	assertContains(t, string(b), `"reply_parameters":{"message_id":7}`)
+	assertContains(t, string(b), `"reply_markup"`)
+
+	document := &types.SendDocumentOptions{
+		ChatID:                      int64(1),
+		Document:                    "doc_id",
+		Thumbnail:                   "thumb_id",
+		ParseMode:                   "MarkdownV2",
+		CaptionEntities:             []types.MessageEntity{{Type: "italic", Offset: 1, Length: 2}},
+		DisableContentTypeDetection: true,
+		MessageThreadID:             5,
+	}
+	b, err = json.Marshal(document)
+	if err != nil {
+		t.Fatalf("marshal SendDocumentOptions: %v", err)
+	}
+	assertContains(t, string(b), `"document":"doc_id"`)
+	assertContains(t, string(b), `"thumbnail":"thumb_id"`)
+	assertContains(t, string(b), `"parse_mode":"MarkdownV2"`)
+	assertContains(t, string(b), `"disable_content_type_detection":true`)
+	assertContains(t, string(b), `"message_thread_id":5`)
+
+	copy := &types.CopyMessageOptions{
+		ChatID:                int64(1),
+		FromChatID:            int64(2),
+		MessageID:             14,
+		MessageThreadID:       9,
+		VideoStartTimestamp:   30,
+		Caption:               "copied",
+		ParseMode:             "HTML",
+		CaptionEntities:       []types.MessageEntity{{Type: "bold", Offset: 0, Length: 6}},
+		ShowCaptionAboveMedia: true,
+		DisableNotification:   true,
+		ProtectContent:        true,
+		ReplyParameters:       &types.ReplyParameters{MessageID: types.Ptr(int64(8))},
+		ReplyMarkup:           &types.InlineKeyboardMarkup{},
+	}
+	b, err = json.Marshal(copy)
+	if err != nil {
+		t.Fatalf("marshal CopyMessageOptions: %v", err)
+	}
+	assertContains(t, string(b), `"chat_id":1`)
+	assertContains(t, string(b), `"from_chat_id":2`)
+	assertContains(t, string(b), `"message_id":14`)
+	assertContains(t, string(b), `"message_thread_id":9`)
+	assertContains(t, string(b), `"video_start_timestamp":30`)
+	assertContains(t, string(b), `"caption":"copied"`)
+	assertContains(t, string(b), `"parse_mode":"HTML"`)
+	assertContains(t, string(b), `"show_caption_above_media":true`)
+	assertContains(t, string(b), `"disable_notification":true`)
+	assertContains(t, string(b), `"protect_content":true`)
+	assertContains(t, string(b), `"reply_parameters":{"message_id":8}`)
+	assertContains(t, string(b), `"reply_markup"`)
 
 	dice := &types.SendDiceOptions{ChatID: int64(1), Emoji: "🎲"}
 	b, _ = json.Marshal(dice)
@@ -134,6 +222,56 @@ func TestSendMediaOptionsOmitempty(t *testing.T) {
 	assertNotContains(t, string(b), `"caption"`)
 	assertNotContains(t, string(b), `"duration"`)
 	assertNotContains(t, string(b), `"reply_markup"`)
+
+	photo := &types.SendPhotoOptions{ChatID: int64(1), Photo: "p"}
+	b, _ = json.Marshal(photo)
+	assertNotContains(t, string(b), `"caption"`)
+	assertNotContains(t, string(b), `"parse_mode"`)
+	assertNotContains(t, string(b), `"caption_entities"`)
+	assertNotContains(t, string(b), `"has_spoiler"`)
+	assertNotContains(t, string(b), `"show_caption_above_media"`)
+	assertNotContains(t, string(b), `"disable_notification"`)
+	assertNotContains(t, string(b), `"protect_content"`)
+	assertNotContains(t, string(b), `"message_thread_id"`)
+	assertNotContains(t, string(b), `"reply_parameters"`)
+	assertNotContains(t, string(b), `"reply_markup"`)
+	assertContains(t, string(b), `"photo":"p"`)
+
+	document := &types.SendDocumentOptions{ChatID: int64(1), Document: "d"}
+	b, _ = json.Marshal(document)
+	assertNotContains(t, string(b), `"thumbnail"`)
+	assertNotContains(t, string(b), `"disable_content_type_detection"`)
+	assertNotContains(t, string(b), `"parse_mode"`)
+	assertNotContains(t, string(b), `"message_thread_id"`)
+	assertNotContains(t, string(b), `"reply_parameters"`)
+	assertNotContains(t, string(b), `"reply_markup"`)
+	assertContains(t, string(b), `"document":"d"`)
+
+	poll := &types.SendPollOptions{ChatID: int64(1), Question: "Q?", Options: []types.InputPollOption{{Text: "A"}}}
+	b, _ = json.Marshal(poll)
+	assertNotContains(t, string(b), `"question_parse_mode"`)
+	assertNotContains(t, string(b), `"question_entities"`)
+	assertNotContains(t, string(b), `"allows_revoting"`)
+	assertNotContains(t, string(b), `"shuffle_options"`)
+	assertNotContains(t, string(b), `"allow_adding_options"`)
+	assertNotContains(t, string(b), `"hide_results_until_closes"`)
+	assertNotContains(t, string(b), `"members_only"`)
+	assertNotContains(t, string(b), `"country_codes"`)
+	assertNotContains(t, string(b), `"explanation_media"`)
+	assertNotContains(t, string(b), `"description"`)
+	assertNotContains(t, string(b), `"media"`)
+	assertContains(t, string(b), `"question":"Q?"`)
+
+	copy := &types.CopyMessageOptions{ChatID: int64(1), FromChatID: int64(2), MessageID: 3}
+	b, _ = json.Marshal(copy)
+	assertNotContains(t, string(b), `"message_thread_id"`)
+	assertNotContains(t, string(b), `"video_start_timestamp"`)
+	assertNotContains(t, string(b), `"caption"`)
+	assertNotContains(t, string(b), `"parse_mode"`)
+	assertNotContains(t, string(b), `"show_caption_above_media"`)
+	assertNotContains(t, string(b), `"reply_parameters"`)
+	assertNotContains(t, string(b), `"reply_markup"`)
+	assertContains(t, string(b), `"message_id":3`)
 }
 
 func TestEditingOptionsSerialization(t *testing.T) {
