@@ -100,7 +100,328 @@
       "ambiguous": [],
       "typesWithMissing": 0,
       "missingRequired": 0,
-      "missingOptional": 0
+      "missingOptional": 0,
+      "documentMethods": 185,
+      "methodRows": [
+        {
+          "name": "sendPoll",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "question_parse_mode",
+            "question_entities",
+            "allows_revoting",
+            "shuffle_options",
+            "allow_adding_options",
+            "hide_results_until_closes",
+            "members_only",
+            "country_codes",
+            "explanation_media",
+            "description",
+            "description_parse_mode",
+            "description_entities",
+            "media",
+            "allow_paid_broadcast"
+          ],
+          "total": 34,
+          "absent": false
+        },
+        {
+          "name": "copyMessage",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "show_caption_above_media",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters",
+            "reply_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "sendVideo",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "cover",
+            "start_timestamp",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 25,
+          "absent": false
+        },
+        {
+          "name": "forwardMessage",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendAnimation",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 22,
+          "absent": false
+        },
+        {
+          "name": "sendAudio",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendContact",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendDice",
+          "file": "packages/node/src/client/methods/messages/edit.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 12,
+          "absent": false
+        },
+        {
+          "name": "sendDocument",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendInvoice",
+          "file": "packages/node/src/client/methods/payments.ts",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 31,
+          "absent": false
+        },
+        {
+          "name": "sendLocation",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendMessage",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendPhoto",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendVenue",
+          "file": "packages/node/src/client/methods/messages/send-basic.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendVideoNote",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendVoice",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "sendGame",
+          "file": "packages/node/src/client/methods/business/games-passport.ts",
+          "required": [],
+          "optional": [
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "reply_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendMediaGroup",
+          "file": "packages/node/src/client/methods/messages/send-media.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "allow_paid_broadcast"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendSticker",
+          "file": "packages/node/src/client/methods/stickers.ts",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 14,
+          "absent": false
+        },
+        {
+          "name": "editMessageCaption",
+          "file": "packages/node/src/client/methods/messages/edit.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 9,
+          "absent": false
+        },
+        {
+          "name": "editMessageReplyMarkup",
+          "file": "packages/node/src/client/methods/messages/edit.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 5,
+          "absent": false
+        },
+        {
+          "name": "getChatAdministrators",
+          "file": "packages/node/src/client/methods/chats/management.ts",
+          "required": [],
+          "optional": [
+            "return_bots"
+          ],
+          "total": 2,
+          "absent": false
+        },
+        {
+          "name": "pinChatMessage",
+          "file": "packages/node/src/client/methods/chats/management.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "unpinChatMessage",
+          "file": "packages/node/src/client/methods/chats/management.ts",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 3,
+          "absent": false
+        }
+      ],
+      "methodsUnresolved": [
+        "editChatSubscriptionInviteLink",
+        "editStory",
+        "getUserGifts"
+      ],
+      "methodsWithMissing": 24,
+      "missingMethodRequired": 0,
+      "missingMethodOptional": 94
     },
     {
       "key": "go",
@@ -179,7 +500,519 @@
       ],
       "typesWithMissing": 0,
       "missingRequired": 0,
-      "missingOptional": 0
+      "missingOptional": 0,
+      "documentMethods": 185,
+      "methodRows": [
+        {
+          "name": "sendDocument",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "thumbnail",
+            "parse_mode",
+            "caption_entities",
+            "disable_content_type_detection",
+            "disable_notification",
+            "protect_content",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters",
+            "reply_parameters",
+            "reply_markup"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "copyMessage",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "caption",
+            "parse_mode",
+            "caption_entities",
+            "show_caption_above_media",
+            "disable_notification",
+            "protect_content",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters",
+            "reply_parameters",
+            "reply_markup"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "sendPhoto",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "parse_mode",
+            "caption_entities",
+            "show_caption_above_media",
+            "has_spoiler",
+            "disable_notification",
+            "protect_content",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters",
+            "reply_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendPoll",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "question_parse_mode",
+            "question_entities",
+            "allows_revoting",
+            "shuffle_options",
+            "allow_adding_options",
+            "hide_results_until_closes",
+            "members_only",
+            "country_codes",
+            "explanation_media",
+            "description",
+            "description_parse_mode",
+            "description_entities",
+            "media",
+            "allow_paid_broadcast"
+          ],
+          "total": 34,
+          "absent": false
+        },
+        {
+          "name": "getBusinessAccountGifts",
+          "file": "packages/go/pkg/bot/business.go",
+          "required": [],
+          "optional": [
+            "exclude_unsaved",
+            "exclude_saved",
+            "exclude_unlimited",
+            "exclude_limited_upgradable",
+            "exclude_limited_non_upgradable",
+            "exclude_unique",
+            "exclude_from_blockchain",
+            "sort_by_price",
+            "offset",
+            "limit"
+          ],
+          "total": 11,
+          "absent": false
+        },
+        {
+          "name": "getChatGifts",
+          "file": "packages/go/pkg/bot/gifts.go",
+          "required": [],
+          "optional": [
+            "exclude_unsaved",
+            "exclude_saved",
+            "exclude_unlimited",
+            "exclude_limited_upgradable",
+            "exclude_limited_non_upgradable",
+            "exclude_from_blockchain",
+            "exclude_unique",
+            "sort_by_price",
+            "offset",
+            "limit"
+          ],
+          "total": 11,
+          "absent": false
+        },
+        {
+          "name": "getUserGifts",
+          "file": "packages/go/pkg/bot/gifts.go",
+          "required": [],
+          "optional": [
+            "exclude_unlimited",
+            "exclude_limited_upgradable",
+            "exclude_limited_non_upgradable",
+            "exclude_from_blockchain",
+            "exclude_unique",
+            "sort_by_price",
+            "offset",
+            "limit"
+          ],
+          "total": 9,
+          "absent": false
+        },
+        {
+          "name": "forwardMessage",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "disable_notification",
+            "protect_content",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendVideo",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "cover",
+            "start_timestamp",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 25,
+          "absent": false
+        },
+        {
+          "name": "sendMessage",
+          "file": "packages/go/pkg/bot/bot.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "editStory",
+          "file": "packages/go/pkg/bot/stories_extra.go",
+          "required": [],
+          "optional": [
+            "caption",
+            "parse_mode",
+            "caption_entities",
+            "areas"
+          ],
+          "total": 7,
+          "absent": false
+        },
+        {
+          "name": "sendAnimation",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 22,
+          "absent": false
+        },
+        {
+          "name": "sendAudio",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendContact",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendInvoice",
+          "file": "packages/go/pkg/bot/payments.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 31,
+          "absent": false
+        },
+        {
+          "name": "sendLocation",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendSticker",
+          "file": "packages/go/pkg/bot/stickers.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 14,
+          "absent": false
+        },
+        {
+          "name": "sendVenue",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendVideoNote",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendVoice",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "setWebhook",
+          "file": "packages/go/pkg/bot/webhook.go",
+          "required": [],
+          "optional": [
+            "certificate",
+            "ip_address",
+            "allowed_updates",
+            "drop_pending_updates"
+          ],
+          "total": 7,
+          "absent": false
+        },
+        {
+          "name": "sendDice",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 12,
+          "absent": false
+        },
+        {
+          "name": "sendGame",
+          "file": "packages/go/pkg/bot/games.go",
+          "required": [],
+          "optional": [
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "reply_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendLivePhoto",
+          "file": "packages/go/pkg/bot/paid_media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 19,
+          "absent": false
+        },
+        {
+          "name": "sendChatAction",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "message_thread_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "sendMediaGroup",
+          "file": "packages/go/pkg/bot/media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "upgradeGift",
+          "file": "packages/go/pkg/bot/gifts.go",
+          "required": [],
+          "optional": [
+            "keep_original_details",
+            "star_count"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "approveSuggestedPost",
+          "file": "packages/go/pkg/bot/suggested_posts.go",
+          "required": [],
+          "optional": [
+            "send_date"
+          ],
+          "total": 3,
+          "absent": false
+        },
+        {
+          "name": "copyMessages",
+          "file": "packages/go/pkg/bot/bulk.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id"
+          ],
+          "total": 8,
+          "absent": false
+        },
+        {
+          "name": "declineSuggestedPost",
+          "file": "packages/go/pkg/bot/suggested_posts.go",
+          "required": [],
+          "optional": [
+            "comment"
+          ],
+          "total": 3,
+          "absent": false
+        },
+        {
+          "name": "editMessageReplyMarkup",
+          "file": "packages/go/pkg/bot/messages.go",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 5,
+          "absent": false
+        },
+        {
+          "name": "forwardMessages",
+          "file": "packages/go/pkg/bot/bulk.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id"
+          ],
+          "total": 7,
+          "absent": false
+        },
+        {
+          "name": "getChatAdministrators",
+          "file": "packages/go/pkg/bot/chats.go",
+          "required": [],
+          "optional": [
+            "return_bots"
+          ],
+          "total": 2,
+          "absent": false
+        },
+        {
+          "name": "pinChatMessage",
+          "file": "packages/go/pkg/bot/chat_management.go",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "sendPaidMedia",
+          "file": "packages/go/pkg/bot/paid_media.go",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "transferGift",
+          "file": "packages/go/pkg/bot/gifts.go",
+          "required": [],
+          "optional": [
+            "star_count"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "unpinChatMessage",
+          "file": "packages/go/pkg/bot/chat_management.go",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 3,
+          "absent": false
+        }
+      ],
+      "methodsUnresolved": [],
+      "methodsWithMissing": 37,
+      "missingMethodRequired": 0,
+      "missingMethodOptional": 172
     },
     {
       "key": "python",
@@ -259,7 +1092,379 @@
       "ambiguous": [],
       "typesWithMissing": 0,
       "missingRequired": 0,
-      "missingOptional": 0
+      "missingOptional": 0,
+      "documentMethods": 185,
+      "methodRows": [
+        {
+          "name": "sendPoll",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "question_parse_mode",
+            "question_entities",
+            "allows_revoting",
+            "shuffle_options",
+            "allow_adding_options",
+            "hide_results_until_closes",
+            "members_only",
+            "country_codes",
+            "explanation_media",
+            "description",
+            "description_parse_mode",
+            "description_entities",
+            "media",
+            "allow_paid_broadcast"
+          ],
+          "total": 34,
+          "absent": false
+        },
+        {
+          "name": "sendDocument",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "thumbnail",
+            "caption_entities",
+            "disable_content_type_detection",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendPhoto",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "message_thread_id",
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "caption_entities",
+            "show_caption_above_media",
+            "has_spoiler",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "copyMessage",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "show_caption_above_media",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "sendVideo",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "cover",
+            "start_timestamp",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 25,
+          "absent": false
+        },
+        {
+          "name": "sendMessage",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "business_connection_id",
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "forwardMessage",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "video_start_timestamp",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendAnimation",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 22,
+          "absent": false
+        },
+        {
+          "name": "sendAudio",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendContact",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendInvoice",
+          "file": "packages/python/src/telebot_py/bot/payments.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "suggested_post_parameters"
+          ],
+          "total": 31,
+          "absent": false
+        },
+        {
+          "name": "sendLivePhoto",
+          "file": "packages/python/src/telebot_py/bot/paid_media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 19,
+          "absent": false
+        },
+        {
+          "name": "sendLocation",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 18,
+          "absent": false
+        },
+        {
+          "name": "sendSticker",
+          "file": "packages/python/src/telebot_py/bot/stickers.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 14,
+          "absent": false
+        },
+        {
+          "name": "sendVenue",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 20,
+          "absent": false
+        },
+        {
+          "name": "sendVideoNote",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 16,
+          "absent": false
+        },
+        {
+          "name": "sendVoice",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "ephemeral_message_parameters",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "sendDice",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast",
+            "suggested_post_parameters"
+          ],
+          "total": 12,
+          "absent": false
+        },
+        {
+          "name": "sendGame",
+          "file": "packages/python/src/telebot_py/bot/games.py",
+          "required": [],
+          "optional": [
+            "allow_paid_broadcast",
+            "message_effect_id",
+            "reply_parameters"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendMediaGroup",
+          "file": "packages/python/src/telebot_py/bot/media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "allow_paid_broadcast"
+          ],
+          "total": 10,
+          "absent": false
+        },
+        {
+          "name": "sendPaidMedia",
+          "file": "packages/python/src/telebot_py/bot/paid_media.py",
+          "required": [],
+          "optional": [
+            "direct_messages_topic_id",
+            "suggested_post_parameters"
+          ],
+          "total": 17,
+          "absent": false
+        },
+        {
+          "name": "setWebhook",
+          "file": "packages/python/src/telebot_py/bot/webhook.py",
+          "required": [],
+          "optional": [
+            "certificate",
+            "ip_address"
+          ],
+          "total": 7,
+          "absent": false
+        },
+        {
+          "name": "editMessageCaption",
+          "file": "packages/python/src/telebot_py/bot/edits.py",
+          "required": [],
+          "optional": [
+            "show_caption_above_media"
+          ],
+          "total": 9,
+          "absent": false
+        },
+        {
+          "name": "getChatAdministrators",
+          "file": "packages/python/src/telebot_py/bot/chats.py",
+          "required": [],
+          "optional": [
+            "return_bots"
+          ],
+          "total": 2,
+          "absent": false
+        },
+        {
+          "name": "pinChatMessage",
+          "file": "packages/python/src/telebot_py/bot/chat_management.py",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "sendChatAction",
+          "file": "packages/python/src/telebot_py/bot/messages.py",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "stopPoll",
+          "file": "packages/python/src/telebot_py/bot/edits.py",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 4,
+          "absent": false
+        },
+        {
+          "name": "unpinChatMessage",
+          "file": "packages/python/src/telebot_py/bot/chat_management.py",
+          "required": [],
+          "optional": [
+            "business_connection_id"
+          ],
+          "total": 3,
+          "absent": false
+        }
+      ],
+      "methodsUnresolved": [],
+      "methodsWithMissing": 28,
+      "missingMethodRequired": 0,
+      "missingMethodOptional": 113
     }
   ]
 }
