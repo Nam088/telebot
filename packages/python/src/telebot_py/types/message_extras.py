@@ -9,11 +9,13 @@ from telebot_py.types.chat import Chat
 from telebot_py.types.common import (
     Contact,
     Dice,
+    LinkPreviewOptions,
     Location,
     MessageEntity,
     Poll,
     Venue,
 )
+from telebot_py.types.games import Game
 from telebot_py.types.media import (
     Animation,
     Audio,
@@ -23,6 +25,8 @@ from telebot_py.types.media import (
     VideoNote,
     Voice,
 )
+from telebot_py.types.payments import Invoice
+from telebot_py.types.stickers import Sticker
 from telebot_py.types.user import User
 
 
@@ -153,13 +157,13 @@ class ExternalReplyInfo(TelegramObject):
         chat: Chat the original message belongs to.
         message_id: Unique message identifier inside the original chat.
         link_preview_options: Options used for link preview generation for
-            the original message (kept raw per node typing).
+            the original message, if it is a text message and includes entity
+            links.
         animation: The message is an animation, information about it.
         audio: The message is an audio file, information about the file.
         document: The message is a general file, information about the file.
         photo: The message is a photo, available sizes of the photo.
-        sticker: The message is a sticker (node Sticker is out of scope here,
-            so the payload stays raw).
+        sticker: The message is a sticker, information about it.
         story: The message is a forwarded story, information about the story.
         video: The message is a video, information about the video.
         video_note: The message is a video note, information about it.
@@ -168,11 +172,11 @@ class ExternalReplyInfo(TelegramObject):
             animation.
         contact: The message is a shared contact, information about it.
         dice: The message is a dice with random value.
-        game: The message is a game (kept raw per node scope).
+        game: The message is a game, information about it.
         giveaway: The message is a scheduled giveaway (kept raw).
         giveaway_winners: A giveaway with public winners was completed
             (kept raw).
-        invoice: The message is an invoice for a payment (kept raw).
+        invoice: The message is an invoice for a payment.
         location: The message is a shared location, information about it.
         poll: The message is a native poll, information about the poll.
         venue: The message is a venue, information about the venue.
@@ -183,12 +187,12 @@ class ExternalReplyInfo(TelegramObject):
     origin: MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel
     chat: Chat | None = None
     message_id: int | None = None
-    link_preview_options: object | None = None
+    link_preview_options: LinkPreviewOptions | None = None
     animation: Animation | None = None
     audio: Audio | None = None
     document: Document | None = None
     photo: list[PhotoSize] | None = None
-    sticker: object | None = None
+    sticker: Sticker | None = None
     story: Story | None = None
     video: Video | None = None
     video_note: VideoNote | None = None
@@ -196,10 +200,10 @@ class ExternalReplyInfo(TelegramObject):
     has_media_spoiler: bool | None = None
     contact: Contact | None = None
     dice: Dice | None = None
-    game: object | None = None
+    game: Game | None = None
     giveaway: object | None = None
     giveaway_winners: object | None = None
-    invoice: object | None = None
+    invoice: Invoice | None = None
     location: Location | None = None
     poll: Poll | None = None
     venue: Venue | None = None

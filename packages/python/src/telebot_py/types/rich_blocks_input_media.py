@@ -5,19 +5,29 @@ Bot API docs for the ``InputRichBlock*`` classes and ``InputRichMessageMedia``
 (Bot API 10.3).
 
 Remarks:
-    ``InputMedia*`` has no dataclasses in this package, so the media fields
-    Telegram types that way are annotated ``object`` and passed through as a
-    mapping or any object exposing ``to_dict``; the bot methods accept both.
-    Telegram ignores the caption inside these media objects in favour of the
-    block's own ``caption``.
+    Media fields use the typed :mod:`telebot_py.types.input_media` dataclasses
+    and additionally accept a raw mapping, so existing dict-built payloads keep
+    working; ``from_dict`` hydrates the variant named by the payload's ``type``
+    key. Telegram ignores the caption inside these media objects in favour of
+    the block's own ``caption``.
 """
 
 from __future__ import annotations
 
 import dataclasses
+import typing as t
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.common import Location
+from telebot_py.types.input_media import (
+    InputMediaAnimation,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaLike,
+    InputMediaPhoto,
+    InputMediaVideo,
+    InputMediaVoiceNote,
+)
 from telebot_py.types.rich_blocks_media import RichBlockCaption
 
 
@@ -32,7 +42,7 @@ class InputRichBlockAnimation(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockanimation
     """
 
-    animation: object
+    animation: InputMediaAnimation | t.Mapping[str, object]
     type: str = "animation"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "animation")
@@ -49,7 +59,7 @@ class InputRichBlockAudio(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockaudio
     """
 
-    audio: object
+    audio: InputMediaAudio | t.Mapping[str, object]
     type: str = "audio"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "audio")
@@ -66,7 +76,7 @@ class InputRichBlockDocument(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockdocument
     """
 
-    document: object
+    document: InputMediaDocument | t.Mapping[str, object]
     type: str = "document"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "document")
@@ -83,7 +93,7 @@ class InputRichBlockPhoto(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockphoto
     """
 
-    photo: object
+    photo: InputMediaPhoto | t.Mapping[str, object]
     type: str = "photo"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "photo")
@@ -100,7 +110,7 @@ class InputRichBlockVideo(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockvideo
     """
 
-    video: object
+    video: InputMediaVideo | t.Mapping[str, object]
     type: str = "video"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "video")
@@ -117,7 +127,7 @@ class InputRichBlockVoiceNote(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#inputrichblockvoicenote
     """
 
-    voice_note: object
+    voice_note: InputMediaVoiceNote | t.Mapping[str, object]
     type: str = "voice_note"
     caption: RichBlockCaption | None = None
     _DISCRIMINATOR = ("type", "voice_note")
@@ -164,4 +174,4 @@ class InputRichMessageMedia(TelegramObject):
     """
 
     id: str
-    media: object
+    media: InputMediaLike

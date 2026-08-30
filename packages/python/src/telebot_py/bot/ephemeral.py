@@ -17,6 +17,7 @@ from telebot_py.bot.base import (
     parse_flag,
     to_wire,
 )
+from telebot_py.types.common import LinkPreviewOptions
 
 
 class EphemeralMixin(Requester):
@@ -32,7 +33,7 @@ class EphemeralMixin(Requester):
         parse_mode: str | None = None,
         entities: Sequence[MarkupLike] | None = None,
         rich_message: MarkupLike | None = None,
-        link_preview_options: MarkupLike | None = None,
+        link_preview_options: LinkPreviewOptions | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> bool:
         """Edit the text of an ephemeral message.
@@ -52,7 +53,8 @@ class EphemeralMixin(Requester):
             parse_mode: Mode for parsing entities in the message text.
             entities: MessageEntity items as ``to_dict`` objects or dicts.
             rich_message: InputRichMessage with the new rich content.
-            link_preview_options: LinkPreviewOptions for the message.
+            link_preview_options: Link preview generation options, as a
+                ``LinkPreviewOptions`` object or a mapping.
             reply_markup: InlineKeyboardMarkup for the message.
 
         Returns:

@@ -52,6 +52,65 @@ class OrderInfo(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class Invoice(TelegramObject):
+    """Basic information about an invoice.
+
+    Attributes:
+        title: Product name.
+        description: Product description.
+        start_parameter: Unique deep-linking parameter that can be used to
+            generate this invoice when used as a start parameter.
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total price in the smallest units of the currency (e.g.
+            cents for USD, or Telegram Stars for ``XTR``).
+
+    Telegram API: https://core.telegram.org/bots/api#invoice
+    """
+
+    title: str
+    description: str
+    start_parameter: str
+    currency: str
+    total_amount: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class SuccessfulPayment(TelegramObject):
+    """Service message describing a successful payment.
+
+    Attributes:
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total price in the smallest units of the currency.
+        invoice_payload: Bot-specified invoice payload.
+        telegram_payment_charge_id: Telegram payment identifier.
+        provider_payment_charge_id: Provider payment identifier.
+        shipping_option_id: Identifier of the shipping option chosen by the
+            user, when applicable.
+        order_info: Order info provided by the user, when applicable.
+        is_recurring: ``True`` if the payment is a recurring subscription one.
+        is_first_recurring: ``True`` if the payment is the first recurring one
+            for a subscription created by the bot.
+        subscription_expiration_date: For subscription payments, the Unix time
+            when the subscription ends.
+
+    Telegram API: https://core.telegram.org/bots/api#successfulpayment
+    """
+
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    telegram_payment_charge_id: str
+    provider_payment_charge_id: str
+    shipping_option_id: str | None = None
+    order_info: OrderInfo | None = None
+    is_recurring: bool | None = None
+    is_first_recurring: bool | None = None
+    subscription_expiration_date: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class ShippingQuery(TelegramObject):
     """An incoming shipping query (only for invoices with flexible prices).
 

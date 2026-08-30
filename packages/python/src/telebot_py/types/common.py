@@ -271,3 +271,33 @@ class ChosenInlineResult(TelegramObject):
     inline_message_id: str | None = None
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class LinkPreviewOptions(TelegramObject):
+    """Controls link preview generation for a message.
+
+    Every field is optional, so an empty instance means "use the defaults"
+    rather than "no preview" — pass ``is_disabled=True`` to suppress the
+    preview entirely.
+
+    Attributes:
+        url: URL used for the link preview. If empty, then the first URL found
+            in the message text is used.
+        is_disabled: Pass ``True`` to disable link preview generation for the
+            message, regardless of the value in ``url``.
+        prefer_small_media: Pass ``True`` if the link preview should show a
+            smaller media content.
+        prefer_large_media: Pass ``True`` if the link preview should show a
+            media content larger than a small one.
+        show_above_text: Pass ``True`` if the link preview should be shown
+            above the message text.
+
+    Telegram API: https://core.telegram.org/bots/api#linkpreviewoptions
+    """
+
+    url: str | None = None
+    is_disabled: bool | None = None
+    prefer_small_media: bool | None = None
+    prefer_large_media: bool | None = None
+    show_above_text: bool | None = None

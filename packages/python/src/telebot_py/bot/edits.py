@@ -13,7 +13,7 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
-from telebot_py.types.common import MessageEntity, Poll
+from telebot_py.types.common import LinkPreviewOptions, MessageEntity, Poll
 from telebot_py.types.message import Message
 
 
@@ -31,7 +31,7 @@ class EditsMixin(Requester):
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
         rich_message: MarkupLike | None = None,
-        link_preview_options: MarkupLike | None = None,
+        link_preview_options: LinkPreviewOptions | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
         """Edit the text of a message sent by the bot or via the bot.
@@ -54,7 +54,8 @@ class EditsMixin(Requester):
             parse_mode: Parse mode for the new text entities.
             entities: Special entities for the new text.
             rich_message: InputRichMessage with the new rich content.
-            link_preview_options: Link preview generation options.
+            link_preview_options: Link preview generation options, as a
+                ``LinkPreviewOptions`` object or a mapping.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 

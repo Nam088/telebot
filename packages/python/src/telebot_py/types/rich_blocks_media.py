@@ -1,10 +1,9 @@
 """Rich message blocks that carry media, plus the shared caption and cell types.
 
 Field names, required-ness and ``type`` literals follow the official Telegram
-Bot API docs for the ``RichBlock*`` classes (Bot API 10.3). Media inputs on the
-sending side are untyped here because ``InputMedia*`` has no dataclasses in this
-package yet, matching the ``object`` treatment ``link_preview_options`` gets in
-:mod:`telebot_py.types.message_extras`.
+Bot API docs for the ``RichBlock*`` classes (Bot API 10.3). The sending-side
+counterparts live in :mod:`telebot_py.types.rich_blocks_input_media`, which
+embeds the typed media payloads from :mod:`telebot_py.types.input_media`.
 
 This module holds the leaf types of the block tree: :class:`RichBlockCaption`
 and :class:`RichBlockTableCell` live here because the modules describing the

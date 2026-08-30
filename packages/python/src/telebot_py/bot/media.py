@@ -13,6 +13,7 @@ from telebot_py.bot.base import (
     to_wire,
 )
 from telebot_py.types.common import MessageEntity
+from telebot_py.types.input_media import InputMediaLike
 from telebot_py.types.message import Message
 from telebot_py.types.message_extras import ReplyParameters
 
@@ -406,7 +407,7 @@ class MediaMixin(Requester):
     async def send_media_group(
         self,
         chat_id: int | str,
-        media: Sequence[MarkupLike],
+        media: Sequence[InputMediaLike],
         *,
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
@@ -418,12 +419,20 @@ class MediaMixin(Requester):
         """Send a group of photos, videos, documents or audios as one message.
 
         Example:
-            >>> msgs = await bot.send_media_group(123456, [{"type": "photo", "media": "id"}])
+            >>> from telebot_py.types import InputMediaPhoto, InputMediaVideo
+            >>> msgs = await bot.send_media_group(
+            ...     123456,
+            ...     [
+            ...         InputMediaPhoto(media="photo_file_id"),
+            ...         InputMediaVideo(media="video_file_id"),
+            ...     ],
+            ... )
 
         Args:
             chat_id: Unique identifier for the target chat or channel username.
-            media: InputMedia items as dicts or ``to_dict`` objects, e.g.
-                ``{"type": "photo", "media": "photo_file_id"}``; 2-10 items.
+            media: InputMedia items, e.g. ``InputMediaPhoto(media="photo_file_id")``
+                or the equivalent mapping ``{"type": "photo", "media":
+                "photo_file_id"}``; 2-10 items.
             business_connection_id: Unique identifier of the business
                 connection on behalf of which the message will be sent.
             message_thread_id: Unique identifier for the target message thread.

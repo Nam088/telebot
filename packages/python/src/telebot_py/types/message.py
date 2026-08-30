@@ -5,6 +5,7 @@ from __future__ import annotations
 import dataclasses
 import typing as t
 
+from telebot_py.types.background import ChatBackground
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.business import ChatBoostAdded
 from telebot_py.types.chat import Chat
@@ -12,11 +13,13 @@ from telebot_py.types.chat_members import CommunityChatJoined
 from telebot_py.types.common import (
     Contact,
     Dice,
+    LinkPreviewOptions,
     Location,
     MessageEntity,
     Poll,
     Venue,
 )
+from telebot_py.types.games import Game
 from telebot_py.types.keyboards import InlineKeyboardMarkup
 from telebot_py.types.media import (
     Animation,
@@ -38,7 +41,10 @@ from telebot_py.types.message_extras import (
     TextQuote,
     WebAppData,
 )
+from telebot_py.types.passport import PassportData
+from telebot_py.types.payments import Invoice, RefundedPayment, SuccessfulPayment
 from telebot_py.types.rich_blocks import RichMessage
+from telebot_py.types.stickers import Sticker
 from telebot_py.types.user import User
 
 
@@ -89,14 +95,13 @@ class Message(TelegramObject):
         text: For text messages, the actual UTF-8 text of the message.
         entities: For text messages, special entities like substrings that
             appear in the text.
-        link_preview_options: Options used for link preview generation
-            (kept raw per node typing).
+        link_preview_options: Options used for link preview generation for the
+            message, if it is a text message and includes entity links.
         animation: Message is an animation, information about the animation.
         audio: Message is an audio file, information about the file.
         document: Message is a general file, information about the file.
         photo: Message is a photo, available sizes of the photo.
-        sticker: Message is a sticker (payload kept raw; node Sticker is out
-            of scope here).
+        sticker: Message is a sticker, information about it.
         story: Message is a forwarded story, information about the story.
         video: Message is a video, information about the video.
         video_note: Message is a video note, information about the message.
@@ -111,7 +116,7 @@ class Message(TelegramObject):
             animation.
         contact: Message is a shared contact, information about the contact.
         dice: Message is a dice with random value.
-        game: Message is a game (payload kept raw per node scope).
+        game: Message is a game, information about it.
         poll: Message is a native poll, information about the poll.
         venue: Message is a venue, information about the venue.
         location: Message is a shared location, information about it.
@@ -131,12 +136,10 @@ class Message(TelegramObject):
         migrate_from_chat_id: The supergroup has been migrated from a group
             with the specified identifier.
         pinned_message: Specified message was pinned.
-        invoice: Message is an invoice for a payment (payload kept raw; node
-            payments models are out of scope here).
-        successful_payment: Service message about a successful payment
-            (payload kept raw).
-        refunded_payment: Service message about a refunded payment (payload
-            kept raw).
+        invoice: Message is an invoice for a payment.
+        successful_payment: Message is a service message about a successful
+            payment.
+        refunded_payment: Service message: a payment was refunded.
         users_shared: Service message: users were shared with the bot
             (payload kept raw).
         chat_shared: Service message: a chat was shared with the bot
@@ -145,11 +148,11 @@ class Message(TelegramObject):
             has logged in.
         write_access_allowed: Service message: the user allowed the bot to
             write messages after adding it to the attachment menu (raw).
-        passport_data: Telegram Passport data (payload kept raw).
+        passport_data: Telegram Passport data provided by the user.
         proximity_alert_triggered: Service message: proximity alert triggered
             while sharing Live Location (payload kept raw).
         boost_added: Service message: user boosted the chat.
-        chat_background_set: Service message: chat background set (raw).
+        chat_background_set: Service message: the chat background was set.
         forum_topic_created: Service message: forum topic created (raw).
         forum_topic_edited: Service message: forum topic edited (raw).
         forum_topic_closed: Service message: forum topic closed (raw).
@@ -212,12 +215,12 @@ class Message(TelegramObject):
     author_signature: str | None = None
     text: str | None = None
     entities: list[MessageEntity] | None = None
-    link_preview_options: object | None = None
+    link_preview_options: LinkPreviewOptions | None = None
     animation: Animation | None = None
     audio: Audio | None = None
     document: Document | None = None
     photo: list[PhotoSize] | None = None
-    sticker: object | None = None
+    sticker: Sticker | None = None
     story: Story | None = None
     video: Video | None = None
     video_note: VideoNote | None = None
@@ -228,7 +231,7 @@ class Message(TelegramObject):
     has_media_spoiler: bool | None = None
     contact: Contact | None = None
     dice: Dice | None = None
-    game: object | None = None
+    game: Game | None = None
     poll: Poll | None = None
     venue: Venue | None = None
     location: Location | None = None
@@ -244,17 +247,17 @@ class Message(TelegramObject):
     migrate_to_chat_id: int | None = None
     migrate_from_chat_id: int | None = None
     pinned_message: Message | None = None
-    invoice: object | None = None
-    successful_payment: object | None = None
-    refunded_payment: object | None = None
+    invoice: Invoice | None = None
+    successful_payment: SuccessfulPayment | None = None
+    refunded_payment: RefundedPayment | None = None
     users_shared: object | None = None
     chat_shared: object | None = None
     connected_website: str | None = None
     write_access_allowed: object | None = None
-    passport_data: object | None = None
+    passport_data: PassportData | None = None
     proximity_alert_triggered: object | None = None
     boost_added: ChatBoostAdded | None = None
-    chat_background_set: object | None = None
+    chat_background_set: ChatBackground | None = None
     forum_topic_created: object | None = None
     forum_topic_edited: object | None = None
     forum_topic_closed: object | None = None

@@ -48,6 +48,7 @@ from telebot_py.types import (
     BusinessOpeningHoursInterval,
     CallbackQuery,
     Chat,
+    ChatBackground,
     ChatBoost,
     ChatBoostAdded,
     ChatBoostRemoved,
@@ -72,16 +73,19 @@ from telebot_py.types import (
     Document,
     ExternalReplyInfo,
     ForceReply,
+    Game,
     Gift,
     GiftBackground,
     Gifts,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQuery,
+    Invoice,
     KeyboardButton,
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
     KeyboardButtonRequestUsers,
+    LinkPreviewOptions,
     LivePhoto,
     Location,
     LoginUrl,
@@ -95,6 +99,7 @@ from telebot_py.types import (
     MessageReactionCountUpdated,
     MessageReactionUpdated,
     OrderInfo,
+    PassportData,
     PhotoSize,
     Poll,
     PollAnswer,
@@ -105,11 +110,14 @@ from telebot_py.types import (
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReactionTypePaid,
+    RefundedPayment,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     ShippingAddress,
     ShippingQuery,
+    Sticker,
     Story,
+    SuccessfulPayment,
     SwitchInlineQueryChosenChat,
     TextQuote,
     UniqueGift,
@@ -897,15 +905,27 @@ class TestNestedTyping:
         assert hints["web_app_data"] == (WebAppData | None)
         assert hints["community_chat_joined"] == (CommunityChatJoined | None)
         assert hints["receiver_user"] == (User | None)
-        # Deferred node types (Sticker, Game, payments) stay loose.
+        # Sticker, Game, payments, passport, link previews and chat
+        # backgrounds all have real classes now, so these are typed.
+        assert hints["sticker"] == (Sticker | None)
+        assert hints["game"] == (Game | None)
+        assert hints["invoice"] == (Invoice | None)
+        assert hints["successful_payment"] == (SuccessfulPayment | None)
+        assert hints["refunded_payment"] == (RefundedPayment | None)
+        assert hints["passport_data"] == (PassportData | None)
+        assert hints["link_preview_options"] == (LinkPreviewOptions | None)
+        assert hints["chat_background_set"] == (ChatBackground | None)
+        # Docs types still unmodeled in this package (giveaway, gift, topic and
+        # service payloads) keep the loose ``object`` annotation.
         for loose in (
-            "sticker",
-            "game",
-            "invoice",
-            "successful_payment",
-            "refunded_payment",
-            "passport_data",
-            "link_preview_options",
+            "users_shared",
+            "chat_shared",
+            "write_access_allowed",
+            "message_auto_delete_timer_changed",
+            "proximity_alert_triggered",
+            "forum_topic_created",
+            "giveaway",
+            "giveaway_winners",
         ):
             assert hints[loose] == (object | None)
 
@@ -1035,7 +1055,11 @@ RAW_CHAT: dict[str, t.Any] = {
     },
     "active_usernames": ["devchat", "dev_chat_old"],
     "birthdate": {"day": 1, "month": 2, "year": 2003},
-    "business_intro": {"title": "Hi", "message": "Welcome", "sticker": {"file_id": "stk"}},
+    "business_intro": {
+        "title": "Hi",
+        "message": "Welcome",
+        "sticker": RAW_STICKER,
+    },
     "business_location": {"address": "1 Main St", "location": {"latitude": 1.0, "longitude": 2.0}},
     "business_opening_hours": {
         "time_zone_name": "UTC",
@@ -1311,7 +1335,13 @@ RAW_MESSAGE: dict[str, t.Any] = {
     "passport_data": {"data": [], "credentials": {"data": "d", "hash": "h", "secret": "s"}},
     "proximity_alert_triggered": {"traveler": {"id": 1}, "watcher": {"id": 2}, "distance": 5},
     "boost_added": {"boost_count": 3},
-    "chat_background_set": {"type": "fill", "fill": {"color": 1}},
+    "chat_background_set": {
+        "type": {
+            "type": "fill",
+            "dark_theme_dimming": 0,
+            "fill": {"type": "solid", "color": 1},
+        }
+    },
     "forum_topic_created": {"name": "Topic", "icon_color": 1},
     "forum_topic_edited": {"name": "Topic2"},
     "forum_topic_closed": {},
@@ -1430,7 +1460,8 @@ class TestRoundTrips:
         assert isinstance(message.boost_added, ChatBoostAdded)
         assert isinstance(message.web_app_data, WebAppData)
         assert isinstance(message.community_chat_joined, CommunityChatJoined)
-        assert isinstance(message.sticker, dict)  # deferred node type stays raw
+        assert isinstance(message.sticker, Sticker)
+        assert isinstance(message.game, Game)
         assert message.to_dict() == RAW_MESSAGE_POPULATED
 
     def test_message_requires_chat(self) -> None:
@@ -1878,7 +1909,7 @@ class TestRoundTrips:
             (Community, {"id": 1, "name": "C"}),
             (CommunityChatJoined, {"community": {"id": 1, "name": "C"}}),
             (ChatLocation, {"location": {"latitude": 1.0, "longitude": 2.0}, "address": "A"}),
-            (BusinessIntro, {"title": "T", "message": "M", "sticker": {"file_id": "s"}}),
+            (BusinessIntro, {"title": "T", "message": "M", "sticker": RAW_STICKER}),
             (BusinessLocation, {"address": "A", "location": {"latitude": 1.0, "longitude": 2.0}}),
             (
                 BusinessOpeningHours,

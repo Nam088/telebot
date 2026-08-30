@@ -17,6 +17,8 @@ import pytest
 import telebot_py.types as types_module
 from telebot_py.bot.errors import TelegramApiError
 from telebot_py.types import (
+    InputMediaDocument,
+    InputMediaPhoto,
     InputRichBlock,
     InputRichBlockButtons,
     InputRichBlockDivider,
@@ -612,11 +614,21 @@ class TestRichTypes:
                 "media": [{"id": "doc1", "media": {"type": "document", "media": "file-id"}}],
             }
         }
-        assert InputRichMessageContent.from_dict(content.to_dict()) == content
+        # Decoding hydrates the embedded payload into its typed InputMedia variant.
+        assert InputRichMessageContent.from_dict(content.to_dict()) == InputRichMessageContent(
+            rich_message=InputRichMessage(
+                blocks=[],
+                html="<p>x</p>",
+                media=[InputRichMessageMedia(id="doc1", media=InputMediaDocument(media="file-id"))],
+            )
+        )
 
-    def test_input_photo_block_keeps_media_payload_raw(self) -> None:
+    def test_input_photo_block_accepts_media_as_mapping(self) -> None:
         block = InputRichBlockPhoto(photo={"type": "photo", "media": "file-id"})
         assert block.to_dict() == {
             "photo": {"type": "photo", "media": "file-id"},
             "type": "photo",
         }
+        assert InputRichBlockPhoto.from_dict(block.to_dict()).photo == InputMediaPhoto(
+            media="file-id"
+        )

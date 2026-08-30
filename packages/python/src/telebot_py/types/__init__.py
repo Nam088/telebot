@@ -4,6 +4,18 @@
 # merged into __all__ below.
 """Telegram Bot API data types (frozen, snake_case, JSON round-trippable)."""
 
+from telebot_py.types.background import (
+    BackgroundFill,
+    BackgroundFillFreeformGradient,
+    BackgroundFillGradient,
+    BackgroundFillSolid,
+    BackgroundType,
+    BackgroundTypeChatTheme,
+    BackgroundTypeFill,
+    BackgroundTypePattern,
+    BackgroundTypeWallpaper,
+    ChatBackground,
+)
 from telebot_py.types.base import TelegramObject, TypeParseError
 from telebot_py.types.business import (
     BusinessBotRights,
@@ -51,6 +63,7 @@ from telebot_py.types.common import (
     Contact,
     Dice,
     InlineQuery,
+    LinkPreviewOptions,
     Location,
     MessageEntity,
     MessageId,
@@ -77,6 +90,16 @@ from telebot_py.types.gifts import (
     UniqueGiftInfo,
     UniqueGiftModel,
     UniqueGiftSymbol,
+)
+from telebot_py.types.input_media import (
+    InputMedia,
+    InputMediaAnimation,
+    InputMediaAudio,
+    InputMediaDocument,
+    InputMediaLike,
+    InputMediaPhoto,
+    InputMediaVideo,
+    InputMediaVoiceNote,
 )
 from telebot_py.types.keyboards import (
     CopyTextButton,
@@ -128,8 +151,15 @@ from telebot_py.types.paid_media import (
     PaidMediaPreview,
     PaidMediaVideo,
 )
-from telebot_py.types.passport import PassportElementError
+from telebot_py.types.passport import (
+    EncryptedCredentials,
+    EncryptedPassportElement,
+    PassportData,
+    PassportElementError,
+    PassportFile,
+)
 from telebot_py.types.payments import (
+    Invoice,
     LabeledPrice,
     OrderInfo,
     PreCheckoutQuery,
@@ -141,6 +171,7 @@ from telebot_py.types.payments import (
     StarAmount,
     StarTransaction,
     StarTransactions,
+    SuccessfulPayment,
 )
 from telebot_py.types.reactions import (
     MessageReactionCountUpdated,
@@ -181,6 +212,15 @@ __all__ = [
     "AcceptedGiftTypes",
     "Animation",
     "Audio",
+    "BackgroundFill",
+    "BackgroundFillFreeformGradient",
+    "BackgroundFillGradient",
+    "BackgroundFillSolid",
+    "BackgroundType",
+    "BackgroundTypeChatTheme",
+    "BackgroundTypeFill",
+    "BackgroundTypePattern",
+    "BackgroundTypeWallpaper",
     "Birthdate",
     "BotAccessSettings",
     "BotCommand",
@@ -197,6 +237,7 @@ __all__ = [
     "CallbackQuery",
     "Chat",
     "ChatAdministratorRights",
+    "ChatBackground",
     "ChatBoost",
     "ChatBoostAdded",
     "ChatBoostRemoved",
@@ -221,6 +262,8 @@ __all__ = [
     "CopyTextButton",
     "Dice",
     "Document",
+    "EncryptedCredentials",
+    "EncryptedPassportElement",
     "ExternalReplyInfo",
     "File",
     "ForceReply",
@@ -235,6 +278,14 @@ __all__ = [
     "InlineQuery",
     "InputChecklist",
     "InputChecklistTask",
+    "InputMedia",
+    "InputMediaAnimation",
+    "InputMediaAudio",
+    "InputMediaDocument",
+    "InputMediaLike",
+    "InputMediaPhoto",
+    "InputMediaVideo",
+    "InputMediaVoiceNote",
     "InputPaidMediaPhoto",
     "InputPaidMediaVideo",
     "InputRichBlock",
@@ -269,11 +320,13 @@ __all__ = [
     "InputSticker",
     "InputStoryContentPhoto",
     "InputStoryContentVideo",
+    "Invoice",
     "KeyboardButton",
     "KeyboardButtonPollType",
     "KeyboardButtonRequestChat",
     "KeyboardButtonRequestUsers",
     "LabeledPrice",
+    "LinkPreviewOptions",
     "LivePhoto",
     "Location",
     "LoginUrl",
@@ -300,7 +353,9 @@ __all__ = [
     "PaidMediaPhoto",
     "PaidMediaPreview",
     "PaidMediaVideo",
+    "PassportData",
     "PassportElementError",
+    "PassportFile",
     "PhotoSize",
     "Poll",
     "PollAnswer",
@@ -393,6 +448,7 @@ __all__ = [
     "StoryAreaTypeSuggestedReaction",
     "StoryAreaTypeUniqueGift",
     "StoryAreaTypeWeather",
+    "SuccessfulPayment",
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",

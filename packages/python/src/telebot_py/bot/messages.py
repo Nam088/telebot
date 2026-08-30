@@ -13,7 +13,7 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
-from telebot_py.types.common import MessageEntity, MessageId
+from telebot_py.types.common import LinkPreviewOptions, MessageEntity, MessageId
 from telebot_py.types.message import Message
 from telebot_py.types.message_extras import ReplyParameters
 
@@ -29,7 +29,7 @@ class MessagesMixin(Requester):
         message_thread_id: int | None = None,
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
-        link_preview_options: MarkupLike | None = None,
+        link_preview_options: LinkPreviewOptions | MarkupLike | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
@@ -51,7 +51,8 @@ class MessagesMixin(Requester):
                 ``MarkdownV2``).
             entities: Special entities that appear in the text, as an
                 alternative to ``parse_mode``.
-            link_preview_options: Link preview generation options.
+            link_preview_options: Link preview generation options, as a
+                ``LinkPreviewOptions`` object or a mapping.
             disable_notification: Send silently; users get a notification with
                 no sound.
             protect_content: Protect the message content from forwarding and

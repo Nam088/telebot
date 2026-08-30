@@ -7,6 +7,7 @@ import typing as t
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.common import Location
+from telebot_py.types.stickers import Sticker
 
 if t.TYPE_CHECKING:  # annotation-only; bound at runtime by message.py
     # The ``as Message`` alias documents this as an explicit re-export: the
@@ -60,15 +61,14 @@ class BusinessIntro(TelegramObject):
     Attributes:
         title: Title of the intro message.
         message: Text of the intro message.
-        sticker: Sticker of the intro message (node Sticker is out of scope
-            here, so the payload stays raw).
+        sticker: Sticker of the intro message.
 
     Telegram API: https://core.telegram.org/bots/api#businessintro
     """
 
     title: str | None = None
     message: str | None = None
-    sticker: object | None = None
+    sticker: Sticker | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
