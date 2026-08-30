@@ -68,3 +68,32 @@ func (b *Bot) GetGameHighScores(ctx context.Context, opts *types.GetGameHighScor
 	}
 	return scores, nil
 }
+
+// SetPassportDataErrors informs a user that some of the Telegram Passport
+// elements they provided contain errors.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: User identifier.
+//   - errors: Array describing the errors in the elements the user provided.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetPassportDataErrors(ctx, 123456, []types.PassportElementError{
+//	    {Source: "data", Type: "passport", Message: "Data is incorrect"},
+//	})
+func (b *Bot) SetPassportDataErrors(ctx context.Context, userID int64, errors []types.PassportElementError) (bool, error) {
+	payload := map[string]any{
+		"user_id": userID,
+		"errors":  errors,
+	}
+	var ok bool
+	if err := b.Request(ctx, "setPassportDataErrors", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}

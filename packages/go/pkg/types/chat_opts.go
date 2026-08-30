@@ -128,6 +128,24 @@ type RevokeChatInviteLinkOptions struct {
 	InviteLink string `json:"invite_link"`
 }
 
+// CreateChatSubscriptionInviteLinkOptions represents parameters for the
+// createChatSubscriptionInviteLink method.
+type CreateChatSubscriptionInviteLinkOptions struct {
+	ChatID             any    `json:"chat_id"`
+	Name               string `json:"name,omitempty"`
+	SubscriptionPeriod int    `json:"subscription_period"`
+	SubscriptionPrice  int    `json:"subscription_price"`
+}
+
+// EditChatSubscriptionInviteLinkOptions represents parameters for the
+// editChatSubscriptionInviteLink method. The subscription period and price of
+// an existing subscription link are immutable, so only the name can be edited.
+type EditChatSubscriptionInviteLinkOptions struct {
+	ChatID     any    `json:"chat_id"`
+	InviteLink string `json:"invite_link"`
+	Name       string `json:"name,omitempty"`
+}
+
 // PromoteChatMemberOptions represents parameters for the promoteChatMember method.
 type PromoteChatMemberOptions struct {
 	ChatID                  any   `json:"chat_id"`

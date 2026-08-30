@@ -126,3 +126,45 @@ func (b *Bot) DeleteMyCommands(ctx context.Context, opts *types.DeleteMyCommands
 	}
 	return ok, nil
 }
+
+// SetMyProfilePhoto sets the default profile photo for the bot.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - photo: Profile photo to set, e.g. an InputProfilePhoto object encoded as
+//     a map or any other JSON payload accepted by the Bot API.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetMyProfilePhoto(ctx, map[string]any{"type": "photo", "id": "12345"})
+func (b *Bot) SetMyProfilePhoto(ctx context.Context, photo any) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "setMyProfilePhoto", map[string]any{"photo": photo}, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// RemoveMyProfilePhoto removes the default profile photo of the bot.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.RemoveMyProfilePhoto(ctx)
+func (b *Bot) RemoveMyProfilePhoto(ctx context.Context) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "removeMyProfilePhoto", nil, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}

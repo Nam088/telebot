@@ -38,3 +38,9 @@ type StarTransaction struct {
 	Source   any    `json:"source,omitempty"`
 	Receiver any    `json:"receiver,omitempty"`
 }
+
+// StarAmount represents an amount of Telegram Stars.
+type StarAmount struct {
+	Amount         int `json:"amount"`
+	NanostarAmount int `json:"nanostar_amount,omitempty"`
+}

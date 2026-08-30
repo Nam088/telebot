@@ -235,3 +235,37 @@ func (b *Bot) DeclineChatJoinRequest(ctx context.Context, chatID any, userID int
 	}
 	return ok, nil
 }
+
+// SetChatMemberTag sets a new custom tag for an administrator or a member
+// promoted by the bot in a supergroup chat. The bot must be an administrator in
+// the chat for this to work and must have the can_manage_tags administrator
+// right.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat or username of the target
+//     channel (int64 or string).
+//   - userID: Unique identifier of the target user.
+//   - tag: New tag, 0-40 characters; pass an empty string to leave the tag unset.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetChatMemberTag(ctx, int64(-1001234567890), 42, "Top contributor")
+func (b *Bot) SetChatMemberTag(ctx context.Context, chatID any, userID int64, tag string) (bool, error) {
+	payload := map[string]any{
+		"chat_id": chatID,
+		"user_id": userID,
+	}
+	if tag != "" {
+		payload["tag"] = tag
+	}
+	var ok bool
+	if err := b.Request(ctx, "setChatMemberTag", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}

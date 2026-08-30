@@ -124,3 +124,24 @@ func (b *Bot) EditUserStarSubscription(ctx context.Context, opts *types.EditUser
 	}
 	return ok, nil
 }
+
+// GetMyStarBalance gets the bot's Telegram Stars balance.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//
+// Returns:
+//   - *types.StarAmount: The balance in Telegram Stars on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	balance, err := b.GetMyStarBalance(ctx)
+//	fmt.Println(balance.Amount)
+func (b *Bot) GetMyStarBalance(ctx context.Context) (*types.StarAmount, error) {
+	var amount types.StarAmount
+	if err := b.Request(ctx, "getMyStarBalance", nil, &amount); err != nil {
+		return nil, err
+	}
+	return &amount, nil
+}

@@ -42,3 +42,37 @@ func (b *Bot) PostStory(ctx context.Context, businessConnectionID string, conten
 	}
 	return &story, nil
 }
+
+// SetUserEmojiStatus changes the emoji status for a given user that allowed
+// the bot to change it.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: Unique identifier of the target user.
+//   - customEmojiID: New custom emoji identifier; pass an empty string to leave
+//     the emoji status unset.
+//   - emojiStatusExpirationDate: Point in time (Unix timestamp) when the emoji
+//     status will expire and be cleared automatically.
+//     Pass 0 to omit the expiration date.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetUserEmojiStatus(ctx, 123456, "5368323575420792074", 0)
+func (b *Bot) SetUserEmojiStatus(ctx context.Context, userID int64, customEmojiID string, emojiStatusExpirationDate int64) (bool, error) {
+	payload := map[string]any{"user_id": userID}
+	if customEmojiID != "" {
+		payload["custom_emoji_id"] = customEmojiID
+	}
+	if emojiStatusExpirationDate > 0 {
+		payload["emoji_status_expiration_date"] = emojiStatusExpirationDate
+	}
+	var ok bool
+	if err := b.Request(ctx, "setUserEmojiStatus", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}

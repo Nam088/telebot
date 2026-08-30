@@ -30,3 +30,31 @@ type GameHighScore struct {
 	User     User `json:"user"`
 	Score    int  `json:"score"`
 }
+
+// ChatBoostSource describes the origin of a chat boost.
+//
+// Node models this as a discriminated union of ChatBoostSourcePremium,
+// ChatBoostSourceGiftCode and ChatBoostSourceGiveaway. Go decodes boosts
+// straight off the wire, so the union is flattened into one struct: Source is
+// the discriminator ("premium", "gift_code" or "giveaway") and every member of
+// the union is present as an optional field.
+type ChatBoostSource struct {
+	Source            string `json:"source"`
+	User              *User  `json:"user,omitempty"`
+	GiveawayMessageID int64  `json:"giveaway_message_id,omitempty"`
+	PrizeStarCount    int    `json:"prize_star_count,omitempty"`
+	IsUnclaimed       bool   `json:"is_unclaimed,omitempty"`
+}
+
+// ChatBoost describes a single boost that was added to a chat.
+type ChatBoost struct {
+	BoostID        string          `json:"boost_id"`
+	AddDate        int64           `json:"add_date"`
+	ExpirationDate int64           `json:"expiration_date"`
+	Source         ChatBoostSource `json:"source"`
+}
+
+// UserChatBoosts represents a list of boosts added to a chat by a user.
+type UserChatBoosts struct {
+	Boosts []ChatBoost `json:"boosts"`
+}

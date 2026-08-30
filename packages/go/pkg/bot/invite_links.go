@@ -36,3 +36,53 @@ func (b *Bot) RevokeChatInviteLink(ctx context.Context, opts *types.RevokeChatIn
 	}
 	return &link, nil
 }
+
+// CreateChatSubscriptionInviteLink creates a subscription invite link for a
+// channel chat. The bot must have the can_invite_users administrator right.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - opts: Options including chat_id, subscription_period, subscription_price
+//     and the optional name.
+//
+// Returns:
+//   - *types.ChatInviteLink: The created invite link on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	link, err := b.CreateChatSubscriptionInviteLink(ctx, &types.CreateChatSubscriptionInviteLinkOptions{
+//	    ChatID: "@channel", SubscriptionPeriod: 2592000, SubscriptionPrice: 50,
+//	})
+func (b *Bot) CreateChatSubscriptionInviteLink(ctx context.Context, opts *types.CreateChatSubscriptionInviteLinkOptions) (*types.ChatInviteLink, error) {
+	var link types.ChatInviteLink
+	if err := b.Request(ctx, "createChatSubscriptionInviteLink", opts, &link); err != nil {
+		return nil, err
+	}
+	return &link, nil
+}
+
+// EditChatSubscriptionInviteLink edits a subscription invite link created by
+// the bot. The bot must have the can_invite_users administrator right. The
+// subscription period and price are immutable and cannot be changed.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - opts: Options including chat_id, invite_link and the optional name.
+//
+// Returns:
+//   - *types.ChatInviteLink: The edited invite link on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	link, err := b.EditChatSubscriptionInviteLink(ctx, &types.EditChatSubscriptionInviteLinkOptions{
+//	    ChatID: "@channel", InviteLink: "https://t.me/joinchat/sub1", Name: "Renamed",
+//	})
+func (b *Bot) EditChatSubscriptionInviteLink(ctx context.Context, opts *types.EditChatSubscriptionInviteLinkOptions) (*types.ChatInviteLink, error) {
+	var link types.ChatInviteLink
+	if err := b.Request(ctx, "editChatSubscriptionInviteLink", opts, &link); err != nil {
+		return nil, err
+	}
+	return &link, nil
+}

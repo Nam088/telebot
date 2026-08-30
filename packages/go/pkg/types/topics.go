@@ -23,3 +23,11 @@ type BotName struct {
 type BotDescription struct {
 	Description string `json:"description"`
 }
+
+// EditForumTopicOptions represents parameters for the editForumTopic method.
+type EditForumTopicOptions struct {
+	ChatID            any    `json:"chat_id"`
+	MessageThreadID   int64  `json:"message_thread_id"`
+	Name              string `json:"name,omitempty"`
+	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+}

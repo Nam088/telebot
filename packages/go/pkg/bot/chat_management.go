@@ -172,3 +172,197 @@ func (b *Bot) GetMyDefaultAdministratorRights(ctx context.Context, opts *types.G
 	}
 	return &rights, nil
 }
+
+// SetChatStickerSet sets a new group sticker set for a supergroup.
+// The bot must be an administrator in the chat for this to work and must have
+// the can_manage_chat administrator right. Use the field "active_sticker_set_name"
+// returned by getChat to check the name of the current group sticker set.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat.
+//   - stickerSetName: Name of the sticker set to be set as the group sticker set.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetChatStickerSet(ctx, int64(-1001234567890), "TelebotTestSet")
+func (b *Bot) SetChatStickerSet(ctx context.Context, chatID any, stickerSetName string) (bool, error) {
+	payload := map[string]any{
+		"chat_id":          chatID,
+		"sticker_set_name": stickerSetName,
+	}
+	var ok bool
+	if err := b.Request(ctx, "setChatStickerSet", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// DeleteChatStickerSet deletes a group sticker set from a supergroup.
+// The bot must be an administrator in the chat for this to work and must have
+// the can_manage_chat administrator right.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.DeleteChatStickerSet(ctx, int64(-1001234567890))
+func (b *Bot) DeleteChatStickerSet(ctx context.Context, chatID any) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "deleteChatStickerSet", map[string]any{"chat_id": chatID}, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// verifyRequest performs a verifyUser or verifyChat request on behalf of the
+// organization that owns the bot, sending the optional custom description only
+// when the caller supplied a non-empty one.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - method: Bot API method name to call.
+//   - idKey: Wire key identifying the target, "user_id" or "chat_id".
+//   - id: Identifier of the target user or chat.
+//   - customDescription: Custom description for the verification status, 0-70
+//     characters; omitted when empty.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+func (b *Bot) verifyRequest(ctx context.Context, method, idKey string, id any, customDescription string) (bool, error) {
+	payload := map[string]any{idKey: id}
+	if customDescription != "" {
+		payload["custom_description"] = customDescription
+	}
+	var ok bool
+	if err := b.Request(ctx, method, payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// VerifyUser verifies a user on behalf of the organization which owns the bot.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: Unique identifier of the target user.
+//   - customDescription: Custom description for the verification status, 0-70
+//     characters; pass an empty string to omit it.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.VerifyUser(ctx, 123456, "Official Staff")
+func (b *Bot) VerifyUser(ctx context.Context, userID int64, customDescription string) (bool, error) {
+	return b.verifyRequest(ctx, "verifyUser", "user_id", userID, customDescription)
+}
+
+// VerifyChat verifies a chat on behalf of the organization which owns the bot.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat or username of the target
+//     channel (in the format @channelusername).
+//   - customDescription: Custom description for the verification status, 0-70
+//     characters; pass an empty string to omit it.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.VerifyChat(ctx, "@channel", "Verified Community")
+func (b *Bot) VerifyChat(ctx context.Context, chatID any, customDescription string) (bool, error) {
+	return b.verifyRequest(ctx, "verifyChat", "chat_id", chatID, customDescription)
+}
+
+// RemoveUserVerification removes verification from a user that was previously
+// verified on behalf of the organization which owns the bot. Does not affect
+// independently obtained verification.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: Unique identifier of the target user.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.RemoveUserVerification(ctx, 123456)
+func (b *Bot) RemoveUserVerification(ctx context.Context, userID int64) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "removeUserVerification", map[string]any{"user_id": userID}, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// RemoveChatVerification removes verification from a chat that was previously
+// verified on behalf of the organization which owns the bot. Does not affect
+// independently obtained verification.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the target chat or username of the target
+//     channel (in the format @channelusername).
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.RemoveChatVerification(ctx, "@channel")
+func (b *Bot) RemoveChatVerification(ctx context.Context, chatID any) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "removeChatVerification", map[string]any{"chat_id": chatID}, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
+// GetUserChatBoosts retrieves the list of boosts added to a chat by a user.
+// Requires administrator rights in the chat.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - chatID: Unique identifier for the chat or username of the channel (in the
+//     format @channelusername).
+//   - userID: Unique identifier of the target user.
+//
+// Returns:
+//   - *types.UserChatBoosts: The list of boosts on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	boosts, err := b.GetUserChatBoosts(ctx, int64(-1001234567890), 123456)
+//	fmt.Println(len(boosts.Boosts))
+func (b *Bot) GetUserChatBoosts(ctx context.Context, chatID any, userID int64) (*types.UserChatBoosts, error) {
+	payload := map[string]any{
+		"chat_id": chatID,
+		"user_id": userID,
+	}
+	var boosts types.UserChatBoosts
+	if err := b.Request(ctx, "getUserChatBoosts", payload, &boosts); err != nil {
+		return nil, err
+	}
+	return &boosts, nil
+}
