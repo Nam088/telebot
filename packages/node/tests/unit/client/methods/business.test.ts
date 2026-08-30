@@ -28,7 +28,7 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
         { source: "data", type: "passport", message: "err" },
       ]),
     ).toBe(true);
-    expect(await client.postStory("biz_1", {})).toBe(true);
+    expect(await client.postStory("biz_1", {}, { active_period: 86400 })).toBe(true);
     expect(await client.editStory("biz_1", 1, {})).toBe(true);
     expect(await client.deleteStory("biz_1", 1)).toBe(true);
   });
@@ -71,13 +71,20 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.logOut()).toBe(true);
     expect(await client.close()).toBe(true);
     expect(await client.getForumTopicIconStickers()).toBe(true);
-    expect(await client.giftPremiumSubscription({ user_id: 123, months: 3 })).toBe(true);
+    expect(
+      await client.giftPremiumSubscription({ user_id: 123, month_count: 3, star_count: 1000 }),
+    ).toBe(true);
     expect(await client.getBusinessAccountGifts("biz_1", { exclude_saved: true })).toBe(true);
     expect(await client.getBusinessAccountStarBalance("biz_1")).toBe(true);
     expect(await client.setBusinessAccountName("biz_1", "First", "Last")).toBe(true);
     expect(await client.setBusinessAccountUsername("biz_1", "U")).toBe(true);
     expect(await client.setBusinessAccountBio("biz_1", "B")).toBe(true);
-    expect(await client.setBusinessAccountGiftSettings("biz_1", {})).toBe(true);
+    expect(
+      await client.setBusinessAccountGiftSettings("biz_1", {
+        show_gift_button: true,
+        accepted_gift_types: { unique_gifts: true },
+      }),
+    ).toBe(true);
     expect(await client.setBusinessAccountProfilePhoto("biz_1", "p", { is_public: true })).toBe(
       true,
     );
@@ -87,12 +94,21 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.transferGift("biz_1", "g", 456, { star_count: 25 })).toBe(true);
     expect(await client.transferBusinessAccountStars("biz_1", 50)).toBe(true);
     expect(await client.getManagedBotAccessSettings(123)).toBe(true);
-    expect(await client.setManagedBotAccessSettings(123, {})).toBe(true);
-    expect(await client.createChatSubscriptionInviteLink(123, {})).toBe(true);
+    expect(await client.setManagedBotAccessSettings(123, { is_access_restricted: true })).toBe(
+      true,
+    );
+    expect(
+      await client.createChatSubscriptionInviteLink(123, {
+        subscription_period: 2592000,
+        subscription_price: 50,
+      }),
+    ).toBe(true);
     expect(await client.editChatSubscriptionInviteLink(123, "l", {})).toBe(true);
     expect(await client.approveSuggestedPost(123, 456)).toBe(true);
     expect(await client.declineSuggestedPost(123, 456)).toBe(true);
-    expect(await client.repostStory({})).toBe(true);
+    expect(
+      await client.repostStory({ from_chat_id: 200, from_story_id: 9, active_period: 86400 }),
+    ).toBe(true);
     expect(await client.getUserGifts(123, { exclude_unique: true, limit: 10 })).toBe(true);
     expect(await client.getChatGifts(123, { exclude_unsaved: true, exclude_saved: false })).toBe(
       true,
@@ -103,7 +119,12 @@ describe("BusinessAndEcosystemMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.setChatMemberTag(123, 456, "t")).toBe(true);
     expect(await client.getManagedBotToken(123)).toBe(true);
     expect(await client.replaceManagedBotToken(123)).toBe(true);
-    expect(await client.savePreparedKeyboardButton({})).toBe(true);
+    expect(
+      await client.savePreparedKeyboardButton({
+        user_id: 42,
+        button: { text: "Share team", request_users: { user_is_bot: true } },
+      }),
+    ).toBe(true);
     await client.initialize();
     await client.shutdown();
     expect(await client.doApiRequest("m", {})).toBe(true);
@@ -234,5 +255,27 @@ describe("Business method payloads match the official Bot API 10.3 parameter nam
     await client.sendGift({ chat_id: "@chan", gift_id: "g1", text: "gg" });
     expect(calls[0]?.payload).toEqual({ chat_id: "@chan", gift_id: "g1", text: "gg" });
     expect(calls[0]?.payload["user_id"]).toBeUndefined();
+  });
+
+  it("managed-bot methods send user_id, never the invented bot_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.getManagedBotAccessSettings(555);
+    await client.setManagedBotAccessSettings(555, {
+      is_access_restricted: true,
+      added_user_ids: [7, 8],
+    });
+    await client.getManagedBotToken(555);
+    await client.replaceManagedBotToken(555);
+    expect(calls[0]?.payload).toEqual({ user_id: 555 });
+    expect(calls[1]?.payload).toEqual({
+      user_id: 555,
+      is_access_restricted: true,
+      added_user_ids: [7, 8],
+    });
+    expect(calls[2]?.payload).toEqual({ user_id: 555 });
+    expect(calls[3]?.payload).toEqual({ user_id: 555 });
+    for (const call of calls) {
+      expect(call.payload["bot_id"]).toBeUndefined();
+    }
   });
 });

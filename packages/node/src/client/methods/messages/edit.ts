@@ -5,7 +5,6 @@
  */
 
 import { MessageBasicMethods } from "./send-basic.js";
-import type { ParseMode } from "../../constants.js";
 import type {
   Message,
   UserProfilePhotos,
@@ -15,21 +14,15 @@ import type {
   EditMessageCaptionOptions,
   EditMessageReplyMarkupOptions,
   EditMessageMediaOptions,
-  EditMessageLiveLocationOptions,
-  StopMessageLiveLocationOptions,
   StopPollOptions,
   SetMessageReactionOptions,
   SetWebhookOptions,
   Poll,
-  MessageId,
-  ForwardMessagesOptions,
-  CopyMessagesOptions,
-  PreparedInlineMessage,
-  SavePreparedInlineMessageOptions,
   SendMessageDraftOptions,
-  SendLivePhotoOptions,
   SendDiceOptions,
   SendChatActionOptions,
+  SendChecklistOptions,
+  EditMessageChecklistOptions,
 } from "../../types/index.js";
 
 /**
@@ -247,11 +240,12 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
   }
 
   /**
-   * Clears the bot's reaction on a message.
+   * Removes the calling user's or a managed business account's reaction from a message.
    *
-   * @param chatId - Unique identifier for the target chat.
-   * @param messageId - Identifier of the message.
-   * @param isBig - Pass `true` for big animation.
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param messageId - Identifier of the target message.
+   * @param userId - Identifier of the target user, for business connections only.
+   * @param actorChatId - Unique identifier of the business chat on behalf of which to act.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When clearing reaction fails.
    *
@@ -260,21 +254,21 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
   public async deleteMessageReaction(
     chatId: number | string,
     messageId: number,
-    isBig?: boolean,
+    userId?: number,
+    actorChatId?: number,
   ): Promise<boolean> {
-    return this.setMessageReaction({
-      chat_id: chatId,
-      message_id: messageId,
-      reaction: [],
-      is_big: isBig,
-    });
+    const payload: Record<string, unknown> = { chat_id: chatId, message_id: messageId };
+    if (userId !== undefined) payload["user_id"] = userId;
+    if (actorChatId !== undefined) payload["actor_chat_id"] = actorChatId;
+    return this.request<boolean>("deleteMessageReaction", payload);
   }
 
   /**
-   * Clears all reactions on a message.
+   * Removes all reactions on a message (this endpoint takes no `message_id`).
    *
-   * @param chatId - Unique identifier for the target chat.
-   * @param messageId - Identifier of the message.
+   * @param chatId - Unique identifier for the target chat or username of the target channel.
+   * @param userId - Identifier of the target user, for business connections only.
+   * @param actorChatId - Unique identifier of the business chat on behalf of which to act.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When clearing reactions fails.
    *
@@ -282,9 +276,13 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
    */
   public async deleteAllMessageReactions(
     chatId: number | string,
-    messageId: number,
+    userId?: number,
+    actorChatId?: number,
   ): Promise<boolean> {
-    return this.setMessageReaction({ chat_id: chatId, message_id: messageId, reaction: [] });
+    const payload: Record<string, unknown> = { chat_id: chatId };
+    if (userId !== undefined) payload["user_id"] = userId;
+    if (actorChatId !== undefined) payload["actor_chat_id"] = actorChatId;
+    return this.request<boolean>("deleteAllMessageReactions", payload);
   }
 
   /**
@@ -411,11 +409,12 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
    *
    * @param options - Checklist configuration options.
    * @returns Sent {@link Message}.
+   * @throws {@link TelegramApiError} When sending the checklist fails.
    *
    * @see {@link https://core.telegram.org/bots/api#sendchecklist Telegram Bot API: sendChecklist}
    */
-  public async sendChecklist(options: Record<string, unknown>): Promise<Message> {
-    return this.request<Message>("sendChecklist", options);
+  public async sendChecklist(options: SendChecklistOptions): Promise<Message> {
+    return this.request<Message>("sendChecklist", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -423,85 +422,15 @@ export abstract class MessageEditMethods extends MessageBasicMethods {
    *
    * @param options - Checklist modification options.
    * @returns Edited {@link Message} or boolean.
+   * @throws {@link TelegramApiError} When editing the checklist fails.
    *
    * @see {@link https://core.telegram.org/bots/api#editmessagechecklist Telegram Bot API: editMessageChecklist}
    */
-  public async editMessageChecklist(options: Record<string, unknown>): Promise<Message | boolean> {
-    return this.request<Message | boolean>("editMessageChecklist", options);
-  }
-
-  /**
-   * Sends paid media (photos/videos purchased with Telegram Stars).
-   *
-   * @param options - Paid media parameters including `chat_id`, `star_count`, and `media` array.
-   * @returns The sent {@link Message}.
-   *
-   * @see {@link https://core.telegram.org/bots/api#sendpaidmedia Telegram Bot API: sendPaidMedia}
-   */
-  public async sendPaidMedia(options: Record<string, unknown>): Promise<Message> {
-    return this.request<Message>("sendPaidMedia", options);
-  }
-
-  /**
-   * Sends an animated Live Photo message.
-   *
-   * @param options - Live photo options.
-   * @returns Sent {@link Message}.
-   *
-   * @see {@link https://core.telegram.org/bots/api#sendlivephoto Telegram Bot API: sendLivePhoto}
-   */
-  public async sendLivePhoto(options: SendLivePhotoOptions): Promise<Message> {
-    return this.request<Message>("sendLivePhoto", options as unknown as Record<string, unknown>);
-  }
-
-  /**
-   * Retrieves messages from a personal chat.
-   *
-   * @param chatId - Chat identifier.
-   * @param limit - Maximum messages to return.
-   * @returns Array of {@link Message} objects.
-   *
-   * @see {@link https://core.telegram.org/bots/api#getuserpersonalchatmessages Telegram Bot API: getUserPersonalChatMessages}
-   */
-  public async getUserPersonalChatMessages(
-    chatId: number | string,
-    limit?: number,
-  ): Promise<Message[]> {
-    const payload: Record<string, unknown> = { chat_id: chatId };
-    if (limit !== undefined) payload["limit"] = limit;
-    return this.request<Message[]>("getUserPersonalChatMessages", payload);
-  }
-
-  /**
-   * Stores a message that can be sent by a user of a Mini App.
-   *
-   * @param options - Prepared inline message options including `user_id` and `result`.
-   * @returns A {@link PreparedInlineMessage} object containing the `id` and `expiration_date`.
-   * @throws {@link TelegramApiError} When saving the prepared message fails.
-   *
-   * @example
-   * ```ts
-   * const prepared = await bot.savePreparedInlineMessage({
-   *   user_id: 123456,
-   *   result: {
-   *     type: "article",
-   *     id: "art_1",
-   *     title: "Shareable Result",
-   *     input_message_content: { message_text: "Shared via Mini App!" },
-   *   },
-   *   allow_user_chats: true,
-   *   allow_group_chats: true,
-   * });
-   * console.log(`Prepared message ID: ${prepared.id}`);
-   * ```
-   *
-   * @see {@link https://core.telegram.org/bots/api#savepreparedinlinemessage Telegram Bot API: savePreparedInlineMessage}
-   */
-  public async savePreparedInlineMessage(
-    options: SavePreparedInlineMessageOptions,
-  ): Promise<PreparedInlineMessage> {
-    return this.request<PreparedInlineMessage>(
-      "savePreparedInlineMessage",
+  public async editMessageChecklist(
+    options: EditMessageChecklistOptions,
+  ): Promise<Message | boolean> {
+    return this.request<Message | boolean>(
+      "editMessageChecklist",
       options as unknown as Record<string, unknown>,
     );
   }

@@ -5,7 +5,7 @@
  */
 
 import { BusinessGamesPassportMethods } from "./games-passport.js";
-import type { Story, BusinessConnection } from "../../types/index.js";
+import type { Story, BusinessConnection, PostStoryOptions } from "../../types/index.js";
 
 /**
  * Mixin providing story management and business account operations.
@@ -25,7 +25,7 @@ export abstract class BusinessStoriesBoostsMethods extends BusinessGamesPassport
   public async postStory(
     businessConnectionId: string,
     content: unknown,
-    options: Record<string, unknown> = {},
+    options: PostStoryOptions,
   ): Promise<Story> {
     return this.request<Story>("postStory", {
       business_connection_id: businessConnectionId,

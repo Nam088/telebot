@@ -8,6 +8,7 @@ import { StickerMethods } from "./stickers.js";
 import type {
   Message,
   SendInvoiceOptions,
+  CreateInvoiceLinkOptions,
   AnswerShippingQueryOptions,
   AnswerPreCheckoutQueryOptions,
   StarTransactions,
@@ -48,7 +49,7 @@ export abstract class PaymentMethods extends StickerMethods {
   /**
    * Creates an HTTP link for an invoice that can be shared in messages or buttons.
    *
-   * @param options - Invoice options without `chat_id`.
+   * @param options - Invoice link parameters matching the documented createInvoiceLink set (no `chat_id`).
    * @returns The created invoice link as a string.
    * @throws {@link TelegramApiError} When link creation fails.
    *
@@ -65,7 +66,7 @@ export abstract class PaymentMethods extends StickerMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#createinvoicelink Telegram Bot API: createInvoiceLink}
    */
-  public async createInvoiceLink(options: Omit<SendInvoiceOptions, "chat_id">): Promise<string> {
+  public async createInvoiceLink(options: CreateInvoiceLinkOptions): Promise<string> {
     return this.request<string>("createInvoiceLink", options as unknown as Record<string, unknown>);
   }
 

@@ -69,11 +69,17 @@ export interface SetMessageReactionOptions {
   is_big?: boolean;
 }
 
+/**
+ * Options for {@link Bot.postStory} (excludes the positional `business_connection_id` and `content`).
+ *
+ * @remarks
+ * `active_period` must be one of 21600, 43200, 86400, or 172800.
+ *
+ * @see {@link https://core.telegram.org/bots/api#poststory Telegram Bot API: postStory}
+ */
 export interface PostStoryOptions {
-  /** Period after which the story is moved to the archive, in seconds; must be one of 6 * 3600, 12 * 3600, 24 * 3600, or 48 * 3600. */
-  active_period?: number;
-  /** Identifier of the target chat to pin the story in. */
-  pinned_peer_id?: number;
+  /** Period after which the story is moved to the archive, in seconds; must be one of 21600, 43200, 86400, or 172800. */
+  active_period: number;
   /** Story caption, 0-1024 characters. */
   caption?: string;
   /** Mode for parsing entities in the story caption. */
@@ -82,6 +88,8 @@ export interface PostStoryOptions {
   caption_entities?: MessageEntity[];
   /** List of story areas to add to the story. */
   areas?: StoryArea[];
+  /** Pass True if the story must be posted on the channel page. */
+  post_to_chat_page?: boolean;
   /** Pass True if the content of the story must be protected from forwarding and saving. */
   protect_content?: boolean;
 }

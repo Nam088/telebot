@@ -14,6 +14,8 @@ import type {
   EditEphemeralMessageCaptionOptions,
   EditEphemeralMessageReplyMarkupOptions,
   DeleteEphemeralMessageOptions,
+  AnswerChatJoinRequestQueryOptions,
+  SendChatJoinRequestWebAppOptions,
 } from "../../types/index.js";
 
 /**
@@ -151,8 +153,13 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#answerchatjoinrequestquery Telegram Bot API: answerChatJoinRequestQuery}
    */
-  public async answerChatJoinRequestQuery(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("answerChatJoinRequestQuery", options);
+  public async answerChatJoinRequestQuery(
+    options: AnswerChatJoinRequestQueryOptions,
+  ): Promise<boolean> {
+    return this.request<boolean>(
+      "answerChatJoinRequestQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -163,8 +170,13 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#sendchatjoinrequestwebapp Telegram Bot API: sendChatJoinRequestWebApp}
    */
-  public async sendChatJoinRequestWebApp(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("sendChatJoinRequestWebApp", options);
+  public async sendChatJoinRequestWebApp(
+    options: SendChatJoinRequestWebAppOptions,
+  ): Promise<boolean> {
+    return this.request<boolean>(
+      "sendChatJoinRequestWebApp",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**

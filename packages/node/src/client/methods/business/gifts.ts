@@ -13,6 +13,14 @@ import type {
   SetBusinessAccountProfilePhotoOptions,
   TransferGiftOptions,
   UpgradeGiftOptions,
+  GiftPremiumSubscriptionOptions,
+  SetBusinessAccountGiftSettingsOptions,
+  CreateChatSubscriptionInviteLinkOptions,
+  RepostStoryOptions,
+  SavePreparedKeyboardButtonOptions,
+  SetManagedBotAccessSettingsOptions,
+  Story,
+  ChatInviteLink,
 } from "../../types/index.js";
 
 /**
@@ -27,8 +35,11 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @see {@link https://core.telegram.org/bots/api#giftpremiumsubscription Telegram Bot API: giftPremiumSubscription}
    */
-  public async giftPremiumSubscription(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("giftPremiumSubscription", options);
+  public async giftPremiumSubscription(options: GiftPremiumSubscriptionOptions): Promise<boolean> {
+    return this.request<boolean>(
+      "giftPremiumSubscription",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -135,7 +146,7 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    */
   public async setBusinessAccountGiftSettings(
     businessConnectionId: string,
-    options: Record<string, unknown>,
+    options: SetBusinessAccountGiftSettingsOptions,
   ): Promise<boolean> {
     return this.request<boolean>("setBusinessAccountGiftSettings", {
       business_connection_id: businessConnectionId,
@@ -277,29 +288,29 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   /**
    * Retrieves access settings for a managed bot.
    *
-   * @param botId - Target bot identifier.
+   * @param userId - Unique identifier of the target user that owns the managed bot.
    * @returns Access settings.
    *
    * @see {@link https://core.telegram.org/bots/api#getmanagedbotaccesssettings Telegram Bot API: getManagedBotAccessSettings}
    */
-  public async getManagedBotAccessSettings(botId: number): Promise<unknown> {
-    return this.request<unknown>("getManagedBotAccessSettings", { bot_id: botId });
+  public async getManagedBotAccessSettings(userId: number): Promise<unknown> {
+    return this.request<unknown>("getManagedBotAccessSettings", { user_id: userId });
   }
 
   /**
    * Updates access settings for a managed bot.
    *
-   * @param botId - Target bot identifier.
-   * @param options - Updated access options.
+   * @param userId - Unique identifier of the target user that owns the managed bot.
+   * @param options - Updated access options including the required `is_access_restricted` flag.
    * @returns `true` on success.
    *
    * @see {@link https://core.telegram.org/bots/api#setmanagedbotaccesssettings Telegram Bot API: setManagedBotAccessSettings}
    */
   public async setManagedBotAccessSettings(
-    botId: number,
-    options: Record<string, unknown>,
+    userId: number,
+    options: SetManagedBotAccessSettingsOptions,
   ): Promise<boolean> {
-    return this.request<boolean>("setManagedBotAccessSettings", { bot_id: botId, ...options });
+    return this.request<boolean>("setManagedBotAccessSettings", { user_id: userId, ...options });
   }
 
   /**
@@ -313,9 +324,9 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    */
   public async createChatSubscriptionInviteLink(
     chatId: number | string,
-    options: Record<string, unknown>,
-  ): Promise<unknown> {
-    return this.request<unknown>("createChatSubscriptionInviteLink", {
+    options: CreateChatSubscriptionInviteLinkOptions,
+  ): Promise<ChatInviteLink> {
+    return this.request<ChatInviteLink>("createChatSubscriptionInviteLink", {
       chat_id: chatId,
       ...options,
     });
@@ -383,8 +394,8 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @see {@link https://core.telegram.org/bots/api#repoststory Telegram Bot API: repostStory}
    */
-  public async repostStory(options: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>("repostStory", options);
+  public async repostStory(options: RepostStoryOptions): Promise<Story> {
+    return this.request<Story>("repostStory", options as unknown as Record<string, unknown>);
   }
 
   /**
@@ -485,25 +496,25 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
   /**
    * Retrieves the token of a managed bot.
    *
-   * @param botId - Target bot identifier.
+   * @param userId - Unique identifier of the target user that owns the managed bot.
    * @returns Object containing the bot `token`.
    *
    * @see {@link https://core.telegram.org/bots/api#getmanagedbottoken Telegram Bot API: getManagedBotToken}
    */
-  public async getManagedBotToken(botId: number): Promise<{ token: string }> {
-    return this.request<{ token: string }>("getManagedBotToken", { bot_id: botId });
+  public async getManagedBotToken(userId: number): Promise<{ token: string }> {
+    return this.request<{ token: string }>("getManagedBotToken", { user_id: userId });
   }
 
   /**
    * Generates a replacement token for a managed bot.
    *
-   * @param botId - Target bot identifier.
+   * @param userId - Unique identifier of the target user that owns the managed bot.
    * @returns Object containing the new bot `token`.
    *
    * @see {@link https://core.telegram.org/bots/api#replacemanagedbottoken Telegram Bot API: replaceManagedBotToken}
    */
-  public async replaceManagedBotToken(botId: number): Promise<{ token: string }> {
-    return this.request<{ token: string }>("replaceManagedBotToken", { bot_id: botId });
+  public async replaceManagedBotToken(userId: number): Promise<{ token: string }> {
+    return this.request<{ token: string }>("replaceManagedBotToken", { user_id: userId });
   }
 
   /**
@@ -514,8 +525,13 @@ export abstract class BusinessGiftsMethods extends BusinessStoriesBoostsMethods 
    *
    * @see {@link https://core.telegram.org/bots/api#savepreparedkeyboardbutton Telegram Bot API: savePreparedKeyboardButton}
    */
-  public async savePreparedKeyboardButton(options: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>("savePreparedKeyboardButton", options);
+  public async savePreparedKeyboardButton(
+    options: SavePreparedKeyboardButtonOptions,
+  ): Promise<unknown> {
+    return this.request<unknown>(
+      "savePreparedKeyboardButton",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**

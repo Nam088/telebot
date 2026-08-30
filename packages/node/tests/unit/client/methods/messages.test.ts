@@ -126,7 +126,7 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
       true,
     );
     expect(await client.deleteMessageReaction(1, 2)).toBe(true);
-    expect(await client.deleteAllMessageReactions(1, 2)).toBe(true);
+    expect(await client.deleteAllMessageReactions(1)).toBe(true);
   });
 
   it("getUserProfilePhotos, getFile, webhook methods, drafts, checklists, paid media, live photo", async () => {
@@ -137,10 +137,80 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.deleteWebhook()).toBe(true);
     expect(await client.getWebhookInfo()).toBe(true);
     expect(await client.sendMessageDraft({ chat_id: 123 })).toBe(true);
-    expect(await client.sendChecklist({ chat_id: 123 })).toBe(true);
-    expect(await client.editMessageChecklist({ chat_id: 123 })).toBe(true);
+    expect(
+      await client.sendChecklist({
+        business_connection_id: "bc1",
+        chat_id: 123,
+        checklist: { title: "Todo", tasks: [] },
+      }),
+    ).toBe(true);
+    expect(
+      await client.editMessageChecklist({
+        business_connection_id: "bc1",
+        chat_id: 123,
+        message_id: 4,
+        checklist: { title: "Todo", tasks: [] },
+      }),
+    ).toBe(true);
     expect(await client.sendPaidMedia({ chat_id: 123, star_count: 1, media: [] })).toBe(true);
-    expect(await client.sendLivePhoto({ chat_id: 123 })).toBe(true);
+    expect(
+      await client.sendLivePhoto({ chat_id: 123, live_photo: "video_1", photo: "photo_1" }),
+    ).toBe(true);
     expect(await client.getUserPersonalChatMessages(123, 10)).toBe(true);
+  });
+});
+
+describe("MessageMethods payloads match the official Bot API 10.3 parameter names", () => {
+  const createPayloadRecorder = () => {
+    const calls: { method: string; payload: Record<string, unknown> }[] = [];
+    const fakeFetch = vi.fn().mockImplementation(async (url: string, init: { body: string }) => {
+      calls.push({
+        method: String(url).split("/").pop() ?? "",
+        payload: JSON.parse(init.body) as Record<string, unknown>,
+      });
+      return { status: 200, json: async () => ({ ok: true, result: true }) };
+    });
+    return { client: new ConcreteMessageClient("TEST_TOKEN", { fetch: fakeFetch }), calls };
+  };
+
+  it("sendPoll sends correct_option_ids, never the invented correct_option_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.sendPoll({
+      chat_id: 1,
+      question: "Q",
+      options: ["A", "B"],
+      type: "quiz",
+      correct_option_ids: [0],
+    });
+    expect(calls[0]?.payload["correct_option_ids"]).toEqual([0]);
+    expect(calls[0]?.payload["correct_option_id"]).toBeUndefined();
+  });
+
+  it("getUserPersonalChatMessages sends required user_id + limit, not chat_id", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.getUserPersonalChatMessages(555, 20);
+    expect(calls[0]?.payload).toEqual({ user_id: 555, limit: 20 });
+    expect(calls[0]?.payload["chat_id"]).toBeUndefined();
+  });
+
+  it("sendLivePhoto sends live_photo + photo and no invented video key", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.sendLivePhoto({ chat_id: 1, live_photo: "vid_1", photo: "pho_1" });
+    expect(calls[0]?.payload).toEqual({ chat_id: 1, live_photo: "vid_1", photo: "pho_1" });
+    expect(calls[0]?.payload["video"]).toBeUndefined();
+  });
+
+  it("deleteMessageReaction and deleteAllMessageReactions hit their true endpoints", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.deleteMessageReaction(1, 2, 3, 4);
+    await client.deleteAllMessageReactions(1, 3, 4);
+    expect(calls[0]?.method).toBe("deleteMessageReaction");
+    expect(calls[0]?.payload).toEqual({ chat_id: 1, message_id: 2, user_id: 3, actor_chat_id: 4 });
+    expect(calls[1]?.method).toBe("deleteAllMessageReactions");
+    expect(calls[1]?.payload).toEqual({ chat_id: 1, user_id: 3, actor_chat_id: 4 });
+    expect(calls[1]?.payload["message_id"]).toBeUndefined();
+    for (const call of calls) {
+      expect(call.method).not.toBe("setMessageReaction");
+    }
   });
 });

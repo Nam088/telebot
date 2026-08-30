@@ -263,13 +263,24 @@ export interface SendVideoNoteOptions {
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
+/**
+ * Options for {@link Bot.sendLivePhoto}.
+ *
+ * @see {@link https://core.telegram.org/bots/api#sendlivephoto Telegram Bot API: sendLivePhoto}
+ */
 export interface SendLivePhotoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
-  /** Photo to send. Pass a file_id as String, an HTTP URL, or upload a new photo using InputFile. */
+  /** Live photo video to send. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
+  live_photo: string | InputFile;
+  /** Static photo to send as the live photo cover. Pass a file_id as String, an HTTP URL, or upload a new photo using InputFile. */
   photo: string | InputFile;
-  /** Video to send along with the photo. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
-  video: string | InputFile;
+  /** Unique identifier of the business connection on behalf of which the message will be sent. */
+  business_connection_id?: string;
+  /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
+  message_thread_id?: number;
+  /** Identifier of the topic the message will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Live photo caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the photo caption. */
@@ -284,16 +295,16 @@ export interface SendLivePhotoOptions {
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
   protect_content?: boolean;
+  /** Pass True to allow paid broadcast of the message. */
+  allow_paid_broadcast?: boolean;
   /** Unique identifier of the message effect to be added to the message. */
   message_effect_id?: string;
+  /** Parameters of the suggested post to send in a business chat. */
+  suggested_post_parameters?: unknown;
   /** Description of the message to reply to. */
   reply_parameters?: ReplyParameters;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
-  /** Unique identifier of the business connection on behalf of which the message will be sent. */
-  business_connection_id?: string;
-  /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
-  message_thread_id?: number;
   /** Ephemeral message parameters (Bot API 10.3+). */
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
@@ -408,6 +419,11 @@ export interface SendContactOptions {
   ephemeral_message_parameters?: EphemeralMessageParameters;
 }
 
+/**
+ * Options for {@link Bot.sendPoll}.
+ *
+ * @see {@link https://core.telegram.org/bots/api#sendpoll Telegram Bot API: sendPoll}
+ */
 export interface SendPollOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
@@ -421,8 +437,8 @@ export interface SendPollOptions {
   type?: PollType;
   /** True, if the poll allows multiple answers, ignored for quizzes, defaults to False. */
   allows_multiple_answers?: boolean;
-  /** 0-based identifier of the correct answer option, required for polls in quiz mode. */
-  correct_option_id?: number;
+  /** A list of 0-based identifiers of known answer option(s) that are correct, required for polls in quiz mode. */
+  correct_option_ids?: number[];
   /** Text that is shown when a user chooses an incorrect answer or taps on the lamp icon, 0-200 characters. */
   explanation?: string;
   /** Mode for parsing entities in the explanation. */

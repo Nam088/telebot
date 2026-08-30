@@ -58,6 +58,70 @@ export interface SendInvoiceOptions {
   message_thread_id?: number;
 }
 
+/**
+ * Options for {@link Bot.createInvoiceLink}.
+ *
+ * @remarks
+ * Mirrors the documented 22-parameter createInvoiceLink set exactly. Unlike
+ * sendInvoice it has no `chat_id` and no message-delivery fields
+ * (`disable_notification`, `message_thread_id`, `protect_content`,
+ * `reply_parameters`, `reply_markup`, `start_parameter`), and it supports
+ * `subscription_period` for recurring charges.
+ *
+ * @see {@link https://core.telegram.org/bots/api#createinvoicelink Telegram Bot API: createInvoiceLink}
+ */
+export interface CreateInvoiceLinkOptions {
+  /** Unique identifier of the business connection on behalf of which the link will be created. */
+  business_connection_id?: string;
+  /** Product name, 1-32 characters. */
+  title: string;
+  /** Product description, 1-255 characters. */
+  description: string;
+  /** Bot-defined invoice payload, 1-128 bytes. */
+  payload: string;
+  /** Payment provider token, obtained via @BotFather. Pass an empty string for payments in Telegram Stars. */
+  provider_token?: string;
+  /** Three-letter ISO 4217 currency code or 'XTR' for Telegram Stars. */
+  currency: string;
+  /** Price breakdown, a JSON-serialized list of components. */
+  prices: LabeledPrice[];
+  /** Subscription period in seconds for recurring payments; must be one of 86400, 604800, 2592000, 6048000, 31536000. */
+  subscription_period?: number;
+  /** The maximum accepted amount for tips in the smallest units of the currency. */
+  max_tip_amount?: number;
+  /** A JSON-serialized array of suggested amounts of tips in the smallest units of the currency. */
+  suggested_tip_amounts?: number[];
+  /** JSON-serialized data about the invoice, which will be shared with the payment provider. */
+  provider_data?: string;
+  /** URL of the product photo for the invoice. */
+  photo_url?: string;
+  /** Photo size in bytes. */
+  photo_size?: number;
+  /** Photo width. */
+  photo_width?: number;
+  /** Photo height. */
+  photo_height?: number;
+  /** Pass True if you require the user's full name to complete the order. */
+  need_name?: boolean;
+  /** Pass True if you require the user's phone number to complete the order. */
+  need_phone_number?: boolean;
+  /** Pass True if you require the user's email address to complete the order. */
+  need_email?: boolean;
+  /** Pass True if you require the user's shipping address to complete the order. */
+  need_shipping_address?: boolean;
+  /** Pass True if the user's phone number should be sent to the provider. */
+  send_phone_number_to_provider?: boolean;
+  /** Pass True if the user's email address should be sent to the provider. */
+  send_email_to_provider?: boolean;
+  /** Pass True if the final price depends on the shipping method. */
+  is_flexible?: boolean;
+}
+
+/**
+ * Options for {@link Bot.answerShippingQuery}.
+ *
+ * @see {@link https://core.telegram.org/bots/api#answershippingquery Telegram Bot API: answerShippingQuery}
+ */
 export interface AnswerShippingQueryOptions {
   /** Unique identifier for the query to be answered. */
   shipping_query_id: string;

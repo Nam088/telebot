@@ -390,21 +390,20 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
   }
 
   /**
-   * Retrieves messages from a personal chat.
+   * Retrieves messages from a user's personal chat with the bot.
    *
-   * @param chatId - Chat identifier.
-   * @param limit - Maximum messages to return.
+   * @param userId - Unique identifier of the target user.
+   * @param limit - Maximum number of messages to be returned; 1-100.
    * @returns Array of {@link Message} objects.
+   * @throws {@link TelegramApiError} When retrieving messages fails.
    *
    * @see {@link https://core.telegram.org/bots/api#getuserpersonalchatmessages Telegram Bot API: getUserPersonalChatMessages}
    */
-  public async getUserPersonalChatMessages(
-    chatId: number | string,
-    limit?: number,
-  ): Promise<Message[]> {
-    const payload: Record<string, unknown> = { chat_id: chatId };
-    if (limit !== undefined) payload["limit"] = limit;
-    return this.request<Message[]>("getUserPersonalChatMessages", payload);
+  public async getUserPersonalChatMessages(userId: number, limit: number): Promise<Message[]> {
+    return this.request<Message[]>("getUserPersonalChatMessages", {
+      user_id: userId,
+      limit,
+    });
   }
 
   /**

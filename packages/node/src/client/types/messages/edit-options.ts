@@ -5,9 +5,20 @@ import type { InputMedia } from "./media.js";
 import type { InputRichMessage } from "../rich/index.js";
 import type { InlineQueryResult } from "../business/index.js";
 
+/**
+ * Options for {@link Bot.editMessageText}.
+ *
+ * @remarks
+ * `text` and `rich_message` are mutually exclusive: exactly one of them must be
+ * supplied. Provide either `chat_id`+`message_id` or `inline_message_id`.
+ *
+ * @see {@link https://core.telegram.org/bots/api#editmessagetext Telegram Bot API: editMessageText}
+ */
 export interface EditMessageTextOptions {
-  /** New text of the message, 1-4096 characters after entities parsing. */
-  text: string;
+  /** New text of the message, 1-4096 characters after entities parsing. Required if rich_message isn't specified. */
+  text?: string;
+  /** New rich content of the message; required if text isn't specified (Bot API 10.1+). */
+  rich_message?: InputRichMessage;
   /** Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel. */
   chat_id?: number | string;
   /** Required if inline_message_id is not specified. Identifier of the message to edit. */

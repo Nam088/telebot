@@ -17,6 +17,7 @@ import type {
   SendVideoNoteOptions,
   SendMediaGroupOptions,
   SendLivePhotoOptions,
+  SendPaidMediaOptions,
 } from "../../types/index.js";
 
 /**
@@ -207,8 +208,8 @@ export abstract class MessageMediaMethods extends BaseBotClient {
    *
    * @see {@link https://core.telegram.org/bots/api#sendpaidmedia Telegram Bot API: sendPaidMedia}
    */
-  public async sendPaidMedia(options: Record<string, unknown>): Promise<Message> {
-    return this.request<Message>("sendPaidMedia", options);
+  public async sendPaidMedia(options: SendPaidMediaOptions): Promise<Message> {
+    return this.request<Message>("sendPaidMedia", options as unknown as Record<string, unknown>);
   }
 
   /**
