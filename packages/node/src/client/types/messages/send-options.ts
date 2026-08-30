@@ -1,6 +1,8 @@
 import type { ParseMode, PollType, ChatAction } from "../../constants.js";
 import type { SuggestedPostParameters } from "../payments/index.js";
 import type { MessageEntity } from "./core.js";
+import type { InputMedia } from "./media.js";
+import type { InputPollOption } from "./polls.js";
 import type { ReplyParameters, EphemeralMessageParameters } from "./reply-context.js";
 import type { ReplyMarkup } from "./keyboards.js";
 
@@ -166,14 +168,30 @@ export interface SendPollOptions {
   chat_id: number | string;
   /** Poll question, 1-300 characters. */
   question: string;
+  /** Mode for parsing entities in the question. */
+  question_parse_mode?: ParseMode;
+  /** A list of special entities that appear in the poll question. */
+  question_entities?: MessageEntity[];
   /** A list of 2-10 answer options. */
-  options: (string | { text: string })[];
+  options: InputPollOption[];
   /** True, if the poll needs to be anonymous, defaults to True. */
   is_anonymous?: boolean;
   /** Poll type, 'quiz' or 'regular', defaults to 'regular'. */
   type?: PollType;
   /** True, if the poll allows multiple answers, ignored for quizzes, defaults to False. */
   allows_multiple_answers?: boolean;
+  /** Pass True, if the poll allows users to change their vote; polls can't be anonymous if revoting is allowed. */
+  allows_revoting?: boolean;
+  /** Pass True, if the order of the answer options must be shuffled for each user. */
+  shuffle_options?: boolean;
+  /** Pass True, if users can add new options to the poll. */
+  allow_adding_options?: boolean;
+  /** Pass True, if the poll results are hidden until the poll is closed. */
+  hide_results_until_closes?: boolean;
+  /** Pass True, if the poll is accessible to chat members only. */
+  members_only?: boolean;
+  /** A list of ISO 3166-1 alpha-2 country codes that restrict which users can participate in the poll. */
+  country_codes?: string[];
   /** A list of 0-based identifiers of known answer option(s) that are correct, required for polls in quiz mode. */
   correct_option_ids?: number[];
   /** Text that is shown when a user chooses an incorrect answer or taps on the lamp icon, 0-200 characters. */
@@ -182,12 +200,22 @@ export interface SendPollOptions {
   explanation_parse_mode?: ParseMode;
   /** A list of special entities that appear in the poll explanation. */
   explanation_entities?: MessageEntity[];
+  /** Media that is shown together with the poll explanation. */
+  explanation_media?: InputMedia;
   /** Amount of time in seconds the poll will be active after creation, 5-600. */
   open_period?: number;
   /** Point in time (Unix timestamp) when the poll will be automatically closed. */
   close_date?: number;
   /** Pass True if the poll needs to be immediately closed. */
   is_closed?: boolean;
+  /** Description of the poll. */
+  description?: string;
+  /** Mode for parsing entities in the description. */
+  description_parse_mode?: ParseMode;
+  /** A list of special entities that appear in the description. */
+  description_entities?: MessageEntity[];
+  /** Media that is shown together with the poll. */
+  media?: InputMedia;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */

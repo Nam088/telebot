@@ -20,7 +20,7 @@ async function sendPoll(update: Update, context: CallbackContext) {
     await context.bot.sendPoll({
       chat_id: update.effective_chat.id,
       question: "What is your favorite TypeScript framework?",
-      options: ["Node.js", "Deno", "Bun", "Other"],
+      options: [{ text: "Node.js" }, { text: "Deno" }, { text: "Bun" }, { text: "Other" }],
       is_anonymous: false,
     });
   }
@@ -31,9 +31,9 @@ async function sendQuiz(update: Update, context: CallbackContext) {
     await context.bot.sendPoll({
       chat_id: update.effective_chat.id,
       question: "What is the result of 2 + 2 * 2?",
-      options: ["6", "8", "4", "10"],
+      options: [{ text: "6" }, { text: "8" }, { text: "4" }, { text: "10" }],
       type: "quiz",
-      correct_option_id: 0,
+      correct_option_ids: [0],
       explanation: "Multiplication precedes addition: 2 + (2 * 2) = 6.",
       is_anonymous: false,
     });

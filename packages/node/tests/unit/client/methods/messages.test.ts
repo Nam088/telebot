@@ -102,7 +102,9 @@ describe("MessageMethods Unit Tests (1:1 mapping)", () => {
       await client.sendVenue({ chat_id: 1, latitude: 1, longitude: 2, title: "T", address: "A" }),
     ).toBe(true);
     expect(await client.sendContact({ chat_id: 1, phone_number: "1", first_name: "F" })).toBe(true);
-    expect(await client.sendPoll({ chat_id: 1, question: "Q", options: ["O1"] })).toBe(true);
+    expect(await client.sendPoll({ chat_id: 1, question: "Q", options: [{ text: "O1" }] })).toBe(
+      true,
+    );
     expect(await client.stopPoll(1, 2)).toBe(true);
     expect(await client.sendDice({ chat_id: 1 })).toBe(true);
     expect(await client.sendChatAction({ chat_id: 1, action: "typing" })).toBe(true);
@@ -187,12 +189,57 @@ describe("MessageMethods payloads match the official Bot API 10.3 parameter name
     await client.sendPoll({
       chat_id: 1,
       question: "Q",
-      options: ["A", "B"],
+      options: [{ text: "A" }, { text: "B" }],
       type: "quiz",
       correct_option_ids: [0],
     });
     expect(calls[0]?.payload["correct_option_ids"]).toEqual([0]);
     expect(calls[0]?.payload["correct_option_id"]).toBeUndefined();
+  });
+
+  it("sendPoll serializes InputPollOption objects and all documented Bot API 10.3 params", async () => {
+    const { client, calls } = createPayloadRecorder();
+    const questionEntities = [{ type: "bold", offset: 0, length: 1 }];
+    const descriptionEntities = [{ type: "italic", offset: 2, length: 3 }];
+    await client.sendPoll({
+      chat_id: 1,
+      question: "Q",
+      question_parse_mode: "MarkdownV2",
+      question_entities: questionEntities,
+      options: [
+        { text: "A", text_parse_mode: "HTML", text_entities: questionEntities },
+        { text: "B", media: { type: "photo", media: "photo_file_id" } },
+      ],
+      allows_revoting: true,
+      shuffle_options: true,
+      allow_adding_options: true,
+      hide_results_until_closes: true,
+      members_only: true,
+      country_codes: ["US", "CA"],
+      explanation_media: { type: "animation", media: "anim_file_id" },
+      description: "Poll description",
+      description_parse_mode: "HTML",
+      description_entities: descriptionEntities,
+      media: { type: "video", media: "video_file_id" },
+    });
+    const payload = calls[0]?.payload ?? {};
+    expect(payload["question_parse_mode"]).toBe("MarkdownV2");
+    expect(payload["question_entities"]).toEqual(questionEntities);
+    expect(payload["options"]).toEqual([
+      { text: "A", text_parse_mode: "HTML", text_entities: questionEntities },
+      { text: "B", media: { type: "photo", media: "photo_file_id" } },
+    ]);
+    expect(payload["allows_revoting"]).toBe(true);
+    expect(payload["shuffle_options"]).toBe(true);
+    expect(payload["allow_adding_options"]).toBe(true);
+    expect(payload["hide_results_until_closes"]).toBe(true);
+    expect(payload["members_only"]).toBe(true);
+    expect(payload["country_codes"]).toEqual(["US", "CA"]);
+    expect(payload["explanation_media"]).toEqual({ type: "animation", media: "anim_file_id" });
+    expect(payload["description"]).toBe("Poll description");
+    expect(payload["description_parse_mode"]).toBe("HTML");
+    expect(payload["description_entities"]).toEqual(descriptionEntities);
+    expect(payload["media"]).toEqual({ type: "video", media: "video_file_id" });
   });
 
   it("getUserPersonalChatMessages sends required user_id + limit, not chat_id", async () => {

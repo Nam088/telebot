@@ -1,8 +1,33 @@
 import type { Link, Location } from "../common/index.js";
 import type { Sticker } from "../stickers/index.js";
-import type { Animation, Audio, Document, LivePhoto, PhotoSize, Video } from "./media.js";
+import type { ParseMode } from "../../constants.js";
+import type {
+  Animation,
+  Audio,
+  Document,
+  InputMedia,
+  LivePhoto,
+  PhotoSize,
+  Video,
+} from "./media.js";
 import type { MessageEntity, Venue } from "./core.js";
 import type { MaybeInaccessibleMessage } from "./reply-context.js";
+
+/**
+ * Contains information about one answer option in a poll to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputpolloption Telegram Bot API: InputPollOption}
+ */
+export interface InputPollOption {
+  /** Option text, 1-100 characters. */
+  text: string;
+  /** Mode for parsing entities in the text; currently, only custom emoji entities are supported. */
+  text_parse_mode?: ParseMode;
+  /** A list of special entities that appear in the option text. */
+  text_entities?: MessageEntity[];
+  /** Media that is shown together with the option. */
+  media?: InputMedia;
+}
 
 /**
  * Describes media added to a poll or a poll option.
