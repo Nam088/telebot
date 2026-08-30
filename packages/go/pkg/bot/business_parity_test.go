@@ -187,12 +187,13 @@ func TestBusiness_EditChatSubscriptionInviteLinkOmitsName(t *testing.T) {
 	}
 }
 
-// TestBusiness_SetUserEmojiStatus covers setUserEmojiStatus ported from
-// packages/node/src/client/methods/business/stories-boosts.ts.
+// TestBusiness_SetUserEmojiStatus covers setUserEmojiStatus, asserting the docs'
+// emoji_status_custom_emoji_id key rather than the bare custom_emoji_id the node
+// port used.
 func TestBusiness_SetUserEmojiStatus(t *testing.T) {
 	srv := profileServer(t, "setUserEmojiStatus", map[string]any{
 		"user_id":                      123456,
-		"custom_emoji_id":              "5368323575420792074",
+		"emoji_status_custom_emoji_id": "5368323575420792074",
 		"emoji_status_expiration_date": 1702592000,
 	}, true)
 	defer srv.Close()
@@ -208,7 +209,7 @@ func TestBusiness_SetUserEmojiStatus(t *testing.T) {
 }
 
 func TestBusiness_SetUserEmojiStatus_OmitsOptionalFields(t *testing.T) {
-	srv := omittingServer(t, "setUserEmojiStatus", []string{"custom_emoji_id", "emoji_status_expiration_date"},
+	srv := omittingServer(t, "setUserEmojiStatus", []string{"emoji_status_custom_emoji_id", "emoji_status_expiration_date"},
 		map[string]any{"user_id": 123456}, true)
 	defer srv.Close()
 

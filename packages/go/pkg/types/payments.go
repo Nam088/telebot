@@ -47,18 +47,24 @@ type StarAmount struct {
 
 // SendGiftOptions represents parameters for the sendGift method.
 //
-// Port of SendGiftOptions in packages/node/src/client/types/payments/options.ts.
+// user_id and chat_id are mutually exclusive; exactly one of them must be set,
+// mirroring the docs' "Required if chat_id is not specified" wording.
 //
 // See https://core.telegram.org/bots/api#sendgift
 type SendGiftOptions struct {
 	// Unique identifier of the target user that will receive the gift.
-	UserID int64 `json:"user_id"`
-	// Identifier of the gift.
+	// Required if ChatID is not specified.
+	UserID *int64 `json:"user_id,omitempty"`
+	// Unique identifier for the chat or username of the channel (in the format
+	// @channelusername) that will receive the gift. Required if UserID is not
+	// specified. Accepts int64 or string.
+	ChatID any `json:"chat_id,omitempty"`
+	// Identifier of the gift; limited gifts can't be sent to channel chats.
 	GiftID string `json:"gift_id"`
 	// Pass true to pay for the gift upgrade from the bot's balance,
 	// thereby making the upgrade free for the receiver.
 	PayForUpgrade bool `json:"pay_for_upgrade,omitempty"`
-	// Text that will be shown along with the gift; 0-255 characters.
+	// Text that will be shown along with the gift; 0-128 characters.
 	Text string `json:"text,omitempty"`
 	// Mode for parsing entities in the text.
 	TextParseMode string `json:"text_parse_mode,omitempty"`

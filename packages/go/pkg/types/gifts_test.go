@@ -81,10 +81,15 @@ func TestGiftModels_WireShape(t *testing.T) {
 	}
 }
 
-// TestGiftsOptionPayload pins the request-side wire keys for sendGift, matching
-// SendGiftOptions in packages/node/src/client/types/payments/options.ts.
+// TestGiftsOptionPayload pins the request-side wire keys for sendGift per
+// https://core.telegram.org/bots/api#sendgift, where user_id and chat_id are
+// mutually exclusive alternatives for the recipient and gift_id is required.
 func TestGiftsOptionPayload(t *testing.T) {
-	out, err := json.Marshal(&types.SendGiftOptions{UserID: 123456, GiftID: "g1", Text: "hi"})
+	out, err := json.Marshal(&types.SendGiftOptions{
+		UserID: types.Ptr(int64(123456)),
+		GiftID: "g1",
+		Text:   "hi",
+	})
 	if err != nil {
 		t.Fatalf("marshal SendGiftOptions: %v", err)
 	}
@@ -97,10 +102,26 @@ func TestGiftsOptionPayload(t *testing.T) {
 			t.Errorf("expected wire key %q in %s", key, out)
 		}
 	}
-	for _, key := range []string{"pay_for_upgrade", "text_parse_mode", "text_entities"} {
+	for _, key := range []string{"pay_for_upgrade", "text_parse_mode", "text_entities", "chat_id"} {
 		if _, present := generic[key]; present {
 			t.Errorf("expected %q to be omitted in %s", key, out)
 		}
+	}
+
+	// The channel-chat form swaps user_id for chat_id.
+	channelOut, err := json.Marshal(&types.SendGiftOptions{ChatID: "@channel", GiftID: "g1"})
+	if err != nil {
+		t.Fatalf("marshal channel SendGiftOptions: %v", err)
+	}
+	var channel map[string]any
+	if err := json.Unmarshal(channelOut, &channel); err != nil {
+		t.Fatalf("unmarshal channel payload: %v", err)
+	}
+	if channel["chat_id"] != "@channel" || channel["gift_id"] != "g1" {
+		t.Errorf("unexpected channel-chat payload: %s", channelOut)
+	}
+	if _, present := channel["user_id"]; present {
+		t.Errorf("expected user_id to be omitted when chat_id is used in %s", channelOut)
 	}
 }
 

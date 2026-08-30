@@ -9,19 +9,25 @@ import (
 	"github.com/Nam088/telebot/packages/go/pkg/types"
 )
 
-// TestBusinessAccount_GetBusinessConnection covers getBusinessConnection ported
-// from packages/node/src/client/methods/business/stories-boosts.ts, asserting the
-// typed BusinessConnection decode.
+// TestBusinessAccount_GetBusinessConnection covers getBusinessConnection,
+// asserting the typed BusinessConnection decode from the documented wire shape,
+// where the bot's permissions arrive as a nested BusinessBotRights object under
+// "rights" (https://core.telegram.org/bots/api#businessconnection).
 func TestBusinessAccount_GetBusinessConnection(t *testing.T) {
 	srv := profileServer(t, "getBusinessConnection", map[string]any{
 		"business_connection_id": "423778511293324225",
-	}, types.BusinessConnection{
-		ID:         "423778511293324225",
-		User:       types.User{ID: 123456, FirstName: "Acme"},
-		UserChatID: 123456,
-		Date:       1702592000,
-		CanReply:   true,
-		IsEnabled:  true,
+	}, map[string]any{
+		"id":           "423778511293324225",
+		"user":         map[string]any{"id": 123456, "is_bot": true, "first_name": "Acme"},
+		"user_chat_id": 123456,
+		"date":         1702592000,
+		"is_enabled":   true,
+		"rights": map[string]any{
+			"can_reply":                  true,
+			"can_read_messages":          true,
+			"can_edit_name":              true,
+			"can_convert_gifts_to_stars": true,
+		},
 	})
 	defer srv.Close()
 
@@ -33,23 +39,37 @@ func TestBusinessAccount_GetBusinessConnection(t *testing.T) {
 	if conn.ID != "423778511293324225" || conn.UserChatID != 123456 {
 		t.Errorf("unexpected connection: %+v", conn)
 	}
-	if !conn.CanReply || !conn.IsEnabled {
-		t.Errorf("expected can_reply/is_enabled to decode true: %+v", conn)
+	if conn.Date != 1702592000 || !conn.IsEnabled {
+		t.Errorf("unexpected date/is_enabled: %+v", conn)
+	}
+	if conn.Rights == nil {
+		t.Fatalf("expected rights to decode, got nil for %+v", conn)
+	}
+	if !conn.Rights.CanReply || !conn.Rights.CanReadMessages {
+		t.Errorf("expected can_reply/can_read_messages true: %+v", conn.Rights)
+	}
+	if !conn.Rights.CanEditName || !conn.Rights.CanConvertGiftsToStars {
+		t.Errorf("expected can_edit_name/can_convert_gifts_to_stars true: %+v", conn.Rights)
+	}
+	if conn.Rights.CanTransferStars {
+		t.Errorf("expected unlisted can_transfer_stars to stay false: %+v", conn.Rights)
 	}
 }
 
 // TestBusinessAccount_BusinessMessageMethods covers readBusinessMessage and
-// deleteBusinessMessages, asserting message_id vs the message_ids array key.
+// deleteBusinessMessages, asserting readBusinessMessage's required chat_id plus
+// the message_id vs message_ids array key difference.
 func TestBusinessAccount_BusinessMessageMethods(t *testing.T) {
 	t.Run("ReadBusinessMessage", func(t *testing.T) {
 		srv := profileServer(t, "readBusinessMessage", map[string]any{
 			"business_connection_id": "423778511293324225",
+			"chat_id":                123456,
 			"message_id":             42,
 		}, true)
 		defer srv.Close()
 
 		b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-		ok, err := b.ReadBusinessMessage(context.Background(), "423778511293324225", 42)
+		ok, err := b.ReadBusinessMessage(context.Background(), "423778511293324225", 123456, 42)
 		if err != nil || !ok {
 			t.Fatalf("ReadBusinessMessage = (%v, %v)", ok, err)
 		}
@@ -125,9 +145,9 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 		{
 			name:    "SetBusinessAccountName",
 			wire:    "setBusinessAccountName",
-			payload: map[string]any{"business_connection_id": "bc1", "name": "Acme Support"},
+			payload: map[string]any{"business_connection_id": "bc1", "first_name": "Acme", "last_name": "Support"},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.SetBusinessAccountName(context.Background(), "bc1", "Acme Support")
+				return b.SetBusinessAccountName(context.Background(), "bc1", "Acme", "Support")
 			},
 		},
 		{
@@ -170,7 +190,7 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 				return b.SetBusinessAccountProfilePhoto(context.Background(), "bc1", map[string]any{
 					"type": "input_file",
 					"id":   "ph1",
-				})
+				}, false)
 			},
 		},
 		{
@@ -178,7 +198,7 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 			wire:    "removeBusinessAccountProfilePhoto",
 			payload: map[string]any{"business_connection_id": "bc1"},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.RemoveBusinessAccountProfilePhoto(context.Background(), "bc1")
+				return b.RemoveBusinessAccountProfilePhoto(context.Background(), "bc1", false)
 			},
 		},
 		{
@@ -208,8 +228,41 @@ func TestBusinessAccount_ManagementMethods(t *testing.T) {
 	}
 }
 
-// TestBusinessAccount_OptionalFieldOmission asserts username and bio stay off the
-// wire when empty, matching node's `!== undefined` payload guards.
+// TestBusinessAccount_ProfilePhotoIsPublic covers the documented optional
+// is_public key of setBusinessAccountProfilePhoto and
+// removeBusinessAccountProfilePhoto.
+func TestBusinessAccount_ProfilePhotoIsPublic(t *testing.T) {
+	t.Run("Set", func(t *testing.T) {
+		srv := profileServer(t, "setBusinessAccountProfilePhoto", map[string]any{
+			"business_connection_id": "bc1",
+			"photo":                  "BAACAgIAAxkBAAI",
+			"is_public":              true,
+		}, true)
+		defer srv.Close()
+
+		b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
+		if _, err := b.SetBusinessAccountProfilePhoto(context.Background(), "bc1", "BAACAgIAAxkBAAI", true); err != nil {
+			t.Fatalf("SetBusinessAccountProfilePhoto error: %v", err)
+		}
+	})
+
+	t.Run("Remove", func(t *testing.T) {
+		srv := profileServer(t, "removeBusinessAccountProfilePhoto", map[string]any{
+			"business_connection_id": "bc1",
+			"is_public":              true,
+		}, true)
+		defer srv.Close()
+
+		b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
+		if _, err := b.RemoveBusinessAccountProfilePhoto(context.Background(), "bc1", true); err != nil {
+			t.Fatalf("RemoveBusinessAccountProfilePhoto error: %v", err)
+		}
+	})
+}
+
+// TestBusinessAccount_OptionalFieldOmission asserts username, bio, last_name and
+// is_public stay off the wire when their argument carries the Go zero value,
+// matching node's `!== undefined` payload guards.
 func TestBusinessAccount_OptionalFieldOmission(t *testing.T) {
 	cases := []struct {
 		name   string
@@ -231,6 +284,22 @@ func TestBusinessAccount_OptionalFieldOmission(t *testing.T) {
 			absent: "bio",
 			invoke: func(b *bot.Bot) (bool, error) {
 				return b.SetBusinessAccountBio(context.Background(), "bc1", "")
+			},
+		},
+		{
+			name:   "LastName",
+			wire:   "setBusinessAccountName",
+			absent: "last_name",
+			invoke: func(b *bot.Bot) (bool, error) {
+				return b.SetBusinessAccountName(context.Background(), "bc1", "Acme", "")
+			},
+		},
+		{
+			name:   "ProfilePhotoIsPublic",
+			wire:   "removeBusinessAccountProfilePhoto",
+			absent: "is_public",
+			invoke: func(b *bot.Bot) (bool, error) {
+				return b.RemoveBusinessAccountProfilePhoto(context.Background(), "bc1", false)
 			},
 		},
 	}
@@ -257,7 +326,7 @@ func TestBusinessAccount_TelegramError(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	_, err := b.SetBusinessAccountName(context.Background(), "bc1", "Acme")
+	_, err := b.SetBusinessAccountName(context.Background(), "bc1", "Acme", "")
 	requireTelegramError(t, err, 400)
 
 	_, err = b.GetBusinessConnection(context.Background(), "bc1")

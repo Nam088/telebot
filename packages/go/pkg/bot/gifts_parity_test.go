@@ -15,12 +15,19 @@ func TestGifts_GetAvailableGifts(t *testing.T) {
 	srv := noPayloadServer(t, "getAvailableGifts", types.Gifts{
 		Gifts: []types.Gift{
 			{
-				ID:               "9bbee321504743a9817031dfc2ba25a3",
-				Sticker:          types.Sticker{FileID: "st1", FileUniqueID: "u1", Type: "regular", Width: 100, Height: 100},
-				StarCount:        50,
-				TotalCount:       1000,
-				RemainingCount:   999,
-				UpgradeStarCount: 500,
+				ID:                     "9bbee321504743a9817031dfc2ba25a3",
+				Sticker:                types.Sticker{FileID: "st1", FileUniqueID: "u1", Type: "regular", Width: 100, Height: 100},
+				StarCount:              50,
+				TotalCount:             1000,
+				RemainingCount:         999,
+				PersonalTotalCount:     10,
+				PersonalRemainingCount: 4,
+				UpgradeStarCount:       500,
+				IsPremium:              true,
+				HasColors:              true,
+				Background:             &types.GiftBackground{CenterColor: 16766720, EdgeColor: 16777215, TextColor: 0},
+				UniqueGiftVariantCount: 3,
+				PublisherChat:          &types.Chat{ID: -1001234567890, Title: "Gift Shop"},
 			},
 		},
 	})
@@ -41,6 +48,18 @@ func TestGifts_GetAvailableGifts(t *testing.T) {
 	if g.Sticker.FileID != "st1" || g.TotalCount != 1000 || g.RemainingCount != 999 {
 		t.Errorf("unexpected nested/optional fields: %+v", g)
 	}
+	if !g.IsPremium || !g.HasColors || g.UniqueGiftVariantCount != 3 {
+		t.Errorf("unexpected premium/colors/variant fields: %+v", g)
+	}
+	if g.PersonalTotalCount != 10 || g.PersonalRemainingCount != 4 {
+		t.Errorf("unexpected personal counts: %+v", g)
+	}
+	if g.Background == nil || g.Background.CenterColor != 16766720 || g.Background.TextColor != 0 {
+		t.Errorf("unexpected background: %+v", g.Background)
+	}
+	if g.PublisherChat == nil || g.PublisherChat.Title != "Gift Shop" {
+		t.Errorf("unexpected publisher_chat: %+v", g.PublisherChat)
+	}
 }
 
 // TestGifts_SendGift covers sendGift with the full option set.
@@ -57,7 +76,7 @@ func TestGifts_SendGift(t *testing.T) {
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
 	ok, err := b.SendGift(context.Background(), &types.SendGiftOptions{
-		UserID:        123456,
+		UserID:        types.Ptr(int64(123456)),
 		GiftID:        "9bbee321504743a9817031dfc2ba25a3",
 		PayForUpgrade: true,
 		Text:          "Enjoy your gift!",
@@ -69,11 +88,12 @@ func TestGifts_SendGift(t *testing.T) {
 	}
 }
 
-// TestGifts_SendGiftOmitsOptionalFields asserts the optional text fields are
-// omitted, keeping the payload to node's required user_id/gift_id pair.
+// TestGifts_SendGiftOmitsOptionalFields asserts the optional text fields and the
+// unused half of the user_id/chat_id pair stay off the wire, keeping the payload
+// to the docs' required gift_id plus the chosen recipient.
 func TestGifts_SendGiftOmitsOptionalFields(t *testing.T) {
 	srv := omittingServer(t, "sendGift",
-		[]string{"pay_for_upgrade", "text", "text_parse_mode", "text_entities"},
+		[]string{"pay_for_upgrade", "text", "text_parse_mode", "text_entities", "chat_id"},
 		map[string]any{
 			"user_id": 123456,
 			"gift_id": "9bbee321504743a9817031dfc2ba25a3",
@@ -82,16 +102,35 @@ func TestGifts_SendGiftOmitsOptionalFields(t *testing.T) {
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
 	if _, err := b.SendGift(context.Background(), &types.SendGiftOptions{
-		UserID: 123456,
+		UserID: types.Ptr(int64(123456)),
 		GiftID: "9bbee321504743a9817031dfc2ba25a3",
 	}); err != nil {
 		t.Fatalf("SendGift error: %v", err)
 	}
 }
 
-// TestGifts_OwnedGiftMethods covers giftPremiumSubscription, convertGiftToStars,
-// upgradeGift and transferGift ported from
-// packages/node/src/client/methods/business/gifts.ts.
+// TestGifts_SendGiftToChannelChat asserts the docs' channel-chat form, where
+// chat_id replaces user_id.
+func TestGifts_SendGiftToChannelChat(t *testing.T) {
+	srv := omittingServer(t, "sendGift", []string{"user_id"}, map[string]any{
+		"chat_id": "@channel",
+		"gift_id": "9bbee321504743a9817031dfc2ba25a3",
+	}, true)
+	defer srv.Close()
+
+	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
+	if _, err := b.SendGift(context.Background(), &types.SendGiftOptions{
+		ChatID: "@channel",
+		GiftID: "9bbee321504743a9817031dfc2ba25a3",
+	}); err != nil {
+		t.Fatalf("SendGift error: %v", err)
+	}
+}
+
+// TestGifts_OwnedGiftMethods covers giftPremiumSubscription and the three
+// business-account gift methods convertGiftToStars, upgradeGift and transferGift.
+// The latter pair are keyed by business_connection_id, not user_id, per
+// https://core.telegram.org/bots/api#convertgifttostars.
 func TestGifts_OwnedGiftMethods(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -103,46 +142,57 @@ func TestGifts_OwnedGiftMethods(t *testing.T) {
 			name: "GiftPremiumSubscription",
 			wire: "giftPremiumSubscription",
 			payload: map[string]any{
-				"user_id":            123456,
-				"gift_id":            "e135440423778511293324225ab619d5",
-				"upgrade_star_count": 500,
-				"pay_for_upgrade":    true,
+				"user_id":     123456,
+				"month_count": 3,
+				"star_count":  1000,
+				"text":        "Enjoy Premium",
 			},
 			invoke: func(b *bot.Bot) (bool, error) {
 				return b.GiftPremiumSubscription(context.Background(), map[string]any{
-					"user_id":            123456,
-					"gift_id":            "e135440423778511293324225ab619d5",
-					"upgrade_star_count": 500,
-					"pay_for_upgrade":    true,
+					"user_id":     123456,
+					"month_count": 3,
+					"star_count":  1000,
+					"text":        "Enjoy Premium",
 				})
 			},
 		},
 		{
 			name:    "ConvertGiftToStars",
 			wire:    "convertGiftToStars",
-			payload: map[string]any{"user_id": 123456, "owned_gift_id": "og1"},
+			payload: map[string]any{"business_connection_id": "bc1", "owned_gift_id": "og1"},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.ConvertGiftToStars(context.Background(), 123456, "og1")
+				return b.ConvertGiftToStars(context.Background(), "bc1", "og1")
 			},
 		},
 		{
-			name:    "UpgradeGift",
-			wire:    "upgradeGift",
-			payload: map[string]any{"user_id": 123456, "owned_gift_id": "og1"},
+			name: "UpgradeGift",
+			wire: "upgradeGift",
+			payload: map[string]any{
+				"business_connection_id": "bc1",
+				"owned_gift_id":          "og1",
+				"keep_original_details":  true,
+				"star_count":             500,
+			},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.UpgradeGift(context.Background(), 123456, "og1")
+				return b.UpgradeGift(context.Background(), "bc1", "og1", map[string]any{
+					"keep_original_details": true,
+					"star_count":            500,
+				})
 			},
 		},
 		{
 			name: "TransferGift",
 			wire: "transferGift",
 			payload: map[string]any{
-				"user_id":           123456,
-				"owned_gift_id":     "og1",
-				"new_owner_chat_id": int64(-1001234567890),
+				"business_connection_id": "bc1",
+				"owned_gift_id":          "og1",
+				"new_owner_chat_id":      int64(-1001234567890),
+				"star_count":             250,
 			},
 			invoke: func(b *bot.Bot) (bool, error) {
-				return b.TransferGift(context.Background(), 123456, "og1", int64(-1001234567890))
+				return b.TransferGift(context.Background(), "bc1", "og1", int64(-1001234567890), map[string]any{
+					"star_count": 250,
+				})
 			},
 		},
 	}
@@ -159,6 +209,59 @@ func TestGifts_OwnedGiftMethods(t *testing.T) {
 			}
 			if !ok {
 				t.Errorf("%s: expected true result", tc.name)
+			}
+		})
+	}
+}
+
+// TestGifts_OwnedGiftMethodsOmitOptionals asserts that upgradeGift and
+// transferGift send only their required keys when no options are passed, and
+// that none of the three business gift methods ever leak a user_id key.
+func TestGifts_OwnedGiftMethodsOmitOptionals(t *testing.T) {
+	tests := []struct {
+		name   string
+		wire   string
+		invoke func(b *bot.Bot) (bool, error)
+		want   map[string]any
+		absent []string
+	}{
+		{
+			name:   "ConvertGiftToStars",
+			wire:   "convertGiftToStars",
+			invoke: func(b *bot.Bot) (bool, error) { return b.ConvertGiftToStars(context.Background(), "bc1", "og1") },
+			want:   map[string]any{"business_connection_id": "bc1", "owned_gift_id": "og1"},
+			absent: []string{"user_id", "chat_id", "star_count", "keep_original_details"},
+		},
+		{
+			name:   "UpgradeGift",
+			wire:   "upgradeGift",
+			invoke: func(b *bot.Bot) (bool, error) { return b.UpgradeGift(context.Background(), "bc1", "og1", nil) },
+			want:   map[string]any{"business_connection_id": "bc1", "owned_gift_id": "og1"},
+			absent: []string{"user_id", "star_count", "keep_original_details"},
+		},
+		{
+			name: "TransferGift",
+			wire: "transferGift",
+			invoke: func(b *bot.Bot) (bool, error) {
+				return b.TransferGift(context.Background(), "bc1", "og1", int64(987654), nil)
+			},
+			want: map[string]any{
+				"business_connection_id": "bc1",
+				"owned_gift_id":          "og1",
+				"new_owner_chat_id":      int64(987654),
+			},
+			absent: []string{"user_id", "star_count", "keep_original_details"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := omittingServer(t, tc.wire, tc.absent, tc.want, true)
+			defer srv.Close()
+
+			b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
+			if _, err := tc.invoke(b); err != nil {
+				t.Fatalf("%s error: %v", tc.name, err)
 			}
 		})
 	}
@@ -197,7 +300,8 @@ func TestGifts_GiftListMethods(t *testing.T) {
 	})
 
 	t.Run("GetUserGiftsWithoutOptions", func(t *testing.T) {
-		srv := omittingServer(t, "getUserGifts", []string{"limit", "offset"},
+		srv := omittingServer(t, "getUserGifts",
+			[]string{"limit", "offset", "exclude_unsaved", "exclude_saved"},
 			map[string]any{"user_id": 123456}, result)
 		defer srv.Close()
 
@@ -209,13 +313,17 @@ func TestGifts_GiftListMethods(t *testing.T) {
 
 	t.Run("GetChatGifts", func(t *testing.T) {
 		srv := profileServer(t, "getChatGifts", map[string]any{
-			"chat_id": "@channel",
-			"offset":  "abc",
+			"chat_id":         "@channel",
+			"offset":          "abc",
+			"exclude_unsaved": true,
 		}, result)
 		defer srv.Close()
 
 		b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-		gifts, err := b.GetChatGifts(context.Background(), "@channel", map[string]any{"offset": "abc"})
+		gifts, err := b.GetChatGifts(context.Background(), "@channel", map[string]any{
+			"offset":          "abc",
+			"exclude_unsaved": true,
+		})
 		if err != nil {
 			t.Fatalf("GetChatGifts error: %v", err)
 		}
@@ -232,7 +340,7 @@ func TestGifts_TelegramError(t *testing.T) {
 	defer srv.Close()
 
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
-	ok, err := b.UpgradeGift(context.Background(), 123456, "og1")
+	ok, err := b.UpgradeGift(context.Background(), "bc1", "og1", nil)
 	if ok {
 		t.Errorf("expected false on error")
 	}

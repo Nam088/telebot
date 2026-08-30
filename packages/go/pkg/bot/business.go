@@ -29,12 +29,18 @@ func (b *Bot) GetBusinessConnection(ctx context.Context, businessConnectionID st
 	return &conn, nil
 }
 
-// ReadBusinessMessage marks incoming messages in a business account as read.
+// ReadBusinessMessage marks an incoming message as read on behalf of a business
+// account.
+//
+// Requires the can_read_messages business bot right.
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
-//   - businessConnectionID: Unique identifier of the business connection.
-//   - messageID: Identifier of the message to mark as read.
+//   - businessConnectionID: Unique identifier of the business connection on
+//     behalf of which to read the message.
+//   - chatID: Unique identifier of the chat in which the message was received;
+//     the chat must have been active in the last 24 hours.
+//   - messageID: Unique identifier of the message to mark as read.
 //
 // Returns:
 //   - bool: True on success.
@@ -42,10 +48,11 @@ func (b *Bot) GetBusinessConnection(ctx context.Context, businessConnectionID st
 //
 // Example:
 //
-//	ok, err := b.ReadBusinessMessage(ctx, "423778511293324225", 42)
-func (b *Bot) ReadBusinessMessage(ctx context.Context, businessConnectionID string, messageID int64) (bool, error) {
+//	ok, err := b.ReadBusinessMessage(ctx, "423778511293324225", 123456, 42)
+func (b *Bot) ReadBusinessMessage(ctx context.Context, businessConnectionID string, chatID int64, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
+		"chat_id":                chatID,
 		"message_id":             messageID,
 	}
 	var ok bool
@@ -156,12 +163,17 @@ func (b *Bot) TransferBusinessAccountStars(ctx context.Context, businessConnecti
 	return ok, nil
 }
 
-// SetBusinessAccountName changes the business name of a connected business account.
+// SetBusinessAccountName changes the first and last name of a connected
+// business account.
+//
+// Requires the can_edit_name business bot right.
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
 //   - businessConnectionID: Unique identifier of the business connection.
-//   - name: New business name; 1-128 characters after entity parsing.
+//   - firstName: New first name of the business account; 1-64 characters.
+//   - lastName: New last name of the business account; 0-64 characters. Pass an
+//     empty string to omit the field, mirroring node's optional last_name.
 //
 // Returns:
 //   - bool: True on success.
@@ -169,11 +181,14 @@ func (b *Bot) TransferBusinessAccountStars(ctx context.Context, businessConnecti
 //
 // Example:
 //
-//	ok, err := b.SetBusinessAccountName(ctx, "423778511293324225", "Acme Support")
-func (b *Bot) SetBusinessAccountName(ctx context.Context, businessConnectionID, name string) (bool, error) {
+//	ok, err := b.SetBusinessAccountName(ctx, "423778511293324225", "Acme", "Support")
+func (b *Bot) SetBusinessAccountName(ctx context.Context, businessConnectionID, firstName, lastName string) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
-		"name":                   name,
+		"first_name":             firstName,
+	}
+	if lastName != "" {
+		payload["last_name"] = lastName
 	}
 	var ok bool
 	if err := b.Request(ctx, "setBusinessAccountName", payload, &ok); err != nil {
@@ -263,14 +278,19 @@ func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, businessConnec
 	return ok, nil
 }
 
-// SetBusinessAccountProfilePhoto sets the profile photo for a connected
+// SetBusinessAccountProfilePhoto changes the profile photo of a connected
 // business account.
+//
+// Requires the can_edit_profile_photo business bot right.
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
 //   - businessConnectionID: Unique identifier of the business connection.
 //   - photo: New profile photo, serialized as-is (a file_id, an https URL or an
-//     input object), mirroring node's unknown photo argument.
+//     InputProfilePhoto object), mirroring node's unknown photo argument.
+//   - isPublic: Pass true to set a public photo, which is visible even if the
+//     main photo is hidden by the business account's privacy settings; false
+//     omits the field.
 //
 // Returns:
 //   - bool: True on success.
@@ -278,11 +298,14 @@ func (b *Bot) SetBusinessAccountGiftSettings(ctx context.Context, businessConnec
 //
 // Example:
 //
-//	ok, err := b.SetBusinessAccountProfilePhoto(ctx, "423778511293324225", "BAACAgIAAxkBAAI")
-func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string, photo any) (bool, error) {
+//	ok, err := b.SetBusinessAccountProfilePhoto(ctx, "423778511293324225", "BAACAgIAAxkBAAI", false)
+func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string, photo any, isPublic bool) (bool, error) {
 	payload := map[string]any{
 		"business_connection_id": businessConnectionID,
 		"photo":                  photo,
+	}
+	if isPublic {
+		payload["is_public"] = true
 	}
 	var ok bool
 	if err := b.Request(ctx, "setBusinessAccountProfilePhoto", payload, &ok); err != nil {
@@ -291,12 +314,17 @@ func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnec
 	return ok, nil
 }
 
-// RemoveBusinessAccountProfilePhoto removes the profile photo of a connected
-// business account.
+// RemoveBusinessAccountProfilePhoto removes the current profile photo of a
+// connected business account.
+//
+// Requires the can_edit_profile_photo business bot right.
 //
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
 //   - businessConnectionID: Unique identifier of the business connection.
+//   - isPublic: Pass true to remove the public photo, which is visible even if
+//     the main photo is hidden by the business account's privacy settings;
+//     false omits the field.
 //
 // Returns:
 //   - bool: True on success.
@@ -304,9 +332,12 @@ func (b *Bot) SetBusinessAccountProfilePhoto(ctx context.Context, businessConnec
 //
 // Example:
 //
-//	ok, err := b.RemoveBusinessAccountProfilePhoto(ctx, "423778511293324225")
-func (b *Bot) RemoveBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string) (bool, error) {
+//	ok, err := b.RemoveBusinessAccountProfilePhoto(ctx, "423778511293324225", false)
+func (b *Bot) RemoveBusinessAccountProfilePhoto(ctx context.Context, businessConnectionID string, isPublic bool) (bool, error) {
 	payload := map[string]any{"business_connection_id": businessConnectionID}
+	if isPublic {
+		payload["is_public"] = true
+	}
 	var ok bool
 	if err := b.Request(ctx, "removeBusinessAccountProfilePhoto", payload, &ok); err != nil {
 		return false, err

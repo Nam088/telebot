@@ -222,3 +222,16 @@ type AnswerCallbackQueryOptions struct {
 	URL             string `json:"url,omitempty"`
 	CacheTime       int    `json:"cache_time,omitempty"`
 }
+
+// Ptr returns a pointer to v, which is how callers set the pointer-typed
+// optional fields of request options structs, e.g.
+// types.SendGiftOptions{UserID: types.Ptr(int64(123456))}.
+//
+// Parameters:
+//   - v: The value to take the address of.
+//
+// Returns:
+//   - *T: A pointer to a copy of v.
+func Ptr[T any](v T) *T {
+	return &v
+}
