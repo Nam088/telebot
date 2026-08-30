@@ -31,17 +31,17 @@ including native `&` / `|` / `~` filter operators.
 
 ## Installation
 
-Requires Python 3.10+. The first release (`telebot-py 0.1.0`) is pending
-publication; until then, install from source:
-
-```bash
-pip install packages/python          # from the repo root
-```
-
-Once published, the package will be available on PyPI:
+Requires Python 3.10+. telebot-py is versioned in lockstep with telebot-ts and
+telebot-go (currently `1.4.0`). Install from PyPI:
 
 ```bash
 pip install telebot-py
+```
+
+Or from source:
+
+```bash
+pip install packages/python          # from the repo root
 ```
 
 ## Quick Start

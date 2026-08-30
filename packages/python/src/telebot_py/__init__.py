@@ -31,7 +31,7 @@ from telebot_py.routing.handlers import (
     MessageHandler,
 )
 
-__version__ = "0.1.0"
+__version__ = "1.4.0"
 
 __all__ = [
     "Application",

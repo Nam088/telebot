@@ -93,6 +93,7 @@ def _disambiguate_type(
         changed = True
     return (signature, return_annotation) if changed else None
 
+
 templates_path: list[str] = []
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 

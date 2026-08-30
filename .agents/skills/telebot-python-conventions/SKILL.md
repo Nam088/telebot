@@ -1,6 +1,6 @@
 ---
 name: telebot-python-conventions
-description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or Sphinx docstrings to the Python framework in packages/python (telebot_py). Use whenever developing, modifying, or reviewing code in packages/python.
+description: Authoritative guide for adding new Bot API methods, Handlers, Filters, Scheduler RRule features, Storage Persistence drivers, or Sphinx docstrings to the Python framework in packages/python (telebot_py), and for keeping version/release parity across telebot-ts, telebot-go, and telebot-py. Use whenever developing, modifying, or reviewing code in packages/python.
 ---
 
 # Telebot Python Framework Conventions
@@ -107,3 +107,20 @@ python scripts/parity_audit.py      # SC-007 parity table; gaps fail CI
 ## 10. Examples
 
 Every major feature keeps a runnable example in `packages/python/examples/` (echo_bot, conversation, scheduler, plugins_i18n, webhook, persistence, ptb_reference_echo for the SC-001 porting proof). Examples are not imported by tests and are excluded from coverage.
+
+---
+
+## 11. Versioning & Release Parity (node = go = python)
+
+All three frameworks share ONE version number (currently `1.4.0`):
+
+- `packages/node/package.json` → npm (`telebot-ts`), released by semantic-release on pushes to `main`; node tags are `vX.Y.Z`.
+- `packages/go` → GitHub Releases only; tags `packages/go/vX.Y.Z` are mirrored by `.github/workflows/release-pipeline.yml` with the same version.
+- `packages/python/pyproject.toml` + `src/telebot_py/__init__.py` (`__version__`) → PyPI (`telebot-py`); tags `packages/python/vX.Y.Z` are mirrored the same way, and `python-release.yml` is dispatched at the mirrored tag to build, create the GitHub Release, and publish to PyPI via trusted publishing (OIDC).
+
+Rules:
+
+- When cutting or referencing a release, all three versions/tags must match. If you bump `pyproject.toml`, bump `__version__` in `src/telebot_py/__init__.py` in the same change (`docs/conf.py` reads from `pyproject.toml` and never drifts).
+- Never hand-push `packages/python/v*` tags ahead of the node line; the pipeline mirrors them. `python-release.yml` stamps the tag's version into `pyproject.toml`/`__init__.py` before building, so the wheel always matches its tag.
+- Release notes come from conventional commits via git-cliff (`packages/python/cliff.toml`); use `feat(py)`/`fix(py)` scopes.
+- Verify releases locally before tagging: `python -m build` then `twine check dist/*`.

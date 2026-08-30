@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "telebot-py"
-version = "0.1.0"
+version = "1.4.0"
 description = "Async-first Telegram Bot framework for Python, mirroring python-telegram-bot's API"
 readme = "README.md"
 license = "MIT"

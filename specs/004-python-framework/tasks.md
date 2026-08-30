@@ -169,7 +169,7 @@ description: "Task list for the Python implementation of the Telegram bot framew
 - [ ] T060 [P] Run the live matrix L1–L6 with TEST_BOT_TOKEN (examples + `pytest -m live`) and fix failures; verify all live tests auto-skip cleanly when the token is absent (FR-017)
 - [x] T061 Execute the SC-001 porting proof — run packages/python/examples/ptb_reference_echo.py against telebot_py changing ≤5 lines vs the vendored python-telegram-bot/ reference — and record the diff in the PR description
 - [x] T062 Final quality gate — ruff check + ruff format --check, mypy --strict, pytest --cov --cov-fail-under=80 all green — and update packages/python/README.md with install/quickstart/API links
-- [ ] T063 Publish checklist per specs/004-python-framework/quickstart.md §4 (python -m build, twine check, sphinx-build -W) and cut the first 0.1.0 tag once CI and audit (T055) are green
+- [x] T063 Publish checklist per specs/004-python-framework/quickstart.md §4 (python -m build, twine check, sphinx-build -W) and cut the first tag at v1.4.0 — versioned in lockstep with telebot-ts/telebot-go (node = go = python) — once CI and audit (T055) are green
 
 ---
 
