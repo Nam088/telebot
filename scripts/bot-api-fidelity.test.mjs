@@ -2,23 +2,25 @@
  * Tests for the per-package field mappers and for the missing-REQUIRED gate.
  *
  * Run with: node --test scripts/bot-api-fidelity.test.mjs
- * (or via the repository's `npm run test:docs` script)
+ * (or via the repository's `npm run test:scripts` script)
  *
  * @module
  */
 
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
 import {
   auditPackage,
+  compareBaseline,
   extractGo,
   extractPython,
   extractTypeScript,
   heritageNames,
+  main,
   maskCommentsAndStrings,
   renderTable,
 } from './bot-api-fidelity.mjs';
@@ -303,4 +305,188 @@ test('heritage never credits a key the package does not actually declare', async
   } finally {
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test('a row names the file holding the declaration that was judged', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  try {
+    await mkdir(path.join(root, 'packages/go/pkg/types'), { recursive: true });
+    // Same-named structs in two files: the declaration that also carries `b`
+    // is the one judged, so its path is the one a reviewer has to fix.
+    await writeFile(
+      path.join(root, 'packages/go/pkg/types/other.go'),
+      'package types\n\ntype Thing struct {\n\tOther string `json:"other"`\n}\n',
+      'utf-8',
+    );
+    await writeFile(
+      path.join(root, 'packages/go/pkg/types/thing.go'),
+      'package types\n\ntype Thing struct {\n\tB string `json:"b,omitempty"`\n}\n',
+      'utf-8',
+    );
+    const report = await auditPackage('go', ORACLE, root);
+    assert.equal(report.rows[0].file, 'packages/go/pkg/types/thing.go');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('a child row points at the child file even though keys came from the parent', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  try {
+    const oracle = structuredClone(ORACLE);
+    // `c` is documented and required but declared nowhere, so Thing keeps a gap.
+    oracle.types.Thing.fields.c = { type: 'String', optional: false, desc: 'Required too' };
+    await mkdir(path.join(root, 'packages/node/src/client/types'), { recursive: true });
+    await writeFile(
+      path.join(root, 'packages/node/src/client/types/base.ts'),
+      'export interface Base {\n  a: number;\n}\n',
+      'utf-8',
+    );
+    await writeFile(
+      path.join(root, 'packages/node/src/client/types/thing.ts'),
+      'export interface Thing extends Base {\n  b?: string;\n}\n',
+      'utf-8',
+    );
+    const report = await auditPackage('node', oracle, root);
+    assert.deepEqual(report.rows[0].required, ['c']);
+    assert.equal(report.rows[0].file, 'packages/node/src/client/types/thing.ts');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('--json dumps the report it just printed', async (t) => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  const target = path.join(dir, 'reports', 'fidelity.json');
+  try {
+    t.mock.method(console, 'log', () => {});
+    t.mock.method(console, 'error', () => {});
+    // --report keeps this independent of whether the real tree has gaps today.
+    const code = await main(['--package', 'go', '--report', '--json', target]);
+    assert.equal(code, 0);
+
+    const dumped = JSON.parse(await readFile(target, 'utf-8'));
+    assert.equal(dumped.oracle.version.length > 0, true);
+    // This dump is meant to be committed as a CI baseline, so it must not carry
+    // a machine-specific absolute path.
+    assert.equal(
+      dumped.oracle.source.startsWith('/'),
+      false,
+      `oracle source must be repo-relative, got ${dumped.oracle.source}`,
+    );
+    assert.equal(dumped.packages.length, 1);
+    assert.equal(dumped.packages[0].key, 'go');
+    // A second round-trip must be identical: nothing unserializable (a Set, say)
+    // may reach the payload, or a baseline diff would read it as empty.
+    assert.deepEqual(JSON.parse(JSON.stringify(dumped)), dumped);
+    for (const report of dumped.packages) {
+      assert.equal(typeof report.missingRequired, 'number');
+      assert.ok(Array.isArray(report.unmodelled));
+      for (const row of report.rows) {
+        assert.match(row.file, /^packages\/go\/pkg\/.+\.go$/, 'paths stay repo-relative');
+      }
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('--baseline gates on drift from the committed report, not on absolute gaps', async (t) => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'fidelity-'));
+  const dump = path.join(dir, 'fidelity.json');
+  try {
+    t.mock.method(console, 'log', () => {});
+    t.mock.method(console, 'error', () => {});
+    await main(['--package', 'go', '--report', '--json', dump]);
+    const fresh = JSON.parse(await readFile(dump, 'utf-8'));
+
+    // Self-consistent: today's tree against today's report is not a regression.
+    assert.equal(await main(['--package', 'go', '--baseline', dump]), 0);
+
+    // Drop one entry from the baseline's unmodelled list and the audit appears
+    // to have modelled nothing new — it found surface nobody covered. Must fail.
+    const stale = structuredClone(fresh);
+    stale.packages[0].unmodelled = fresh.packages[0].unmodelled.slice(1);
+    await writeFile(dump, JSON.stringify(stale), 'utf-8');
+    assert.equal(await main(['--package', 'go', '--baseline', dump]), 1);
+
+    // A missing baseline is operator error, not a reason to pass.
+    const code = await main(['--package', 'go', '--baseline', path.join(dir, 'nope.json')]);
+    assert.equal(code, 2);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+/** Minimal audit-shaped report for the baseline diff tests. */
+const reportOf = (key, rows, unmodelled) => ({ key, rows, unmodelled });
+
+/** Minimal `--json` payload shape, which is also the committed baseline shape. */
+const baselineOf = (packages, version = '9.9') => ({
+  oracle: { version, source: 'scripts/bot-api-oracle.json' },
+  packages,
+});
+
+test('compareBaseline passes while nothing gets worse', () => {
+  const known = [{ name: 'Thing', file: 'a.go', required: ['a'], optional: ['b'] }];
+  const verdict = compareBaseline(
+    [reportOf('go', known, ['Unmodelled'])],
+    baselineOf([reportOf('go', known, ['Unmodelled'])]),
+  );
+  assert.equal(verdict.regressions, 0);
+  assert.equal(verdict.improvements, 0);
+});
+
+test('compareBaseline allows a known gap but not a field that only just went missing', () => {
+  const baseline = baselineOf([
+    reportOf(
+      'go',
+      [
+        { name: 'Thing', file: 'a.go', required: ['a'], optional: ['b'] },
+        { name: 'Other', file: 'b.go', required: ['x'], optional: [] },
+      ],
+      [],
+    ),
+  ]);
+  const current = [
+    // `a` and `b` were already missing; `c` is the new hole. `Other` is absent
+    // from the rows now, i.e. fully modelled on this branch.
+    reportOf('go', [{ name: 'Thing', file: 'a.go', required: ['a', 'c'], optional: ['b'] }], []),
+  ];
+  const verdict = compareBaseline(current, baseline);
+  assert.equal(verdict.regressions, 1, 'only `c` counts');
+  assert.deepEqual(verdict.entries[0].newGaps, [
+    { name: 'Thing', file: 'a.go', required: ['c'], optional: [] },
+  ]);
+  assert.deepEqual(verdict.entries[0].closed, ['Other'], 'a shrinking gap list is progress');
+  assert.equal(verdict.improvements, 1);
+});
+
+test('compareBaseline flags a type that fell out of the model entirely', () => {
+  // `User` was modelled in the baseline (so absent from its unmodelled list)
+  // and is gone from the tree now: still a docs type, now unmodelled.
+  const verdict = compareBaseline(
+    [reportOf('go', [], ['Chat', 'User'])],
+    baselineOf([reportOf('go', [], ['Chat'])]),
+  );
+  assert.deepEqual(verdict.entries[0].newlyUnmodelled, ['User']);
+  assert.deepEqual(verdict.entries[0].nowModelled, [], 'Chat stays unmodelled, unchanged');
+  assert.equal(verdict.regressions, 1);
+
+  const improved = compareBaseline(
+    [reportOf('go', [], ['Chat'])],
+    baselineOf([reportOf('go', [], ['Chat', 'User'])]),
+  );
+  assert.deepEqual(improved.entries[0].nowModelled, ['User']);
+  assert.equal(improved.regressions, 0);
+  assert.equal(improved.improvements, 1);
+});
+
+test('compareBaseline refuses to let a package slip out of the baseline', () => {
+  const verdict = compareBaseline(
+    [reportOf('node', [], []), reportOf('python', [], [])],
+    baselineOf([reportOf('node', [], [])]),
+  );
+  assert.deepEqual(verdict.unbaselined, ['python']);
+  assert.equal(verdict.regressions, 1, 'uncovered surface must fail the gate');
 });

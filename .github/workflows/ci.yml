@@ -109,11 +109,14 @@ jobs:
         working-directory: packages/python
         run: python scripts/parity_audit.py
 
-  # Gates the declared type surface against the documented Bot API shape: a
-  # missing REQUIRED field means incoming updates silently lose data, so this
-  # fails the build. Runs against the committed oracle, never the live site, so
-  # a Telegram docs hiccup cannot redden CI. Refresh the oracle with
-  # `npm run audit:docs -- --refresh` and commit the diff when the API changes.
+  # Gates the declared type surface against the documented Bot API shape. The
+  # committed baseline report is the accepted state of the tree, so this fails on
+  # drift away from it — a documented field that only just went missing, or a
+  # docs type that stopped being modelled — instead of an ever-growing list of
+  # known gaps. Refresh it deliberately with `npm run audit:baseline`. Runs
+  # against the committed oracle, never the live site, so a Telegram docs hiccup
+  # cannot redden CI. Update the oracle with `npm run audit:docs -- --refresh`
+  # and commit the diff when the API changes.
   bot-api-fidelity:
     name: Bot API Docs Fidelity
     runs-on: ubuntu-latest
@@ -137,10 +140,11 @@ jobs:
         run: npm run audit:fidelity:report
 
       # Advisory: re-runs the same audit against a freshly fetched oracle, so a
-      # Bot API change shows up as a diff here without reddening CI while the
-      # three packages catch up. The committed-oracle step above is the gate.
+      # Bot API change shows up as a named diff here (which types the docs added)
+      # without reddening CI while the three packages catch up. The committed
+      # oracle step above is the gate.
       - name: Check Oracle Freshness Against Live Docs
         continue-on-error: true
         run: |
           npm run audit:docs -- --out "${RUNNER_TEMP}/live-oracle.json"
-          node scripts/bot-api-fidelity.mjs --oracle "${RUNNER_TEMP}/live-oracle.json"
+          node scripts/bot-api-fidelity.mjs --oracle "${RUNNER_TEMP}/live-oracle.json" --baseline scripts/bot-api-fidelity-baseline.json

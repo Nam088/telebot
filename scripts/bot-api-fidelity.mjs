@@ -23,6 +23,9 @@
  *   node scripts/bot-api-fidelity.mjs --report
  *   node scripts/bot-api-fidelity.mjs --package go
  *   node scripts/bot-api-fidelity.mjs --oracle path/to/oracle.json
+ *   node scripts/bot-api-fidelity.mjs --json build/fidelity.json
+ *   node scripts/bot-api-fidelity.mjs --oracle scripts/bot-api-oracle.json \
+ *     --baseline scripts/bot-api-fidelity-baseline.json
  *
  * Zero dependencies: Node 22+ built-ins only, per the repo NFR-1 policy.
  *
@@ -372,23 +375,26 @@ async function walk(dir, extension) {
  *
  * @param {string} key Package key.
  * @param {string} root Repository root.
- * @returns {Promise<Map<string, Array<Set<string>>>>} Type name to candidate wire-key sets.
+ * @returns {Promise<Map<string, Array<{fields: Set<string>, parents: string[], file: string}>>>}
+ *   Type name to candidate declarations, widest first. `file` is repo-relative.
  */
 export async function collectDeclaredTypes(key, root = REPO_ROOT) {
   const pkg = PACKAGES[key];
   if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
   const declared = new Map();
-  const push = (name, fields, parents = []) => {
+  const push = (name, fields, parents = [], file = '') => {
     const candidates = declared.get(name);
-    if (candidates) candidates.push({ fields, parents });
-    else declared.set(name, [{ fields, parents }]);
+    if (candidates) candidates.push({ fields, parents, file });
+    else declared.set(name, [{ fields, parents, file }]);
   };
 
   for (const file of await walk(path.join(root, pkg.dir), pkg.extension)) {
     if (pkg.skipFile && pkg.skipFile(path.basename(file))) continue;
     const raw = await readFile(file, 'utf-8');
     const masked = maskCommentsAndStrings(raw, pkg.mask);
-    for (const entry of pkg.extract(masked, raw)) push(entry.name, entry.fields, entry.parents);
+    const relative = path.relative(root, file);
+    const entries = pkg.extract(masked, raw);
+    for (const entry of entries) push(entry.name, entry.fields, entry.parents, relative);
   }
 
   // node models the documented `Update` under the identifier `RawUpdate`; move
@@ -396,7 +402,9 @@ export async function collectDeclaredTypes(key, root = REPO_ROOT) {
   for (const [alias, docsName] of Object.entries(pkg.rename ?? {})) {
     const candidates = declared.get(alias);
     if (!candidates) continue;
-    for (const candidate of candidates) push(docsName, candidate.fields);
+    for (const candidate of candidates) {
+      push(docsName, candidate.fields, candidate.parents, candidate.file);
+    }
     declared.delete(alias);
   }
 
@@ -420,12 +428,21 @@ export async function collectDeclaredTypes(key, root = REPO_ROOT) {
 
   const resolved = new Map();
   for (const [name, candidates] of declared) {
-    const sets = candidates.map((candidate) => {
-      if (candidate.parents.length === 0) return candidate.fields;
-      return new Set([...candidate.fields, ...inherited(candidate.parents, new Set([name]))]);
+    const judged = candidates.map((candidate) => {
+      const keys =
+        candidate.parents.length === 0
+          ? candidate.fields
+          : new Set([
+              ...candidate.fields,
+              ...inherited(candidate.parents, new Set([name])),
+            ]);
+      // Provenance stays the declaring file: keys inherited from a parent
+      // defined elsewhere must not send a reviewer to the parent to fix a gap
+      // that is only visible on the child.
+      return { fields: keys, file: candidate.file };
     });
-    sets.sort((a, b) => b.size - a.size);
-    resolved.set(name, sets);
+    judged.sort((a, b) => b.fields.size - a.fields.size);
+    resolved.set(name, judged);
   }
   return resolved;
 }
@@ -465,21 +482,24 @@ export async function auditPackage(key, oracle, root = REPO_ROOT) {
     // A package models a type faithfully if ANY of its same-named declarations
     // does, so judge by the best candidate rather than by an average.
     let best = null;
-    for (const wireKeys of candidates) {
+    for (const candidate of candidates) {
       const required = [];
       const optional = [];
       for (const [field, meta] of Object.entries(docsType.fields)) {
-        if (wireKeys.has(field)) continue;
+        if (candidate.fields.has(field)) continue;
         if (meta.optional) optional.push(field);
         else required.push(field);
       }
       const score = required.length * 1000 + optional.length;
-      if (best === null || score < best.score) best = { required, optional, score };
+      if (best === null || score < best.score) {
+        best = { required, optional, score, file: candidate.file };
+      }
     }
 
     if (best.required.length > 0 || best.optional.length > 0) {
       rows.push({
         name,
+        file: best.file,
         required: best.required,
         optional: best.optional,
         total: Object.keys(docsType.fields).length,
@@ -544,6 +564,65 @@ export function renderTable(reports) {
 }
 
 /**
+ * Diffs a fresh audit against a baseline report (the `--json` dump committed
+ * from a known-good tree).
+ *
+ * The baseline records the accepted state of the code, so only drift away from
+ * it is worth failing a build over: a documented field that was already absent
+ * stays absent without noise, while one that only just went missing is a
+ * regression — and so is a concrete docs type nobody models any more. Closing a
+ * gap is reported as progress, meaning the baseline is due a refresh.
+ *
+ * @param {object[]} reports Fresh per-package audit results.
+ * @param {{packages?: object[]}} baseline Parsed baseline report.
+ * @returns {{entries: object[], unbaselined: string[], regressions: number, improvements: number}}
+ */
+export function compareBaseline(reports, baseline) {
+  const previous = new Map((baseline?.packages ?? []).map((report) => [report.key, report]));
+  const entries = [];
+  const unbaselined = [];
+  let regressions = 0;
+  let improvements = 0;
+
+  for (const report of reports) {
+    const before = previous.get(report.key);
+    if (before === undefined) {
+      unbaselined.push(report.key);
+      regressions += 1;
+      continue;
+    }
+
+    const beforeRows = new Map((before.rows ?? []).map((row) => [row.name, row]));
+    const afterNames = new Set(report.rows.map((row) => row.name));
+    const newGaps = [];
+    for (const row of report.rows) {
+      const known = beforeRows.get(row.name);
+      const knownRequired = new Set(known?.required ?? []);
+      const knownOptional = new Set(known?.optional ?? []);
+      const required = row.required.filter((field) => !knownRequired.has(field));
+      const optional = row.optional.filter((field) => !knownOptional.has(field));
+      if (required.length > 0 || optional.length > 0) {
+        newGaps.push({ name: row.name, file: row.file ?? '', required, optional });
+      }
+    }
+
+    const beforeUnmodelled = new Set(before.unmodelled ?? []);
+    const afterUnmodelled = new Set(report.unmodelled);
+    const newlyUnmodelled = report.unmodelled.filter((name) => !beforeUnmodelled.has(name));
+    const nowModelled = [...beforeUnmodelled]
+      .filter((name) => !afterUnmodelled.has(name))
+      .sort();
+    const closed = [...beforeRows.keys()].filter((name) => !afterNames.has(name)).sort();
+
+    regressions += newGaps.length + newlyUnmodelled.length;
+    improvements += closed.length + nowModelled.length;
+    entries.push({ key: report.key, newGaps, newlyUnmodelled, closed, nowModelled });
+  }
+
+  return { entries, unbaselined, regressions, improvements };
+}
+
+/**
  * Resolves the oracle from the most specific source the CLI was given.
  *
  * @param {{offline?: string, oracle?: string, refresh?: boolean}} options Parsed flags.
@@ -588,6 +667,8 @@ export async function main(argv = process.argv.slice(2)) {
     else if (flag === '--package') [options.package, i] = [argv[i + 1], i + 1];
     else if (flag === '--oracle') [options.oracle, i] = [path.resolve(argv[i + 1]), i + 1];
     else if (flag === '--offline') [options.offline, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--json') [options.json, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--baseline') [options.baseline, i] = [path.resolve(argv[i + 1]), i + 1];
     else if (flag === '--help' || flag === '-h') options.help = true;
     else {
       console.error(`Unknown argument: ${flag}`);
@@ -601,12 +682,18 @@ export async function main(argv = process.argv.slice(2)) {
       [
         'Usage: node scripts/bot-api-fidelity.mjs [--report] [--package node|go|python]',
         '                          [--oracle <path> | --offline <page.html>] [--refresh]',
+        '                          [--json <report.json>] [--baseline <report.json>]',
         '',
         'Reports, per package, which documented Bot API types are not modelled at',
         'all and which documented fields are missing from the types that are.',
         '',
         'Exits non-zero when a package is missing a REQUIRED documented field on a',
         'type it declares. --report prints the same tables but never fails.',
+        '--json writes that same report as JSON: oracle metadata plus one entry',
+        'per audited package, every row stamped with the file declaring it.',
+        '--baseline compares against such a dump instead of failing absolutely:',
+        'only drift away from it fails (a field that was not already missing, or a',
+        'docs type that stopped being modelled). Use it once the tree is clean.',
         `Oracle defaults to ${oraclePath()}; build it with node scripts/bot-api-docs.mjs.`,
       ].join('\n'),
     );
@@ -630,6 +717,20 @@ export async function main(argv = process.argv.slice(2)) {
     }
   }
 
+  // Read before auditing: --json may target this same path to refresh it, and
+  // the comparison has to be against what was on disk when the run started.
+  let baseline = null;
+  if (options.baseline !== undefined) {
+    if (!fs.existsSync(options.baseline)) {
+      console.error(
+        `No such baseline: ${options.baseline}\n` +
+          `Create one with: node scripts/bot-api-fidelity.mjs --json ${options.baseline}`,
+      );
+      return 2;
+    }
+    baseline = JSON.parse(await readFile(options.baseline, 'utf-8'));
+  }
+
   console.log(`Docs oracle: Bot API ${oracle.version}  [${source}]`);
   console.log(`Parser counts: ${formatCounts(oracle.counts)}`);
   console.log('');
@@ -647,7 +748,9 @@ export async function main(argv = process.argv.slice(2)) {
     }
     for (const row of report.rows) {
       const marks = [...row.required.map((field) => `${field}*`), ...row.optional];
-      console.log(`  ${row.name.padEnd(32)} ${row.required.length ? 'REQUIRED' : 'optional'}  ${marks.join(', ')}`);
+      const kind = row.required.length ? 'REQUIRED' : 'optional';
+      console.log(`  ${row.name.padEnd(32)} ${kind}  ${marks.join(', ')}`);
+      if (row.file) console.log(`      ${row.file}`);
     }
     if (report.ambiguous.length > 0) {
       console.log(`  judged from several same-named declarations: ${report.ambiguous.join(', ')}`);
@@ -656,6 +759,74 @@ export async function main(argv = process.argv.slice(2)) {
       console.log(`  concrete docs types not modelled at all (${report.unmodelled.length}):`);
       console.log(`    ${report.unmodelled.join(', ')}`);
     }
+  }
+
+  if (options.json !== undefined) {
+    const payload = {
+      oracle: {
+        version: oracle.version,
+        // Relative so a committed baseline does not carry this machine's paths.
+        source: path.isAbsolute(source) ? path.relative(REPO_ROOT, source) : source,
+        counts: oracle.counts,
+      },
+      packages: reports,
+    };
+    try {
+      await mkdir(path.dirname(options.json), { recursive: true });
+      await writeFile(options.json, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8');
+      console.log('');
+      console.log(`JSON report written to ${options.json}`);
+    } catch (error) {
+      console.error(`--json: ${error.message}`);
+      return 2;
+    }
+  }
+
+  if (baseline !== null) {
+    const verdict = compareBaseline(reports, baseline);
+    const baselineVersion = baseline.oracle?.version ?? 'unknown';
+    console.log('');
+    console.log(`Baseline: ${options.baseline} (Bot API ${baselineVersion})`);
+    if (baselineVersion !== oracle.version) {
+      console.log(
+        `  NOTE: the oracle is Bot API ${oracle.version}; counts shifting is expected ` +
+          'until the baseline is refreshed deliberately.',
+      );
+    }
+    for (const entry of verdict.entries) {
+      const parts = [];
+      if (entry.newGaps.length > 0) parts.push(`${entry.newGaps.length} new field gap(s)`);
+      if (entry.newlyUnmodelled.length > 0) {
+        parts.push(`${entry.newlyUnmodelled.length} newly unmodelled`);
+      }
+      if (entry.closed.length > 0) parts.push(`${entry.closed.length} gap row(s) closed`);
+      if (entry.nowModelled.length > 0) parts.push(`${entry.nowModelled.length} newly modelled`);
+      console.log(`  ${entry.key.padEnd(8)} ${parts.length > 0 ? parts.join(', ') : 'unchanged'}`);
+      for (const gap of entry.newGaps) {
+        const marks = [...gap.required.map((field) => `${field}*`), ...gap.optional];
+        console.log(`      ${gap.name}: ${marks.join(', ')}`);
+        if (gap.file) console.log(`        ${gap.file}`);
+      }
+      if (entry.newlyUnmodelled.length > 0) {
+        console.log(`      ${entry.newlyUnmodelled.join(', ')}`);
+      }
+    }
+    if (verdict.unbaselined.length > 0) {
+      console.log(`  no baseline entry for: ${verdict.unbaselined.join(', ')}`);
+    }
+    if (verdict.regressions > 0) {
+      console.error(
+        `FAIL: ${verdict.regressions} regression(s) versus the baseline ` +
+          `(improvements: ${verdict.improvements})`,
+      );
+      return 1;
+    }
+    console.log(
+      verdict.improvements > 0
+        ? `PASS: no regressions; ${verdict.improvements} improvement(s) -> refresh the baseline.`
+        : 'PASS: no drift versus the baseline.',
+    );
+    return 0;
   }
 
   const failing = reports.filter((report) => report.missingRequired > 0);
