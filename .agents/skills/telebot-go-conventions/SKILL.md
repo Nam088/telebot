@@ -53,19 +53,25 @@ packages/go/pkg/
 └── utils/           # Rich text formatting, rate limiters, validation
 ```
 
+The tree shows representative responsibilities, not an inventory: `pkg/bot/` holds ~32 files and `pkg/types/` ~50. `ls` the target package and extend an existing domain file before adding a new one (files stay < 500 lines).
+
 ---
 
 ## 4. How to Add a New Bot API Method in Go
 
 1. **Step 1: Define Options/Models in `packages/go/pkg/types/`**:
-   - Add request options struct or model struct in the appropriate domain file (`messages.go`, `chats.go`, `payments.go`, `stickers.go`, `topics.go`, `business.go`).
+   - Add the request options struct or model struct in the matching domain file (`messages.go`, `chats.go`, `chat_full_info.go`, `payments.go`, `stickers.go`, `topics.go`, `business.go`, `rich_blocks_received.go`, …). The directory holds ~50 files and outgrows any list — `ls pkg/types/` and extend an existing file before adding one.
    - Use explicit `json:"snake_case,omitempty"` tags on all fields.
+   - **Fields come from `scripts/bot-api-oracle.json`, not from `packages/node`.** Node is a peer implementation that has been wrong repeatedly (its `Chat` declares 43 fields where the docs table lists 8, and go's declares exactly 8 — go is right here, node is not). Query the oracle offline:
+     `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(JSON.stringify(o.types['ChatFullInfo'].fields,null,1))"` → `{wire_name: {type, optional}}`.
+   - Declare **every** field of that row, required *and optional*, **in the struct itself**. The fidelity audit resolves `extends` only for TypeScript, so an embedded struct contributes nothing to the comparison — go types stay flat and repeat their inherited docs fields. `npm run audit:fidelity` enforces this against the committed baseline.
+   - `Integer` → `int64`. Return what the docs say: `getChat` returns **`ChatFullInfo`**, so prefer `GetChatFullInfo` (→ `*types.ChatFullInfo`, all 53 documented fields) for new call sites; the older `GetChat` decodes into the 8-field `*types.Chat` and therefore silently drops the rest of the response.
 2. **Step 2: Implement Method on `*Bot` in `packages/go/pkg/bot/`**:
    - Add method signature taking `ctx context.Context` as the first parameter.
    - Use `b.Request(ctx, "methodName", payload, &result)`.
 3. **Step 3: Add Comprehensive GoDoc Comments**:
    - Provide summary, `Parameters:` list, `Returns:` list, and `Example:` snippet.
-   - End the GoDoc block with `// Telegram API: https://core.telegram.org/bots/api#<slug>` for every documented method/type, where `<slug>` is the wire method name (from the `b.Request` literal) or type name, fully lowercased. The slug MUST exist as an anchor on the official docs page (verify against a fresh fetch of `core.telegram.org/bots/api`, never from memory); skip the line for framework extensions and non-API helpers.
+   - End the GoDoc block with `// Telegram API: https://core.telegram.org/bots/api#<slug>` for every documented method/type, where `<slug>` is the wire method name (from the `b.Request` literal) or type name, fully lowercased. The slug MUST exist in the oracle's anchor list — `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(o.anchors.includes('sendmessage'))"` — never recalled from memory; fetch the live page only if you suspect the oracle is stale, then `npm run audit:docs`. Skip the line for framework extensions and non-API helpers.
 4. **Step 4: Add Unit Tests in `packages/go/pkg/bot/*_test.go`**:
    - Test with `httptest.NewServer` mock server to verify URL path, headers, and payload serialization.
 
@@ -89,10 +95,12 @@ packages/go/pkg/
 Before considering any Go feature, bug fix, or refactor complete, execute:
 1. `npm run test:go` (or `cd packages/go && go test -v -race ./...`) → 100% Go unit tests pass.
 2. `npm run build:go` (or `cd packages/go && go build ./...`) → All Go packages compile cleanly.
-3. `npm run format:check` → Formatting check across all `.go` files.
+3. `cd packages/go && go vet ./...` → no vet findings.
+4. `npm run format:check` → Formatting check across all `.go` files.
+5. `npm run audit:fidelity` → the docs field-fidelity ratchet (see AGENTS.md "Bot API docs oracle & fidelity gate"). Green means **no new drift** versus `scripts/bot-api-fidelity-baseline.json`, not "complete". Never run `npm run audit:baseline` to make a failure go away — fix the struct, and re-baseline only as its own deliberate commit when Telegram ships a new API version.
 
 ---
 
 ## 7. Version & Release Parity (node = go = python)
 
-All three frameworks share ONE version (currently `1.4.0`). Go embeds no version: tags `packages/go/vX.Y.Z` are mirrored automatically by `.github/workflows/release-pipeline.yml` with the exact semantic-release version of the node release. Never create or push Go tags manually, and keep commit scopes Go-specific (`feat(go)`, `fix(go)`, ...) so git-cliff release notes stay correct. See AGENTS.md "Versioning & release parity".
+All three frameworks share ONE version (currently `1.5.0`). Go embeds no version: tags `packages/go/vX.Y.Z` are mirrored automatically by `.github/workflows/release-pipeline.yml` with the exact semantic-release version of the node release. Never create or push Go tags manually, and keep commit scopes Go-specific (`feat(go)`, `fix(go)`, ...) so git-cliff release notes stay correct. See AGENTS.md "Versioning & release parity".

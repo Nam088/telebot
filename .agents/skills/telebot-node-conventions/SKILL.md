@@ -32,6 +32,9 @@ The `Bot` client in `packages/node/src/client/` uses modular domain submodules:
 1. **Step 1: Define Types in `packages/node/src/client/types/<domain>/`**
    - Add payload interfaces (e.g. `SendXOptions`) and model interfaces in the appropriate domain folder (`messages/`, `chats/`, `stickers/`, `payments/`, `topics/`, `business/`, `rich/`, `common/`).
    - Export through `packages/node/src/client/types/<domain>/index.ts` and `packages/node/src/client/types/index.ts`.
+   - **A documented type's fields come from `scripts/bot-api-oracle.json`**, not from memory or a sibling package:
+     `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(JSON.stringify(o.types['ChatFullInfo'].fields,null,1))"` → `{wire_name: {type, optional}}`. Every field in that row must be declared, required *and* optional; `npm run audit:fidelity` checks it against the committed baseline. Node is the one package where the audit resolves `extends`, so an interface may inherit documented fields instead of repeating them.
+   - **Do not grow the gap the other way.** The audit reports missing fields only and never surplus ones, so over-modelling is invisible to CI: `Chat` in `types/common/models.ts` declares 43 properties where the docs table lists 8 (go declares exactly 8). Adding a non-documented property is a deliberate API decision — say why in the doc comment, and never present a node type as proof of what Telegram sends.
 2. **Step 2: Implement in appropriate domain submodule under `packages/node/src/client/methods/<domain>/`**
    - `messages/`: Message sending (`send-basic.ts`, `send-media.ts`), editing and reactions (`edit.ts`).
    - `chats/`: Moderation (`members.ts`), metadata and settings (`management.ts`).
@@ -45,7 +48,7 @@ The `Bot` client in `packages/node/src/client/` uses modular domain submodules:
    - `@returns The Telegram response object wrapped in Promise.`
    - `@throws {@link TelegramApiError} When Telegram API returns an error code.`
    - `@example` Runnable TypeScript snippet.
-   - `@see {@link https://core.telegram.org/bots/api#<slug> Telegram Bot API: <wireName>}` as the last tag for every documented method/type: `<slug>` is the wire method name (from the request literal) or interface name, fully lowercased, and MUST be verified against a fresh fetch of the official docs page (never from memory); skip for framework extensions and helpers.
+   - `@see {@link https://core.telegram.org/bots/api#<slug> Telegram Bot API: <wireName>}` as the last tag for every documented method/type: `<slug>` is the wire method name (from the request literal) or interface name, fully lowercased, and MUST exist in the oracle's anchor list — `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(o.anchors.includes('sendmessage'))"` — never recalled from memory. Fetch the live page only if you suspect the oracle is stale, then `npm run audit:docs`. Skip for framework extensions and helpers.
 4. **Step 4: Add Unit Tests in `packages/node/tests/unit/client/methods/`**
    - Mock fetch response using mock adapter to test payload serialization and error handling.
 
@@ -100,9 +103,10 @@ Before considering any Node.js feature, bug fix, or refactor complete, execute:
 5. `npm run test:node` → 100% test suites pass (Vitest).
 6. `npm run test:coverage` → Ensure line coverage stays **>90%**.
 7. `npm run docs` → TypeDoc generated with **0 errors and 0 warnings**.
+8. `npm run audit:fidelity` → the docs field-fidelity ratchet (see AGENTS.md "Bot API docs oracle & fidelity gate"). Green means **no new drift** versus `scripts/bot-api-fidelity-baseline.json`, not "complete". Never run `npm run audit:baseline` to make a failure go away — fix the interface, and re-baseline only as its own deliberate commit when Telegram ships a new API version.
 
 ---
 
 ## 8. Version & Release Parity (node = go = python)
 
-All three frameworks share ONE version (currently `1.4.0`), and Node drives it: semantic-release bumps `packages/node/package.json` on pushes to `main` (npm `telebot-ts`, tag `vX.Y.Z`), and `.github/workflows/release-pipeline.yml` mirrors the same version as `packages/go/vX.Y.Z` and `packages/python/vX.Y.Z`. Never bump the node version by hand, never hand-push the mirrored tags, and keep commit scopes node-specific (`feat(ext)`, `fix(bot)`, ...) so git-cliff/semantic-release analysis stays correct. See AGENTS.md "Versioning & release parity".
+All three frameworks share ONE version (currently `1.5.0`), and Node drives it: semantic-release bumps `packages/node/package.json` on pushes to `main` (npm `telebot-ts`, tag `vX.Y.Z`), and `.github/workflows/release-pipeline.yml` mirrors the same version as `packages/go/vX.Y.Z` and `packages/python/vX.Y.Z`. Never bump the node version by hand, never hand-push the mirrored tags, and keep commit scopes node-specific (`feat(ext)`, `fix(bot)`, ...) so git-cliff/semantic-release analysis stays correct. See AGENTS.md "Versioning & release parity".

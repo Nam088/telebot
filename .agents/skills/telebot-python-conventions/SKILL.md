@@ -18,7 +18,7 @@ When adding new methods, features, handlers, or storage drivers, agents must str
 | **Method you call (`x()`)** | `snake_case` (PTB parity) | `send_message`, `add_handler`, `run_polling`, `delete_user_data` |
 | **Property / Storage key / API option** | `snake_case` Telegram field names | `context.user_data`, `context.chat_data`, `chat_id`, `message_id`, `first_name` |
 | **Class / Filter constant** | `PascalCase` / `UPPER_SNAKE_CASE` | `CommandHandler`, `RRule`, `filters.TEXT`, `filters.ChatType.PRIVATE` |
-| **Filter combinators** | Native operators | `&`, `|`, `~`; aliases `and_()/or_()/not_()` (bare `.and()` is a syntax error) |
+| **Filter combinators** | Native operators | `&`, <code>\|</code>, `~`; aliases `and_()/or_()/not_()` (bare `.and()` is a syntax error) |
 | **Filenames & Folders** | lowercase `snake_case` modules | `conversation.py`, `chat_management.py`, `invite_links.py` |
 | **File Length Constraint** | Strictly `< 500` lines per file | Decompose larger files into dedicated subpackages |
 | **Module Exports** | Re-export through `__init__.py` | Public API available from `telebot_py` and each subpackage root |
@@ -31,14 +31,19 @@ The `Bot` client in `packages/python/src/telebot_py/bot/` composes domain mixins
 
 1. **Step 1: Define/verify types in `src/telebot_py/types/`**
    - Frozen dataclasses subclassing `TelegramObject` (`types/base.py` provides `from_dict`/`to_dict`, wire mapping `from` → `from_user`, tolerance of unknown fields).
-   - Domain files: `user.py`, `chat.py`, `message.py`, `media.py`, `keyboards.py`, `chat_members.py`, `payments.py`, `business.py`, `reactions.py`, `message_extras.py`, `common.py`. Re-export via `types/__init__.py`.
-   - Source of truth for fields: `packages/node/src/client/types/` (field-accurate, Bot API 10.3). Never guess fields.
-2. **Step 2: Implement in the matching domain mixin file** under `src/telebot_py/bot/` (Go-style split): `messages.py`, `chats.py`, `edits.py`, `webhook.py`, `media.py`, `stickers.py`, `payments.py`, `games.py`, `inline.py`, `invite_links.py`, `reactions.py`, `profile.py`, `topics.py`, `members.py`, `chat_management.py`, `files.py`, `bulk.py`, `stories_gifts.py`.
+   - **Fields come from `scripts/bot-api-oracle.json`, not from `packages/node`.** Node is a peer implementation, not ground truth, and has been wrong repeatedly (it exposed no `ChatFullInfo` for its first releases; its `Chat` declares 43 fields where the docs table lists 8, while go's `Chat` declares exactly 8). Query the oracle offline:
+     `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(JSON.stringify(o.types['ChatFullInfo'].fields,null,1))"` → `{wire_name: {type, optional}}`.
+   - Declare **every** field of that row, required *and optional*, **inside the dataclass itself**. The fidelity audit resolves `extends` only for TypeScript, so a field you inherit from another docs type still reads as missing — python types stay flat, and one duplicated field is cheaper than a red gate. `npm run audit:fidelity` checks this against the committed baseline.
+   - Docs-required ⇒ no dataclass default; docs-optional ⇒ a default. Never guess a field name or optionality.
+   - One module per docs domain (`chat_full_info.py`, `message_service.py`, `input_media.py`, `gifts.py`, `rich_blocks.py`, …). The directory holds ~37 modules, far more than any list here can stay current — `ls src/telebot_py/types/` and reuse a module before creating one; re-export via `types/__init__.py`.
+2. **Step 2: Implement in the matching domain mixin file** under `src/telebot_py/bot/` (Go-style split: `messages.py`, `chats.py`, `edits.py`, `rich_messages.py`, `checklists.py`, `owned_gifts.py`, `managed_bot.py`, `verification.py`, `webhook.py`, …). The directory holds ~34 mixins — `ls src/telebot_py/bot/` and extend the existing domain file rather than adding a new one.
    - Use the `Requester.request(method, payload)` helper from `bot/base.py` plus `clean_payload` (omit unset kwargs), `parse_flag`, `to_wire` (accepts `Mapping | SupportsToDict` for markup params).
+   - Return the type the docs say the method returns. `getChat` returns **`ChatFullInfo`**, so `get_chat` decodes into `ChatFullInfo`, not `Chat`; `Chat` is what rides inside `Message`.
+   - Do **not** add a `get_chat_full_info` alias to close the parity gap: the Bot API defines no such method, go's `GetChatFullInfo` is a convenience alias over the same `getChat` wire call, and python's `get_chat` already returns the full object. `parity_audit.py`'s `ALLOWLIST` records that reasoning — a stale allowlist entry is an error, so leave the entry alone unless you also change go.
    - Compose the mixin onto `Bot` in `client.py` and re-export in `bot/__init__.py`.
 3. **Step 3: Add complete Sphinx-ready docstrings (Google style)**
    - One-line summary, an `Example:` doctest-style snippet, `Args:`, `Returns:`, `Raises:` listing `InvalidTokenError` / `TelegramApiError` / `NetworkError`.
-   - Close the docstring with a final `Telegram API: https://core.telegram.org/bots/api#<slug>` line for every documented method/type: `<slug>` is the wire name from the `self.request(...)` literal (or the class name) fully lowercased, and MUST be verified against a fresh fetch of the official docs page (never from memory); skip for framework extensions and helpers.
+   - Close the docstring with a final `Telegram API: https://core.telegram.org/bots/api#<slug>` line for every documented method/type: `<slug>` is the wire name from the `self.request(...)` literal (or the class name) fully lowercased, and MUST be present in the oracle's anchor list — `node -e "const o=require('./scripts/bot-api-oracle.json');console.log(o.anchors.includes('sendmessage'))"` — never recalled from memory. Fetch the live page only if you suspect the oracle is stale, then `npm run audit:docs`. Skip the line for framework extensions and helpers.
 4. **Step 4: TDD unit tests in `tests/unit/bot/test_methods_<domain>.py`**
    - Use the `bot_transport` MockTransport fixtures + `record_into` helpers from `tests/conftest.py`; assert URL path, snake_case payload serialization, typed results, and `TelegramApiError` on error responses. NO real HTTP ever.
 
@@ -95,6 +100,7 @@ python -m pytest -q                 # offline, no TEST_BOT_TOKEN needed
 ruff check . && ruff format --check .
 mypy --strict src
 python scripts/parity_audit.py      # SC-007 parity table; gaps fail CI
+cd ../.. && npm run audit:fidelity  # docs field-fidelity ratchet (runs from repo root)
 ```
 
 - TDD is mandatory (AGENTS.md): write the test, watch it fail, implement.
