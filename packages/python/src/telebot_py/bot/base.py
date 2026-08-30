@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import abc
 import typing as t
+from collections.abc import Sequence
 
 from telebot_py.types.base import TelegramObject, TypeParseError
 from telebot_py.types.message import Message
 
 TObj = t.TypeVar("TObj", bound=TelegramObject)
+_Val = t.TypeVar("_Val")
 
 
 class SupportsToDict(t.Protocol):
@@ -21,6 +23,54 @@ class SupportsToDict(t.Protocol):
 
 #: Markup-shaped parameters accept plain dicts or typed objects with ``to_dict``.
 MarkupLike = t.Mapping[str, object] | SupportsToDict
+
+
+class _Unset:
+    """Marker type for an optional parameter the caller did not pass."""
+
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        """Return the sentinel's source-like representation."""
+        return "UNSET"
+
+    def __bool__(self) -> bool:
+        """Report falsiness so the sentinel never reads as a supplied value."""
+        return False
+
+
+#: Sentinel marking "parameter omitted", used where an empty value is meaningful.
+UNSET: t.Final[_Unset] = _Unset()
+
+#: Annotation alias for parameters that are omitted, or set to an explicit value
+#: which may itself be empty (``""``, ``[]``, ...).
+Unset = _Unset
+
+
+def omit_unset(value: _Val | Unset) -> _Val | None:
+    """Translate the :data:`UNSET` sentinel to ``None`` for :func:`clean_payload`.
+
+    Args:
+        value: The parameter as received, either a real value or ``UNSET``.
+
+    Returns:
+        ``None`` when the caller left the parameter unset, else the value.
+    """
+    return None if isinstance(value, _Unset) else value
+
+
+def optional_list(value: Sequence[_Val] | Unset) -> list[_Val] | None:
+    """Convert an omittable sequence parameter to its JSON list wire shape.
+
+    Args:
+        value: The parameter as received: a sequence, or ``UNSET`` when the
+            caller omitted it.
+
+    Returns:
+        ``None`` when unset so the field is omitted; otherwise a plain list,
+        which is empty exactly when the caller passed an empty sequence.
+    """
+    return None if isinstance(value, _Unset) else list(value)
 
 
 class Requester(abc.ABC):

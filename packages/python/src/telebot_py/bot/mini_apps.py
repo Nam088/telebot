@@ -2,8 +2,8 @@
 
 Ported from node ``client/methods/business/stories-boosts.ts``
 (answerGuestQuery), ``client/methods/business/ephemeral.ts``
-(sendChatJoinRequestWebApp), and ``client/methods/business/gifts.ts``
-(savePreparedKeyboardButton).
+(sendChatJoinRequestWebApp, answerChatJoinRequestQuery), and
+``client/methods/business/gifts.ts`` (savePreparedKeyboardButton).
 """
 
 from __future__ import annotations
@@ -94,6 +94,40 @@ class MiniAppsMixin(Requester):
             chat_join_request_query_id=chat_join_request_query_id, web_app_url=web_app_url
         )
         return parse_flag(await self.request("sendChatJoinRequestWebApp", payload))
+
+    async def answer_chat_join_request_query(
+        self, chat_join_request_query_id: str, result: str
+    ) -> bool:
+        """Process a received chat join request query.
+
+        Remarks:
+            Completes the flow started by ``send_chat_join_request_web_app``:
+            ``result`` must be one of the three values Telegram documents,
+            ``approve`` to let the user join, ``decline`` to disallow it, or
+            ``queue`` to leave the decision to other administrators.
+
+        Example:
+            >>> ok = await bot.answer_chat_join_request_query("join-1", "approve")
+
+        Args:
+            chat_join_request_query_id: Unique identifier of the join request
+                query to be answered.
+            result: Result of the query: ``approve``, ``decline``, or ``queue``.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerchatjoinrequestquery
+        """
+        payload = clean_payload(
+            chat_join_request_query_id=chat_join_request_query_id, result=result
+        )
+        return parse_flag(await self.request("answerChatJoinRequestQuery", payload))
 
     async def save_prepared_keyboard_button(
         self, user_id: int, button: MarkupLike

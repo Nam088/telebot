@@ -34,6 +34,12 @@ class TestChatTitleAndDescription:
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setChatDescription"
         assert sent_payload(seen[0]) == {"chat_id": "@channel", "description": "desc"}
 
+        assert await bot.set_chat_description("@channel") is True
+        assert sent_payload(seen[1]) == {"chat_id": "@channel"}
+
+        assert await bot.set_chat_description("@channel", "") is True
+        assert sent_payload(seen[2]) == {"chat_id": "@channel", "description": ""}
+
 
 class TestChatPhoto:
     async def test_set_chat_photo(self, bot_transport: Any, ok_response: Any) -> None:

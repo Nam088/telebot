@@ -369,24 +369,19 @@ class MessagesMixin(Requester):
         )
         return parse_result(Message, await self.request("sendDocument", payload))
 
-    async def get_user_personal_chat_messages(
-        self, chat_id: int | str, limit: int | None = None
-    ) -> list[Message]:
+    async def get_user_personal_chat_messages(self, user_id: int, limit: int) -> list[Message]:
         """Get the last messages from the personal chat of a user.
 
         Remarks:
-            The parameter is named ``chat_id`` and ``limit`` is optional to
-            mirror the node and go siblings' signatures, which send
-            ``{"chat_id": ..., "limit": ...}``; pass the identifier of the
-            personal chat being read (Telegram's own page documents it as
-            ``user_id`` with a required limit of 1-20).
+            The user is identified by ``user_id``, not by the identifier of
+            their personal chat. ``limit`` is required and must be 1-20.
 
         Example:
-            >>> messages = await bot.get_user_personal_chat_messages(-1001234, 10)
+            >>> messages = await bot.get_user_personal_chat_messages(42, 10)
 
         Args:
-            chat_id: Identifier of the personal chat to read.
-            limit: Maximum number of messages to return.
+            user_id: Unique identifier of the target user.
+            limit: Maximum number of messages to return; 1-20.
 
         Returns:
             The messages of the personal chat, oldest first.
@@ -398,7 +393,7 @@ class MessagesMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#getuserpersonalchatmessages
         """
-        payload = clean_payload(chat_id=chat_id, limit=limit)
+        payload = clean_payload(user_id=user_id, limit=limit)
         return parse_list_result(
             Message, await self.request("getUserPersonalChatMessages", payload)
         )

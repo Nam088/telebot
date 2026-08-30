@@ -158,6 +158,7 @@ from telebot_py.types.stories import (
     StoryAreaTypeWeather,
 )
 from telebot_py.types.topics import (
+    BotAccessSettings,
     BotCommand,
     BotDescription,
     BotName,
@@ -175,6 +176,7 @@ __all__ = [
     "Animation",
     "Audio",
     "Birthdate",
+    "BotAccessSettings",
     "BotCommand",
     "BotDescription",
     "BotName",

@@ -28,30 +28,36 @@ class TestGetUserPersonalChatMessages:
             ok_response([make_message(message_id=3), make_message(message_id=4)]), seen
         )
         bot = make_bot(bot_transport, step)
-        messages = await bot.get_user_personal_chat_messages(-1001234, 10)
+        messages = await bot.get_user_personal_chat_messages(42, 10)
         assert [m.message_id for m in messages] == [3, 4]
         assert all(isinstance(m, Message) for m in messages)
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getUserPersonalChatMessages"
-        assert sent_payload(seen[0]) == {"chat_id": -1001234, "limit": 10}
+        assert sent_payload(seen[0]) == {"user_id": 42, "limit": 10}
 
-    async def test_omits_unset_limit(self, bot_transport: Any, ok_response: Any) -> None:
+    async def test_accepts_keyword_arguments(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response([]), seen)
         bot = make_bot(bot_transport, step)
-        assert await bot.get_user_personal_chat_messages(42) == []
-        assert sent_payload(seen[0]) == {"chat_id": 42}
+        assert await bot.get_user_personal_chat_messages(user_id=42, limit=1) == []
+        assert sent_payload(seen[0]) == {"user_id": 42, "limit": 1}
+
+    async def test_limit_is_required(self, bot_transport: Any, ok_response: Any) -> None:
+        step = record_into(ok_response([]), [])
+        bot = make_bot(bot_transport, step)
+        with pytest.raises(TypeError):
+            await bot.get_user_personal_chat_messages(42)  # type: ignore[call-arg]
 
     async def test_rejects_non_array_result(self, bot_transport: Any, ok_response: Any) -> None:
         step = record_into(ok_response({"message_id": 1}), [])
         bot = make_bot(bot_transport, step)
         with pytest.raises(TypeParseError):
-            await bot.get_user_personal_chat_messages(42)
+            await bot.get_user_personal_chat_messages(42, 10)
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
-        step = record_into(error_response(400, 400, "Bad Request: chat not found"), [])
+        step = record_into(error_response(400, 400, "Bad Request: user not found"), [])
         bot = make_bot(bot_transport, step, max_retries=0)
         with pytest.raises(TelegramApiError):
-            await bot.get_user_personal_chat_messages(42)
+            await bot.get_user_personal_chat_messages(42, 10)
 
 
 class TestGetUserProfileAudios:

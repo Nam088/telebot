@@ -181,6 +181,12 @@ class TestStickerSetManagement:
         assert await bot.set_sticker_keywords("s1", ["hello", "wave"])
         assert sent_payload(seen[0]) == {"sticker": "s1", "keywords": ["hello", "wave"]}
 
+        assert await bot.set_sticker_keywords("s1", []) is True
+        assert sent_payload(seen[1]) == {"sticker": "s1", "keywords": []}
+
+        assert await bot.set_sticker_keywords("s1") is True
+        assert sent_payload(seen[2]) == {"sticker": "s1"}
+
     async def test_set_sticker_mask_position(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
@@ -188,6 +194,9 @@ class TestStickerSetManagement:
         mask = {"point": "eyes", "x_shift": 0.1, "y_shift": 0.2, "scale": 1.5}
         assert await bot.set_sticker_mask_position("s1", mask)
         assert sent_payload(seen[0]) == {"sticker": "s1", "mask_position": mask}
+
+        assert await bot.set_sticker_mask_position("s1") is True
+        assert sent_payload(seen[1]) == {"sticker": "s1"}
 
     async def test_delete_sticker_set(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []

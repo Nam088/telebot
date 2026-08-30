@@ -22,6 +22,7 @@ from telebot_py.bot.games import GamesMixin
 from telebot_py.bot.gifts import GiftsMixin
 from telebot_py.bot.inline import InlineMixin
 from telebot_py.bot.invite_links import InviteLinksMixin
+from telebot_py.bot.managed_bot import ManagedBotMixin
 from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
@@ -100,6 +101,7 @@ class Bot(
     TopicsMixin,
     ReactionsMixin,
     ProfileMixin,
+    ManagedBotMixin,
     FilesMixin,
     BulkMixin,
     EditsMixin,
@@ -114,8 +116,8 @@ class Bot(
     stories, story management, checklists, paid media, mini app queries,
     business accounts, gifts, owned gifts, ephemeral messages, chats, chat
     management, verification, invite links, members, topics, reactions, profile,
-    files, bulk operations, edits, webhook) are composed onto this class via
-    mixins.
+    managed bots, files, bulk operations, edits, webhook) are composed onto this
+    class via mixins.
 
     Example:
         >>> bot = Bot("123456:ABC...")

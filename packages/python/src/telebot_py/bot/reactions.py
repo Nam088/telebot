@@ -33,8 +33,9 @@ class ReactionsMixin(Requester):
     ) -> bool:
         """Change the chosen reactions on a message.
 
-        A single reaction dict is normalized to a one-element list. An empty
-        reaction list (see the delete helpers) removes the reaction.
+        A single reaction dict is normalized to a one-element list. Omitting
+        ``reaction`` removes the currently set one; to remove reactions added
+        by other users or chats use ``delete_message_reaction``.
 
         Example:
             >>> ok = await bot.set_message_reaction(1, 7, [{"type": "emoji", "emoji": "👍"}])
@@ -66,20 +67,32 @@ class ReactionsMixin(Requester):
         return parse_flag(await self.request("setMessageReaction", payload))
 
     async def delete_message_reaction(
-        self, chat_id: int | str, message_id: int, *, is_big: bool = False
+        self,
+        chat_id: int | str,
+        message_id: int,
+        *,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
     ) -> bool:
-        """Remove the bot's reaction from a message.
+        """Remove a reaction from a message in a group or a supergroup chat.
 
-        Implemented via ``setMessageReaction`` with an empty reaction list.
+        Remarks:
+            The bot must have the ``can_delete_messages`` administrator right in
+            the chat. Omit both ``user_id`` and ``actor_chat_id`` to remove the
+            bot's own reaction; pass ``user_id`` for a reaction added by a user
+            and ``actor_chat_id`` for one added by a chat.
 
         Example:
             >>> ok = await bot.delete_message_reaction(1, 7)
 
         Args:
             chat_id: Unique identifier for the target chat or username of the
-                target channel.
+                target supergroup.
             message_id: Identifier of the target message.
-            is_big: Pass True to remove the reaction with a big animation.
+            user_id: Identifier of the user whose reaction will be removed, if
+                the reaction was added by a user.
+            actor_chat_id: Identifier of the chat whose reaction will be
+                removed, if the reaction was added by a chat.
 
         Returns:
             True on success.
@@ -89,29 +102,40 @@ class ReactionsMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
 
-        Telegram API: https://core.telegram.org/bots/api#setmessagereaction
+        Telegram API: https://core.telegram.org/bots/api#deletemessagereaction
         """
-        payload: dict[str, object] = {
-            "chat_id": chat_id,
-            "message_id": message_id,
-            "reaction": [],
-        }
-        if is_big:
-            payload["is_big"] = True
-        return parse_flag(await self.request("setMessageReaction", payload))
+        payload = clean_payload(
+            chat_id=chat_id,
+            message_id=message_id,
+            user_id=user_id,
+            actor_chat_id=actor_chat_id,
+        )
+        return parse_flag(await self.request("deleteMessageReaction", payload))
 
-    async def delete_all_message_reactions(self, chat_id: int | str, message_id: int) -> bool:
-        """Clear all reactions on a message.
+    async def delete_all_message_reactions(
+        self,
+        chat_id: int | str,
+        *,
+        user_id: int | None = None,
+        actor_chat_id: int | None = None,
+    ) -> bool:
+        """Remove up to 10000 recent reactions in a chat added by a given user or chat.
 
-        Implemented via ``setMessageReaction`` with an empty reaction list.
+        Remarks:
+            The bot must have the ``can_delete_messages`` administrator right in
+            the chat. Unlike ``delete_message_reaction`` this endpoint targets a
+            sender across the whole chat and takes no ``message_id``.
 
         Example:
-            >>> ok = await bot.delete_all_message_reactions("@channel", 7)
+            >>> ok = await bot.delete_all_message_reactions("@supergroup", user_id=42)
 
         Args:
             chat_id: Unique identifier for the target chat or username of the
-                target channel.
-            message_id: Identifier of the target message.
+                target supergroup.
+            user_id: Identifier of the user whose reactions will be removed, if
+                the reactions were added by a user.
+            actor_chat_id: Identifier of the chat whose reactions will be
+                removed, if the reactions were added by a chat.
 
         Returns:
             True on success.
@@ -121,11 +145,7 @@ class ReactionsMixin(Requester):
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
 
-        Telegram API: https://core.telegram.org/bots/api#setmessagereaction
+        Telegram API: https://core.telegram.org/bots/api#deleteallmessagereactions
         """
-        payload: dict[str, object] = {
-            "chat_id": chat_id,
-            "message_id": message_id,
-            "reaction": [],
-        }
-        return parse_flag(await self.request("setMessageReaction", payload))
+        payload = clean_payload(chat_id=chat_id, user_id=user_id, actor_chat_id=actor_chat_id)
+        return parse_flag(await self.request("deleteAllMessageReactions", payload))

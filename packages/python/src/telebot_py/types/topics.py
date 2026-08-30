@@ -1,4 +1,4 @@
-"""Bot profile and forum-topic types: names, commands, topics, menu buttons."""
+"""Bot profile and forum-topic types: names, commands, topics, menu buttons, access settings."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import typing as t
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.keyboards import WebAppInfo
+from telebot_py.types.user import User
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -46,6 +47,23 @@ class BotShortDescription(TelegramObject):
     """
 
     short_description: str
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class BotAccessSettings(TelegramObject):
+    """The access settings of a managed bot.
+
+    Attributes:
+        is_access_restricted: True if only selected users can access the bot.
+            The bot's owner can always access it.
+        added_users: The list of other users who have access to the bot if the
+            access is restricted.
+
+    Telegram API: https://core.telegram.org/bots/api#botaccesssettings
+    """
+
+    is_access_restricted: bool
+    added_users: list[User] | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

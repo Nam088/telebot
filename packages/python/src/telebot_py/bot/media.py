@@ -666,7 +666,7 @@ class MediaMixin(Requester):
         is_anonymous: bool | None = None,
         type: str | None = None,
         allows_multiple_answers: bool | None = None,
-        correct_option_id: int | None = None,
+        correct_option_ids: Sequence[int] | None = None,
         explanation: str | None = None,
         explanation_parse_mode: str | None = None,
         explanation_entities: Sequence[MessageEntity] | None = None,
@@ -694,8 +694,8 @@ class MediaMixin(Requester):
             is_anonymous: Whether the poll is anonymous; omitted by default.
             type: Poll type, ``quiz`` or ``regular``.
             allows_multiple_answers: Whether multiple answers can be chosen.
-            correct_option_id: 0-based identifier of the correct answer option
-                (quiz mode).
+            correct_option_ids: 0-based identifiers of the correct answer
+                options (quiz mode).
             explanation: Text shown when a user gives a wrong answer.
             explanation_parse_mode: Parse mode for the explanation.
             explanation_entities: Special entities for the explanation.
@@ -727,7 +727,7 @@ class MediaMixin(Requester):
             is_anonymous=is_anonymous,
             type=type,
             allows_multiple_answers=allows_multiple_answers,
-            correct_option_id=correct_option_id,
+            correct_option_ids=list(correct_option_ids) if correct_option_ids is not None else None,
             explanation=explanation,
             explanation_parse_mode=explanation_parse_mode,
             explanation_entities=[entity.to_dict() for entity in explanation_entities]

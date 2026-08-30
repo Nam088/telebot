@@ -27,7 +27,6 @@ class EditsMixin(Requester):
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
-        message_thread_id: int | None = None,
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
         link_preview_options: MarkupLike | None = None,
@@ -46,7 +45,6 @@ class EditsMixin(Requester):
                 ``inline_message_id`` is given.
             inline_message_id: Identifier of the inline message to edit,
                 instead of ``chat_id`` and ``message_id``.
-            message_thread_id: Unique identifier for the target message thread.
             parse_mode: Parse mode for the new text entities.
             entities: Special entities for the new text.
             link_preview_options: Link preview generation options.
@@ -68,7 +66,6 @@ class EditsMixin(Requester):
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
-            message_thread_id=message_thread_id,
             parse_mode=parse_mode,
             entities=[entity.to_dict() for entity in entities] if entities is not None else None,
             link_preview_options=to_wire(link_preview_options),
@@ -190,8 +187,8 @@ class EditsMixin(Requester):
         inline_message_id: str | None = None,
         live_period: int | None = None,
         horizontal_accuracy: float | None = None,
-        vertical_accuracy: float | None = None,
         heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
         """Edit the live location of a live-location message.
@@ -212,8 +209,9 @@ class EditsMixin(Requester):
                 be updated, starting from the message send date.
             horizontal_accuracy: Radius of uncertainty for the location,
                 in meters; 0-1500.
-            vertical_accuracy: Accuracy of altitude, in meters; 0-1500.
             heading: Direction in which the user is moving, in degrees; 1-360.
+            proximity_alert_radius: Maximum distance for proximity alerts about
+                approaching another chat member, in meters; 1-100000.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -235,8 +233,8 @@ class EditsMixin(Requester):
             inline_message_id=inline_message_id,
             live_period=live_period,
             horizontal_accuracy=horizontal_accuracy,
-            vertical_accuracy=vertical_accuracy,
             heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
             reply_markup=to_wire(reply_markup),
         )
         return parse_message_or_true(await self.request("editMessageLiveLocation", payload))

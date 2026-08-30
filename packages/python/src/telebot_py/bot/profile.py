@@ -5,9 +5,12 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from telebot_py.bot.base import (
+    UNSET,
     MarkupLike,
     Requester,
+    Unset,
     clean_payload,
+    omit_unset,
     parse_flag,
     parse_list_result,
     parse_result,
@@ -109,7 +112,7 @@ class ProfileMixin(Requester):
         return parse_result(BotName, await self.request("getMyName", payload))
 
     async def set_my_description(
-        self, description: str, *, language_code: str | None = None
+        self, description: str | Unset = UNSET, *, language_code: str | None = None
     ) -> bool:
         """Change the bot's description shown on its profile page.
 
@@ -117,7 +120,9 @@ class ProfileMixin(Requester):
             >>> ok = await bot.set_my_description("A helpful bot")
 
         Args:
-            description: New bot description; 0-512 characters.
+            description: New bot description; 0-512 characters. Omit the
+                parameter to leave it untouched; pass an empty string to remove
+                the dedicated description for the given language.
             language_code: User language the description applies to.
 
         Returns:
@@ -130,7 +135,7 @@ class ProfileMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#setmydescription
         """
-        payload = clean_payload(description=description, language_code=language_code)
+        payload = clean_payload(description=omit_unset(description), language_code=language_code)
         return parse_flag(await self.request("setMyDescription", payload))
 
     async def get_my_description(self, *, language_code: str | None = None) -> BotDescription:
@@ -156,7 +161,7 @@ class ProfileMixin(Requester):
         return parse_result(BotDescription, await self.request("getMyDescription", payload))
 
     async def set_my_short_description(
-        self, short_description: str, *, language_code: str | None = None
+        self, short_description: str | Unset = UNSET, *, language_code: str | None = None
     ) -> bool:
         """Change the bot's short description shown in chats.
 
@@ -164,7 +169,9 @@ class ProfileMixin(Requester):
             >>> ok = await bot.set_my_short_description("Say hi!")
 
         Args:
-            short_description: New short description; 0-120 characters.
+            short_description: New short description; 0-120 characters. Omit the
+                parameter to leave it untouched; pass an empty string to remove
+                the dedicated short description for the given language.
             language_code: User language the short description applies to.
 
         Returns:
@@ -177,7 +184,9 @@ class ProfileMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#setmyshortdescription
         """
-        payload = clean_payload(short_description=short_description, language_code=language_code)
+        payload = clean_payload(
+            short_description=omit_unset(short_description), language_code=language_code
+        )
         return parse_flag(await self.request("setMyShortDescription", payload))
 
     async def get_my_short_description(

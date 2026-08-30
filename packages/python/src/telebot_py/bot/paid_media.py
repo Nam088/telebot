@@ -116,8 +116,8 @@ class PaidMediaMixin(Requester):
     async def send_live_photo(
         self,
         chat_id: int | str,
+        live_photo: str,
         photo: str,
-        video: str,
         *,
         caption: str | None = None,
         parse_mode: str | None = None,
@@ -132,21 +132,21 @@ class PaidMediaMixin(Requester):
         business_connection_id: str | None = None,
         message_thread_id: int | None = None,
     ) -> Message:
-        """Send an animated live photo (a still photo plus a short video).
+        """Send a live photo (a short video plus its static photo).
 
         Remarks:
-            ``photo`` and ``video`` are ``file_id`` references to already
-            uploaded files; the video must be no longer than 10 seconds and at
-            most 10 MB. Sending live photos by URL is unsupported.
+            ``live_photo`` and ``photo`` are ``file_id`` references to already
+            uploaded files; the video must be no longer than 10 seconds and must
+            not exceed 10 MB. Sending live photos by a URL is unsupported.
 
         Example:
-            >>> message = await bot.send_live_photo(123, "photo-file-id", "video-file-id")
+            >>> message = await bot.send_live_photo(123, "video-file-id", "photo-file-id")
 
         Args:
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
-            photo: Static photo to send.
-            video: Live photo video to send.
+            live_photo: Live photo video to send.
+            photo: The static photo to send.
             caption: Live photo caption, 0-1024 characters after entities
                 parsing.
             parse_mode: Mode for parsing entities in the caption.
@@ -178,8 +178,8 @@ class PaidMediaMixin(Requester):
         """
         payload = clean_payload(
             chat_id=chat_id,
+            live_photo=live_photo,
             photo=photo,
-            video=video,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=[to_wire(entity) for entity in caption_entities]

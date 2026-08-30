@@ -5,9 +5,12 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from telebot_py.bot.base import (
+    UNSET,
     MarkupLike,
     Requester,
+    Unset,
     clean_payload,
+    optional_list,
     parse_flag,
     parse_list_result,
     parse_result,
@@ -315,7 +318,9 @@ class StickersMixin(Requester):
         payload = clean_payload(sticker=sticker, emoji_list=list(emoji_list))
         return parse_flag(await self.request("setStickerEmojiList", payload))
 
-    async def set_sticker_keywords(self, sticker: str, keywords: Sequence[str]) -> bool:
+    async def set_sticker_keywords(
+        self, sticker: str, keywords: Sequence[str] | Unset = UNSET
+    ) -> bool:
         """Change the search keywords of a sticker created by the bot.
 
         Example:
@@ -324,7 +329,7 @@ class StickersMixin(Requester):
         Args:
             sticker: File identifier of the sticker.
             keywords: New search keywords; 0-20 items, total length up to 64
-                characters.
+                characters. Omit to leave them untouched; ``[]`` clears them.
 
         Returns:
             True on success.
@@ -336,10 +341,12 @@ class StickersMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#setstickerkeywords
         """
-        payload = clean_payload(sticker=sticker, keywords=list(keywords))
+        payload = clean_payload(sticker=sticker, keywords=optional_list(keywords))
         return parse_flag(await self.request("setStickerKeywords", payload))
 
-    async def set_sticker_mask_position(self, sticker: str, mask_position: MarkupLike) -> bool:
+    async def set_sticker_mask_position(
+        self, sticker: str, mask_position: MarkupLike | Unset = UNSET
+    ) -> bool:
         """Change the mask position of a sticker created by the bot.
 
         Example:
@@ -348,6 +355,7 @@ class StickersMixin(Requester):
         Args:
             sticker: File identifier of the sticker.
             mask_position: New MaskPosition as a dict or ``to_dict`` object.
+                Omit the parameter to remove the mask position.
 
         Returns:
             True on success.
@@ -359,7 +367,8 @@ class StickersMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#setstickermaskposition
         """
-        payload = clean_payload(sticker=sticker, mask_position=to_wire(mask_position))
+        position = None if isinstance(mask_position, Unset) else mask_position
+        payload = clean_payload(sticker=sticker, mask_position=to_wire(position))
         return parse_flag(await self.request("setStickerMaskPosition", payload))
 
     async def delete_sticker_set(self, name: str) -> bool:

@@ -117,17 +117,19 @@ class TestSendPaidMedia:
 
 
 class TestSendLivePhoto:
-    async def test_sends_photo_and_video(
+    async def test_sends_live_photo_and_still(
         self, bot_transport: Any, ok_response: Any, make_message: Any
     ) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(make_message(message_id=12)), seen)
         bot = make_bot(bot_transport, step)
-        message = await bot.send_live_photo(123, "photo-id", "video-id")
+        message = await bot.send_live_photo(123, "video-id", "photo-id")
         assert isinstance(message, Message)
         assert message.message_id == 12
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/sendLivePhoto"
-        assert sent_payload(seen[0]) == {"chat_id": 123, "photo": "photo-id", "video": "video-id"}
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": 123, "live_photo": "video-id", "photo": "photo-id"}
+        assert "video" not in payload
 
     async def test_serializes_caption_entities_and_markup(
         self, bot_transport: Any, ok_response: Any, make_message: Any
@@ -137,8 +139,8 @@ class TestSendLivePhoto:
         bot = make_bot(bot_transport, step)
         await bot.send_live_photo(
             123,
-            "photo-id",
             "video-id",
+            "photo-id",
             caption="Look",
             parse_mode="HTML",
             caption_entities=[{"type": "italic", "offset": 0, "length": 4}],
@@ -151,8 +153,8 @@ class TestSendLivePhoto:
         )
         assert sent_payload(seen[0]) == {
             "chat_id": 123,
+            "live_photo": "video-id",
             "photo": "photo-id",
-            "video": "video-id",
             "caption": "Look",
             "parse_mode": "HTML",
             "caption_entities": [{"type": "italic", "offset": 0, "length": 4}],
@@ -168,7 +170,7 @@ class TestSendLivePhoto:
         step = record_into(ok_response(True), [])
         bot = make_bot(bot_transport, step)
         with pytest.raises(TypeParseError):
-            await bot.send_live_photo(123, "photo-id", "video-id")
+            await bot.send_live_photo(123, "video-id", "photo-id")
 
 
 class TestPaidMediaTypes:

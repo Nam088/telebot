@@ -21,6 +21,7 @@ from telebot_py.bot.games import GamesMixin
 from telebot_py.bot.gifts import GiftsMixin
 from telebot_py.bot.inline import InlineMixin
 from telebot_py.bot.invite_links import InviteLinksMixin
+from telebot_py.bot.managed_bot import ManagedBotMixin
 from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
@@ -56,6 +57,7 @@ __all__ = [
     "InviteLinksMixin",
     "MarkupLike",
     "MediaMixin",
+    "ManagedBotMixin",
     "MembersMixin",
     "MessagesMixin",
     "MiniAppsMixin",

@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 
 from telebot_py.types import Message
 from telebot_py.types.common import Poll
@@ -108,7 +109,7 @@ class TestEditMessageLiveLocation:
             message_id=7,
             live_period=600,
             horizontal_accuracy=12.5,
-            vertical_accuracy=4.0,
+            proximity_alert_radius=500,
         )
         assert sent_payload(seen[0]) == {
             "latitude": 1.5,
@@ -117,8 +118,48 @@ class TestEditMessageLiveLocation:
             "message_id": 7,
             "live_period": 600,
             "horizontal_accuracy": 12.5,
-            "vertical_accuracy": 4.0,
+            "proximity_alert_radius": 500,
         }
+
+    async def test_rejects_vertical_accuracy(
+        self, bot_transport: Any, ok_response: Any, make_message: Any
+    ) -> None:
+        """No Bot API method carries vertical_accuracy; the kwarg must not exist."""
+        step = record_into(ok_response(make_message(message_id=7, text=None)), [])
+        bot = make_bot(bot_transport, step)
+        with pytest.raises(TypeError):
+            await bot.edit_message_live_location(
+                1.5, 2.5, chat_id=1, message_id=7, vertical_accuracy=4.0
+            )
+
+
+class TestEditMessageText:
+    async def test_edits_text_without_message_thread_id(
+        self, bot_transport: Any, ok_response: Any, make_message: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(message_id=7, text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        message = await bot.edit_message_text(
+            "new text", chat_id=1, message_id=7, parse_mode="HTML"
+        )
+        assert isinstance(message, Message)
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/editMessageText"
+        payload = sent_payload(seen[0])
+        assert payload == {
+            "text": "new text",
+            "chat_id": 1,
+            "message_id": 7,
+            "parse_mode": "HTML",
+        }
+        assert "message_thread_id" not in payload
+
+    async def test_rejects_message_thread_id(self, bot_transport: Any, ok_response: Any) -> None:
+        """editMessageText's documented parameter set has no message_thread_id."""
+        step = record_into(ok_response(True), [])
+        bot = make_bot(bot_transport, step)
+        with pytest.raises(TypeError):
+            await bot.edit_message_text("t", chat_id=1, message_id=7, message_thread_id=3)
 
 
 class TestStopMessageLiveLocation:

@@ -279,6 +279,21 @@ class TestSendPoll:
         assert payload == {"chat_id": 123, "question": "Q?", "options": ["A", "B"]}
         assert "is_anonymous" not in payload
 
+    async def test_sends_quiz_correct_option_ids_as_array(
+        self,
+        bot_transport: Any,
+        ok_response: Any,
+        make_message: Any,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(message_id=9, text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_poll(123, "Q?", ["A", "B", "C"], type="quiz", correct_option_ids=[0, 2])
+        payload = sent_payload(seen[0])
+        assert payload["type"] == "quiz"
+        assert payload["correct_option_ids"] == [0, 2]
+        assert "correct_option_id" not in payload
+
 
 class TestSendDice:
     async def test_sends_dice_with_emoji(

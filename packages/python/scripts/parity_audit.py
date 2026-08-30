@@ -59,13 +59,8 @@ NODE_ONLY_GAP_REASON = (
 
 _NODE_ONLY_DEFERRED = frozenset(
     {
-        "answer_chat_join_request_query",
-        "get_managed_bot_access_settings",
-        "get_managed_bot_token",
-        "replace_managed_bot_token",
         "send_rich_message",
         "send_rich_message_draft",
-        "set_managed_bot_access_settings",
     }
 )
 

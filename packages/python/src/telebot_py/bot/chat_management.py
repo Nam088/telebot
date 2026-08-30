@@ -5,9 +5,12 @@ from __future__ import annotations
 import typing as t
 
 from telebot_py.bot.base import (
+    UNSET,
     MarkupLike,
     Requester,
+    Unset,
     clean_payload,
+    omit_unset,
     parse_flag,
     parse_result,
     parse_string,
@@ -53,7 +56,9 @@ class ChatManagementMixin(Requester):
         payload = clean_payload(chat_id=chat_id, title=title)
         return parse_flag(await self.request("setChatTitle", payload))
 
-    async def set_chat_description(self, chat_id: int | str, description: str) -> bool:
+    async def set_chat_description(
+        self, chat_id: int | str, description: str | Unset = UNSET
+    ) -> bool:
         """Change the description of a group, supergroup, or channel.
 
         Example:
@@ -62,7 +67,9 @@ class ChatManagementMixin(Requester):
         Args:
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
-            description: New chat description; 0-255 characters.
+            description: New chat description; 0-255 characters. Omit the
+                parameter to leave the description untouched; an explicit
+                ``""`` is sent as an empty description.
 
         Returns:
             True on success.
@@ -74,7 +81,7 @@ class ChatManagementMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#setchatdescription
         """
-        payload = clean_payload(chat_id=chat_id, description=description)
+        payload = clean_payload(chat_id=chat_id, description=omit_unset(description))
         return parse_flag(await self.request("setChatDescription", payload))
 
     async def set_chat_photo(self, chat_id: int | str, photo: str) -> bool:
