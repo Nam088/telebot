@@ -29,6 +29,11 @@ telebot_py.bot.chats
 
 .. automodule:: telebot_py.bot.chats
 
+telebot_py.bot.checklists
+-------------------------
+
+.. automodule:: telebot_py.bot.checklists
+
 telebot_py.bot.client
 ---------------------
 
@@ -89,10 +94,20 @@ telebot_py.bot.messages
 
 .. automodule:: telebot_py.bot.messages
 
+telebot_py.bot.mini_apps
+------------------------
+
+.. automodule:: telebot_py.bot.mini_apps
+
 telebot_py.bot.owned_gifts
 --------------------------
 
 .. automodule:: telebot_py.bot.owned_gifts
+
+telebot_py.bot.paid_media
+-------------------------
+
+.. automodule:: telebot_py.bot.paid_media
 
 telebot_py.bot.payments
 -----------------------
@@ -118,6 +133,11 @@ telebot_py.bot.stickers
 -----------------------
 
 .. automodule:: telebot_py.bot.stickers
+
+telebot_py.bot.stories
+----------------------
+
+.. automodule:: telebot_py.bot.stories
 
 telebot_py.bot.stories_gifts
 ----------------------------

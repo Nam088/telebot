@@ -9,6 +9,7 @@ from telebot_py.bot.base import (
     Requester,
     clean_payload,
     parse_flag,
+    parse_list_result,
     parse_result,
     to_wire,
 )
@@ -353,3 +354,35 @@ class MessagesMixin(Requester):
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Message, await self.request("sendDocument", payload))
+
+    async def get_user_personal_chat_messages(
+        self, chat_id: int | str, limit: int | None = None
+    ) -> list[Message]:
+        """Get the last messages from the personal chat of a user.
+
+        Remarks:
+            The parameter is named ``chat_id`` and ``limit`` is optional to
+            mirror the node and go siblings' signatures, which send
+            ``{"chat_id": ..., "limit": ...}``; pass the identifier of the
+            personal chat being read (Telegram's own page documents it as
+            ``user_id`` with a required limit of 1-20).
+
+        Example:
+            >>> messages = await bot.get_user_personal_chat_messages(-1001234, 10)
+
+        Args:
+            chat_id: Identifier of the personal chat to read.
+            limit: Maximum number of messages to return.
+
+        Returns:
+            The messages of the personal chat, oldest first.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(chat_id=chat_id, limit=limit)
+        return parse_list_result(
+            Message, await self.request("getUserPersonalChatMessages", payload)
+        )

@@ -199,3 +199,52 @@ class TestStopPoll:
             "message_id": 9,
             "reply_markup": markup,
         }
+
+
+class TestSendMessageDraft:
+    async def test_sends_required_fields_only(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.send_message_draft(123, 1) is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/sendMessageDraft"
+        assert sent_payload(seen[0]) == {"chat_id": 123, "draft_id": 1}
+
+    async def test_keeps_empty_text_on_the_wire(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.send_message_draft(123, 2, text="", can_stop=True) is True
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "draft_id": 2,
+            "text": "",
+            "can_stop": True,
+        }
+
+    async def test_serializes_entities_and_options(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_message_draft(
+            123,
+            3,
+            message_thread_id=7,
+            text="Working",
+            parse_mode="HTML",
+            entities=[{"type": "bold", "offset": 0, "length": 7}],
+            can_stop=True,
+            keep_on_stop=False,
+        )
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "draft_id": 3,
+            "message_thread_id": 7,
+            "text": "Working",
+            "parse_mode": "HTML",
+            "entities": [{"type": "bold", "offset": 0, "length": 7}],
+            "can_stop": True,
+            "keep_on_stop": False,
+        }

@@ -13,6 +13,7 @@ from telebot_py.bot.bulk import BulkMixin
 from telebot_py.bot.business_account import BusinessAccountMixin
 from telebot_py.bot.chat_management import ChatManagementMixin
 from telebot_py.bot.chats import ChatsMixin
+from telebot_py.bot.checklists import ChecklistsMixin
 from telebot_py.bot.edits import EditsMixin
 from telebot_py.bot.ephemeral import EphemeralMixin
 from telebot_py.bot.errors import InvalidTokenError, NetworkError, TelegramApiError
@@ -24,12 +25,15 @@ from telebot_py.bot.invite_links import InviteLinksMixin
 from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
+from telebot_py.bot.mini_apps import MiniAppsMixin
 from telebot_py.bot.owned_gifts import OwnedGiftsMixin
+from telebot_py.bot.paid_media import PaidMediaMixin
 from telebot_py.bot.payments import PaymentsMixin
 from telebot_py.bot.profile import ProfileMixin
 from telebot_py.bot.reactions import ReactionsMixin
 from telebot_py.bot.retry import RetryPolicy
 from telebot_py.bot.stickers import StickersMixin
+from telebot_py.bot.stories import StoriesMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
 from telebot_py.bot.verification import VerificationMixin
@@ -80,6 +84,10 @@ class Bot(
     PaymentsMixin,
     GamesMixin,
     StoriesGiftsMixin,
+    StoriesMixin,
+    ChecklistsMixin,
+    PaidMediaMixin,
+    MiniAppsMixin,
     BusinessAccountMixin,
     GiftsMixin,
     OwnedGiftsMixin,
@@ -103,10 +111,11 @@ class Bot(
     unwrapping, typed error mapping, and retry with exponential backoff
     (FR-012). The transport is injectable so tests can run fully offline.
     Typed Bot API methods (messages, media, stickers, inline, payments, games,
-    stories, business accounts, gifts, owned gifts, ephemeral messages, chats,
-    chat management, verification, invite links, members, topics, reactions,
-    profile, files, bulk operations, edits, webhook) are composed onto this
-    class via mixins.
+    stories, story management, checklists, paid media, mini app queries,
+    business accounts, gifts, owned gifts, ephemeral messages, chats, chat
+    management, verification, invite links, members, topics, reactions, profile,
+    files, bulk operations, edits, webhook) are composed onto this class via
+    mixins.
 
     Example:
         >>> bot = Bot("123456:ABC...")

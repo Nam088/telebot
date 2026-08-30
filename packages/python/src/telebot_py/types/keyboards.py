@@ -278,3 +278,14 @@ class ForceReply(TelegramObject):
     force_reply: bool = True
     input_field_placeholder: str | None = None
     selective: bool | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class PreparedKeyboardButton(TelegramObject):
+    """A keyboard button prepared for use by a user of a Mini App.
+
+    Attributes:
+        id: Unique identifier of the keyboard button.
+    """
+
+    id: str

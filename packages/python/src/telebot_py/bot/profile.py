@@ -13,6 +13,7 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
+from telebot_py.types.files import UserProfileAudios
 from telebot_py.types.topics import (
     BotCommand,
     BotDescription,
@@ -305,3 +306,30 @@ class ProfileMixin(Requester):
             NetworkError: If the transport keeps failing after retries.
         """
         return parse_flag(await self.request("removeMyProfilePhoto"))
+
+    async def get_user_profile_audios(
+        self, user_id: int, offset: int | None = None, limit: int | None = None
+    ) -> UserProfileAudios:
+        """Get the list of audios displayed on a user's profile.
+
+        Example:
+            >>> audios = await bot.get_user_profile_audios(42, 0, 10)
+            >>> print(audios.total_count)
+
+        Args:
+            user_id: Unique identifier of the target user.
+            offset: Sequential number of the first audio to be returned; omit
+                to return all audios.
+            limit: Maximum number of audios to retrieve, 1-100; defaults
+                to 100.
+
+        Returns:
+            The UserProfileAudios object carrying the requested audios.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(user_id=user_id, offset=offset, limit=limit)
+        return parse_result(UserProfileAudios, await self.request("getUserProfileAudios", payload))

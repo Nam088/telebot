@@ -369,3 +369,60 @@ class EditsMixin(Requester):
         """
         payload = {"chat_id": chat_id, "message_id": message_id}
         return parse_flag(await self.request("deleteMessage", payload))
+
+    async def send_message_draft(
+        self,
+        chat_id: int | str,
+        draft_id: int,
+        *,
+        message_thread_id: int | None = None,
+        text: str | None = None,
+        parse_mode: str | None = None,
+        entities: Sequence[MarkupLike] | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+    ) -> bool:
+        """Stream a partial message draft while the final answer is generated.
+
+        Remarks:
+            The draft is ephemeral: it acts as a temporary 30-second preview,
+            so the bot must still call ``sendMessage`` with the complete text
+            to persist the message. Passing an empty ``text`` shows a
+            "Thinking..." placeholder.
+
+        Example:
+            >>> ok = await bot.send_message_draft(123, 1, text="Working on it")
+
+        Args:
+            chat_id: Unique identifier for the target private chat.
+            draft_id: Unique identifier of the message draft; must be
+                non-zero. Drafts sharing an identifier are animated.
+            message_thread_id: Unique identifier of the target message thread.
+            text: Text of the draft, 0-4096 characters after entities parsing.
+            parse_mode: Mode for parsing entities in the draft text.
+            entities: MessageEntity items as ``to_dict`` objects or dicts; can
+                be specified instead of ``parse_mode``.
+            can_stop: Whether to show the user a button stopping further
+                drafts.
+            keep_on_stop: Whether to keep the draft in the chat when the stop
+                button is pressed.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+        """
+        payload = clean_payload(
+            chat_id=chat_id,
+            draft_id=draft_id,
+            message_thread_id=message_thread_id,
+            text=text,
+            parse_mode=parse_mode,
+            entities=[to_wire(entity) for entity in entities] if entities is not None else None,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
+        )
+        return parse_flag(await self.request("sendMessageDraft", payload))

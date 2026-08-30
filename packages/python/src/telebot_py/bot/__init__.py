@@ -5,6 +5,7 @@ from telebot_py.bot.bulk import BulkMixin
 from telebot_py.bot.business_account import BusinessAccountMixin
 from telebot_py.bot.chat_management import ChatManagementMixin
 from telebot_py.bot.chats import ChatsMixin
+from telebot_py.bot.checklists import ChecklistsMixin
 from telebot_py.bot.client import Bot
 from telebot_py.bot.edits import EditsMixin
 from telebot_py.bot.ephemeral import EphemeralMixin
@@ -23,12 +24,15 @@ from telebot_py.bot.invite_links import InviteLinksMixin
 from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
+from telebot_py.bot.mini_apps import MiniAppsMixin
 from telebot_py.bot.owned_gifts import OwnedGiftsMixin
+from telebot_py.bot.paid_media import PaidMediaMixin
 from telebot_py.bot.payments import PaymentsMixin
 from telebot_py.bot.profile import ProfileMixin
 from telebot_py.bot.reactions import ReactionsMixin
 from telebot_py.bot.retry import RetryPolicy
 from telebot_py.bot.stickers import StickersMixin
+from telebot_py.bot.stories import StoriesMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
 from telebot_py.bot.verification import VerificationMixin
@@ -41,6 +45,7 @@ __all__ = [
     "BusinessAccountMixin",
     "ChatManagementMixin",
     "ChatsMixin",
+    "ChecklistsMixin",
     "EditsMixin",
     "EphemeralMixin",
     "FilesMixin",
@@ -53,18 +58,21 @@ __all__ = [
     "MediaMixin",
     "MembersMixin",
     "MessagesMixin",
+    "MiniAppsMixin",
     "NetworkError",
     "OwnedGiftsMixin",
+    "PaidMediaMixin",
     "PaymentsMixin",
     "ProfileMixin",
     "ReactionsMixin",
     "Requester",
     "RetryPolicy",
-    "StoriesGiftsMixin",
     "StickersMixin",
+    "StoriesGiftsMixin",
+    "StoriesMixin",
     "SupportsToDict",
-    "TelegramApiError",
     "TelebotError",
+    "TelegramApiError",
     "TopicsMixin",
     "VerificationMixin",
     "WebhookMixin",

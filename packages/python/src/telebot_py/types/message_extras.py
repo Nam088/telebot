@@ -248,3 +248,15 @@ class PreparedInlineMessage(TelegramObject):
 
     id: str
     expiration_date: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class SentGuestMessage(TelegramObject):
+    """An inline message sent by a guest bot in reply to a guest query.
+
+    Attributes:
+        inline_message_id: Identifier of the sent inline message, available
+            only if there is an inline message attached to the guest query.
+    """
+
+    inline_message_id: str | None = None

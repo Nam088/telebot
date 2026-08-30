@@ -108,6 +108,27 @@ class PurchasedPaidMedia(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class RefundedPayment(TelegramObject):
+    """A service message about a refunded payment.
+
+    Attributes:
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total refunded price in the smallest units of the
+            currency.
+        invoice_payload: Bot-specified invoice payload.
+        telegram_payment_charge_id: Telegram payment identifier.
+        provider_payment_charge_id: Provider payment identifier.
+    """
+
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    telegram_payment_charge_id: str
+    provider_payment_charge_id: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class LabeledPrice(TelegramObject):
     """A portion of a price.
 

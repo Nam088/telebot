@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 
 from telebot_py.types.base import TelegramObject
-from telebot_py.types.media import PhotoSize
+from telebot_py.types.media import Audio, PhotoSize
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -40,3 +40,16 @@ class UserProfilePhotos(TelegramObject):
 
     total_count: int
     photos: list[list[PhotoSize]]
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class UserProfileAudios(TelegramObject):
+    """The audios displayed on a user's profile.
+
+    Attributes:
+        total_count: Total number of profile audios for the target user.
+        audios: Requested profile audios.
+    """
+
+    total_count: int
+    audios: list[Audio]
