@@ -12,6 +12,9 @@ import (
 type ButtonHandler = routing.HandlerFunc
 
 // MenuButton represents a single button within a Menu layout.
+//
+// This is a framework type, not the Bot API MenuButton object that shares its
+// name (the chat command-menu button), so it carries no docs link.
 type MenuButton struct {
 	Text    string
 	Data    string
