@@ -29,7 +29,7 @@ func DefaultRetryPolicy() *RetryPolicy {
 
 // IsRetryableStatus reports whether an HTTP status code should be retried.
 func (p *RetryPolicy) IsRetryableStatus(statusCode int) bool {
-	return statusCode == 429 || (statusCode >= 500 && statusCode <= 599)
+	return statusCode == 429 || statusCode == 500 || statusCode == 502 || statusCode == 503 || statusCode == 504
 }
 
 // DelayFor computes the backoff delay to wait before retry number attempt.
