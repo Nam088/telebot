@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Nam088/telebot/packages/go/pkg/types"
@@ -105,5 +104,5 @@ func (b *Bot) doRequestWithRetry(ctx context.Context, method string, payload any
 		// Retry network errors
 	}
 
-	return nil, fmt.Errorf("max retries (%d) exceeded: %w", policy.MaxRetries, lastErr)
+	return nil, lastErr
 }
