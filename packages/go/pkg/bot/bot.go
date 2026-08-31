@@ -36,10 +36,11 @@ type errorHookEntry struct{ fn ErrorHook }
 
 // Bot represents a Telegram Bot API HTTP client.
 type Bot struct {
-	token      string
-	baseURL    string
-	httpClient *http.Client
-	maxRetries int
+	token       string
+	baseURL     string
+	httpClient  *http.Client
+	maxRetries  int
+	retryPolicy *RetryPolicy
 
 	hookMu        sync.RWMutex
 	responseHooks []*responseHookEntry
@@ -67,16 +68,28 @@ func WithHTTPClient(client *http.Client) Option {
 func WithMaxRetries(retries int) Option {
 	return func(b *Bot) {
 		b.maxRetries = retries
+		if b.retryPolicy == nil {
+			b.retryPolicy = DefaultRetryPolicy()
+		}
+		b.retryPolicy.MaxRetries = retries
+	}
+}
+
+// WithRetryPolicy sets a custom retry policy for network/429 errors.
+func WithRetryPolicy(policy *RetryPolicy) Option {
+	return func(b *Bot) {
+		b.retryPolicy = policy
 	}
 }
 
 // NewBot constructs a new Bot client.
 func NewBot(token string, opts ...Option) *Bot {
 	b := &Bot{
-		token:      token,
-		baseURL:    DefaultBaseURL,
-		httpClient: &http.Client{Timeout: DefaultTimeout},
-		maxRetries: 3,
+		token:       token,
+		baseURL:     DefaultBaseURL,
+		httpClient:  &http.Client{Timeout: DefaultTimeout},
+		maxRetries:  3,
+		retryPolicy: DefaultRetryPolicy(),
 	}
 	for _, opt := range opts {
 		opt(b)
@@ -167,7 +180,7 @@ func (b *Bot) OnError(h ErrorHook) func() {
 // Returns:
 //   - error: Non-nil on transport failures or when Telegram returns ok:false.
 func (b *Bot) Request(ctx context.Context, method string, payload any, result any) error {
-	rawResult, err := b.doRequest(ctx, method, payload, result)
+	rawResult, err := b.doRequestWithRetry(ctx, method, payload, result)
 	if err != nil {
 		b.hookMu.RLock()
 		hooks := make([]*errorHookEntry, len(b.errorHooks))

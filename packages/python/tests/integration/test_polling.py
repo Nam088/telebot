@@ -247,9 +247,9 @@ class TestPollingErrorRecovery:
         finally:
             await env["app"].stop()
             await task
-        # Bot-internal backoff (1,2,4,8) plus one polling-loop backoff step.
-        assert env["sleeps"].delays[:4] == [1.0, 2.0, 4.0, 8.0]
-        assert env["sleeps"].delays[4] == 1.0
+        # Bot-internal backoff (1,2,4) plus one polling-loop backoff step.
+        assert env["sleeps"].delays[:3] == [1.0, 2.0, 4.0]
+        assert env["sleeps"].delays[3] == 1.0
 
 
 class TestPollingLifecycle:

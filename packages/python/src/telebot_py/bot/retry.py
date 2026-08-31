@@ -18,7 +18,7 @@ class RetryPolicy:
         max_delay: Upper bound in seconds for any single backoff delay.
     """
 
-    max_retries: int = 4
+    max_retries: int = 3
     base_delay: float = 1.0
     max_delay: float = 30.0
 
@@ -29,9 +29,9 @@ class RetryPolicy:
             status_code: The HTTP status code returned by Telegram.
 
         Returns:
-            True for 429 and any 5xx status, False otherwise.
+            True for 429, 500, 502, 503, or 504; False otherwise.
         """
-        return status_code == 429 or 500 <= status_code <= 599
+        return status_code in (429, 500, 502, 503, 504)
 
     def delay_for(self, attempt: int, retry_after: float | None = None) -> float:
         """Backoff delay to wait before retry number ``attempt``.

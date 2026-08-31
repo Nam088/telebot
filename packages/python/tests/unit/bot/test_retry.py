@@ -92,8 +92,8 @@ class TestBackoffOn5xx:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.request("getMe")
         assert excinfo.value.error_code == 500
-        assert sleeps.delays == [1.0, 2.0, 4.0, 8.0]
-        assert len(seen) == 5
+        assert sleeps.delays == [1.0, 2.0, 4.0]
+        assert len(seen) == 4
 
     async def test_delay_capped_at_max(
         self,
@@ -155,6 +155,21 @@ class TestRateLimit429:
 
 
 class TestClientErrorsFailFast:
+    async def test_501_not_retried(
+        self,
+        bot_transport: Any,
+        sleeps: SleepRecorder,
+        error_response: ResponseFactory,
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = count_calls(error_response(501, 501, "Not Implemented"), seen)
+        bot = make_bot(bot_transport, sleeps, step)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.request("sendMessage")
+        assert excinfo.value.error_code == 501
+        assert sleeps.delays == []
+        assert len(seen) == 1
+
     async def test_400_fails_immediately_without_retry(
         self,
         bot_transport: Any,
@@ -211,7 +226,7 @@ class TestTransportAndEnvelope:
         bot = make_bot(bot_transport, sleeps, raising_handler(httpx.ConnectError("boom")))
         with pytest.raises(NetworkError, match="boom"):
             await bot.request("getMe")
-        assert sleeps.delays == [1.0, 2.0, 4.0, 8.0]
+        assert sleeps.delays == [1.0, 2.0, 4.0]
 
     async def test_transport_failure_then_success(
         self,
@@ -259,8 +274,8 @@ class TestTransportAndEnvelope:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.request("getMe")
         assert excinfo.value.error_code == 502
-        assert len(seen) == 5
-        assert sleeps.delays == [1.0, 2.0, 4.0, 8.0]
+        assert len(seen) == 4
+        assert sleeps.delays == [1.0, 2.0, 4.0]
 
 
 class TestClientConstruction:
