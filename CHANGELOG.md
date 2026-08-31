@@ -2,6 +2,19 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.7.0](https://github.com/Nam088/telebot/compare/v1.6.0...v1.7.0) (2026-08-31)
+
+
+### Bug Fixes
+
+* **py:** update polling integration test for max_retries=3 ([bac8431](https://github.com/Nam088/telebot/commit/bac84315bd8008f904ac53330fd6815384b6e311))
+* synchronize retry configuration across all three packages ([492aa38](https://github.com/Nam088/telebot/commit/492aa38c20a3c3f49ef6ec4957687ceba88a3483))
+
+
+### Features
+
+* **go:** implement retry mechanism with exponential backoff for 429/5xx errors ([ac70326](https://github.com/Nam088/telebot/commit/ac703261e537a3d2be36f8f52638beed37ca4eb6))
+
 # [1.6.0](https://github.com/Nam088/telebot/compare/v1.5.0...v1.6.0) (2026-08-31)
 
 
