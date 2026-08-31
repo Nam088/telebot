@@ -2,6 +2,55 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.6.0](https://github.com/Nam088/telebot/compare/v1.5.0...v1.6.0) (2026-08-31)
+
+
+### Bug Fixes
+
+* close re-audit gaps — checklist_task_id, AcceptedGiftTypes docs shape, ReplyParameters typing, business_connection_id kwargs, split files over 500-line ceiling (all 3 packages) ([aa7f1a1](https://github.com/Nam088/telebot/commit/aa7f1a12c1858fc33b4fdf1b1c05c07e902d84da))
+* **go:** align gift/business/emoji-status params and BusinessConnection shape with official Bot API 10.3 docs ([c878c60](https://github.com/Nam088/telebot/commit/c878c601504d5222aa0f3cdf8f6a40446240511b))
+* **go:** correct poll/draft/live-photo/bulk/invoice/story params, true reaction endpoints, port 5 missing methods, type 9 untyped sites per Bot API 10.3 ([9546719](https://github.com/Nam088/telebot/commit/95467194980135df2fd46a6c8baecabea8bce055))
+* **node:** align 7 gift/business methods and models with official Bot API 10.3 docs ([3cd23e0](https://github.com/Nam088/telebot/commit/3cd23e04ff6718f1d8d1e13f20a447db88441362))
+* **node:** align the rich message surface with the official Bot API docs ([630c1ce](https://github.com/Nam088/telebot/commit/630c1ce04cfec9d43b16a1e731239d07bf111bc3))
+* **node:** correct sendPoll/getUserPersonalChatMessages/sendLivePhoto/managed-bot/createInvoiceLink params and true reaction endpoints per Bot API 10.3; type 12 untyped sites; dedupe edit.ts methods ([7f2e4aa](https://github.com/Nam088/telebot/commit/7f2e4aa57070813860b016cb28d378b5a20d27b6))
+* **py:** align gift/business params, add BusinessBotRights, fix BusinessConnection decode per Bot API 10.3 ([78ff3a3](https://github.com/Nam088/telebot/commit/78ff3a3af4229741a622f46b94c292fa25d98388))
+* **py:** correct poll/draft/live-photo/bulk/story/edit params, true reaction endpoints, port 5 missing methods, UNSET omission hygiene per Bot API 10.3 ([c04e85b](https://github.com/Nam088/telebot/commit/c04e85b8b2e953f6981e9f947ee2289c52ba107d))
+* **scripts:** make the docs fidelity gate able to actually fail ([066bf24](https://github.com/Nam088/telebot/commit/066bf24d91de79b64606d324ae205bf87bb44e02))
+* **scripts:** resolve TypeScript interface heritage in the fidelity audit ([d847fb1](https://github.com/Nam088/telebot/commit/d847fb1980e81b0d29b50d0089379b148bd6b63b))
+
+
+### Features
+
+* **go:** add 15 stories/paid-media/checklist/draft Bot API methods + story area types (parity phase 3) ([abf7f5e](https://github.com/Nam088/telebot/commit/abf7f5ef3566cc7b44b0354b8c91bf23e3fe891f))
+* **go:** add 25 Bot API methods for node parity (forum topics, chat admin, verification, subscription invite links) ([d698d49](https://github.com/Nam088/telebot/commit/d698d49882205c39b528036e24784e5783588cab))
+* **go:** add 25 business/ephemeral/gifts Bot API methods + gift types (node parity phase 2) ([4dfd0fc](https://github.com/Nam088/telebot/commit/4dfd0fc43a0c7ec24676aacfc81af362cd5fd592))
+* **go:** add the 6 backlog params to the send/forward/copy surface (SC-007) ([c474e9d](https://github.com/Nam088/telebot/commit/c474e9d6c33b439724ab22c9e22c9ccb21e765f1))
+* **go:** close the Bot API type surface so incoming updates stop losing data ([0d5c2d6](https://github.com/Nam088/telebot/commit/0d5c2d684b89d3af56ed87e272dd7c31068dc819))
+* **go:** complete sendPoll, sendPhoto, sendDocument and copyMessage surfaces (SC-007) ([7b0fcb3](https://github.com/Nam088/telebot/commit/7b0fcb3b39415d725cfff7b63facad99ca84787a))
+* **go:** complete the inline-query types and finish docs-link coverage ([d5ca021](https://github.com/Nam088/telebot/commit/d5ca021cc1aa011c48617df02729539c052f1276))
+* **go:** complete Update per Bot API 10.3 and add the 12 missing routes ([3efef00](https://github.com/Nam088/telebot/commit/3efef008c51eca95072e74061ce571843eb078df))
+* **go:** model the remaining concrete Bot API types and drop `any` at their call sites ([e07ba62](https://github.com/Nam088/telebot/commit/e07ba62579b1048e19f38c1efa307473dd951c76))
+* **go:** port Bot API 10.3 rich messages (83 docs types + sendRichMessage/Draft) ([a4663f7](https://github.com/Nam088/telebot/commit/a4663f7ac038e905116fc8f50d65873580756bb4))
+* **node:** add the 6 backlog params to the send/copy/forward surface (SC-007) ([7ae0a7f](https://github.com/Nam088/telebot/commit/7ae0a7f80601c08b90a500423bcb944a68f7a71a))
+* **node:** complete the Bot API 10.3 Message carriers and their payload types ([7264b4b](https://github.com/Nam088/telebot/commit/7264b4b2c8b3143b01172572db8758764de478b3))
+* **node:** complete the sendPoll surface and model InputPollOption (SC-007) ([2e5db8d](https://github.com/Nam088/telebot/commit/2e5db8da107a208ba412571377dabc2fb2b56fe7))
+* **node:** make editStory, editChatSubscriptionInviteLink and getUserGifts measurable (SC-007) ([5067e6e](https://github.com/Nam088/telebot/commit/5067e6e2f547aeb06bd6f4b580be7552465d5831))
+* **node:** model ChatFullInfo, the shape getChat actually returns ([c937a29](https://github.com/Nam088/telebot/commit/c937a295432d09e66d12c2aa0a36e52f8a88560f))
+* **py:** add 15 stories/paid-media/checklist/draft Bot API methods + story area types (parity phase 3) ([34c66ce](https://github.com/Nam088/telebot/commit/34c66cee4accefea491d28098c0c9c321ca5db89))
+* **py:** add 25 Bot API methods for node parity (forum topics, chat admin, verification, subscription invite links) ([06727f1](https://github.com/Nam088/telebot/commit/06727f11906d7844b33a25e3ae23a88b7b6a3af6))
+* **py:** add 25 business/ephemeral/gifts Bot API methods + gift types (node parity phase 2) ([8dcb742](https://github.com/Nam088/telebot/commit/8dcb7422ebaf356d41cabca64700e80b51623b29))
+* **py:** add the 6 backlog params to the send/forward/copy surface (SC-007) ([ee42512](https://github.com/Nam088/telebot/commit/ee425120023f8e6cd397be860d3b9047621bbe69))
+* **py:** complete sendPoll, sendPhoto and sendDocument surfaces, model InputPollOption (SC-007) ([1dd3afa](https://github.com/Nam088/telebot/commit/1dd3afad4e27bac99600969426177fe4298f2e7f))
+* **py:** decode the Bot API 10.3 service messages Telegram actually sends ([3480936](https://github.com/Nam088/telebot/commit/34809362611776bb6d935c08d1abd48facc470b0))
+* **py:** model ChatFullInfo and the docs carriers getChat/Message actually return (SC-007, Bot API 10.3) ([4808b78](https://github.com/Nam088/telebot/commit/4808b78638f1b819eb174c369c3225d9855f626d))
+* **py:** port Bot API 10.3 rich messages (83 docs types + send_rich_message/Draft) ([6769b30](https://github.com/Nam088/telebot/commit/6769b304ca596f52a366c44a4fc2d091d052ab3c))
+* **py:** type the input media, preview, payment, passport and background objects ([49ca358](https://github.com/Nam088/telebot/commit/49ca3586f241def57adbe23f93924277db1bff00))
+* **scripts:** measure which documented Bot API params each method can send (SC-007) ([e7062e7](https://github.com/Nam088/telebot/commit/e7062e7d31c4136719ab4acfbe0a4ea104d04978))
+* **scripts:** put the fidelity report in the CI job summary ([a5cb52f](https://github.com/Nam088/telebot/commit/a5cb52f96a86b9693ce19aec623cb02d42462b74))
+* **scripts:** ratchet method-param gaps like documented fields (SC-007) ([34758b5](https://github.com/Nam088/telebot/commit/34758b55304732a02bf324e798acf2afab691d4c))
+* **scripts:** surface method-param fidelity in the summary, table and strict gate ([ffee224](https://github.com/Nam088/telebot/commit/ffee224188445cb0573bdcafeba9058d82888959))
+* **scripts:** turn the Bot API fidelity audit into a regression ratchet ([092d8ed](https://github.com/Nam088/telebot/commit/092d8ed6acd2c115be0ef59df5ed2d1e504f92cd))
+
 # [1.5.0](https://github.com/Nam088/telebot/compare/v1.4.0...v1.5.0) (2026-08-30)
 
 
