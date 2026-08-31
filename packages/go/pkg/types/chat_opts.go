@@ -1,11 +1,15 @@
 package types
 
 // MenuButton is the union of all supported bot menu button types.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubutton
 type MenuButton interface {
 	menuButton()
 }
 
 // MenuButtonDefault represents the default menu button.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttondefault
 type MenuButtonDefault struct {
 	Type string `json:"type"`
 }
@@ -13,6 +17,8 @@ type MenuButtonDefault struct {
 func (MenuButtonDefault) menuButton() {}
 
 // MenuButtonCommands represents a menu button that opens the bot's commands.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttoncommands
 type MenuButtonCommands struct {
 	Type string `json:"type"`
 }
@@ -20,6 +26,8 @@ type MenuButtonCommands struct {
 func (MenuButtonCommands) menuButton() {}
 
 // MenuButtonWebApp represents a menu button that launches a Web App.
+//
+// Telegram API: https://core.telegram.org/bots/api#menubuttonwebapp
 type MenuButtonWebApp struct {
 	Type   string     `json:"type"`
 	Text   string     `json:"text"`
@@ -53,15 +61,17 @@ type DeleteChatPhotoOptions struct {
 
 // PinChatMessageOptions represents parameters for the pinChatMessage method.
 type PinChatMessageOptions struct {
-	ChatID              any   `json:"chat_id"`
-	MessageID           int64 `json:"message_id"`
-	DisableNotification bool  `json:"disable_notification,omitempty"`
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	ChatID               any    `json:"chat_id"`
+	MessageID            int64  `json:"message_id"`
+	DisableNotification  bool   `json:"disable_notification,omitempty"`
 }
 
 // UnpinChatMessageOptions represents parameters for the unpinChatMessage method.
 type UnpinChatMessageOptions struct {
-	ChatID    any   `json:"chat_id"`
-	MessageID int64 `json:"message_id,omitempty"`
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	ChatID               any    `json:"chat_id"`
+	MessageID            int64  `json:"message_id,omitempty"`
 }
 
 // SetChatPermissionsOptions represents parameters for the setChatPermissions method.
@@ -126,6 +136,24 @@ type EditChatInviteLinkOptions struct {
 type RevokeChatInviteLinkOptions struct {
 	ChatID     any    `json:"chat_id"`
 	InviteLink string `json:"invite_link"`
+}
+
+// CreateChatSubscriptionInviteLinkOptions represents parameters for the
+// createChatSubscriptionInviteLink method.
+type CreateChatSubscriptionInviteLinkOptions struct {
+	ChatID             any    `json:"chat_id"`
+	Name               string `json:"name,omitempty"`
+	SubscriptionPeriod int    `json:"subscription_period"`
+	SubscriptionPrice  int    `json:"subscription_price"`
+}
+
+// EditChatSubscriptionInviteLinkOptions represents parameters for the
+// editChatSubscriptionInviteLink method. The subscription period and price of
+// an existing subscription link are immutable, so only the name can be edited.
+type EditChatSubscriptionInviteLinkOptions struct {
+	ChatID     any    `json:"chat_id"`
+	InviteLink string `json:"invite_link"`
+	Name       string `json:"name,omitempty"`
 }
 
 // PromoteChatMemberOptions represents parameters for the promoteChatMember method.

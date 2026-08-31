@@ -5,9 +5,12 @@ from __future__ import annotations
 import typing as t
 
 from telebot_py.bot.base import (
+    UNSET,
     MarkupLike,
     Requester,
+    Unset,
     clean_payload,
+    omit_unset,
     parse_flag,
     parse_result,
     parse_string,
@@ -47,11 +50,15 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchattitle
         """
         payload = clean_payload(chat_id=chat_id, title=title)
         return parse_flag(await self.request("setChatTitle", payload))
 
-    async def set_chat_description(self, chat_id: int | str, description: str) -> bool:
+    async def set_chat_description(
+        self, chat_id: int | str, description: str | Unset = UNSET
+    ) -> bool:
         """Change the description of a group, supergroup, or channel.
 
         Example:
@@ -60,7 +67,9 @@ class ChatManagementMixin(Requester):
         Args:
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
-            description: New chat description; 0-255 characters.
+            description: New chat description; 0-255 characters. Omit the
+                parameter to leave the description untouched; an explicit
+                ``""`` is sent as an empty description.
 
         Returns:
             True on success.
@@ -69,8 +78,10 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatdescription
         """
-        payload = clean_payload(chat_id=chat_id, description=description)
+        payload = clean_payload(chat_id=chat_id, description=omit_unset(description))
         return parse_flag(await self.request("setChatDescription", payload))
 
     async def set_chat_photo(self, chat_id: int | str, photo: str) -> bool:
@@ -95,6 +106,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatphoto
         """
         payload = clean_payload(chat_id=chat_id, photo=photo)
         return parse_flag(await self.request("setChatPhoto", payload))
@@ -119,6 +132,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletechatphoto
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("deleteChatPhoto", payload))
@@ -128,6 +143,7 @@ class ChatManagementMixin(Requester):
         chat_id: int | str,
         message_id: int,
         *,
+        business_connection_id: str | None = None,
         disable_notification: bool | None = None,
     ) -> bool:
         """Add a message to the list of pinned messages in a chat.
@@ -139,6 +155,8 @@ class ChatManagementMixin(Requester):
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
             message_id: Identifier of the message to pin.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be pinned.
             disable_notification: Pin without sending a notification.
 
         Returns:
@@ -148,15 +166,24 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#pinchatmessage
         """
         payload = clean_payload(
             chat_id=chat_id,
             message_id=message_id,
+            business_connection_id=business_connection_id,
             disable_notification=disable_notification,
         )
         return parse_flag(await self.request("pinChatMessage", payload))
 
-    async def unpin_chat_message(self, chat_id: int | str, message_id: int | None = None) -> bool:
+    async def unpin_chat_message(
+        self,
+        chat_id: int | str,
+        message_id: int | None = None,
+        *,
+        business_connection_id: str | None = None,
+    ) -> bool:
         """Remove a message from the list of pinned messages in a chat.
 
         Example:
@@ -167,6 +194,8 @@ class ChatManagementMixin(Requester):
                 target channel.
             message_id: Identifier of the message to unpin; omit to unpin the
                 most recently pinned message.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message will be unpinned.
 
         Returns:
             True on success.
@@ -175,8 +204,14 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unpinchatmessage
         """
-        payload = clean_payload(chat_id=chat_id, message_id=message_id)
+        payload = clean_payload(
+            chat_id=chat_id,
+            message_id=message_id,
+            business_connection_id=business_connection_id,
+        )
         return parse_flag(await self.request("unpinChatMessage", payload))
 
     async def unpin_all_chat_messages(self, chat_id: int | str) -> bool:
@@ -196,6 +231,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unpinallchatmessages
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_flag(await self.request("unpinAllChatMessages", payload))
@@ -229,6 +266,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatpermissions
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -257,6 +296,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#exportchatinvitelink
         """
         payload = clean_payload(chat_id=chat_id)
         return parse_string(await self.request("exportChatInviteLink", payload))
@@ -282,6 +323,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatmenubutton
         """
         payload = clean_payload(chat_id=chat_id, menu_button=to_wire(menu_button))
         return parse_flag(await self.request("setChatMenuButton", payload))
@@ -304,6 +347,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatmenubutton
         """
         payload = clean_payload(chat_id=chat_id)
         result = await self.request("getChatMenuButton", payload)
@@ -344,6 +389,8 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmydefaultadministratorrights
         """
         payload = clean_payload(rights=to_wire(rights), for_channels=for_channels)
         return parse_flag(await self.request("setMyDefaultAdministratorRights", payload))
@@ -366,9 +413,67 @@ class ChatManagementMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmydefaultadministratorrights
         """
         payload = clean_payload(for_channels=for_channels)
         return parse_result(
             ChatAdministratorRights,
             await self.request("getMyDefaultAdministratorRights", payload),
         )
+
+    async def set_chat_sticker_set(self, chat_id: int | str, sticker_set_name: str) -> bool:
+        """Set a new group sticker set for a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must
+        have the ``can_change_info`` administrator right. Use the field
+        ``active_sticker_set_id`` returned by ``get_chat`` to test whether the
+        bot can set the sticker set.
+
+        Example:
+            >>> ok = await bot.set_chat_sticker_set(-100, "test_set_by_bot")
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target supergroup.
+            sticker_set_name: Name of the sticker set to be set as the group
+                sticker set.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatstickerset
+        """
+        payload = clean_payload(chat_id=chat_id, sticker_set_name=sticker_set_name)
+        return parse_flag(await self.request("setChatStickerSet", payload))
+
+    async def delete_chat_sticker_set(self, chat_id: int | str) -> bool:
+        """Delete the group sticker set from a supergroup.
+
+        The bot must be an administrator in the chat for this to work and must
+        have the appropriate administrator rights.
+
+        Example:
+            >>> ok = await bot.delete_chat_sticker_set(-100)
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target supergroup.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletechatstickerset
+        """
+        payload = clean_payload(chat_id=chat_id)
+        return parse_flag(await self.request("deleteChatStickerSet", payload))

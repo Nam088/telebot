@@ -17,6 +17,8 @@ import (
 // Returns:
 //   - *types.Message: The sent Message object on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendgame
 func (b *Bot) SendGame(ctx context.Context, opts *types.SendGameOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendGame", opts, &msg); err != nil {
@@ -35,6 +37,8 @@ func (b *Bot) SendGame(ctx context.Context, opts *types.SendGameOptions) (*types
 //   - *types.Message: The edited Message object when a chat message was targeted.
 //   - bool: True when an inline message was targeted.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#setgamescore
 func (b *Bot) SetGameScore(ctx context.Context, opts *types.SetGameScoreOptions) (*types.Message, bool, error) {
 	var raw json.RawMessage
 	if err := b.Request(ctx, "setGameScore", opts, &raw); err != nil {
@@ -61,10 +65,43 @@ func (b *Bot) SetGameScore(ctx context.Context, opts *types.SetGameScoreOptions)
 // Returns:
 //   - []types.GameHighScore: A list of high scores on success.
 //   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getgamehighscores
 func (b *Bot) GetGameHighScores(ctx context.Context, opts *types.GetGameHighScoresOptions) ([]types.GameHighScore, error) {
 	var scores []types.GameHighScore
 	if err := b.Request(ctx, "getGameHighScores", opts, &scores); err != nil {
 		return nil, err
 	}
 	return scores, nil
+}
+
+// SetPassportDataErrors informs a user that some of the Telegram Passport
+// elements they provided contain errors.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - userID: User identifier.
+//   - errors: Array describing the errors in the elements the user provided.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SetPassportDataErrors(ctx, 123456, []types.PassportElementError{
+//	    {Source: "data", Type: "passport", Message: "Data is incorrect"},
+//	})
+//
+// Telegram API: https://core.telegram.org/bots/api#setpassportdataerrors
+func (b *Bot) SetPassportDataErrors(ctx context.Context, userID int64, errors []types.PassportElementError) (bool, error) {
+	payload := map[string]any{
+		"user_id": userID,
+		"errors":  errors,
+	}
+	var ok bool
+	if err := b.Request(ctx, "setPassportDataErrors", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
 }

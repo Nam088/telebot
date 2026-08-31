@@ -8,6 +8,7 @@ import { StickerMethods } from "./stickers.js";
 import type {
   Message,
   SendInvoiceOptions,
+  CreateInvoiceLinkOptions,
   AnswerShippingQueryOptions,
   AnswerPreCheckoutQueryOptions,
   StarTransactions,
@@ -38,6 +39,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   prices: [{ label: "1 Month", amount: 100 }],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendinvoice Telegram Bot API: sendInvoice}
    */
   public async sendInvoice(options: SendInvoiceOptions): Promise<Message> {
     return this.request<Message>("sendInvoice", options as unknown as Record<string, unknown>);
@@ -46,7 +49,7 @@ export abstract class PaymentMethods extends StickerMethods {
   /**
    * Creates an HTTP link for an invoice that can be shared in messages or buttons.
    *
-   * @param options - Invoice options without `chat_id`.
+   * @param options - Invoice link parameters matching the documented createInvoiceLink set (no `chat_id`).
    * @returns The created invoice link as a string.
    * @throws {@link TelegramApiError} When link creation fails.
    *
@@ -60,8 +63,10 @@ export abstract class PaymentMethods extends StickerMethods {
    *   prices: [{ label: "Stars", amount: 50 }],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#createinvoicelink Telegram Bot API: createInvoiceLink}
    */
-  public async createInvoiceLink(options: Omit<SendInvoiceOptions, "chat_id">): Promise<string> {
+  public async createInvoiceLink(options: CreateInvoiceLinkOptions): Promise<string> {
     return this.request<string>("createInvoiceLink", options as unknown as Record<string, unknown>);
   }
 
@@ -82,6 +87,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   ],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answershippingquery Telegram Bot API: answerShippingQuery}
    */
   public async answerShippingQuery(options: AnswerShippingQueryOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -104,6 +111,8 @@ export abstract class PaymentMethods extends StickerMethods {
    *   ok: true,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#answerprecheckoutquery Telegram Bot API: answerPreCheckoutQuery}
    */
   public async answerPreCheckoutQuery(options: AnswerPreCheckoutQueryOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -124,6 +133,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```ts
    * await bot.refundStarPayment(123456, "tx_charge_123");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#refundstarpayment Telegram Bot API: refundStarPayment}
    */
   public async refundStarPayment(
     userId: number,
@@ -148,6 +159,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * const txs = await bot.getStarTransactions(0, 20);
    * console.log(`Total transactions returned: ${txs.transactions.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getstartransactions Telegram Bot API: getStarTransactions}
    */
   public async getStarTransactions(offset?: number, limit?: number): Promise<StarTransactions> {
     const payload: Record<string, unknown> = {};
@@ -169,6 +182,8 @@ export abstract class PaymentMethods extends StickerMethods {
    * ```ts
    * await bot.editUserStarSubscription(123456, "sub_charge_123", true);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#edituserstarsubscription Telegram Bot API: editUserStarSubscription}
    */
   public async editUserStarSubscription(
     userId: number,
@@ -193,13 +208,15 @@ export abstract class PaymentMethods extends StickerMethods {
    * const balance = await bot.getMyStarBalance();
    * console.log(`Current Stars: ${balance.amount}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmystarbalance Telegram Bot API: getMyStarBalance}
    */
   public async getMyStarBalance(): Promise<StarAmount> {
     return this.request<StarAmount>("getMyStarBalance");
   }
 
   /**
-   * Returns the list of gifts that can be sent by the bot to users.
+   * Returns the list of gifts that can be sent by the bot to users and channel chats.
    *
    * @returns A {@link Gifts} object containing the available gifts.
    * @throws {@link TelegramApiError} When retrieving gifts fails.
@@ -209,16 +226,19 @@ export abstract class PaymentMethods extends StickerMethods {
    * const gifts = await bot.getAvailableGifts();
    * console.log(`Available gifts count: ${gifts.gifts.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getavailablegifts Telegram Bot API: getAvailableGifts}
    */
   public async getAvailableGifts(): Promise<Gifts> {
     return this.request<Gifts>("getAvailableGifts");
   }
 
   /**
-   * Sends a gift to the given user.
+   * Sends a gift to the given user or channel chat.
    *
-   * @param options - Options including `user_id`, `gift_id`, and optional message `text`, `text_parse_mode`, `text_entities`, and `pay_for_upgrade`.
+   * @param options - Options including `gift_id` and either `user_id` or `chat_id`, plus optional message `text`, `text_parse_mode`, `text_entities` and `pay_for_upgrade`.
    * @returns `true` on success.
+   * @remarks Exactly one of `user_id` and `chat_id` must be provided. The gift can't be converted to Telegram Stars by the receiver.
    * @throws {@link TelegramApiError} When sending gift fails.
    *
    * @example
@@ -230,6 +250,14 @@ export abstract class PaymentMethods extends StickerMethods {
    *   pay_for_upgrade: true,
    * });
    * ```
+   *
+   * @example
+   * ```ts
+   * // Send to a channel chat instead of a user
+   * await bot.sendGift({ chat_id: "@my_channel", gift_id: "gift_abc123" });
+   * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendgift Telegram Bot API: sendGift}
    */
   public async sendGift(options: SendGiftOptions): Promise<boolean> {
     return this.request<boolean>("sendGift", options as unknown as Record<string, unknown>);

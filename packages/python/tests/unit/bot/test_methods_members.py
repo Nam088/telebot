@@ -8,7 +8,12 @@ import httpx
 import pytest
 
 from telebot_py.bot.errors import TelegramApiError
-from telebot_py.types import ChatMember
+from telebot_py.types import (
+    ChatBoostSourceGiftCode,
+    ChatBoostSourcePremium,
+    ChatMember,
+    UserChatBoosts,
+)
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 
@@ -123,6 +128,59 @@ class TestChatJoinRequests:
         assert await bot.decline_chat_join_request("@my_channel", 42)
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/declineChatJoinRequest"
         assert sent_payload(seen[0]) == {"chat_id": "@my_channel", "user_id": 42}
+
+
+class TestGetUserChatBoosts:
+    async def test_returns_typed_boosts(
+        self, bot_transport: Any, ok_response: Any, make_user: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        result = {
+            "boosts": [
+                {
+                    "boost_id": "boost-1",
+                    "add_date": 1_700_000_000,
+                    "expiration_date": 1_702_592_000,
+                    "source": {"source": "premium", "user": make_user(id=42)},
+                },
+                {
+                    "boost_id": "boost-2",
+                    "add_date": 1_700_000_100,
+                    "expiration_date": 1_702_592_100,
+                    "source": {"source": "gift_code", "user": make_user(id=43)},
+                },
+            ]
+        }
+        step = record_into(ok_response(result), seen)
+        bot = make_bot(bot_transport, step)
+        boosts = await bot.get_user_chat_boosts(-100, 42)
+        assert isinstance(boosts, UserChatBoosts)
+        assert len(boosts.boosts) == 2
+        assert boosts.boosts[0].boost_id == "boost-1"
+        assert isinstance(boosts.boosts[0].source, ChatBoostSourcePremium)
+        assert boosts.boosts[0].source.user.first_name == "Alice"
+        assert isinstance(boosts.boosts[1].source, ChatBoostSourceGiftCode)
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getUserChatBoosts"
+        assert sent_payload(seen[0]) == {"chat_id": -100, "user_id": 42}
+
+
+class TestSetChatMemberTag:
+    async def test_sets_tag(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_chat_member_tag(-100, 42, "VIP") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setChatMemberTag"
+        assert sent_payload(seen[0]) == {"chat_id": -100, "user_id": 42, "tag": "VIP"}
+
+    async def test_omits_unset_tag(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_chat_member_tag(-100, 42) is True
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": -100, "user_id": 42}
+        assert "tag" not in payload
 
 
 class TestMembersApiError:

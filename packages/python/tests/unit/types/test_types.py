@@ -14,10 +14,12 @@ from telebot_py.types import (
     InlineQuery,
     Message,
     PreCheckoutQuery,
+    ReplyParameters,
     Update,
     User,
 )
 from telebot_py.types.base import TypeParseError
+from telebot_py.types.common import MessageEntity
 
 
 class TestUser:
@@ -280,3 +282,65 @@ class TestUpdate:
         update = Update(update_id=5, my_chat_member=updated)
         assert update.effective_user is updated.from_user
         assert update.effective_chat is updated.chat
+
+
+class TestReplyParameters:
+    """ReplyParameters matches the Bot API field list and serializes snake_case."""
+
+    def test_field_names_match_documentation(self) -> None:
+        assert [field.name for field in dataclasses.fields(ReplyParameters)] == [
+            "chat_id",
+            "message_id",
+            "allow_sending_without_reply",
+            "quote",
+            "quote_parse_mode",
+            "quote_entities",
+            "quote_position",
+            "checklist_task_id",
+            "poll_option_id",
+            "ephemeral_message_id",
+        ]
+
+    def test_every_field_is_optional(self) -> None:
+        assert ReplyParameters().to_dict() == {}
+
+    def test_serializes_snake_case_and_omits_none(self) -> None:
+        params = ReplyParameters(
+            chat_id=-100_500,
+            message_id=5,
+            quote="hi",
+            quote_position=0,
+            checklist_task_id=9,
+            poll_option_id="2",
+            ephemeral_message_id=11,
+        )
+        assert params.to_dict() == {
+            "chat_id": -100_500,
+            "message_id": 5,
+            "quote": "hi",
+            "quote_position": 0,
+            "checklist_task_id": 9,
+            "poll_option_id": "2",
+            "ephemeral_message_id": 11,
+        }
+
+    def test_hydrates_nested_quote_entities(self) -> None:
+        params = ReplyParameters.from_dict(
+            {
+                "message_id": 5,
+                "quote_entities": [{"type": "bold", "offset": 0, "length": 2}],
+                "quote_parse_mode": "HTML",
+            }
+        )
+        assert params.message_id == 5
+        assert params.quote_parse_mode == "HTML"
+        assert isinstance(params.quote_entities, list)
+        assert params.quote_entities[0] == MessageEntity(type="bold", offset=0, length=2)
+
+    def test_round_trip(self) -> None:
+        data = {
+            "message_id": 5,
+            "allow_sending_without_reply": True,
+            "quote_entities": [{"type": "bold", "offset": 0, "length": 2}],
+        }
+        assert ReplyParameters.from_dict(data).to_dict() == data

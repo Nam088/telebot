@@ -22,6 +22,8 @@ class MaskPosition(TelegramObject):
         y_shift: Shift by Y-axis measured in heights of the mask scaled to the
             face size, from top to bottom.
         scale: Mask scaling coefficient.
+
+    Telegram API: https://core.telegram.org/bots/api#maskposition
     """
 
     point: str
@@ -57,6 +59,8 @@ class Sticker(TelegramObject):
         needs_repainting: Whether the sticker must be repainted to a text
             color in messages.
         file_size: File size in bytes.
+
+    Telegram API: https://core.telegram.org/bots/api#sticker
     """
 
     file_id: str
@@ -87,6 +91,8 @@ class StickerSet(TelegramObject):
             ``regular``, ``mask``, ``custom_emoji``.
         stickers: List of all stickers in the set.
         thumbnail: Sticker set thumbnail in the .WEBP, .TGS, or .WEBM format.
+
+    Telegram API: https://core.telegram.org/bots/api#stickerset
     """
 
     name: str
@@ -114,6 +120,8 @@ class InputSticker(TelegramObject):
         keywords: List of 0-20 search keywords for the sticker with total
             length up to 64 characters; for ``regular`` and ``custom_emoji``
             stickers only.
+
+    Telegram API: https://core.telegram.org/bots/api#inputsticker
     """
 
     sticker: str | t.Mapping[str, object]

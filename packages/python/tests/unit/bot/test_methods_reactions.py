@@ -67,33 +67,69 @@ class TestSetMessageReaction:
 
 
 class TestDeleteMessageReaction:
-    async def test_sends_empty_reaction_list(self, bot_transport: Any, ok_response: Any) -> None:
+    async def test_calls_dedicated_endpoint(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        ok = await bot.delete_message_reaction(1, 7, is_big=True)
+        ok = await bot.delete_message_reaction(1, 7)
         assert ok is True
-        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setMessageReaction"
-        assert sent_payload(seen[0]) == {
-            "chat_id": 1,
-            "message_id": 7,
-            "reaction": [],
-            "is_big": True,
-        }
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/deleteMessageReaction"
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": 1, "message_id": 7}
+        assert "reaction" not in payload
+        assert "is_big" not in payload
 
-
-class TestDeleteAllMessageReactions:
-    async def test_sends_empty_reaction_list_without_is_big(
+    async def test_forwards_optional_user_and_actor_chat(
         self, bot_transport: Any, ok_response: Any
     ) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response(True), seen)
         bot = make_bot(bot_transport, step)
-        ok = await bot.delete_all_message_reactions("@channel", 7)
+        ok = await bot.delete_message_reaction("@supergroup", 7, user_id=42, actor_chat_id=-10099)
         assert ok is True
+        assert sent_payload(seen[0]) == {
+            "chat_id": "@supergroup",
+            "message_id": 7,
+            "user_id": 42,
+            "actor_chat_id": -10099,
+        }
+
+    async def test_rejects_is_big(self, bot_transport: Any, ok_response: Any) -> None:
+        """is_big only exists on setMessageReaction."""
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(TypeError):
+            await bot.delete_message_reaction(1, 7, is_big=True)
+
+
+class TestDeleteAllMessageReactions:
+    async def test_calls_dedicated_endpoint_without_message_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        ok = await bot.delete_all_message_reactions("@channel")
+        assert ok is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/deleteAllMessageReactions"
         payload = sent_payload(seen[0])
-        assert payload == {"chat_id": "@channel", "message_id": 7, "reaction": []}
-        assert "is_big" not in payload
+        assert payload == {"chat_id": "@channel"}
+        assert "message_id" not in payload
+        assert "reaction" not in payload
+
+    async def test_forwards_optional_user_and_actor_chat(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        ok = await bot.delete_all_message_reactions(1, user_id=42)
+        assert ok is True
+        assert sent_payload(seen[0]) == {"chat_id": 1, "user_id": 42}
+
+    async def test_rejects_is_big(self, bot_transport: Any, ok_response: Any) -> None:
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(TypeError):
+            await bot.delete_all_message_reactions(1, is_big=True)
 
 
 class TestReactionApiError:

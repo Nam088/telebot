@@ -94,3 +94,101 @@ class TestRevokeChatInviteLink:
             "chat_id": 1,
             "invite_link": "https://t.me/join/old",
         }
+
+
+class TestChatSubscriptionInviteLink:
+    async def test_creates_subscription_link(
+        self, bot_transport: Any, ok_response: Any, make_user: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        result = {
+            "invite_link": "https://t.me/join/sub",
+            "creator": make_user(),
+            "creates_join_request": False,
+            "is_primary": False,
+            "is_revoked": False,
+            "name": "VIP",
+            "subscription_period": 2_592_000,
+            "subscription_price": 50,
+        }
+        step = record_into(ok_response(result), seen)
+        bot = make_bot(bot_transport, step)
+        link = await bot.create_chat_subscription_invite_link(-100, 2_592_000, 50, name="VIP")
+        assert isinstance(link, ChatInviteLink)
+        assert link.subscription_period == 2_592_000
+        assert link.subscription_price == 50
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/createChatSubscriptionInviteLink"
+        assert sent_payload(seen[0]) == {
+            "chat_id": -100,
+            "subscription_period": 2_592_000,
+            "subscription_price": 50,
+            "name": "VIP",
+        }
+
+    async def test_create_omits_unset_name(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        result = {
+            "invite_link": "https://t.me/join/sub",
+            "creator": {"id": 1, "is_bot": True, "first_name": "Bot"},
+            "creates_join_request": False,
+            "is_primary": False,
+            "is_revoked": False,
+        }
+        step = record_into(ok_response(result), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.create_chat_subscription_invite_link(-100, 2_592_000, 50)
+        payload = sent_payload(seen[0])
+        assert payload == {
+            "chat_id": -100,
+            "subscription_period": 2_592_000,
+            "subscription_price": 50,
+        }
+        assert "name" not in payload
+
+    async def test_edits_subscription_link_name(
+        self, bot_transport: Any, ok_response: Any, make_user: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        result = {
+            "invite_link": "https://t.me/join/sub",
+            "creator": make_user(),
+            "creates_join_request": False,
+            "is_primary": False,
+            "is_revoked": False,
+            "name": "Renamed",
+        }
+        step = record_into(ok_response(result), seen)
+        bot = make_bot(bot_transport, step)
+        link = await bot.edit_chat_subscription_invite_link(
+            -100, "https://t.me/join/sub", name="Renamed"
+        )
+        assert link.name == "Renamed"
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/editChatSubscriptionInviteLink"
+        assert sent_payload(seen[0]) == {
+            "chat_id": -100,
+            "invite_link": "https://t.me/join/sub",
+            "name": "Renamed",
+        }
+
+    async def test_edit_omits_unset_name(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        result = {
+            "invite_link": "https://t.me/join/sub",
+            "creator": {"id": 1, "is_bot": True, "first_name": "Bot"},
+            "creates_join_request": False,
+            "is_primary": False,
+            "is_revoked": False,
+        }
+        step = record_into(ok_response(result), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.edit_chat_subscription_invite_link(-100, "https://t.me/join/sub")
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": -100, "invite_link": "https://t.me/join/sub"}
+        assert "name" not in payload
+
+    async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: subscription period invalid"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.create_chat_subscription_invite_link(1, 10, 50)
+        assert excinfo.value.error_code == 400

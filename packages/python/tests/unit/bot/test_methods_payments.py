@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 
-from telebot_py.types import Message, StarTransactions
+from telebot_py.bot.errors import TelegramApiError
+from telebot_py.types import Message, StarAmount, StarTransactions
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 PRICES = [{"label": "base", "amount": 100}]
@@ -146,3 +148,61 @@ class TestEditUserStarSubscription:
             "telegram_payment_charge_id": "charge-1",
             "is_canceled": True,
         }
+
+
+class TestGetMyStarBalance:
+    async def test_returns_typed_star_amount(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response({"amount": 1000, "nanostar_amount": 5}), seen)
+        bot = make_bot(bot_transport, step)
+        balance = await bot.get_my_star_balance()
+        assert isinstance(balance, StarAmount)
+        assert balance.amount == 1000
+        assert balance.nanostar_amount == 5
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getMyStarBalance"
+        assert sent_payload(seen[0]) == {}
+
+    async def test_omits_missing_nanostar_amount(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        step = record_into(ok_response({"amount": 0}), [])
+        bot = make_bot(bot_transport, step)
+        balance = await bot.get_my_star_balance()
+        assert balance.amount == 0
+        assert balance.nanostar_amount is None
+
+    async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
+        step = record_into(error_response(401, 401, "Unauthorized"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.get_my_star_balance()
+        assert excinfo.value.error_code == 401
+
+
+class TestCreateInvoiceLinkBusinessConnectionId:
+    """createInvoiceLink accepts business_connection_id (Bot API docs)."""
+
+    async def test_serializes_business_connection_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response("https://t.me/invoice/x"), seen))
+        link = await bot.create_invoice_link(
+            "Coffee", "A fine coffee", "order-1", "XTR", PRICES, business_connection_id="bc1"
+        )
+        assert link == "https://t.me/invoice/x"
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/createInvoiceLink"
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "title": "Coffee",
+            "description": "A fine coffee",
+            "payload": "order-1",
+            "currency": "XTR",
+            "prices": PRICES,
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response("https://t.me/invoice/x"), seen))
+        await bot.create_invoice_link("Coffee", "A fine coffee", "order-1", "XTR", PRICES)
+        assert "business_connection_id" not in sent_payload(seen[0])

@@ -6,23 +6,31 @@ import dataclasses
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.chat import Chat
+from telebot_py.types.checklists import Checklist
 from telebot_py.types.common import (
     Contact,
     Dice,
+    LinkPreviewOptions,
     Location,
     MessageEntity,
-    Poll,
     Venue,
 )
+from telebot_py.types.games import Game
+from telebot_py.types.giveaway_types import Giveaway, GiveawayWinners
 from telebot_py.types.media import (
     Animation,
     Audio,
     Document,
+    LivePhoto,
     PhotoSize,
     Video,
     VideoNote,
     Voice,
 )
+from telebot_py.types.paid_media import PaidMediaInfo
+from telebot_py.types.payments import Invoice
+from telebot_py.types.poll_types import Poll
+from telebot_py.types.stickers import Sticker
 from telebot_py.types.user import User
 
 
@@ -33,6 +41,8 @@ class Story(TelegramObject):
     Attributes:
         chat: Chat that posted the story.
         id: Unique identifier of the story in the chat.
+
+    Telegram API: https://core.telegram.org/bots/api#story
     """
 
     chat: Chat
@@ -47,6 +57,8 @@ class MessageOriginUser(TelegramObject):
         type: Type of the message origin, always 'user'.
         date: Date the message was sent originally in Unix time.
         sender_user: User that sent the message originally.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginuser
     """
 
     type: str
@@ -64,6 +76,8 @@ class MessageOriginHiddenUser(TelegramObject):
         type: Type of the message origin, always 'hidden_user'.
         date: Date the message was sent originally in Unix time.
         sender_user_name: Name of the user that sent the message originally.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginhiddenuser
     """
 
     type: str
@@ -83,6 +97,8 @@ class MessageOriginChat(TelegramObject):
         sender_chat: Chat that sent the message originally.
         author_signature: For messages originally sent by an anonymous chat
             administrator, the original message author signature.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginchat
     """
 
     type: str
@@ -103,6 +119,8 @@ class MessageOriginChannel(TelegramObject):
         chat: Channel chat to which the message was originally sent.
         message_id: Identifier of the original message in the channel.
         author_signature: Signature of the original post author, if present.
+
+    Telegram API: https://core.telegram.org/bots/api#messageoriginchannel
     """
 
     type: str
@@ -124,6 +142,8 @@ class TextQuote(TelegramObject):
             UTF-16 code units.
         entities: Special entities that appear in the quote.
         is_manual: Whether the quote was chosen manually by the sender.
+
+    Telegram API: https://core.telegram.org/bots/api#textquote
     """
 
     text: str
@@ -141,51 +161,58 @@ class ExternalReplyInfo(TelegramObject):
         chat: Chat the original message belongs to.
         message_id: Unique message identifier inside the original chat.
         link_preview_options: Options used for link preview generation for
-            the original message (kept raw per node typing).
+            the original message, if it is a text message and includes entity
+            links.
         animation: The message is an animation, information about it.
         audio: The message is an audio file, information about the file.
         document: The message is a general file, information about the file.
+        live_photo: The message is a live photo, information about it.
+        paid_media: The message contains paid media, information about it.
         photo: The message is a photo, available sizes of the photo.
-        sticker: The message is a sticker (node Sticker is out of scope here,
-            so the payload stays raw).
+        sticker: The message is a sticker, information about it.
         story: The message is a forwarded story, information about the story.
         video: The message is a video, information about the video.
         video_note: The message is a video note, information about it.
         voice: The message is a voice message, information about the file.
         has_media_spoiler: Whether the message media is covered by a spoiler
             animation.
+        checklist: The message is a checklist, information about it.
         contact: The message is a shared contact, information about it.
         dice: The message is a dice with random value.
-        game: The message is a game (kept raw per node scope).
-        giveaway: The message is a scheduled giveaway (kept raw).
-        giveaway_winners: A giveaway with public winners was completed
-            (kept raw).
-        invoice: The message is an invoice for a payment (kept raw).
+        game: The message is a game, information about it.
+        giveaway: The message is a scheduled giveaway, information about it.
+        giveaway_winners: A giveaway with public winners was completed.
+        invoice: The message is an invoice for a payment.
         location: The message is a shared location, information about it.
         poll: The message is a native poll, information about the poll.
         venue: The message is a venue, information about the venue.
+
+    Telegram API: https://core.telegram.org/bots/api#externalreplyinfo
     """
 
     origin: MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel
     chat: Chat | None = None
     message_id: int | None = None
-    link_preview_options: object | None = None
+    link_preview_options: LinkPreviewOptions | None = None
     animation: Animation | None = None
     audio: Audio | None = None
     document: Document | None = None
+    live_photo: LivePhoto | None = None
+    paid_media: PaidMediaInfo | None = None
     photo: list[PhotoSize] | None = None
-    sticker: object | None = None
+    sticker: Sticker | None = None
     story: Story | None = None
     video: Video | None = None
     video_note: VideoNote | None = None
     voice: Voice | None = None
     has_media_spoiler: bool | None = None
+    checklist: Checklist | None = None
     contact: Contact | None = None
     dice: Dice | None = None
-    game: object | None = None
-    giveaway: object | None = None
-    giveaway_winners: object | None = None
-    invoice: object | None = None
+    game: Game | None = None
+    giveaway: Giveaway | None = None
+    giveaway_winners: GiveawayWinners | None = None
+    invoice: Invoice | None = None
     location: Location | None = None
     poll: Poll | None = None
     venue: Venue | None = None
@@ -199,6 +226,8 @@ class WebAppData(TelegramObject):
         data: The data. Be aware that a bad client can send arbitrary data.
         button_text: Text of the web_app keyboard button from which the Web
             App was opened.
+
+    Telegram API: https://core.telegram.org/bots/api#webappdata
     """
 
     data: str
@@ -213,13 +242,18 @@ class PollAnswer(TelegramObject):
         poll_id: Unique poll identifier.
         option_ids: 0-based identifiers of chosen answer options; may be
             empty if the user retracted their vote.
+        option_persistent_ids: Persistent identifiers of chosen answer
+            options; may be empty if the user retracted their vote.
         voter_chat: The chat that changed the answer to the poll, if the
             voter is anonymous.
         user: The user who changed the answer to the poll, if not anonymous.
+
+    Telegram API: https://core.telegram.org/bots/api#pollanswer
     """
 
     poll_id: str
     option_ids: list[int]
+    option_persistent_ids: list[str]
     voter_chat: Chat | None = None
     user: User | None = None
 
@@ -231,6 +265,8 @@ class SentWebAppMessage(TelegramObject):
     Attributes:
         inline_message_id: Identifier of the sent inline message, available
             only if there is an inline message attached to the Web App.
+
+    Telegram API: https://core.telegram.org/bots/api#sentwebappmessage
     """
 
     inline_message_id: str | None = None
@@ -244,7 +280,97 @@ class PreparedInlineMessage(TelegramObject):
         id: Unique identifier of the prepared message.
         expiration_date: Expiration date of the prepared message, in Unix
             time. Expired prepared messages can no longer be used.
+
+    Telegram API: https://core.telegram.org/bots/api#preparedinlinemessage
     """
 
     id: str
     expiration_date: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class SentGuestMessage(TelegramObject):
+    """An inline message sent by a guest bot in reply to a guest query.
+
+    Attributes:
+        inline_message_id: Identifier of the sent inline message, available
+            only if there is an inline message attached to the guest query.
+
+    Telegram API: https://core.telegram.org/bots/api#sentguestmessage
+    """
+
+    inline_message_id: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class ReplyParameters(TelegramObject):
+    """Describes a message reply to apply.
+
+    Every field is optional on the wire; unset fields are omitted by
+    ``to_dict``, so ``ReplyParameters(message_id=5)`` serializes to exactly
+    ``{"message_id": 5}``.
+
+    Attributes:
+        chat_id: Unique identifier of the chat the message to reply to belongs
+            to; omit when the message to reply to is in the current chat.
+        message_id: Identifier of the message that will be replied to in the
+            current chat, or in ``chat_id`` if it is specified.
+        allow_sending_without_reply: Whether the message should be sent even if
+            the specified replied-to message is not found.
+        quote: Quoted part of the message to be replied to, 0-1024 characters
+            after entities parsing.
+        quote_parse_mode: Parse mode for the entities in the quote.
+        quote_entities: Special entities that appear in the quote, which can be
+            specified instead of ``quote_parse_mode``.
+        quote_position: Position of the quote in the original message in UTF-16
+            code units.
+        checklist_task_id: Identifier of the specific checklist item that the
+            message is replying to, relative to the first item in the checklist
+            in the replied message.
+        poll_option_id: Identifier of the specific answer option in the poll
+            that the message is replying to.
+        ephemeral_message_id: Identifier of the ephemeral message that will be
+            replied to, with an expiration date of at least 1 hour from now and
+            no more than 366 days from now. Ignored for messages having
+            ``chat_id``.
+
+    Telegram API: https://core.telegram.org/bots/api#replyparameters
+    """
+
+    chat_id: int | str | None = None
+    message_id: int | None = None
+    allow_sending_without_reply: bool | None = None
+    quote: str | None = None
+    quote_parse_mode: str | None = None
+    quote_entities: list[MessageEntity] | None = None
+    quote_position: int | None = None
+    checklist_task_id: int | None = None
+    poll_option_id: str | None = None
+    ephemeral_message_id: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class EphemeralMessageParameters(TelegramObject):
+    """Parameters for sending an ephemeral message to a specific user.
+
+    Accepted by the ``ephemeral_message_parameters`` argument of the Bot API
+    ``send*`` methods, which take any ``to_dict`` object. The message is
+    visible to the receiver only and disappears automatically after 1 hour by
+    default.
+
+    Attributes:
+        receiver_user_id: Identifier of the user who will receive the message.
+            It is not guaranteed that the user will receive the message,
+            especially if they are offline.
+        callback_query_id: Identifier of the callback query which triggered the
+            message, if any.
+        replace_callback_query_message: Pass True if the ephemeral message must
+            be shown in place of the original message. Must be False for
+            callback queries from ephemeral messages.
+
+    Telegram API: https://core.telegram.org/bots/api#ephemeralmessageparameters
+    """
+
+    receiver_user_id: int
+    callback_query_id: str | None = None
+    replace_callback_query_message: bool | None = None

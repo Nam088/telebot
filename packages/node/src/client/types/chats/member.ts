@@ -4,6 +4,8 @@ import type { ChatBoost } from "../business/index.js";
 
 /**
  * Represents a physical location to which a supergroup is connected.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatlocation Telegram Bot API: ChatLocation}
  */
 export interface ChatLocation {
   /** The physical location to which the supergroup is connected. */
@@ -14,6 +16,8 @@ export interface ChatLocation {
 
 /**
  * Represents an invite link for a chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatinvitelink Telegram Bot API: ChatInviteLink}
  */
 export interface ChatInviteLink {
   /** The invite link as a string. */
@@ -42,6 +46,8 @@ export interface ChatInviteLink {
 
 /**
  * Represents changes in the status of a chat member.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatmemberupdated Telegram Bot API: ChatMemberUpdated}
  */
 export interface ChatMemberUpdated {
   /** Chat, which member status was updated. */
@@ -64,6 +70,8 @@ export interface ChatMemberUpdated {
 
 /**
  * Contains information about one member of a chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatmember Telegram Bot API: ChatMember}
  */
 export interface ChatMember {
   /** The member's status in the chat ('creator', 'administrator', 'member', 'restricted', 'left', or 'kicked'). */
@@ -112,6 +120,8 @@ export interface ChatMember {
 
 /**
  * Represents a chat member that has some additional privileges.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatmemberadministrator Telegram Bot API: ChatMemberAdministrator}
  */
 export interface ChatMemberAdministrator {
   /** The member's status in the chat, always 'administrator'. */
@@ -162,6 +172,8 @@ export interface ChatMemberAdministrator {
 
 /**
  * Represents a join request sent to a chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#chatjoinrequest Telegram Bot API: ChatJoinRequest}
  */
 export interface ChatJoinRequest {
   /** Chat to which the request was sent. */
@@ -176,10 +188,14 @@ export interface ChatJoinRequest {
   bio?: string;
   /** Chat invite link that was used by the user to send the join request. */
   invite_link?: ChatInviteLink;
+  /** Identifier of the join request query; for bots assigned to process join requests only. */
+  query_id?: string;
 }
 
 /**
  * Represents a list of boosts added to a chat by a user.
+ *
+ * @see {@link https://core.telegram.org/bots/api#userchatboosts Telegram Bot API: UserChatBoosts}
  */
 export interface UserChatBoosts {
   /** The list of boosts added to the chat by the user. */

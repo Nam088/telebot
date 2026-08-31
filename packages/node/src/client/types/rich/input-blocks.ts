@@ -5,30 +5,35 @@ import type {
   InputMediaDocument,
   InputMediaPhoto,
   InputMediaVideo,
+  MessageEntity,
 } from "../messages/index.js";
 import type { RichText, RichMessageButton } from "./text.js";
 import type { RichBlockCaption, RichBlockTableCell } from "./received-blocks.js";
 
 /**
  * Voice note media object to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediavoicenote Telegram Bot API: InputMediaVoiceNote}
  */
 export interface InputMediaVoiceNote {
-  /** Type of the result, always 'voice'. */
-  type: "voice";
+  /** Type of the media, must be 'voice_note'. */
+  type: "voice_note";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
   media: string;
   /** Caption of the voice note to be sent, 0-1024 characters. */
   caption?: string;
   /** Mode for parsing entities in the voice note caption. */
   parse_mode?: string;
-  /** Special entities that appear in the caption. */
-  caption_entities?: unknown[];
+  /** A list of special entities that appear in the caption. */
+  caption_entities?: MessageEntity[];
   /** Duration of the voice note in seconds. */
   duration?: number;
 }
 
 /**
  * An item of a list to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblocklistitem Telegram Bot API: InputRichBlockListItem}
  */
 export interface InputRichBlockListItem {
   /** The content of the item. */
@@ -45,6 +50,8 @@ export interface InputRichBlockListItem {
 
 /**
  * A text paragraph block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockparagraph Telegram Bot API: InputRichBlockParagraph}
  */
 export interface InputRichBlockParagraph {
   /** Type of the block, always 'paragraph'. */
@@ -55,6 +62,8 @@ export interface InputRichBlockParagraph {
 
 /**
  * A section heading block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblocksectionheading Telegram Bot API: InputRichBlockSectionHeading}
  */
 export interface InputRichBlockSectionHeading {
   /** Type of the block, always 'heading'. */
@@ -67,6 +76,8 @@ export interface InputRichBlockSectionHeading {
 
 /**
  * A preformatted text block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockpreformatted Telegram Bot API: InputRichBlockPreformatted}
  */
 export interface InputRichBlockPreformatted {
   /** Type of the block, always 'pre'. */
@@ -79,6 +90,8 @@ export interface InputRichBlockPreformatted {
 
 /**
  * A footer block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockfooter Telegram Bot API: InputRichBlockFooter}
  */
 export interface InputRichBlockFooter {
   /** Type of the block, always 'footer'. */
@@ -89,6 +102,8 @@ export interface InputRichBlockFooter {
 
 /**
  * A divider block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockdivider Telegram Bot API: InputRichBlockDivider}
  */
 export interface InputRichBlockDivider {
   /** Type of the block, always 'divider'. */
@@ -97,6 +112,8 @@ export interface InputRichBlockDivider {
 
 /**
  * A mathematical expression block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockmathematicalexpression Telegram Bot API: InputRichBlockMathematicalExpression}
  */
 export interface InputRichBlockMathematicalExpression {
   /** Type of the block, always 'mathematical_expression'. */
@@ -107,6 +124,8 @@ export interface InputRichBlockMathematicalExpression {
 
 /**
  * An anchor block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockanchor Telegram Bot API: InputRichBlockAnchor}
  */
 export interface InputRichBlockAnchor {
   /** Type of the block, always 'anchor'. */
@@ -117,6 +136,8 @@ export interface InputRichBlockAnchor {
 
 /**
  * A list of blocks to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblocklist Telegram Bot API: InputRichBlockList}
  */
 export interface InputRichBlockList {
   /** Type of the block, always 'list'. */
@@ -127,6 +148,8 @@ export interface InputRichBlockList {
 
 /**
  * A block quotation to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockblockquotation Telegram Bot API: InputRichBlockBlockQuotation}
  */
 export interface InputRichBlockBlockQuotation {
   /** Type of the block, always 'blockquote'. */
@@ -139,6 +162,8 @@ export interface InputRichBlockBlockQuotation {
 
 /**
  * An expandable block quotation to be sent (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockexpandableblockquotation Telegram Bot API: InputRichBlockExpandableBlockQuotation}
  */
 export interface InputRichBlockExpandableBlockQuotation {
   /** Type of the block, always 'expandable_blockquote'. */
@@ -151,6 +176,8 @@ export interface InputRichBlockExpandableBlockQuotation {
 
 /**
  * A pull quotation block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockpullquotation Telegram Bot API: InputRichBlockPullQuotation}
  */
 export interface InputRichBlockPullQuotation {
   /** Type of the block, always 'pullquote'. */
@@ -163,6 +190,8 @@ export interface InputRichBlockPullQuotation {
 
 /**
  * A collage block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockcollage Telegram Bot API: InputRichBlockCollage}
  */
 export interface InputRichBlockCollage {
   /** Type of the block, always 'collage'. */
@@ -175,6 +204,8 @@ export interface InputRichBlockCollage {
 
 /**
  * A slideshow block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockslideshow Telegram Bot API: InputRichBlockSlideshow}
  */
 export interface InputRichBlockSlideshow {
   /** Type of the block, always 'slideshow'. */
@@ -187,6 +218,8 @@ export interface InputRichBlockSlideshow {
 
 /**
  * A table block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblocktable Telegram Bot API: InputRichBlockTable}
  */
 export interface InputRichBlockTable {
   /** Type of the block, always 'table'. */
@@ -205,6 +238,8 @@ export interface InputRichBlockTable {
 
 /**
  * An expandable details block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockdetails Telegram Bot API: InputRichBlockDetails}
  */
 export interface InputRichBlockDetails {
   /** Type of the block, always 'details'. */
@@ -219,6 +254,8 @@ export interface InputRichBlockDetails {
 
 /**
  * A map block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockmap Telegram Bot API: InputRichBlockMap}
  */
 export interface InputRichBlockMap {
   /** Type of the block, always 'map'. */
@@ -237,6 +274,8 @@ export interface InputRichBlockMap {
 
 /**
  * A block containing buttons to send in one row (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockbuttons Telegram Bot API: InputRichBlockButtons}
  */
 export interface InputRichBlockButtons {
   /** Type of the block, always 'buttons'. */
@@ -249,6 +288,8 @@ export interface InputRichBlockButtons {
 
 /**
  * An animation media block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockanimation Telegram Bot API: InputRichBlockAnimation}
  */
 export interface InputRichBlockAnimation {
   /** Type of the block, always 'animation'. */
@@ -261,6 +302,8 @@ export interface InputRichBlockAnimation {
 
 /**
  * An audio media block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockaudio Telegram Bot API: InputRichBlockAudio}
  */
 export interface InputRichBlockAudio {
   /** Type of the block, always 'audio'. */
@@ -273,18 +316,26 @@ export interface InputRichBlockAudio {
 
 /**
  * A document file block to be sent (Bot API 10.3+).
+ *
+ * @remarks
+ * The docs type `document` as `InputMediaDocument` only — a bare `file_id` string is not a
+ * valid value, matching the sibling `photo`, `video`, `animation` and `audio` blocks.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockdocument Telegram Bot API: InputRichBlockDocument}
  */
 export interface InputRichBlockDocument {
   /** Type of the block, always 'document'. */
   type: "document";
   /** The document. Caption is ignored. */
-  document: InputMediaDocument | string;
+  document: InputMediaDocument;
   /** Caption of the block. */
   caption?: RichBlockCaption;
 }
 
 /**
  * A photo media block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockphoto Telegram Bot API: InputRichBlockPhoto}
  */
 export interface InputRichBlockPhoto {
   /** Type of the block, always 'photo'. */
@@ -297,6 +348,8 @@ export interface InputRichBlockPhoto {
 
 /**
  * A video media block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockvideo Telegram Bot API: InputRichBlockVideo}
  */
 export interface InputRichBlockVideo {
   /** Type of the block, always 'video'. */
@@ -309,6 +362,8 @@ export interface InputRichBlockVideo {
 
 /**
  * A voice note media block to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockvoicenote Telegram Bot API: InputRichBlockVoiceNote}
  */
 export interface InputRichBlockVoiceNote {
   /** Type of the block, always 'voice_note'. */
@@ -321,6 +376,8 @@ export interface InputRichBlockVoiceNote {
 
 /**
  * A thinking placeholder block to be sent in drafts.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblockthinking Telegram Bot API: InputRichBlockThinking}
  */
 export interface InputRichBlockThinking {
   /** Type of the block, always 'thinking'. */
@@ -331,6 +388,8 @@ export interface InputRichBlockThinking {
 
 /**
  * Union of outgoing rich block types.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputrichblock Telegram Bot API: InputRichBlock}
  */
 export type InputRichBlock =
   | InputRichBlockParagraph

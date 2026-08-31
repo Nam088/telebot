@@ -17,8 +17,8 @@ class BulkMixin(Requester):
         from_chat_id: int | str,
         message_ids: Sequence[int],
         *,
-        business_connection_id: str | None = None,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
     ) -> list[MessageId]:
@@ -33,8 +33,10 @@ class BulkMixin(Requester):
             from_chat_id: Unique identifier of the source chat or username of
                 the source channel.
             message_ids: Identifiers of the messages to forward, 1-100.
-            business_connection_id: Business connection on whose behalf to act.
             message_thread_id: Target message thread identifier.
+            direct_messages_topic_id: Unique identifier of the direct messages
+                topic to which the messages are forwarded, for a direct
+                messages chat.
             disable_notification: Send silently.
             protect_content: Protect the forwarded content from saving.
 
@@ -45,13 +47,15 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#forwardmessages
         """
         payload = clean_payload(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_ids=list(message_ids),
-            business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
         )
@@ -63,8 +67,8 @@ class BulkMixin(Requester):
         from_chat_id: int | str,
         message_ids: Sequence[int],
         *,
-        business_connection_id: str | None = None,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         remove_caption: bool | None = None,
@@ -80,8 +84,10 @@ class BulkMixin(Requester):
             from_chat_id: Unique identifier of the source chat or username of
                 the source channel.
             message_ids: Identifiers of the messages to copy, 1-100.
-            business_connection_id: Business connection on whose behalf to act.
             message_thread_id: Target message thread identifier.
+            direct_messages_topic_id: Unique identifier of the direct messages
+                topic to which the messages are copied, for a direct messages
+                chat.
             disable_notification: Send silently.
             protect_content: Protect the copied content from saving.
             remove_caption: Pass True to copy messages without their captions.
@@ -93,13 +99,15 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#copymessages
         """
         payload = clean_payload(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_ids=list(message_ids),
-            business_connection_id=business_connection_id,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
             remove_caption=remove_caption,
@@ -110,8 +118,6 @@ class BulkMixin(Requester):
         self,
         chat_id: int | str,
         message_ids: Sequence[int],
-        *,
-        business_connection_id: str | None = None,
     ) -> bool:
         """Delete multiple messages from a chat at once.
 
@@ -122,7 +128,6 @@ class BulkMixin(Requester):
             chat_id: Unique identifier for the target chat or username of the
                 target channel.
             message_ids: Identifiers of the messages to delete, 1-100.
-            business_connection_id: Business connection on whose behalf to act.
 
         Returns:
             True on success.
@@ -131,10 +136,11 @@ class BulkMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemessages
         """
         payload = clean_payload(
             chat_id=chat_id,
             message_ids=list(message_ids),
-            business_connection_id=business_connection_id,
         )
         return parse_flag(await self.request("deleteMessages", payload))

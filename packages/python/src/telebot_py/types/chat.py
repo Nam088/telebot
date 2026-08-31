@@ -7,6 +7,7 @@ import typing as t
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.common import Location
+from telebot_py.types.stickers import Sticker
 
 if t.TYPE_CHECKING:  # annotation-only; bound at runtime by message.py
     # The ``as Message`` alias documents this as an explicit re-export: the
@@ -26,6 +27,8 @@ class ChatPhoto(TelegramObject):
         small_file_unique_id: Unique file identifier of the small photo.
         big_file_id: File identifier of the big (640x640) chat photo.
         big_file_unique_id: Unique file identifier of the big photo.
+
+    Telegram API: https://core.telegram.org/bots/api#chatphoto
     """
 
     small_file_id: str
@@ -42,6 +45,8 @@ class Birthdate(TelegramObject):
         day: Day of the user's birth; 1-31.
         month: Month of the user's birth; 1-12.
         year: Year of the user's birth, when known.
+
+    Telegram API: https://core.telegram.org/bots/api#birthdate
     """
 
     day: int
@@ -56,13 +61,14 @@ class BusinessIntro(TelegramObject):
     Attributes:
         title: Title of the intro message.
         message: Text of the intro message.
-        sticker: Sticker of the intro message (node Sticker is out of scope
-            here, so the payload stays raw).
+        sticker: Sticker of the intro message.
+
+    Telegram API: https://core.telegram.org/bots/api#businessintro
     """
 
     title: str | None = None
     message: str | None = None
-    sticker: object | None = None
+    sticker: Sticker | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -72,6 +78,8 @@ class BusinessLocation(TelegramObject):
     Attributes:
         address: Address of the business.
         location: Location of the business, when available.
+
+    Telegram API: https://core.telegram.org/bots/api#businesslocation
     """
 
     address: str
@@ -87,6 +95,8 @@ class BusinessOpeningHoursInterval(TelegramObject):
             the business opens in UTC+0.
         closing_minute: The minute's sequence number in a week (1-10080) when
             the business closes in UTC+0.
+
+    Telegram API: https://core.telegram.org/bots/api#businessopeninghoursinterval
     """
 
     opening_minute: int
@@ -101,6 +111,8 @@ class BusinessOpeningHours(TelegramObject):
         time_zone_name: Unique name of the time zone.
         opening_hours: List of time intervals during which the business is
             open.
+
+    Telegram API: https://core.telegram.org/bots/api#businessopeninghours
     """
 
     time_zone_name: str
@@ -115,6 +127,8 @@ class ChatLocation(TelegramObject):
         location: The physical location to which the supergroup is connected.
         address: Location address; 1-64 characters, as defined by the chat
             owner.
+
+    Telegram API: https://core.telegram.org/bots/api#chatlocation
     """
 
     location: Location
@@ -141,12 +155,18 @@ class ChatPermissions(TelegramObject):
             stickers and use inline bots.
         can_add_web_page_previews: Whether the user may add web page previews
             to their messages.
+        can_react_to_messages: Whether the user may react to messages. If
+            omitted, defaults to the value of ``can_send_messages``.
+        can_edit_tag: Whether the user may edit their own tag. If omitted,
+            defaults to the value of ``can_change_info``.
         can_change_info: Whether the user may change the chat title, photo
             and other settings.
         can_invite_users: Whether the user may invite new users to the chat.
         can_pin_messages: Whether the user may pin messages.
         can_manage_topics: Whether the user may create, rename, close, and
             reopen forum topics.
+
+    Telegram API: https://core.telegram.org/bots/api#chatpermissions
     """
 
     can_send_messages: bool | None = None
@@ -159,6 +179,8 @@ class ChatPermissions(TelegramObject):
     can_send_polls: bool | None = None
     can_send_other_messages: bool | None = None
     can_add_web_page_previews: bool | None = None
+    can_react_to_messages: bool | None = None
+    can_edit_tag: bool | None = None
     can_change_info: bool | None = None
     can_invite_users: bool | None = None
     can_pin_messages: bool | None = None
@@ -207,6 +229,8 @@ class ChatAdministratorRights(TelegramObject):
             regular members.
         can_send_welcome_messages: Whether the administrator can manage chat
             welcome messages (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#chatadministratorrights
     """
 
     is_anonymous: bool
@@ -243,6 +267,8 @@ class Chat(TelegramObject):
         first_name: First name of the other party in a private chat.
         last_name: Last name of the other party in a private chat.
         is_forum: Whether the supergroup chat is a forum (topics enabled).
+        is_direct_messages: Whether the chat is the direct messages chat of a
+            channel.
         photo: Chat photo.
         active_usernames: If non-empty, the list of all active chat usernames.
         birthdate: For private chats, the date of birth of the user.
@@ -303,6 +329,8 @@ class Chat(TelegramObject):
             channels.
         location: For supergroups, the location to which the supergroup is
             connected.
+
+    Telegram API: https://core.telegram.org/bots/api#chat
     """
 
     id: int | str
@@ -312,6 +340,7 @@ class Chat(TelegramObject):
     first_name: str | None = None
     last_name: str | None = None
     is_forum: bool | None = None
+    is_direct_messages: bool | None = None
     photo: ChatPhoto | None = None
     active_usernames: list[str] | None = None
     birthdate: Birthdate | None = None

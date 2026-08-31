@@ -36,6 +36,8 @@ export abstract class StickerMethods extends ChatMethods {
    *   sticker: stickerFileId,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendsticker Telegram Bot API: sendSticker}
    */
   public async sendSticker(options: SendStickerOptions): Promise<Message> {
     return this.request<Message>("sendSticker", options as unknown as Record<string, unknown>);
@@ -53,6 +55,8 @@ export abstract class StickerMethods extends ChatMethods {
    * const set = await bot.getStickerSet("animals");
    * console.log(`Sticker set title: ${set.title}, stickers: ${set.stickers.length}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getstickerset Telegram Bot API: getStickerSet}
    */
   public async getStickerSet(name: string): Promise<StickerSet> {
     return this.request<StickerSet>("getStickerSet", { name });
@@ -69,6 +73,8 @@ export abstract class StickerMethods extends ChatMethods {
    * ```ts
    * const emojis = await bot.getCustomEmojiStickers(["5368324170671202286"]);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getcustomemojistickers Telegram Bot API: getCustomEmojiStickers}
    */
   public async getCustomEmojiStickers(customEmojiIds: string[]): Promise<Sticker[]> {
     return this.request<Sticker[]>("getCustomEmojiStickers", { custom_emoji_ids: customEmojiIds });
@@ -87,6 +93,8 @@ export abstract class StickerMethods extends ChatMethods {
    * ```ts
    * const file = await bot.uploadStickerFile(userId, stickerInputFile, "static");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#uploadstickerfile Telegram Bot API: uploadStickerFile}
    */
   public async uploadStickerFile(
     userId: number,
@@ -117,6 +125,8 @@ export abstract class StickerMethods extends ChatMethods {
    *   sticker_format: "static",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#createnewstickerset Telegram Bot API: createNewStickerSet}
    */
   public async createNewStickerSet(options: CreateNewStickerSetOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -131,6 +141,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param options - Options including `user_id`, `name`, and `sticker` descriptor.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When adding sticker fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#addstickertoset Telegram Bot API: addStickerToSet}
    */
   public async addStickerToSet(options: AddStickerToSetOptions): Promise<boolean> {
     return this.request<boolean>("addStickerToSet", options as unknown as Record<string, unknown>);
@@ -143,6 +155,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param position - New 0-based position of the sticker in the set.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When moving position fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickerpositioninset Telegram Bot API: setStickerPositionInSet}
    */
   public async setStickerPositionInSet(sticker: string, position: number): Promise<boolean> {
     return this.request<boolean>("setStickerPositionInSet", { sticker, position });
@@ -154,6 +168,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param sticker - File identifier of the sticker.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When deleting sticker fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletestickerfromset Telegram Bot API: deleteStickerFromSet}
    */
   public async deleteStickerFromSet(sticker: string): Promise<boolean> {
     return this.request<boolean>("deleteStickerFromSet", { sticker });
@@ -165,6 +181,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param name - Sticker set name.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When deleting set fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletestickerset Telegram Bot API: deleteStickerSet}
    */
   public async deleteStickerSet(name: string): Promise<boolean> {
     return this.request<boolean>("deleteStickerSet", { name });
@@ -176,6 +194,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param options - Options including `user_id`, `name`, `old_sticker`, and `sticker` descriptor.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When replacing sticker fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#replacestickerinset Telegram Bot API: replaceStickerInSet}
    */
   public async replaceStickerInSet(options: ReplaceStickerInSetOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -193,6 +213,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param thumbnail - Thumbnail file identifier, URL, or {@link InputFile}.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting thumbnail fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickersetthumbnail Telegram Bot API: setStickerSetThumbnail}
    */
   public async setStickerSetThumbnail(
     name: string,
@@ -217,6 +239,8 @@ export abstract class StickerMethods extends ChatMethods {
    * ```ts
    * await bot.setCustomEmojiStickerSetThumbnail("custom_emojis", "5368324170671202286");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setcustomemojistickersetthumbnail Telegram Bot API: setCustomEmojiStickerSetThumbnail}
    */
   public async setCustomEmojiStickerSetThumbnail(
     name: string,
@@ -239,6 +263,8 @@ export abstract class StickerMethods extends ChatMethods {
    * ```ts
    * await bot.setStickerSetTitle("my_pack", "My Awesome Sticker Pack");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickersettitle Telegram Bot API: setStickerSetTitle}
    */
   public async setStickerSetTitle(name: string, title: string): Promise<boolean> {
     return this.request<boolean>("setStickerSetTitle", { name, title });
@@ -251,6 +277,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param emojiList - List of 1-20 emoji associated with the sticker.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting emoji list fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickeremojilist Telegram Bot API: setStickerEmojiList}
    */
   public async setStickerEmojiList(sticker: string, emojiList: string[]): Promise<boolean> {
     return this.request<boolean>("setStickerEmojiList", { sticker, emoji_list: emojiList });
@@ -263,6 +291,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param keywords - List of 0-20 search keywords for the sticker.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting keywords fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickerkeywords Telegram Bot API: setStickerKeywords}
    */
   public async setStickerKeywords(sticker: string, keywords?: string[]): Promise<boolean> {
     const payload: Record<string, unknown> = { sticker };
@@ -277,6 +307,8 @@ export abstract class StickerMethods extends ChatMethods {
    * @param maskPosition - Object with the position where the mask should be placed.
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When setting mask position fails.
+   *
+   * @see {@link https://core.telegram.org/bots/api#setstickermaskposition Telegram Bot API: setStickerMaskPosition}
    */
   public async setStickerMaskPosition(
     sticker: string,

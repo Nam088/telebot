@@ -122,8 +122,8 @@ func TestReactions_SetMessageReaction_OmittedFields(t *testing.T) {
 
 func TestReactions_DeleteMessageReaction(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, "/setMessageReaction") {
-			t.Errorf("expected path to end with /setMessageReaction, got %s", r.URL.Path)
+		if !strings.HasSuffix(r.URL.Path, "/deleteMessageReaction") {
+			t.Errorf("expected path to end with /deleteMessageReaction, got %s", r.URL.Path)
 		}
 		var got map[string]json.RawMessage
 		if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
@@ -135,18 +135,26 @@ func TestReactions_DeleteMessageReaction(t *testing.T) {
 		if string(got["message_id"]) != `7` {
 			t.Errorf("unexpected message_id: %s", got["message_id"])
 		}
-		if string(got["reaction"]) != `[]` {
-			t.Errorf("expected empty reaction array, got %s", got["reaction"])
+		if string(got["user_id"]) != `42` {
+			t.Errorf("unexpected user_id: %s", got["user_id"])
 		}
-		if string(got["is_big"]) != `true` {
-			t.Errorf("expected is_big true, got %s", got["is_big"])
+		// reaction/is_big belong to setMessageReaction, not the real endpoint.
+		if raw, exists := got["reaction"]; exists {
+			t.Errorf("expected reaction to be absent, got %s", raw)
+		}
+		if raw, exists := got["is_big"]; exists {
+			t.Errorf("expected is_big to be absent, got %s", raw)
 		}
 		_ = json.NewEncoder(w).Encode(types.Response[bool]{Ok: true, Result: true})
 	}))
 	defer srv.Close()
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
 
-	ok, err := b.DeleteMessageReaction(context.Background(), int64(1), 7, true)
+	ok, err := b.DeleteMessageReaction(context.Background(), &types.DeleteMessageReactionOptions{
+		ChatID:    int64(1),
+		MessageID: 7,
+		UserID:    42,
+	})
 	if err != nil {
 		t.Fatalf("DeleteMessageReaction error: %v", err)
 	}
@@ -157,8 +165,8 @@ func TestReactions_DeleteMessageReaction(t *testing.T) {
 
 func TestReactions_DeleteAllMessageReactions(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, "/setMessageReaction") {
-			t.Errorf("expected path to end with /setMessageReaction, got %s", r.URL.Path)
+		if !strings.HasSuffix(r.URL.Path, "/deleteAllMessageReactions") {
+			t.Errorf("expected path to end with /deleteAllMessageReactions, got %s", r.URL.Path)
 		}
 		var got map[string]json.RawMessage
 		if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
@@ -167,18 +175,25 @@ func TestReactions_DeleteAllMessageReactions(t *testing.T) {
 		if string(got["chat_id"]) != `"@channel"` {
 			t.Errorf("unexpected chat_id: %s", got["chat_id"])
 		}
-		if string(got["reaction"]) != `[]` {
-			t.Errorf("expected empty reaction array, got %s", got["reaction"])
+		if string(got["user_id"]) != `42` {
+			t.Errorf("unexpected user_id: %s", got["user_id"])
 		}
-		if raw, exists := got["is_big"]; exists {
-			t.Errorf("expected is_big to be omitted, got %s", raw)
+		// deleteAllMessageReactions has no message_id per the Bot API.
+		if raw, exists := got["message_id"]; exists {
+			t.Errorf("expected message_id to be absent, got %s", raw)
+		}
+		if raw, exists := got["reaction"]; exists {
+			t.Errorf("expected reaction to be absent, got %s", raw)
 		}
 		_ = json.NewEncoder(w).Encode(types.Response[bool]{Ok: true, Result: true})
 	}))
 	defer srv.Close()
 	b := bot.NewBot("tok", bot.WithBaseURL(srv.URL))
 
-	ok, err := b.DeleteAllMessageReactions(context.Background(), "@channel", 7)
+	ok, err := b.DeleteAllMessageReactions(context.Background(), &types.DeleteAllMessageReactionsOptions{
+		ChatID: "@channel",
+		UserID: 42,
+	})
 	if err != nil {
 		t.Fatalf("DeleteAllMessageReactions error: %v", err)
 	}
@@ -205,11 +220,11 @@ func TestReactions_TelegramError(t *testing.T) {
 			return err
 		},
 		"DeleteMessageReaction": func() error {
-			_, err := b.DeleteMessageReaction(ctx, int64(1), 2, false)
+			_, err := b.DeleteMessageReaction(ctx, &types.DeleteMessageReactionOptions{ChatID: int64(1), MessageID: 2})
 			return err
 		},
 		"DeleteAllMessageReactions": func() error {
-			_, err := b.DeleteAllMessageReactions(ctx, int64(1), 2)
+			_, err := b.DeleteAllMessageReactions(ctx, &types.DeleteAllMessageReactionsOptions{ChatID: int64(1)})
 			return err
 		},
 	}

@@ -2,8 +2,9 @@ package inlinequery
 
 import "github.com/Nam088/telebot/packages/go/pkg/types"
 
-// InlineQueryResultPhoto represents a link to a photo
-// (Telegram's InlineQueryResultPhoto object).
+// InlineQueryResultPhoto represents a link to a photo.
+//
+// Telegram API: https://core.telegram.org/bots/api#inlinequeryresultphoto
 type InlineQueryResultPhoto struct {
 	// Type of the result, always "photo".
 	Type string `json:"type"`
@@ -26,10 +27,16 @@ type InlineQueryResultPhoto struct {
 	Caption string `json:"caption,omitempty"`
 	// ParseMode is the mode used to parse entities in the photo caption.
 	ParseMode string `json:"parse_mode,omitempty"`
+	// CaptionEntities are special entities that appear in the caption, which
+	// can be specified instead of ParseMode.
+	CaptionEntities []types.MessageEntity `json:"caption_entities,omitempty"`
 	// ShowCaptionAboveMedia, when true, shows the caption above the photo.
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 	// ReplyMarkup is the inline keyboard attached to the message.
 	ReplyMarkup *types.InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	// InputMessageContent is the content of the message to be sent instead of
+	// the photo.
+	InputMessageContent *InputTextMessageContent `json:"input_message_content,omitempty"`
 }
 
 // PhotoBuilder is a fluent builder for photo inline query results.

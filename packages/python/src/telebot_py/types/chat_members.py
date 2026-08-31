@@ -30,6 +30,8 @@ class ChatInviteLink(TelegramObject):
         subscription_period: Seconds the subscription will be active for.
         subscription_price: Telegram Stars a user must pay initially and
             after each subscription period.
+
+    Telegram API: https://core.telegram.org/bots/api#chatinvitelink
     """
 
     invite_link: str
@@ -90,6 +92,8 @@ class ChatMember(TelegramObject):
         can_send_welcome_messages: Whether the administrator can manage chat
             welcome messages (Bot API 10.3+).
         until_date: Unix time when restrictions will be lifted for this user.
+
+    Telegram API: https://core.telegram.org/bots/api#chatmember
     """
 
     status: str
@@ -157,6 +161,8 @@ class ChatMemberAdministrator(TelegramObject):
         can_send_welcome_messages: Whether the administrator can manage chat
             welcome messages (Bot API 10.3+).
         custom_title: Custom title for this user.
+
+    Telegram API: https://core.telegram.org/bots/api#chatmemberadministrator
     """
 
     status: str
@@ -199,6 +205,8 @@ class ChatMemberUpdated(TelegramObject):
             direct join request and being approved.
         via_chat_folder_invite_link: Whether the user joined the chat via a
             chat folder invite link.
+
+    Telegram API: https://core.telegram.org/bots/api#chatmemberupdated
     """
 
     chat: Chat
@@ -226,6 +234,10 @@ class ChatJoinRequest(TelegramObject):
         bio: Bio of the user.
         invite_link: Chat invite link that was used by the user to send the
             join request.
+        query_id: Identifier of the join request query; for bots assigned to
+            process join requests only.
+
+    Telegram API: https://core.telegram.org/bots/api#chatjoinrequest
     """
 
     chat: Chat
@@ -234,6 +246,7 @@ class ChatJoinRequest(TelegramObject):
     date: int
     bio: str | None = None
     invite_link: ChatInviteLink | None = None
+    query_id: str | None = None
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}
 
@@ -245,6 +258,8 @@ class Community(TelegramObject):
     Attributes:
         id: Unique identifier for this community.
         name: Name of the community.
+
+    Telegram API: https://core.telegram.org/bots/api#community
     """
 
     id: int
@@ -257,6 +272,8 @@ class CommunityChatJoined(TelegramObject):
 
     Attributes:
         community: The community from which the chat was joined.
+
+    Telegram API: https://core.telegram.org/bots/api#communitychatjoined
     """
 
     community: Community

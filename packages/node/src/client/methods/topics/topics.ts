@@ -27,6 +27,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * });
    * console.log(`Created thread ID: ${topic.message_thread_id}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#createforumtopic Telegram Bot API: createForumTopic}
    */
   public async createForumTopic(options: {
     chat_id: number | string;
@@ -55,6 +57,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    *   name: "Updated Announcements",
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#editforumtopic Telegram Bot API: editForumTopic}
    */
   public async editForumTopic(options: {
     chat_id: number | string;
@@ -77,6 +81,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.closeForumTopic(-1001234567890, 42);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#closeforumtopic Telegram Bot API: closeForumTopic}
    */
   public async closeForumTopic(chatId: number | string, messageThreadId: number): Promise<boolean> {
     return this.request<boolean>("closeForumTopic", {
@@ -97,6 +103,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.reopenForumTopic(-1001234567890, 42);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#reopenforumtopic Telegram Bot API: reopenForumTopic}
    */
   public async reopenForumTopic(
     chatId: number | string,
@@ -120,6 +128,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.deleteForumTopic(-1001234567890, 42);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#deleteforumtopic Telegram Bot API: deleteForumTopic}
    */
   public async deleteForumTopic(
     chatId: number | string,
@@ -143,6 +153,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.unpinAllForumTopicMessages(-1001234567890, 42);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#unpinallforumtopicmessages Telegram Bot API: unpinAllForumTopicMessages}
    */
   public async unpinAllForumTopicMessages(
     chatId: number | string,
@@ -166,6 +178,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.editGeneralForumTopic(-1001234567890, "General Chat");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#editgeneralforumtopic Telegram Bot API: editGeneralForumTopic}
    */
   public async editGeneralForumTopic(chatId: number | string, name: string): Promise<boolean> {
     return this.request<boolean>("editGeneralForumTopic", { chat_id: chatId, name });
@@ -182,6 +196,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.closeGeneralForumTopic(-1001234567890);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#closegeneralforumtopic Telegram Bot API: closeGeneralForumTopic}
    */
   public async closeGeneralForumTopic(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("closeGeneralForumTopic", { chat_id: chatId });
@@ -198,6 +214,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.reopenGeneralForumTopic(-1001234567890);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#reopengeneralforumtopic Telegram Bot API: reopenGeneralForumTopic}
    */
   public async reopenGeneralForumTopic(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("reopenGeneralForumTopic", { chat_id: chatId });
@@ -214,6 +232,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.hideGeneralForumTopic(-1001234567890);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#hidegeneralforumtopic Telegram Bot API: hideGeneralForumTopic}
    */
   public async hideGeneralForumTopic(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("hideGeneralForumTopic", { chat_id: chatId });
@@ -230,6 +250,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.unhideGeneralForumTopic(-1001234567890);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#unhidegeneralforumtopic Telegram Bot API: unhideGeneralForumTopic}
    */
   public async unhideGeneralForumTopic(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("unhideGeneralForumTopic", { chat_id: chatId });
@@ -246,6 +268,8 @@ export abstract class ForumTopicMethods extends BotProfileMethods {
    * ```ts
    * await bot.unpinAllGeneralForumTopicMessages(-1001234567890);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#unpinallgeneralforumtopicmessages Telegram Bot API: unpinAllGeneralForumTopicMessages}
    */
   public async unpinAllGeneralForumTopicMessages(chatId: number | string): Promise<boolean> {
     return this.request<boolean>("unpinAllGeneralForumTopicMessages", { chat_id: chatId });

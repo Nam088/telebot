@@ -24,6 +24,8 @@ import (
 //		MessageID: 789,
 //		Caption:   "Updated caption",
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagecaption
 func (b *Bot) EditMessageCaption(ctx context.Context, opts *types.EditMessageCaptionOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageCaption", opts, &msg); err != nil {
@@ -50,6 +52,8 @@ func (b *Bot) EditMessageCaption(ctx context.Context, opts *types.EditMessageCap
 //		MessageID: 789,
 //		Media:     types.InputMediaPhoto{Type: "photo", Media: "https://example.com/new.jpg"},
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagemedia
 func (b *Bot) EditMessageMedia(ctx context.Context, opts *types.EditMessageMediaOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageMedia", opts, &msg); err != nil {
@@ -77,6 +81,8 @@ func (b *Bot) EditMessageMedia(ctx context.Context, opts *types.EditMessageMedia
 //		Latitude:  37.7749,
 //		Longitude: -122.4194,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#editmessagelivelocation
 func (b *Bot) EditMessageLiveLocation(ctx context.Context, opts *types.EditMessageLiveLocationOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "editMessageLiveLocation", opts, &msg); err != nil {
@@ -102,6 +108,8 @@ func (b *Bot) EditMessageLiveLocation(ctx context.Context, opts *types.EditMessa
 //		ChatID:    int64(123456),
 //		MessageID: 789,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#stopmessagelivelocation
 func (b *Bot) StopMessageLiveLocation(ctx context.Context, opts *types.StopMessageLiveLocationOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "stopMessageLiveLocation", opts, &msg); err != nil {
@@ -127,10 +135,41 @@ func (b *Bot) StopMessageLiveLocation(ctx context.Context, opts *types.StopMessa
 //		ChatID:    int64(123456),
 //		MessageID: 789,
 //	})
+//
+// Telegram API: https://core.telegram.org/bots/api#stoppoll
 func (b *Bot) StopPoll(ctx context.Context, opts *types.StopPollOptions) (*types.Poll, error) {
 	var poll types.Poll
 	if err := b.Request(ctx, "stopPoll", opts, &poll); err != nil {
 		return nil, err
 	}
 	return &poll, nil
+}
+
+// SendMessageDraft sets a message draft in a personal chat (Bot API 10.1+).
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - opts: Options carrying chat_id and draft_id plus the optional text,
+//     parse mode, entities and stop-button flags.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Example:
+//
+//	ok, err := b.SendMessageDraft(ctx, &types.SendMessageDraftOptions{
+//		ChatID:  int64(123456),
+//		DraftID: 7,
+//		Text:    "Final answer",
+//		CanStop: true,
+//	})
+//
+// Telegram API: https://core.telegram.org/bots/api#sendmessagedraft
+func (b *Bot) SendMessageDraft(ctx context.Context, opts *types.SendMessageDraftOptions) (bool, error) {
+	var ok bool
+	if err := b.Request(ctx, "sendMessageDraft", opts, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
 }

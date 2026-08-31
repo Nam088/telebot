@@ -243,6 +243,8 @@ func (b *Bot) doRequest(ctx context.Context, method string, payload any, result 
 }
 
 // GetMe returns basic information about the bot.
+//
+// Telegram API: https://core.telegram.org/bots/api#getme
 func (b *Bot) GetMe(ctx context.Context) (*types.User, error) {
 	var user types.User
 	if err := b.Request(ctx, "getMe", nil, &user); err != nil {
@@ -252,6 +254,8 @@ func (b *Bot) GetMe(ctx context.Context) (*types.User, error) {
 }
 
 // GetUpdates fetches incoming updates using long polling.
+//
+// Telegram API: https://core.telegram.org/bots/api#getupdates
 func (b *Bot) GetUpdates(ctx context.Context, opts *types.GetUpdatesOptions) ([]types.Update, error) {
 	var updates []types.Update
 	if err := b.Request(ctx, "getUpdates", opts, &updates); err != nil {
@@ -261,6 +265,8 @@ func (b *Bot) GetUpdates(ctx context.Context, opts *types.GetUpdatesOptions) ([]
 }
 
 // SendMessage sends a text message to a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendmessage
 func (b *Bot) SendMessage(ctx context.Context, opts *types.SendMessageOptions) (*types.Message, error) {
 	var msg types.Message
 	if err := b.Request(ctx, "sendMessage", opts, &msg); err != nil {
@@ -270,6 +276,8 @@ func (b *Bot) SendMessage(ctx context.Context, opts *types.SendMessageOptions) (
 }
 
 // AnswerCallbackQuery sends answers to callback queries.
+//
+// Telegram API: https://core.telegram.org/bots/api#answercallbackquery
 func (b *Bot) AnswerCallbackQuery(ctx context.Context, opts *types.AnswerCallbackQueryOptions) (bool, error) {
 	var ok bool
 	if err := b.Request(ctx, "answerCallbackQuery", opts, &ok); err != nil {
@@ -279,6 +287,8 @@ func (b *Bot) AnswerCallbackQuery(ctx context.Context, opts *types.AnswerCallbac
 }
 
 // DeleteMessage deletes a message in a chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletemessage
 func (b *Bot) DeleteMessage(ctx context.Context, chatID any, messageID int64) (bool, error) {
 	payload := map[string]any{
 		"chat_id":    chatID,
@@ -289,4 +299,25 @@ func (b *Bot) DeleteMessage(ctx context.Context, chatID any, messageID int64) (b
 		return false, err
 	}
 	return ok, nil
+}
+
+// requestUnknown sends a Bot API method whose result node types as `unknown`
+// and decodes whatever Telegram returned into an `any`, so both the bare
+// boolean and object-shaped results decode without a type assertion at the
+// call site.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - method: Bot API method name.
+//   - payload: Request payload; may be nil.
+//
+// Returns:
+//   - any: The decoded result — a bool, a map[string]any, a slice, or a scalar.
+//   - error: TelegramError if the API returns an error.
+func (b *Bot) requestUnknown(ctx context.Context, method string, payload any) (any, error) {
+	var result any
+	if err := b.Request(ctx, method, payload, &result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

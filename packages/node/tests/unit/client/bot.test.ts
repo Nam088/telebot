@@ -96,7 +96,7 @@ describe("Bot Composite Class Integration Tests", () => {
     const msg = await bot.sendLivePhoto({
       chat_id: 12345,
       photo: "photo_123",
-      video: "video_123",
+      live_photo: "video_123",
       caption: "Live Photo Caption",
       show_caption_above_media: true,
       ephemeral_message_parameters: {
@@ -108,6 +108,9 @@ describe("Bot Composite Class Integration Tests", () => {
     expect(msg.message_id).toBe(1);
     expect(msg.live_photo?.file_id).toBe("photo_123");
     expect(calledPayload["chat_id"]).toBe(12345);
+    expect(calledPayload["photo"]).toBe("photo_123");
+    expect(calledPayload["live_photo"]).toBe("video_123");
+    expect(calledPayload["video"]).toBeUndefined();
     expect(calledPayload["show_caption_above_media"]).toBe(true);
     expect(calledPayload["ephemeral_message_parameters"]).toEqual({
       receiver_user_id: 999,
@@ -146,8 +149,14 @@ describe("Bot Composite Class Integration Tests", () => {
         {
           type: "table",
           cells: [
-            [{ text: "Header 1" }, { text: "Header 2" }],
-            [{ text: "Val 1" }, { text: "Val 2" }],
+            [
+              { text: "Header 1", align: "left", valign: "top" },
+              { text: "Header 2", align: "left", valign: "top" },
+            ],
+            [
+              { text: "Val 1", align: "left", valign: "top" },
+              { text: "Val 2", align: "left", valign: "top" },
+            ],
           ],
           is_compact: true,
         },
@@ -157,7 +166,7 @@ describe("Bot Composite Class Integration Tests", () => {
         },
         {
           type: "document",
-          document: "doc_123",
+          document: { type: "document", media: "doc_123" },
         },
         {
           type: "buttons",

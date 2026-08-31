@@ -84,3 +84,43 @@ describe("PaymentMethods Unit Tests (1:1 mapping)", () => {
     ).toBe(true);
   });
 });
+
+describe("createInvoiceLink payload matches the documented CreateInvoiceLinkOptions set", () => {
+  it("sends subscription_period and omits message-delivery keys leaked by the old Omit<> type", async () => {
+    const calls: Record<string, unknown>[] = [];
+    const fakeFetch = vi.fn().mockImplementation(async (_url: string, init: { body: string }) => {
+      calls.push(JSON.parse(init.body) as Record<string, unknown>);
+      return { status: 200, json: async () => ({ ok: true, result: "https://t.me/x" }) };
+    });
+    const client = new ConcretePaymentClient("TEST_TOKEN", { fetch: fakeFetch });
+
+    await client.createInvoiceLink({
+      title: "Sub",
+      description: "Monthly",
+      payload: "sub_1",
+      currency: "XTR",
+      prices: [{ label: "Month", amount: 100 }],
+      subscription_period: 2592000,
+    });
+
+    expect(calls[0]).toEqual({
+      title: "Sub",
+      description: "Monthly",
+      payload: "sub_1",
+      currency: "XTR",
+      prices: [{ label: "Month", amount: 100 }],
+      subscription_period: 2592000,
+    });
+    for (const leaked of [
+      "chat_id",
+      "disable_notification",
+      "message_thread_id",
+      "protect_content",
+      "reply_markup",
+      "reply_parameters",
+      "start_parameter",
+    ]) {
+      expect(calls[0]?.[leaked]).toBeUndefined();
+    }
+  });
+});

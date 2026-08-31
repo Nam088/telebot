@@ -9,9 +9,10 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 
 from telebot_py.types import Message
-from telebot_py.types.common import Poll
+from telebot_py.types.poll_types import Poll
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 
@@ -108,7 +109,7 @@ class TestEditMessageLiveLocation:
             message_id=7,
             live_period=600,
             horizontal_accuracy=12.5,
-            vertical_accuracy=4.0,
+            proximity_alert_radius=500,
         )
         assert sent_payload(seen[0]) == {
             "latitude": 1.5,
@@ -117,8 +118,48 @@ class TestEditMessageLiveLocation:
             "message_id": 7,
             "live_period": 600,
             "horizontal_accuracy": 12.5,
-            "vertical_accuracy": 4.0,
+            "proximity_alert_radius": 500,
         }
+
+    async def test_rejects_vertical_accuracy(
+        self, bot_transport: Any, ok_response: Any, make_message: Any
+    ) -> None:
+        """No Bot API method carries vertical_accuracy; the kwarg must not exist."""
+        step = record_into(ok_response(make_message(message_id=7, text=None)), [])
+        bot = make_bot(bot_transport, step)
+        with pytest.raises(TypeError):
+            await bot.edit_message_live_location(
+                1.5, 2.5, chat_id=1, message_id=7, vertical_accuracy=4.0
+            )
+
+
+class TestEditMessageText:
+    async def test_edits_text_without_message_thread_id(
+        self, bot_transport: Any, ok_response: Any, make_message: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(make_message(message_id=7, text=None)), seen)
+        bot = make_bot(bot_transport, step)
+        message = await bot.edit_message_text(
+            "new text", chat_id=1, message_id=7, parse_mode="HTML"
+        )
+        assert isinstance(message, Message)
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/editMessageText"
+        payload = sent_payload(seen[0])
+        assert payload == {
+            "text": "new text",
+            "chat_id": 1,
+            "message_id": 7,
+            "parse_mode": "HTML",
+        }
+        assert "message_thread_id" not in payload
+
+    async def test_rejects_message_thread_id(self, bot_transport: Any, ok_response: Any) -> None:
+        """editMessageText's documented parameter set has no message_thread_id."""
+        step = record_into(ok_response(True), [])
+        bot = make_bot(bot_transport, step)
+        with pytest.raises(TypeError):
+            await bot.edit_message_text("t", chat_id=1, message_id=7, message_thread_id=3)
 
 
 class TestStopMessageLiveLocation:
@@ -151,14 +192,16 @@ class TestStopPoll:
                     "id": "poll_1",
                     "question": "Favorite color?",
                     "options": [
-                        {"text": "Red", "voter_count": 2},
-                        {"text": "Blue", "voter_count": 1},
+                        {"persistent_id": "opt-1", "text": "Red", "voter_count": 2},
+                        {"persistent_id": "opt-2", "text": "Blue", "voter_count": 1},
                     ],
                     "total_voter_count": 3,
                     "is_closed": True,
                     "is_anonymous": True,
                     "type": "regular",
                     "allows_multiple_answers": False,
+                    "allows_revoting": False,
+                    "members_only": False,
                 }
             ),
             seen,
@@ -187,6 +230,8 @@ class TestStopPoll:
                     "is_anonymous": True,
                     "type": "regular",
                     "allows_multiple_answers": False,
+                    "allows_revoting": False,
+                    "members_only": False,
                 }
             ),
             seen,
@@ -199,3 +244,134 @@ class TestStopPoll:
             "message_id": 9,
             "reply_markup": markup,
         }
+
+
+class TestSendMessageDraft:
+    async def test_sends_required_fields_only(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.send_message_draft(123, 1) is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/sendMessageDraft"
+        assert sent_payload(seen[0]) == {"chat_id": 123, "draft_id": 1}
+
+    async def test_keeps_empty_text_on_the_wire(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.send_message_draft(123, 2, text="", can_stop=True) is True
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "draft_id": 2,
+            "text": "",
+            "can_stop": True,
+        }
+
+    async def test_serializes_entities_and_options(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        await bot.send_message_draft(
+            123,
+            3,
+            message_thread_id=7,
+            text="Working",
+            parse_mode="HTML",
+            entities=[{"type": "bold", "offset": 0, "length": 7}],
+            can_stop=True,
+            keep_on_stop=False,
+        )
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "draft_id": 3,
+            "message_thread_id": 7,
+            "text": "Working",
+            "parse_mode": "HTML",
+            "entities": [{"type": "bold", "offset": 0, "length": 7}],
+            "can_stop": True,
+            "keep_on_stop": False,
+        }
+
+
+class TestEditMethodsBusinessConnectionId:
+    """All six edit/stop methods accept business_connection_id (Bot API docs)."""
+
+    async def test_edit_message_text(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        assert await bot.edit_message_text(
+            "new text", inline_message_id="abc", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "text": "new text",
+        }
+
+    async def test_edit_message_caption(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_caption(
+            inline_message_id="abc", caption="new", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "caption": "new",
+        }
+
+    async def test_edit_message_media(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        media = {"type": "photo", "media": "photo_file_id"}
+        await bot.edit_message_media(media, inline_message_id="abc", business_connection_id="bc1")
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "media": media,
+            "inline_message_id": "abc",
+        }
+
+    async def test_edit_message_reply_markup(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_reply_markup(
+            inline_message_id="abc", reply_markup={}, business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+            "reply_markup": {},
+        }
+
+    async def test_edit_message_live_location(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_live_location(
+            37.5, -122.5, inline_message_id="abc", business_connection_id="bc1"
+        )
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "latitude": 37.5,
+            "longitude": -122.5,
+            "inline_message_id": "abc",
+        }
+
+    async def test_stop_message_live_location(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.stop_message_live_location(inline_message_id="abc", business_connection_id="bc1")
+        assert sent_payload(seen[0]) == {
+            "business_connection_id": "bc1",
+            "inline_message_id": "abc",
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        """Unset business_connection_id must not appear on the wire."""
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response(True), seen))
+        await bot.edit_message_text("new text", chat_id=1, message_id=2)
+        payload = sent_payload(seen[0])
+        assert "business_connection_id" not in payload
+        assert payload == {"text": "new text", "chat_id": 1, "message_id": 2}

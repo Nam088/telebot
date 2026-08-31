@@ -134,3 +134,31 @@ func TestBot_CreateChatInviteLink_TelegramError(t *testing.T) {
 		t.Errorf("unexpected error code: %d", telegramErr.ErrorCode)
 	}
 }
+
+// TestChatInviteLink_WireShape decodes a literal Telegram payload instead of
+// round-tripping the Go struct, so a json tag that drifts from the documented
+// field name fails here. See
+// https://core.telegram.org/bots/api#chatinvitelink.
+func TestChatInviteLink_WireShape(t *testing.T) {
+	payload := `{
+		"invite_link": "https://t.me/joinchat/abc",
+		"creator": {"id": 123456, "is_bot": true, "first_name": "Acme Bot"},
+		"creates_join_request": true,
+		"is_primary": false,
+		"is_revoked": false,
+		"name": "VIP",
+		"member_limit": 10,
+		"pending_join_request_count": 3
+	}`
+
+	var link types.ChatInviteLink
+	if err := json.Unmarshal([]byte(payload), &link); err != nil {
+		t.Fatalf("unmarshal ChatInviteLink: %v", err)
+	}
+	if link.Name != "VIP" || link.MemberLimit != 10 {
+		t.Errorf("unexpected invite link: %+v", link)
+	}
+	if link.PendingJoinRequestCount != 3 {
+		t.Errorf("expected pending_join_request_count to decode, got %d", link.PendingJoinRequestCount)
+	}
+}

@@ -8,6 +8,8 @@ type SendGameOptions struct {
 	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
 	DisableNotification  bool                  `json:"disable_notification,omitempty"`
 	ProtectContent       bool                  `json:"protect_content,omitempty"`
+	AllowPaidBroadcast   bool                  `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID      string                `json:"message_effect_id,omitempty"`
 	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
@@ -29,3 +31,9 @@ type GetGameHighScoresOptions struct {
 	MessageID       int64  `json:"message_id,omitempty"`
 	InlineMessageID string `json:"inline_message_id,omitempty"`
 }
+
+// CallbackGame is a placeholder for the game that an inline keyboard button
+// launches. Use BotFather to set up the game.
+//
+// Telegram API: https://core.telegram.org/bots/api#callbackgame
+type CallbackGame struct{}

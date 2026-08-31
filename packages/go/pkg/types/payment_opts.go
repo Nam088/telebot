@@ -1,6 +1,8 @@
 package types
 
 // ShippingOption represents one shipping option.
+//
+// Telegram API: https://core.telegram.org/bots/api#shippingoption
 type ShippingOption struct {
 	ID     string         `json:"id"`
 	Title  string         `json:"title"`
@@ -9,46 +11,53 @@ type ShippingOption struct {
 
 // SendInvoiceOptions represents parameters for the sendInvoice method.
 type SendInvoiceOptions struct {
-	ChatID                    any                   `json:"chat_id"`
-	Title                     string                `json:"title"`
-	Description               string                `json:"description"`
-	Payload                   string                `json:"payload"`
-	Currency                  string                `json:"currency"`
-	Prices                    []LabeledPrice        `json:"prices"`
-	ProviderToken             string                `json:"provider_token,omitempty"`
-	MaxTipAmount              int                   `json:"max_tip_amount,omitempty"`
-	SuggestedTipAmounts       []int                 `json:"suggested_tip_amounts,omitempty"`
-	StartParameter            string                `json:"start_parameter,omitempty"`
-	ProviderData              string                `json:"provider_data,omitempty"`
-	PhotoURL                  string                `json:"photo_url,omitempty"`
-	PhotoSize                 int                   `json:"photo_size,omitempty"`
-	PhotoWidth                int                   `json:"photo_width,omitempty"`
-	PhotoHeight               int                   `json:"photo_height,omitempty"`
-	NeedName                  bool                  `json:"need_name,omitempty"`
-	NeedPhoneNumber           bool                  `json:"need_phone_number,omitempty"`
-	NeedEmail                 bool                  `json:"need_email,omitempty"`
-	NeedShippingAddress       bool                  `json:"need_shipping_address,omitempty"`
-	SendPhoneNumberToProvider bool                  `json:"send_phone_number_to_provider,omitempty"`
-	SendEmailToProvider       bool                  `json:"send_email_to_provider,omitempty"`
-	IsFlexible                bool                  `json:"is_flexible,omitempty"`
-	DisableNotification       bool                  `json:"disable_notification,omitempty"`
-	ProtectContent            bool                  `json:"protect_content,omitempty"`
-	ReplyParameters           *ReplyParameters      `json:"reply_parameters,omitempty"`
-	ReplyMarkup               *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
-	MessageThreadID           int64                 `json:"message_thread_id,omitempty"`
+	ChatID                    any                      `json:"chat_id"`
+	Title                     string                   `json:"title"`
+	Description               string                   `json:"description"`
+	Payload                   string                   `json:"payload"`
+	Currency                  string                   `json:"currency"`
+	Prices                    []LabeledPrice           `json:"prices"`
+	ProviderToken             string                   `json:"provider_token,omitempty"`
+	MaxTipAmount              int                      `json:"max_tip_amount,omitempty"`
+	SuggestedTipAmounts       []int                    `json:"suggested_tip_amounts,omitempty"`
+	StartParameter            string                   `json:"start_parameter,omitempty"`
+	ProviderData              string                   `json:"provider_data,omitempty"`
+	PhotoURL                  string                   `json:"photo_url,omitempty"`
+	PhotoSize                 int                      `json:"photo_size,omitempty"`
+	PhotoWidth                int                      `json:"photo_width,omitempty"`
+	PhotoHeight               int                      `json:"photo_height,omitempty"`
+	NeedName                  bool                     `json:"need_name,omitempty"`
+	NeedPhoneNumber           bool                     `json:"need_phone_number,omitempty"`
+	NeedEmail                 bool                     `json:"need_email,omitempty"`
+	NeedShippingAddress       bool                     `json:"need_shipping_address,omitempty"`
+	SendPhoneNumberToProvider bool                     `json:"send_phone_number_to_provider,omitempty"`
+	SendEmailToProvider       bool                     `json:"send_email_to_provider,omitempty"`
+	IsFlexible                bool                     `json:"is_flexible,omitempty"`
+	DisableNotification       bool                     `json:"disable_notification,omitempty"`
+	ProtectContent            bool                     `json:"protect_content,omitempty"`
+	AllowPaidBroadcast        bool                     `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID           string                   `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters   *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters           *ReplyParameters         `json:"reply_parameters,omitempty"`
+	ReplyMarkup               *InlineKeyboardMarkup    `json:"reply_markup,omitempty"`
+	MessageThreadID           int64                    `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID     int64                    `json:"direct_messages_topic_id,omitempty"`
 }
 
 // CreateInvoiceLinkOptions represents parameters for the createInvoiceLink method.
+//
+// Telegram API: https://core.telegram.org/bots/api#createinvoicelink
 type CreateInvoiceLinkOptions struct {
+	BusinessConnectionID      string         `json:"business_connection_id,omitempty"`
 	Title                     string         `json:"title"`
 	Description               string         `json:"description"`
 	Payload                   string         `json:"payload"`
+	ProviderToken             string         `json:"provider_token,omitempty"`
 	Currency                  string         `json:"currency"`
 	Prices                    []LabeledPrice `json:"prices"`
-	ProviderToken             string         `json:"provider_token,omitempty"`
+	SubscriptionPeriod        int            `json:"subscription_period,omitempty"`
 	MaxTipAmount              int            `json:"max_tip_amount,omitempty"`
 	SuggestedTipAmounts       []int          `json:"suggested_tip_amounts,omitempty"`
-	StartParameter            string         `json:"start_parameter,omitempty"`
 	ProviderData              string         `json:"provider_data,omitempty"`
 	PhotoURL                  string         `json:"photo_url,omitempty"`
 	PhotoSize                 int            `json:"photo_size,omitempty"`

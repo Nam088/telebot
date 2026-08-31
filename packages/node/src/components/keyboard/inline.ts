@@ -40,6 +40,8 @@ export type InlineKeyboardButtonOptions = Omit<RawInlineKeyboardButton, "text">;
  *   [new InlineKeyboardButton("Website", { url: "https://example.com" })],
  * ]);
  * ```
+ *
+ * @see {@link https://core.telegram.org/bots/api#inlinekeyboardbutton Telegram Bot API: InlineKeyboardButton}
  */
 export class InlineKeyboardButton implements RawInlineKeyboardButton {
   /** Label text on the button. */
@@ -101,6 +103,8 @@ export class InlineKeyboardButton implements RawInlineKeyboardButton {
  * ]);
  * await bot.sendMessage({ chat_id: 12345, text: "Confirm?", reply_markup: markup });
  * ```
+ *
+ * @see {@link https://core.telegram.org/bots/api#inlinekeyboardmarkup Telegram Bot API: InlineKeyboardMarkup}
  */
 export class InlineKeyboardMarkup implements RawInlineKeyboardMarkup {
   /** Array of button rows, each an array of {@link InlineKeyboardButton}. */

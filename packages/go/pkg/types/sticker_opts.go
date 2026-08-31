@@ -1,6 +1,8 @@
 package types
 
 // InputSticker represents a sticker to be added to a set.
+//
+// Telegram API: https://core.telegram.org/bots/api#inputsticker
 type InputSticker struct {
 	Sticker      any           `json:"sticker"`
 	Format       string        `json:"format"`
@@ -11,16 +13,20 @@ type InputSticker struct {
 
 // SendStickerOptions represents parameters for the sendSticker method.
 type SendStickerOptions struct {
-	BusinessConnectionID string                `json:"business_connection_id,omitempty"`
-	ChatID               any                   `json:"chat_id"`
-	Sticker              any                   `json:"sticker"`
-	MessageThreadID      int64                 `json:"message_thread_id,omitempty"`
-	Emoji                string                `json:"emoji,omitempty"`
-	DisableNotification  bool                  `json:"disable_notification,omitempty"`
-	ProtectContent       bool                  `json:"protect_content,omitempty"`
-	MessageEffectID      string                `json:"message_effect_id,omitempty"`
-	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
-	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
+	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
+	ChatID                     any                         `json:"chat_id"`
+	Sticker                    any                         `json:"sticker"`
+	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+	Emoji                      string                      `json:"emoji,omitempty"`
+	DisableNotification        bool                        `json:"disable_notification,omitempty"`
+	ProtectContent             bool                        `json:"protect_content,omitempty"`
+	AllowPaidBroadcast         bool                        `json:"allow_paid_broadcast,omitempty"`
+	MessageEffectID            string                      `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters    *SuggestedPostParameters    `json:"suggested_post_parameters,omitempty"`
+	ReplyParameters            *ReplyParameters            `json:"reply_parameters,omitempty"`
+	ReplyMarkup                *InlineKeyboardMarkup       `json:"reply_markup,omitempty"`
 }
 
 // GetStickerSetOptions represents parameters for the getStickerSet method.

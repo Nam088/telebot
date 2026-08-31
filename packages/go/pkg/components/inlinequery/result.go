@@ -13,12 +13,21 @@ import (
 
 // InputTextMessageContent represents the text content of a message to be sent
 // when an inline query result is chosen.
+//
+// Telegram API: https://core.telegram.org/bots/api#inputtextmessagecontent
 type InputTextMessageContent struct {
 	// MessageText is the text of the message to be sent, 1-4096 characters.
 	MessageText string `json:"message_text"`
 	// ParseMode is the mode used to parse entities in the message text.
 	ParseMode string `json:"parse_mode,omitempty"`
+	// Entities are special entities appearing in the message text, which can be
+	// specified instead of ParseMode.
+	Entities []types.MessageEntity `json:"entities,omitempty"`
+	// LinkPreviewOptions controls link previews for links in the message.
+	LinkPreviewOptions *types.LinkPreviewOptions `json:"link_preview_options,omitempty"`
 	// DisableWebPagePreview disables link previews for links in the message.
+	//
+	// Deprecated: Telegram replaced this field with LinkPreviewOptions.
 	DisableWebPagePreview bool `json:"disable_web_page_preview,omitempty"`
 }
 

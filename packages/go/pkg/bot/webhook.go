@@ -12,6 +12,8 @@ import (
 )
 
 // SetWebhook specifies a URL and receive incoming updates via an outgoing webhook.
+//
+// Telegram API: https://core.telegram.org/bots/api#setwebhook
 func (b *Bot) SetWebhook(ctx context.Context, url string, secretToken string, maxConnections int) (bool, error) {
 	payload := map[string]any{
 		"url": url,
@@ -30,10 +32,12 @@ func (b *Bot) SetWebhook(ctx context.Context, url string, secretToken string, ma
 }
 
 // DeleteWebhook removes webhook integration.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletewebhook
 func (b *Bot) DeleteWebhook(ctx context.Context, dropPendingUpdates bool) (bool, error) {
-	payload := map[string]any{
-		"drop_pending_updates": dropPendingUpdates,
-	}
+	payload := struct {
+		DropPendingUpdates bool `json:"drop_pending_updates,omitempty"`
+	}{DropPendingUpdates: dropPendingUpdates}
 	var ok bool
 	if err := b.Request(ctx, "deleteWebhook", payload, &ok); err != nil {
 		return false, err
@@ -42,6 +46,8 @@ func (b *Bot) DeleteWebhook(ctx context.Context, dropPendingUpdates bool) (bool,
 }
 
 // GetWebhookInfo gets current webhook status.
+//
+// Telegram API: https://core.telegram.org/bots/api#getwebhookinfo
 func (b *Bot) GetWebhookInfo(ctx context.Context) (*types.WebhookInfo, error) {
 	var info types.WebhookInfo
 	if err := b.Request(ctx, "getWebhookInfo", nil, &info); err != nil {

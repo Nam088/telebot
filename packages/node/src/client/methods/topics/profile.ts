@@ -32,6 +32,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    *   commands: [{ command: "start", description: "Start the bot" }],
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmycommands Telegram Bot API: setMyCommands}
    */
   public async setMyCommands(options: {
     commands: BotCommand[];
@@ -53,6 +55,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const commands = await bot.getMyCommands();
    * console.log(commands);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmycommands Telegram Bot API: getMyCommands}
    */
   public async getMyCommands(
     options: {
@@ -77,6 +81,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * ```ts
    * await bot.deleteMyCommands();
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletemycommands Telegram Bot API: deleteMyCommands}
    */
   public async deleteMyCommands(
     options: {
@@ -99,6 +105,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * ```ts
    * await bot.setMyName("CoolBot", "en");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmyname Telegram Bot API: setMyName}
    */
   public async setMyName(name?: string, languageCode?: string): Promise<boolean> {
     const payload: Record<string, unknown> = {};
@@ -119,6 +127,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const { name } = await bot.getMyName("en");
    * console.log(`Bot Name: ${name}`);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmyname Telegram Bot API: getMyName}
    */
   public async getMyName(languageCode?: string): Promise<BotName> {
     const payload: Record<string, unknown> = {};
@@ -138,6 +148,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * ```ts
    * await bot.setMyDescription("An awesome assistant bot.", "en");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmydescription Telegram Bot API: setMyDescription}
    */
   public async setMyDescription(description?: string, languageCode?: string): Promise<boolean> {
     const payload: Record<string, unknown> = {};
@@ -158,6 +170,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const { description } = await bot.getMyDescription("en");
    * console.log(description);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmydescription Telegram Bot API: getMyDescription}
    */
   public async getMyDescription(languageCode?: string): Promise<BotDescription> {
     const payload: Record<string, unknown> = {};
@@ -177,6 +191,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * ```ts
    * await bot.setMyShortDescription("Fast and powerful Telegram Bot", "en");
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmyshortdescription Telegram Bot API: setMyShortDescription}
    */
   public async setMyShortDescription(
     shortDescription?: string,
@@ -200,6 +216,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const { short_description } = await bot.getMyShortDescription("en");
    * console.log(short_description);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmyshortdescription Telegram Bot API: getMyShortDescription}
    */
   public async getMyShortDescription(languageCode?: string): Promise<BotShortDescription> {
     const payload: Record<string, unknown> = {};
@@ -228,6 +246,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    *   can_invite_users: true,
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setmydefaultadministratorrights Telegram Bot API: setMyDefaultAdministratorRights}
    */
   public async setMyDefaultAdministratorRights(
     rights?: ChatAdministratorRights,
@@ -251,6 +271,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const rights = await bot.getMyDefaultAdministratorRights();
    * console.log(rights);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getmydefaultadministratorrights Telegram Bot API: getMyDefaultAdministratorRights}
    */
   public async getMyDefaultAdministratorRights(
     forChannels?: boolean,
@@ -276,6 +298,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    *   web_app: { url: "https://example.com/app" },
    * });
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#setchatmenubutton Telegram Bot API: setChatMenuButton}
    */
   public async setChatMenuButton(
     chatId?: number | string,
@@ -299,6 +323,8 @@ export abstract class BotProfileMethods extends PaymentMethods {
    * const menu = await bot.getChatMenuButton(123456);
    * console.log(menu.type);
    * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatmenubutton Telegram Bot API: getChatMenuButton}
    */
   public async getChatMenuButton(chatId?: number | string): Promise<MenuButton> {
     const payload: Record<string, unknown> = {};

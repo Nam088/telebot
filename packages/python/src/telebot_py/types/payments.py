@@ -6,6 +6,7 @@ import dataclasses
 import typing as t
 
 from telebot_py.types.base import TelegramObject
+from telebot_py.types.chat import Chat
 from telebot_py.types.user import User
 
 
@@ -20,6 +21,8 @@ class ShippingAddress(TelegramObject):
         post_code: Address post code.
         state: State, if applicable.
         street_line2: Second line for the address.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingaddress
     """
 
     country_code: str
@@ -39,12 +42,73 @@ class OrderInfo(TelegramObject):
         phone_number: User's phone number.
         email: User's email.
         shipping_address: User's shipping address.
+
+    Telegram API: https://core.telegram.org/bots/api#orderinfo
     """
 
     name: str | None = None
     phone_number: str | None = None
     email: str | None = None
     shipping_address: ShippingAddress | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class Invoice(TelegramObject):
+    """Basic information about an invoice.
+
+    Attributes:
+        title: Product name.
+        description: Product description.
+        start_parameter: Unique deep-linking parameter that can be used to
+            generate this invoice when used as a start parameter.
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total price in the smallest units of the currency (e.g.
+            cents for USD, or Telegram Stars for ``XTR``).
+
+    Telegram API: https://core.telegram.org/bots/api#invoice
+    """
+
+    title: str
+    description: str
+    start_parameter: str
+    currency: str
+    total_amount: int
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class SuccessfulPayment(TelegramObject):
+    """Service message describing a successful payment.
+
+    Attributes:
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total price in the smallest units of the currency.
+        invoice_payload: Bot-specified invoice payload.
+        telegram_payment_charge_id: Telegram payment identifier.
+        provider_payment_charge_id: Provider payment identifier.
+        shipping_option_id: Identifier of the shipping option chosen by the
+            user, when applicable.
+        order_info: Order info provided by the user, when applicable.
+        is_recurring: ``True`` if the payment is a recurring subscription one.
+        is_first_recurring: ``True`` if the payment is the first recurring one
+            for a subscription created by the bot.
+        subscription_expiration_date: For subscription payments, the Unix time
+            when the subscription ends.
+
+    Telegram API: https://core.telegram.org/bots/api#successfulpayment
+    """
+
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    telegram_payment_charge_id: str
+    provider_payment_charge_id: str
+    shipping_option_id: str | None = None
+    order_info: OrderInfo | None = None
+    is_recurring: bool | None = None
+    is_first_recurring: bool | None = None
+    subscription_expiration_date: int | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -56,6 +120,8 @@ class ShippingQuery(TelegramObject):
         from_user: User who sent the query.
         invoice_payload: Bot-specified invoice payload.
         shipping_address: User-specified shipping address.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingquery
     """
 
     id: str
@@ -79,6 +145,8 @@ class PreCheckoutQuery(TelegramObject):
         shipping_option_id: Identifier of the shipping option chosen by the
             user, when applicable.
         order_info: Order info provided by the user, when applicable.
+
+    Telegram API: https://core.telegram.org/bots/api#precheckoutquery
     """
 
     id: str
@@ -93,12 +161,14 @@ class PreCheckoutQuery(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
-class PurchasedPaidMedia(TelegramObject):
+class PaidMediaPurchased(TelegramObject):
     """A user purchased paid media with Telegram Stars.
 
     Attributes:
         from_user: User who purchased the media.
         paid_media_payload: Bot-specified paid media payload.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmediapurchased
     """
 
     from_user: User
@@ -108,12 +178,56 @@ class PurchasedPaidMedia(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class BotSubscriptionUpdated(TelegramObject):
+    """A user changed the state of a subscription to the bot's payments.
+
+    Attributes:
+        user: User who subscribed for payments toward the bot.
+        invoice_payload: Bot-specified invoice payload.
+        state: New state of the subscription; 'canceled' if the user canceled
+            the subscription, 'active' if the user re-enabled a previously
+            canceled subscription.
+
+    Telegram API: https://core.telegram.org/bots/api#botsubscriptionupdated
+    """
+
+    user: User
+    invoice_payload: str
+    state: str
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class RefundedPayment(TelegramObject):
+    """A service message about a refunded payment.
+
+    Attributes:
+        currency: Three-letter ISO 4217 currency code, or ``XTR`` for payments
+            in Telegram Stars.
+        total_amount: Total refunded price in the smallest units of the
+            currency.
+        invoice_payload: Bot-specified invoice payload.
+        telegram_payment_charge_id: Telegram payment identifier.
+        provider_payment_charge_id: Provider payment identifier.
+
+    Telegram API: https://core.telegram.org/bots/api#refundedpayment
+    """
+
+    currency: str
+    total_amount: int
+    invoice_payload: str
+    telegram_payment_charge_id: str
+    provider_payment_charge_id: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class LabeledPrice(TelegramObject):
     """A portion of a price.
 
     Attributes:
         label: Portion label.
         amount: Price of the product in the smallest units of the currency.
+
+    Telegram API: https://core.telegram.org/bots/api#labeledprice
     """
 
     label: str
@@ -128,6 +242,8 @@ class ShippingOption(TelegramObject):
         id: Shipping option identifier.
         title: Option title.
         prices: List of price portions.
+
+    Telegram API: https://core.telegram.org/bots/api#shippingoption
     """
 
     id: str
@@ -148,6 +264,8 @@ class StarTransaction(TelegramObject):
         source: Source of the transaction; shape depends on the partner type.
         receiver: Receiver of the transaction; shape depends on the partner
             type.
+
+    Telegram API: https://core.telegram.org/bots/api#startransaction
     """
 
     id: str
@@ -159,11 +277,61 @@ class StarTransaction(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class StarAmount(TelegramObject):
+    """An amount of Telegram Stars.
+
+    Returned by ``Bot.get_my_star_balance``.
+
+    Attributes:
+        amount: The integer number of Telegram Stars.
+        nanostar_amount: The number of 1/1000000000 shares of Telegram Stars.
+
+    Telegram API: https://core.telegram.org/bots/api#staramount
+    """
+
+    amount: int
+    nanostar_amount: int | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class StarTransactions(TelegramObject):
     """The list of Telegram Stars transactions of a bot.
 
     Attributes:
         transactions: List of transactions.
+
+    Telegram API: https://core.telegram.org/bots/api#startransactions
     """
 
     transactions: list[StarTransaction]
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class AffiliateInfo(TelegramObject):
+    """The affiliate that received a commission via a transaction.
+
+    Reached through the ``affiliate_info`` field of the docs'
+    ``TransactionPartnerUser`` object.
+
+    Attributes:
+        commission_per_mille: The number of Telegram Stars received by the
+            affiliate for each 1000 Telegram Stars received by the bot from
+            referred users.
+        amount: Integer amount of Telegram Stars received by the affiliate from
+            the transaction, rounded to 0; can be negative for refunds.
+        affiliate_user: The bot or the user that received an affiliate
+            commission if it was received by a bot or a user.
+        affiliate_chat: The chat that received an affiliate commission if it
+            was received by a chat.
+        nanostar_amount: The number of 1/1000000000 shares of Telegram Stars
+            received by the affiliate; from -999999999 to 999999999; can be
+            negative for refunds.
+
+    Telegram API: https://core.telegram.org/bots/api#affiliateinfo
+    """
+
+    commission_per_mille: int
+    amount: int
+    affiliate_user: User | None = None
+    affiliate_chat: Chat | None = None
+    nanostar_amount: int | None = None

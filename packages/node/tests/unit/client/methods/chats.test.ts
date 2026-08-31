@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { ChatMethods } from "../../../../src/client/methods/index.js";
+import type { ChatFullInfo } from "../../../../src/client/types.js";
 
 class ConcreteChatClient extends ChatMethods {}
 
@@ -34,7 +35,7 @@ describe("ChatMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.declineChatJoinRequest(123, 456)).toBe(true);
   });
 
-  it("chat photo, title, description, pin/unpin, leaveChat, getChat info & members", async () => {
+  it("chat photo, title, description, pin/unpin, leaveChat & members", async () => {
     const { client } = createMock(true);
     expect(await client.setChatPhoto(123, "photo_id")).toBe(true);
     expect(await client.deleteChatPhoto(123)).toBe(true);
@@ -44,12 +45,29 @@ describe("ChatMethods Unit Tests (1:1 mapping)", () => {
     expect(await client.unpinChatMessage(123, 1)).toBe(true);
     expect(await client.unpinAllChatMessages(123)).toBe(true);
     expect(await client.leaveChat(123)).toBe(true);
-    expect(await client.getChat(123)).toBe(true);
     expect(await client.getChatAdministrators(123)).toBe(true);
     expect(await client.getChatMemberCount(123)).toBe(true);
     expect(await client.getChatMember(123, 456)).toBe(true);
     expect(await client.setChatStickerSet(123, "pack")).toBe(true);
     expect(await client.deleteChatStickerSet(123)).toBe(true);
+  });
+
+  it("getChat returns the documented ChatFullInfo object", async () => {
+    const fullInfo: ChatFullInfo = {
+      id: -1001234567890,
+      type: "supergroup",
+      accent_color_id: 3,
+      max_reaction_count: 7,
+      accepted_gift_types: {
+        unlimited_gifts: true,
+        limited_gifts: false,
+        unique_gifts: true,
+        premium_subscription: false,
+        gifts_from_channels: true,
+      },
+    };
+    const { client } = createMock(fullInfo);
+    expect(await client.getChat(-1001234567890)).toEqual(fullInfo);
   });
 
   it("verifyUser, verifyChat, removeUserVerification, removeChatVerification, getUserChatBoosts", async () => {

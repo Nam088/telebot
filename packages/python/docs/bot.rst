@@ -14,6 +14,11 @@ telebot_py.bot.bulk
 
 .. automodule:: telebot_py.bot.bulk
 
+telebot_py.bot.business_account
+-------------------------------
+
+.. automodule:: telebot_py.bot.business_account
+
 telebot_py.bot.chat_management
 ------------------------------
 
@@ -24,6 +29,11 @@ telebot_py.bot.chats
 
 .. automodule:: telebot_py.bot.chats
 
+telebot_py.bot.checklists
+-------------------------
+
+.. automodule:: telebot_py.bot.checklists
+
 telebot_py.bot.client
 ---------------------
 
@@ -33,6 +43,11 @@ telebot_py.bot.edits
 --------------------
 
 .. automodule:: telebot_py.bot.edits
+
+telebot_py.bot.ephemeral
+------------------------
+
+.. automodule:: telebot_py.bot.ephemeral
 
 telebot_py.bot.errors
 ---------------------
@@ -48,6 +63,11 @@ telebot_py.bot.games
 --------------------
 
 .. automodule:: telebot_py.bot.games
+
+telebot_py.bot.gifts
+--------------------
+
+.. automodule:: telebot_py.bot.gifts
 
 telebot_py.bot.inline
 ---------------------
@@ -74,6 +94,21 @@ telebot_py.bot.messages
 
 .. automodule:: telebot_py.bot.messages
 
+telebot_py.bot.mini_apps
+------------------------
+
+.. automodule:: telebot_py.bot.mini_apps
+
+telebot_py.bot.owned_gifts
+--------------------------
+
+.. automodule:: telebot_py.bot.owned_gifts
+
+telebot_py.bot.paid_media
+-------------------------
+
+.. automodule:: telebot_py.bot.paid_media
+
 telebot_py.bot.payments
 -----------------------
 
@@ -99,6 +134,11 @@ telebot_py.bot.stickers
 
 .. automodule:: telebot_py.bot.stickers
 
+telebot_py.bot.stories
+----------------------
+
+.. automodule:: telebot_py.bot.stories
+
 telebot_py.bot.stories_gifts
 ----------------------------
 
@@ -108,6 +148,11 @@ telebot_py.bot.topics
 ---------------------
 
 .. automodule:: telebot_py.bot.topics
+
+telebot_py.bot.verification
+---------------------------
+
+.. automodule:: telebot_py.bot.verification
 
 telebot_py.bot.webhook
 ----------------------

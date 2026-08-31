@@ -14,6 +14,8 @@ import type {
   EditEphemeralMessageCaptionOptions,
   EditEphemeralMessageReplyMarkupOptions,
   DeleteEphemeralMessageOptions,
+  AnswerChatJoinRequestQueryOptions,
+  SendChatJoinRequestWebAppOptions,
 } from "../../types/index.js";
 
 /**
@@ -25,6 +27,8 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @param options - Rich message options including `chat_id` and `rich_message`.
    * @returns The sent {@link Message}.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendrichmessage Telegram Bot API: sendRichMessage}
    */
   public async sendRichMessage(options: SendRichMessageOptions): Promise<Message> {
     return this.request<Message>("sendRichMessage", options as unknown as Record<string, unknown>);
@@ -35,6 +39,8 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @param options - Rich message draft options.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendrichmessagedraft Telegram Bot API: sendRichMessageDraft}
    */
   public async sendRichMessageDraft(options: SendRichMessageDraftOptions): Promise<boolean> {
     return this.request<boolean>(
@@ -47,12 +53,14 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message text (Bot API 10.2+).
    *
    * @param options - Ephemeral message edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#editephemeralmessagetext Telegram Bot API: editEphemeralMessageText}
    */
   public async editEphemeralMessageText(
     options: EditEphemeralMessageTextOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageText",
       options as unknown as Record<string, unknown>,
     );
@@ -62,12 +70,14 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message media (Bot API 10.3+).
    *
    * @param options - Ephemeral message media edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#editephemeralmessagemedia Telegram Bot API: editEphemeralMessageMedia}
    */
   public async editEphemeralMessageMedia(
     options: EditEphemeralMessageMediaOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageMedia",
       options as unknown as Record<string, unknown>,
     );
@@ -77,12 +87,14 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message caption (Bot API 10.3+).
    *
    * @param options - Ephemeral message caption edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#editephemeralmessagecaption Telegram Bot API: editEphemeralMessageCaption}
    */
   public async editEphemeralMessageCaption(
     options: EditEphemeralMessageCaptionOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageCaption",
       options as unknown as Record<string, unknown>,
     );
@@ -92,12 +104,14 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * Edits an ephemeral message reply markup (Bot API 10.3+).
    *
    * @param options - Ephemeral message reply markup edit options.
-   * @returns Edited {@link Message} or boolean.
+   * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#editephemeralmessagereplymarkup Telegram Bot API: editEphemeralMessageReplyMarkup}
    */
   public async editEphemeralMessageReplyMarkup(
     options: EditEphemeralMessageReplyMarkupOptions,
-  ): Promise<Message | boolean> {
-    return this.request<Message | boolean>(
+  ): Promise<boolean> {
+    return this.request<boolean>(
       "editEphemeralMessageReplyMarkup",
       options as unknown as Record<string, unknown>,
     );
@@ -110,6 +124,8 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    * @param receiverUserId - Receiver user identifier when passing positional arguments.
    * @param ephemeralMessageId - Ephemeral message identifier when passing positional arguments.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#deleteephemeralmessage Telegram Bot API: deleteEphemeralMessage}
    */
   public async deleteEphemeralMessage(
     optionsOrChatId: DeleteEphemeralMessageOptions | number | string,
@@ -134,9 +150,16 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @param options - Query response options.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#answerchatjoinrequestquery Telegram Bot API: answerChatJoinRequestQuery}
    */
-  public async answerChatJoinRequestQuery(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("answerChatJoinRequestQuery", options);
+  public async answerChatJoinRequestQuery(
+    options: AnswerChatJoinRequestQueryOptions,
+  ): Promise<boolean> {
+    return this.request<boolean>(
+      "answerChatJoinRequestQuery",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**
@@ -144,9 +167,16 @@ export abstract class BusinessEphemeralMethods extends BusinessGiftsMethods {
    *
    * @param options - Join request Web App options.
    * @returns `true` on success.
+   *
+   * @see {@link https://core.telegram.org/bots/api#sendchatjoinrequestwebapp Telegram Bot API: sendChatJoinRequestWebApp}
    */
-  public async sendChatJoinRequestWebApp(options: Record<string, unknown>): Promise<boolean> {
-    return this.request<boolean>("sendChatJoinRequestWebApp", options);
+  public async sendChatJoinRequestWebApp(
+    options: SendChatJoinRequestWebAppOptions,
+  ): Promise<boolean> {
+    return this.request<boolean>(
+      "sendChatJoinRequestWebApp",
+      options as unknown as Record<string, unknown>,
+    );
   }
 
   /**

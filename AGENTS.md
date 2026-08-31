@@ -8,9 +8,13 @@ A zero-required-dependency, TypeScript-first Telegram Bot framework that mirrors
 
 ## Source of truth
 
+Ranked — when two of these disagree, the higher one wins. Say so out loud instead of silently following the lower one.
+
+- `scripts/bot-api-oracle.json` — **what the Bot API actually is.** Field tables for every documented method and type, machine-extracted from `core.telegram.org/bots/api` and committed (Bot API 10.3: 185 methods, 400 types, 1888 fields), so it is readable with no network. See "Bot API docs oracle & fidelity gate".
 - `specs/001-telegram-bot-framework/spec.md` — functional/non-functional requirements, success criteria, naming conventions, out-of-scope items. Read this before implementing any feature.
 - `specs/001-telegram-bot-framework/technical-context.md` — architecture, data models, API contracts, performance targets. This is the authoritative source for exact numbers/interfaces; spec.md only restates ceilings so the two files don't drift — if you change one, check the other.
-- `python-telegram-bot/` — the actual upstream PTB source, vendored in this repo for reference. When porting a class, method, or filter, read the real implementation here (e.g. `python-telegram-bot/src/telegram/ext/`) instead of recalling PTB's API from memory. Training data can be stale or wrong about exact signatures/behavior; this vendored copy cannot be.
+- The sibling packages' source — **a peer implementation, not ground truth.** For a documented field or method signature, go to the oracle. `packages/node` has been the wrong one more than once: it exposed no `ChatFullInfo` for its first releases even though `getChat` returns that type, and its `Chat` still declares 43 fields against the 8 the docs table lists — while go's `Chat` declares exactly those 8. Which sibling is right is not predictable, so it is not a shortcut. Read a sibling for convention and shape ideas, then confirm against the oracle.
+- `python-telegram-bot/` — upstream PTB source, vendored locally for reference. When porting a class, method, or filter, read the real implementation here (e.g. `python-telegram-bot/src/telegram/ext/`) instead of recalling PTB's API from memory. Training data can be stale or wrong about exact signatures/behavior; this vendored copy cannot be. It is gitignored, so it may simply be absent from a given checkout — if it is, fetch upstream rather than working from memory, and say which you used.
 
 If a request conflicts with `spec.md`, flag the conflict and ask rather than silently picking one side.
 
@@ -39,8 +43,34 @@ Doc comments must use the TSDoc/JSDoc tags [TypeDoc](https://typedoc.org) unders
 - `@defaultValue` on optional fields with a runtime default.
 - `@remarks` for PTB-vs-Node behavior differences.
 - `@deprecated` only for APIs kept as a migration bridge.
+- Every documented Bot API method/type carries an official-docs link (`https://core.telegram.org/bots/api#<slug>`, `<slug>` = wire name/type name fully lowercased) — as TSDoc `@see`, GoDoc `// Telegram API:`, or a Sphinx `Telegram API:` line. Slugs are verified against the committed oracle's `anchors` list, never from memory; fetch the live page only when you suspect the oracle itself is stale. Framework extensions without a docs anchor get no link rather than a guessed one.
 
 Before writing code against a library not already decided in `technical-context.md` (a new dependency, a new dev tool), resolve and query its docs via the `context7` MCP server first rather than relying on memory — this project's global instructions require it.
+
+## Bot API docs oracle & fidelity gate
+
+`scripts/` turns "does our type match Telegram's table?" into a machine question. Zero dependencies, Node built-ins only.
+
+- `npm run audit:docs` → `bot-api-docs.mjs` parses `core.telegram.org/bots/api` and writes `scripts/bot-api-oracle.json`. Committed and trimmed of prose so it reads offline.
+- `npm run audit:fidelity` → `bot-api-fidelity.mjs` extracts every declared type from all three packages and diffs each against the oracle: missing REQUIRED, missing optional, and concrete docs types not modelled at all. It also diffs the **method-parameter layer** (`oracle.methods[*].params`, which the oracle always carried while the audit ignored it — so a green gate could coexist with an incomplete send surface), measured from the expression that actually becomes the HTTP body rather than from the parameter list. Both layers render into the CI job summary, and `audit:fidelity:strict` fails on a missing REQUIRED *param* as well as a missing REQUIRED field.
+
+Querying the oracle (`types`/`methods`/`anchors`):
+
+```bash
+node -e "const o=require('./scripts/bot-api-oracle.json');console.log(JSON.stringify(o.types['ChatFullInfo'].fields,null,1))"
+node -e "const o=require('./scripts/bot-api-oracle.json');console.log(o.anchors.includes('chatfullinfo'))"
+```
+
+Each field is `{type, optional}`; `methods[wireName].params` has the same shape; `anchors` is every valid docs slug.
+
+Gate rules that follow:
+
+- **The fidelity gate is a ratchet, not a clean bill of health.** It compares against the committed `scripts/bot-api-fidelity-baseline.json` and exits 1 only on *new* drift, so a large known backlog can coexist with a green CI. `npm run audit:fidelity:strict` shows every gap, known or new; `npm run audit:fidelity:report` prints the per-type detail.
+- **Never refresh the baseline to make red go away.** A failing ratchet means fix the type. `npm run audit:baseline` exists for the moment Telegram ships a new API version and must be its own commit so the deliberate acceptance of drift is visible in history.
+- **A modelled type must carry its whole docs row**, required *and* optional. In go and python declare every field **in that type itself** — the audit resolves `extends` only for TypeScript, so an inherited field still reads as missing. Adding a half-complete type is worse than not adding it: it converts a silent backlog entry into a red gate.
+- **For a documented method argument to count as sendable, it must be enumerable in the language's own idiom**: node — a property on the named options interface (or an inline object type) that reaches `this.request("wire", …)`; go — a `json:"name"` tag on `types.XOptions`, a key in the `map[string]any` payload, or one in an anonymous payload struct; python — an explicit keyword argument on `async def` reaching `clean_payload(...)`. A python `**kwargs`, or a node `options: Record<string, unknown>` that swallows the undocumented params, is reported as an *unmeasurable method* rather than guessed at — the audit never invents a key list it cannot read, so routing more arguments through an untyped bag is a regression, not a shortcut.
+- **The audit is one-directional: it reports missing fields, never extra ones.** Over-modelling is invisible to CI and stays a human call — node's `Chat` declares 43 fields against 8 documented, while go's declares exactly 8. Check the oracle row before copying a sibling's field list.
+- Types with an empty docs table (`MessageOrigin`, `InputMedia`, `CallbackGame`) are abstract unions, not concrete types; their absence is not a gap. The audit only counts types whose row lists at least one field.
 
 ## TypeScript & module conventions
 

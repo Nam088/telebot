@@ -3,6 +3,7 @@ import { BusinessEphemeralMethods } from "./ephemeral.js";
 export * from "./queries.js";
 export * from "./games-passport.js";
 export * from "./stories-boosts.js";
+export * from "./business-account.js";
 export * from "./gifts.js";
 export * from "./ephemeral.js";
 

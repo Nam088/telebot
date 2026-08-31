@@ -1,7 +1,13 @@
-"""Field-fidelity tests: Python types must match the node sibling field sets.
+"""Field-fidelity tests: Python types must match the documented field sets.
 
-The inventory below was extracted field-by-field from the authoritative
-TypeScript sources (Bot API 10.3):
+The inventory below was extracted field-by-field from the official Telegram
+Bot API 10.3 documentation (https://core.telegram.org/bots/api), which is the
+authoritative source. The TypeScript sources in ``packages/node`` were used as
+a secondary cross-check, but the ported node reference has drifted for some
+types (e.g. ``BusinessConnection.can_reply`` vs. the documented ``rights``);
+where the docs and node disagree, the docs win.
+
+Secondary cross-check sources:
 
 - packages/node/src/client/types/common/models.ts (User, Chat, ChatPhoto,
   Birthdate, Location, RawUpdate/Update, MessageGenerationStopped)
@@ -17,7 +23,7 @@ TypeScript sources (Bot API 10.3):
   InlineQuery, ChosenInlineResult, Business*, ChatBoost*, Story)
 - packages/node/src/client/types/payments/models.ts
 
-Each spec entry is ``(field_name, required_in_node)``. The Python attribute
+Each spec entry is ``(field_name, required_by_the_docs)``. The Python attribute
 name matches the wire field name, except ``from`` which is exposed as
 ``from_user`` (keyword-avoidance) and re-mapped on the wire.
 """
@@ -30,9 +36,13 @@ import typing as t
 import pytest
 
 from telebot_py.types import (
+    AcceptedGiftTypes,
+    AffiliateInfo,
     Animation,
     Audio,
     Birthdate,
+    BotSubscriptionUpdated,
+    BusinessBotRights,
     BusinessConnection,
     BusinessIntro,
     BusinessLocation,
@@ -41,6 +51,7 @@ from telebot_py.types import (
     BusinessOpeningHoursInterval,
     CallbackQuery,
     Chat,
+    ChatBackground,
     ChatBoost,
     ChatBoostAdded,
     ChatBoostRemoved,
@@ -48,34 +59,68 @@ from telebot_py.types import (
     ChatBoostSourceGiveaway,
     ChatBoostSourcePremium,
     ChatBoostUpdated,
+    ChatFullInfo,
     ChatInviteLink,
     ChatJoinRequest,
     ChatLocation,
     ChatMember,
     ChatMemberAdministrator,
     ChatMemberUpdated,
+    ChatOwnerChanged,
+    ChatOwnerLeft,
     ChatPermissions,
     ChatPhoto,
+    ChatShared,
+    Checklist,
+    ChecklistTasksAdded,
+    ChecklistTasksDone,
     ChosenInlineResult,
     Community,
+    CommunityChatAdded,
     CommunityChatJoined,
+    CommunityChatRemoved,
     Contact,
     CopyTextButton,
     Dice,
+    DirectMessagePriceChanged,
+    DirectMessagesTopic,
     Document,
+    EphemeralMessageParameters,
     ExternalReplyInfo,
     ForceReply,
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
+    Game,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
+    Gift,
+    GiftBackground,
+    Gifts,
+    Giveaway,
+    GiveawayCompleted,
+    GiveawayCreated,
+    GiveawayWinners,
+    InaccessibleMessage,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQuery,
+    Invoice,
     KeyboardButton,
     KeyboardButtonPollType,
     KeyboardButtonRequestChat,
     KeyboardButtonRequestUsers,
+    Link,
+    LinkPreviewOptions,
     LivePhoto,
     Location,
+    LocationAddress,
     LoginUrl,
+    ManagedBotCreated,
+    ManagedBotUpdated,
     Message,
+    MessageAutoDeleteTimerChanged,
     MessageEntity,
     MessageGenerationStopped,
     MessageOriginChannel,
@@ -85,36 +130,70 @@ from telebot_py.types import (
     MessageReactionCountUpdated,
     MessageReactionUpdated,
     OrderInfo,
+    PaidMediaPurchased,
+    PaidMessagePriceChanged,
+    PassportData,
     PhotoSize,
     Poll,
     PollAnswer,
+    PollMedia,
     PollOption,
+    PollOptionAdded,
+    PollOptionDeleted,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
+    ProximityAlertTriggered,
     ReactionCount,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     ReactionTypePaid,
+    RefundedPayment,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
+    ResponseParameters,
+    SharedUser,
     ShippingAddress,
     ShippingQuery,
+    Sticker,
     Story,
+    SuccessfulPayment,
+    SuggestedPostApprovalFailed,
+    SuggestedPostApproved,
+    SuggestedPostDeclined,
+    SuggestedPostInfo,
+    SuggestedPostPaid,
+    SuggestedPostParameters,
+    SuggestedPostPrice,
+    SuggestedPostRefunded,
     SwitchInlineQueryChosenChat,
     TextQuote,
+    UniqueGift,
+    UniqueGiftBackdrop,
+    UniqueGiftBackdropColors,
+    UniqueGiftColors,
+    UniqueGiftInfo,
+    UniqueGiftModel,
+    UniqueGiftSymbol,
     Update,
     User,
+    UserRating,
+    UsersShared,
     Venue,
     Video,
+    VideoChatEnded,
+    VideoChatParticipantsInvited,
+    VideoChatScheduled,
+    VideoChatStarted,
     VideoNote,
+    VideoQuality,
     Voice,
     WebAppData,
     WebAppInfo,
+    WriteAccessAllowed,
 )
-from telebot_py.types.base import TypeParseError
+from telebot_py.types.base import TelegramObject, TypeParseError
 
 # ---------------------------------------------------------------------------
-# Field inventory extracted from the node type definitions.
+# Field inventory transcribed from the Bot API 10.3 documentation.
 # ---------------------------------------------------------------------------
 
 FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
@@ -129,9 +208,14 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("added_to_attachment_menu", False),
         ("can_join_groups", False),
         ("can_read_all_group_messages", False),
+        ("supports_guest_queries", False),
         ("supports_inline_queries", False),
         ("can_connect_to_business", False),
         ("has_main_web_app", False),
+        ("has_topics_enabled", False),
+        ("allows_users_to_create_topics", False),
+        ("can_manage_bots", False),
+        ("supports_join_request_queries", False),
     ),
     Birthdate: (("day", True), ("month", True), ("year", False)),
     ChatPhoto: (
@@ -148,6 +232,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("first_name", False),
         ("last_name", False),
         ("is_forum", False),
+        ("is_direct_messages", False),
         ("photo", False),
         ("active_usernames", False),
         ("birthdate", False),
@@ -184,6 +269,103 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("linked_chat_id", False),
         ("location", False),
     ),
+    # ChatFullInfo is what the docs' getChat method returns: the eight Chat
+    # identity fields plus the 45 fields Chat cannot carry. The five fields the
+    # docs mark required come first because Python dataclasses cannot interleave
+    # required fields after defaulted ones.
+    ChatFullInfo: (
+        ("id", True),
+        ("type", True),
+        ("accent_color_id", True),
+        ("max_reaction_count", True),
+        ("accepted_gift_types", True),
+        ("title", False),
+        ("username", False),
+        ("first_name", False),
+        ("last_name", False),
+        ("is_forum", False),
+        ("is_direct_messages", False),
+        ("photo", False),
+        ("active_usernames", False),
+        ("birthdate", False),
+        ("business_intro", False),
+        ("business_location", False),
+        ("business_opening_hours", False),
+        ("personal_chat", False),
+        ("parent_chat", False),
+        ("available_reactions", False),
+        ("background_custom_emoji_id", False),
+        ("profile_accent_color_id", False),
+        ("profile_background_custom_emoji_id", False),
+        ("emoji_status_custom_emoji_id", False),
+        ("emoji_status_expiration_date", False),
+        ("bio", False),
+        ("has_private_forwards", False),
+        ("has_restricted_voice_and_video_messages", False),
+        ("join_to_send_messages", False),
+        ("join_by_request", False),
+        ("description", False),
+        ("invite_link", False),
+        ("pinned_message", False),
+        ("permissions", False),
+        ("can_send_paid_media", False),
+        ("slow_mode_delay", False),
+        ("unrestrict_boost_count", False),
+        ("message_auto_delete_time", False),
+        ("has_aggressive_anti_spam_enabled", False),
+        ("has_hidden_members", False),
+        ("has_protected_content", False),
+        ("has_visible_history", False),
+        ("sticker_set_name", False),
+        ("can_set_sticker_set", False),
+        ("custom_emoji_sticker_set_name", False),
+        ("linked_chat_id", False),
+        ("location", False),
+        ("rating", False),
+        ("first_profile_audio", False),
+        ("unique_gift_colors", False),
+        ("paid_message_star_count", False),
+        ("guard_bot", False),
+        ("community", False),
+    ),
+    UserRating: (
+        ("level", True),
+        ("rating", True),
+        ("current_level_rating", True),
+        ("next_level_rating", False),
+    ),
+    # Docs types that had no Python counterpart before this inventory entry.
+    InaccessibleMessage: (
+        ("chat", True),
+        ("message_id", True),
+        ("date", True),
+    ),
+    ResponseParameters: (
+        ("migrate_to_chat_id", False),
+        ("retry_after", False),
+    ),
+    LocationAddress: (
+        ("country_code", True),
+        ("state", False),
+        ("city", False),
+        ("street", False),
+    ),
+    SuggestedPostParameters: (
+        ("price", False),
+        ("send_date", False),
+    ),
+    EphemeralMessageParameters: (
+        ("receiver_user_id", True),
+        ("callback_query_id", False),
+        ("replace_callback_query_message", False),
+    ),
+    AffiliateInfo: (
+        ("commission_per_mille", True),
+        ("amount", True),
+        ("affiliate_user", False),
+        ("affiliate_chat", False),
+        ("nanostar_amount", False),
+    ),
     Location: (
         ("latitude", True),
         ("longitude", True),
@@ -217,33 +399,50 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("user", False),
         ("language", False),
         ("custom_emoji_id", False),
+        ("unix_time", False),
+        ("date_time_format", False),
     ),
     PollOption: (
+        ("persistent_id", True),
         ("text", True),
-        ("voter_count", True),
-        ("persistent_id", False),
         ("text_entities", False),
+        ("media", False),
+        ("voter_count", True),
+        ("added_by_user", False),
+        ("added_by_chat", False),
+        ("addition_date", False),
     ),
     Poll: (
         ("id", True),
         ("question", True),
+        ("question_entities", False),
         ("options", True),
         ("total_voter_count", True),
         ("is_closed", True),
         ("is_anonymous", True),
         ("type", True),
         ("allows_multiple_answers", True),
-        ("correct_option_id", False),
+        ("allows_revoting", True),
+        ("members_only", True),
+        ("country_codes", False),
+        ("correct_option_ids", False),
         ("explanation", False),
         ("explanation_entities", False),
+        ("explanation_media", False),
         ("open_period", False),
         ("close_date", False),
+        ("description", False),
+        ("description_entities", False),
+        ("media", False),
+        # Legacy single-value form kept so pre-10.3 quiz payloads still decode.
+        ("correct_option_id", False),
     ),
     PollAnswer: (
         ("poll_id", True),
-        ("option_ids", True),
         ("voter_chat", False),
         ("user", False),
+        ("option_ids", True),
+        ("option_persistent_ids", True),
     ),
     PhotoSize: (
         ("file_id", True),
@@ -278,6 +477,9 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("height", True),
         ("duration", True),
         ("thumbnail", False),
+        ("cover", False),
+        ("start_timestamp", False),
+        ("qualities", False),
         ("file_name", False),
         ("mime_type", False),
         ("file_size", False),
@@ -309,12 +511,14 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("file_size", False),
     ),
     LivePhoto: (
+        ("photo", False),
         ("file_id", True),
         ("file_unique_id", True),
         ("width", True),
         ("height", True),
-        ("photo", True),
-        ("video", True),
+        ("duration", True),
+        ("mime_type", False),
+        ("file_size", False),
     ),
     Story: (("chat", True), ("id", True)),
     ChatBoostAdded: (("boost_count", True),),
@@ -375,8 +579,11 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
     ),
     KeyboardButton: (
         ("text", True),
+        ("icon_custom_emoji_id", False),
+        ("style", False),
         ("request_users", False),
         ("request_chat", False),
+        ("request_managed_bot", False),
         ("request_contact", False),
         ("request_location", False),
         ("request_poll", False),
@@ -426,6 +633,8 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("animation", False),
         ("audio", False),
         ("document", False),
+        ("live_photo", False),
+        ("paid_media", False),
         ("photo", False),
         ("sticker", False),
         ("story", False),
@@ -433,6 +642,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("video_note", False),
         ("voice", False),
         ("has_media_spoiler", False),
+        ("checklist", False),
         ("contact", False),
         ("dice", False),
         ("game", False),
@@ -456,6 +666,8 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("can_send_polls", False),
         ("can_send_other_messages", False),
         ("can_add_web_page_previews", False),
+        ("can_react_to_messages", False),
+        ("can_edit_tag", False),
         ("can_change_info", False),
         ("can_invite_users", False),
         ("can_pin_messages", False),
@@ -538,6 +750,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("date", True),
         ("bio", False),
         ("invite_link", False),
+        ("query_id", False),
     ),
     Community: (("id", True), ("name", True)),
     CommunityChatJoined: (("community", True),),
@@ -545,12 +758,28 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
     BusinessLocation: (("address", True), ("location", False)),
     BusinessOpeningHoursInterval: (("opening_minute", True), ("closing_minute", True)),
     BusinessOpeningHours: (("time_zone_name", True), ("opening_hours", True)),
+    BusinessBotRights: (
+        ("can_reply", False),
+        ("can_read_messages", False),
+        ("can_delete_sent_messages", False),
+        ("can_delete_all_messages", False),
+        ("can_edit_name", False),
+        ("can_edit_bio", False),
+        ("can_edit_profile_photo", False),
+        ("can_edit_username", False),
+        ("can_change_gift_settings", False),
+        ("can_view_gifts_and_stars", False),
+        ("can_convert_gifts_to_stars", False),
+        ("can_transfer_and_upgrade_gifts", False),
+        ("can_transfer_stars", False),
+        ("can_manage_stories", False),
+    ),
     BusinessConnection: (
         ("id", True),
         ("user", True),
         ("user_chat_id", True),
         ("date", True),
-        ("can_reply", True),
+        ("rights", False),
         ("is_enabled", True),
     ),
     BusinessMessagesDeleted: (
@@ -628,7 +857,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("shipping_option_id", False),
         ("order_info", False),
     ),
-    PurchasedPaidMedia: (("from_user", True), ("paid_media_payload", True)),
+    PaidMediaPurchased: (("from_user", True), ("paid_media_payload", True)),
     InlineQuery: (
         ("id", True),
         ("from_user", True),
@@ -654,9 +883,262 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("game_short_name", False),
     ),
     MessageGenerationStopped: (("chat", True), ("draft_id", True), ("message_thread_id", False)),
+    Gift: (
+        ("id", True),
+        ("sticker", True),
+        ("star_count", True),
+        ("upgrade_star_count", False),
+        ("is_premium", False),
+        ("has_colors", False),
+        ("total_count", False),
+        ("remaining_count", False),
+        ("personal_total_count", False),
+        ("personal_remaining_count", False),
+        ("background", False),
+        ("unique_gift_variant_count", False),
+        ("publisher_chat", False),
+    ),
+    GiftBackground: (
+        ("center_color", True),
+        ("edge_color", True),
+        ("text_color", True),
+    ),
+    Gifts: (("gifts", True),),
+    UniqueGiftBackdropColors: (
+        ("center_color", True),
+        ("edge_color", True),
+        ("symbol_color", True),
+        ("text_color", True),
+    ),
+    UniqueGiftBackdrop: (
+        ("name", True),
+        ("colors", True),
+        ("rarity_per_mille", True),
+    ),
+    UniqueGiftModel: (
+        ("name", True),
+        ("sticker", True),
+        ("rarity_per_mille", True),
+        ("rarity", False),
+    ),
+    UniqueGiftSymbol: (
+        ("name", True),
+        ("sticker", True),
+        ("rarity_per_mille", True),
+    ),
+    UniqueGiftColors: (
+        ("model_custom_emoji_id", True),
+        ("symbol_custom_emoji_id", True),
+        ("light_theme_main_color", True),
+        ("light_theme_other_colors", True),
+        ("dark_theme_main_color", True),
+        ("dark_theme_other_colors", True),
+    ),
+    UniqueGift: (
+        ("gift_id", True),
+        ("base_name", True),
+        ("name", True),
+        ("number", True),
+        ("model", True),
+        ("symbol", True),
+        ("backdrop", True),
+        ("is_premium", False),
+        ("is_burned", False),
+        ("is_from_blockchain", False),
+        ("colors", False),
+        ("publisher_chat", False),
+    ),
+    UniqueGiftInfo: (
+        ("gift", True),
+        ("origin", True),
+        ("text", False),
+        ("entities", False),
+        ("is_private", False),
+        ("last_resale_currency", False),
+        ("last_resale_amount", False),
+        ("owned_gift_id", False),
+        ("transfer_star_count", False),
+        ("next_transfer_date", False),
+    ),
+    # Poll and link payloads (poll_types.py)
+    Link: (("url", True),),
+    PollMedia: (
+        ("animation", False),
+        ("audio", False),
+        ("document", False),
+        ("link", False),
+        ("live_photo", False),
+        ("location", False),
+        ("photo", False),
+        ("sticker", False),
+        ("venue", False),
+        ("video", False),
+    ),
+    VideoQuality: (
+        ("file_id", True),
+        ("file_unique_id", True),
+        ("width", True),
+        ("height", True),
+        ("codec", True),
+        ("file_size", False),
+    ),
+    # Service-message payloads (message_service.py)
+    MessageAutoDeleteTimerChanged: (("message_auto_delete_time", True),),
+    ProximityAlertTriggered: (
+        ("traveler", True),
+        ("watcher", True),
+        ("distance", True),
+    ),
+    WriteAccessAllowed: (
+        ("from_request", False),
+        ("web_app_name", False),
+        ("from_attachment_menu", False),
+    ),
+    SharedUser: (
+        ("user_id", True),
+        ("first_name", False),
+        ("last_name", False),
+        ("username", False),
+        ("photo", False),
+    ),
+    UsersShared: (
+        ("request_id", True),
+        ("users", True),
+    ),
+    ChatShared: (
+        ("request_id", True),
+        ("chat_id", True),
+        ("title", False),
+        ("username", False),
+        ("photo", False),
+    ),
+    ForumTopicCreated: (
+        ("name", True),
+        ("icon_color", True),
+        ("icon_custom_emoji_id", False),
+        ("is_name_implicit", False),
+    ),
+    ForumTopicEdited: (
+        ("name", False),
+        ("icon_custom_emoji_id", False),
+    ),
+    ForumTopicClosed: (),
+    ForumTopicReopened: (),
+    GeneralForumTopicHidden: (),
+    GeneralForumTopicUnhidden: (),
+    VideoChatScheduled: (("start_date", True),),
+    VideoChatStarted: (),
+    VideoChatEnded: (("duration", True),),
+    VideoChatParticipantsInvited: (("users", True),),
+    # Community, ownership and poll-option payloads (message_community.py)
+    ChatOwnerChanged: (("new_owner", True),),
+    ChatOwnerLeft: (("new_owner", False),),
+    CommunityChatAdded: (("community", True),),
+    CommunityChatRemoved: (),
+    DirectMessagesTopic: (
+        ("topic_id", True),
+        ("user", False),
+    ),
+    DirectMessagePriceChanged: (
+        ("are_direct_messages_enabled", True),
+        ("direct_message_star_count", False),
+    ),
+    PaidMessagePriceChanged: (("paid_message_star_count", True),),
+    ManagedBotCreated: (("bot", True),),
+    ManagedBotUpdated: (
+        ("user", True),
+        ("bot", True),
+    ),
+    PollOptionAdded: (
+        ("poll_message", False),
+        ("option_persistent_id", True),
+        ("option_text", True),
+        ("option_text_entities", False),
+    ),
+    PollOptionDeleted: (
+        ("poll_message", False),
+        ("option_persistent_id", True),
+        ("option_text", True),
+        ("option_text_entities", False),
+    ),
+    ChecklistTasksAdded: (
+        ("checklist_message", False),
+        ("tasks", True),
+    ),
+    ChecklistTasksDone: (
+        ("checklist_message", False),
+        ("marked_as_done_task_ids", False),
+        ("marked_as_not_done_task_ids", False),
+    ),
+    # Giveaway payloads (giveaway_types.py)
+    GiveawayCreated: (("prize_star_count", False),),
+    Giveaway: (
+        ("chats", True),
+        ("winners_selection_date", True),
+        ("winner_count", True),
+        ("only_new_members", False),
+        ("has_public_winners", False),
+        ("prize_description", False),
+        ("country_codes", False),
+        ("prize_star_count", False),
+        ("premium_subscription_month_count", False),
+    ),
+    GiveawayCompleted: (
+        ("winner_count", True),
+        ("unclaimed_prize_count", False),
+        ("giveaway_message", False),
+        ("is_star_giveaway", False),
+    ),
+    GiveawayWinners: (
+        ("chat", True),
+        ("giveaway_message_id", True),
+        ("winners_selection_date", True),
+        ("winner_count", True),
+        ("winners", True),
+        ("additional_chat_count", False),
+        ("prize_star_count", False),
+        ("premium_subscription_month_count", False),
+        ("unclaimed_prize_count", False),
+        ("only_new_members", False),
+        ("was_refunded", False),
+        ("prize_description", False),
+    ),
+    # Suggested-post payloads (suggested_post_types.py)
+    SuggestedPostPrice: (
+        ("currency", True),
+        ("amount", True),
+    ),
+    SuggestedPostInfo: (
+        ("state", True),
+        ("price", False),
+        ("send_date", False),
+    ),
+    SuggestedPostApproved: (
+        ("suggested_post_message", False),
+        ("price", False),
+        ("send_date", True),
+    ),
+    SuggestedPostApprovalFailed: (
+        ("suggested_post_message", False),
+        ("price", True),
+    ),
+    SuggestedPostDeclined: (
+        ("suggested_post_message", False),
+        ("comment", False),
+    ),
+    SuggestedPostPaid: (
+        ("suggested_post_message", False),
+        ("currency", True),
+        ("amount", False),
+        ("star_amount", False),
+    ),
+    SuggestedPostRefunded: (
+        ("suggested_post_message", False),
+        ("reason", True),
+    ),
 }
 
-#: Node's ``RawUpdate`` payload fields (common/models.ts), in node order.
+#: Payload fields documented on ``Update`` (Bot API 10.3), in docs order.
 UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "message",
     "edited_message",
@@ -666,6 +1148,7 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "business_message",
     "edited_business_message",
     "deleted_business_messages",
+    "guest_message",
     "message_reaction",
     "message_reaction_count",
     "inline_query",
@@ -673,6 +1156,7 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "callback_query",
     "shipping_query",
     "pre_checkout_query",
+    "purchased_paid_media",
     "poll",
     "poll_answer",
     "my_chat_member",
@@ -680,7 +1164,8 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "chat_join_request",
     "chat_boost",
     "removed_chat_boost",
-    "purchased_paid_media",
+    "managed_bot",
+    "subscription",
     "stopped_message_generation",
 )
 
@@ -692,7 +1177,7 @@ FROM_USER_CLASSES: tuple[type, ...] = (
     ChosenInlineResult,
     ShippingQuery,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
+    PaidMediaPurchased,
     ChatMemberUpdated,
     ChatJoinRequest,
 )
@@ -712,16 +1197,16 @@ def _field_map(cls: type) -> dict[str, dataclasses.Field[t.Any]]:
 
 class TestFieldInventory:
     @pytest.mark.parametrize("cls", list(FIELD_SPECS), ids=_spec_ids)
-    def test_field_names_match_node_exactly(self, cls: type) -> None:
+    def test_field_names_match_docs_exactly(self, cls: type) -> None:
         spec = FIELD_SPECS[cls]
         actual = [field.name for field in dataclasses.fields(cls)]  # type: ignore[arg-type]
         assert set(actual) == {name for name, _ in spec}, (
-            f"{cls.__name__} fields drifted from the node reference"
+            f"{cls.__name__} fields drifted from the documented field set"
         )
         assert len(actual) == len(spec)
 
     @pytest.mark.parametrize("cls", list(FIELD_SPECS), ids=_spec_ids)
-    def test_required_vs_optional_matches_node(self, cls: type) -> None:
+    def test_required_vs_optional_matches_docs(self, cls: type) -> None:
         fields = _field_map(cls)
         for name, required in FIELD_SPECS[cls]:
             field = fields[name]
@@ -730,10 +1215,12 @@ class TestFieldInventory:
                 assert field.default is True, f"{cls.__name__}.{name} must default to True"
                 continue
             if required:
-                assert not has_default, f"{cls.__name__}.{name} must be required like in node"
+                assert not has_default, (
+                    f"{cls.__name__}.{name} must be required like in the Bot API docs"
+                )
             else:
                 assert has_default and field.default is None, (
-                    f"{cls.__name__}.{name} must default to None like node's optional fields"
+                    f"{cls.__name__}.{name} must default to None like the docs' optional fields"
                 )
 
     @pytest.mark.parametrize("cls", list(FROM_USER_CLASSES), ids=lambda c: c.__name__)
@@ -785,18 +1272,36 @@ class TestNestedTyping:
         assert hints["web_app_data"] == (WebAppData | None)
         assert hints["community_chat_joined"] == (CommunityChatJoined | None)
         assert hints["receiver_user"] == (User | None)
-        # Deferred node types (Sticker, Game, payments, rich) stay loose.
-        for loose in (
-            "sticker",
-            "game",
-            "invoice",
-            "successful_payment",
-            "refunded_payment",
-            "passport_data",
-            "rich_message",
-            "link_preview_options",
-        ):
-            assert hints[loose] == (object | None)
+        # Sticker, Game, payments, passport, link previews and chat
+        # backgrounds all have real classes now, so these are typed.
+        assert hints["sticker"] == (Sticker | None)
+        assert hints["game"] == (Game | None)
+        assert hints["invoice"] == (Invoice | None)
+        assert hints["successful_payment"] == (SuccessfulPayment | None)
+        assert hints["refunded_payment"] == (RefundedPayment | None)
+        assert hints["passport_data"] == (PassportData | None)
+        assert hints["link_preview_options"] == (LinkPreviewOptions | None)
+        assert hints["chat_background_set"] == (ChatBackground | None)
+        # The service, giveaway and community payloads the previous revision
+        # kept raw are concrete docs classes now, so nothing on Message is
+        # annotated with the loose ``object`` placeholder.
+        assert hints["users_shared"] == (UsersShared | None)
+        assert hints["chat_shared"] == (ChatShared | None)
+        assert hints["write_access_allowed"] == (WriteAccessAllowed | None)
+        assert hints["message_auto_delete_timer_changed"] == (MessageAutoDeleteTimerChanged | None)
+        assert hints["proximity_alert_triggered"] == (ProximityAlertTriggered | None)
+        assert hints["forum_topic_created"] == (ForumTopicCreated | None)
+        assert hints["giveaway"] == (Giveaway | None)
+        assert hints["giveaway_winners"] == (GiveawayWinners | None)
+        assert hints["managed_bot_created"] == (ManagedBotCreated | None)
+        assert hints["poll_option_added"] == (PollOptionAdded | None)
+        assert hints["checklist_tasks_done"] == (ChecklistTasksDone | None)
+        assert hints["suggested_post_paid"] == (SuggestedPostPaid | None)
+        assert hints["direct_messages_topic"] == (DirectMessagesTopic | None)
+        assert hints["paid_message_price_changed"] == (PaidMessagePriceChanged | None)
+        assert hints["checklist"] == (Checklist | None)
+        for name, hint in hints.items():
+            assert hint is not (object | None), f"Message.{name} is still loosely typed"
 
     def test_chat_nested_types(self) -> None:
         hints = t.get_type_hints(Chat)
@@ -856,13 +1361,41 @@ class TestNestedTyping:
         assert hints["chat_join_request"] == (ChatJoinRequest | None)
         assert hints["chat_boost"] == (ChatBoostUpdated | None)
         assert hints["removed_chat_boost"] == (ChatBoostRemoved | None)
-        assert hints["purchased_paid_media"] == (PurchasedPaidMedia | None)
+        assert hints["purchased_paid_media"] == (PaidMediaPurchased | None)
         assert hints["stopped_message_generation"] == (MessageGenerationStopped | None)
 
 
 # ---------------------------------------------------------------------------
 # Fully-populated realistic payloads for round-trip checks.
 # ---------------------------------------------------------------------------
+
+RAW_STICKER: dict[str, t.Any] = {
+    "file_id": "st1",
+    "file_unique_id": "stu1",
+    "type": "regular",
+    "width": 100,
+    "height": 100,
+    "is_animated": False,
+    "is_video": False,
+}
+
+#: Every field the Bot API 10.3 docs list for BusinessBotRights.
+RAW_BUSINESS_BOT_RIGHTS: dict[str, t.Any] = {
+    "can_reply": True,
+    "can_read_messages": True,
+    "can_delete_sent_messages": True,
+    "can_delete_all_messages": False,
+    "can_edit_name": True,
+    "can_edit_bio": True,
+    "can_edit_profile_photo": False,
+    "can_edit_username": True,
+    "can_change_gift_settings": False,
+    "can_view_gifts_and_stars": True,
+    "can_convert_gifts_to_stars": True,
+    "can_transfer_and_upgrade_gifts": False,
+    "can_transfer_stars": True,
+    "can_manage_stories": False,
+}
 
 RAW_USER: dict[str, t.Any] = {
     "id": 7,
@@ -896,7 +1429,11 @@ RAW_CHAT: dict[str, t.Any] = {
     },
     "active_usernames": ["devchat", "dev_chat_old"],
     "birthdate": {"day": 1, "month": 2, "year": 2003},
-    "business_intro": {"title": "Hi", "message": "Welcome", "sticker": {"file_id": "stk"}},
+    "business_intro": {
+        "title": "Hi",
+        "message": "Welcome",
+        "sticker": RAW_STICKER,
+    },
     "business_location": {"address": "1 Main St", "location": {"latitude": 1.0, "longitude": 2.0}},
     "business_opening_hours": {
         "time_zone_name": "UTC",
@@ -1105,6 +1642,8 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "is_anonymous": True,
         "type": "quiz",
         "allows_multiple_answers": False,
+        "allows_revoting": False,
+        "members_only": False,
         "correct_option_id": 0,
         "explanation": "Pho wins",
         "explanation_entities": [{"type": "italic", "offset": 0, "length": 3}],
@@ -1165,14 +1704,33 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "invoice_payload": "pl",
         "telegram_payment_charge_id": "tg",
     },
-    "users_shared": {"request_id": 1, "users": [{"id": 5}]},
+    "users_shared": {
+        "request_id": 1,
+        "users": [
+            {
+                "user_id": 5,
+                "first_name": "Shared",
+                "photo": [{"file_id": "su", "file_unique_id": "suu", "width": 90, "height": 90}],
+            }
+        ],
+    },
     "chat_shared": {"request_id": 2, "chat_id": -1001},
     "connected_website": "https://example.com",
     "write_access_allowed": {"from_request": True},
     "passport_data": {"data": [], "credentials": {"data": "d", "hash": "h", "secret": "s"}},
-    "proximity_alert_triggered": {"traveler": {"id": 1}, "watcher": {"id": 2}, "distance": 5},
+    "proximity_alert_triggered": {
+        "traveler": {"id": 1, "is_bot": False, "first_name": "Traveler"},
+        "watcher": {"id": 2, "is_bot": False, "first_name": "Watcher"},
+        "distance": 5,
+    },
     "boost_added": {"boost_count": 3},
-    "chat_background_set": {"type": "fill", "fill": {"color": 1}},
+    "chat_background_set": {
+        "type": {
+            "type": "fill",
+            "dark_theme_dimming": 0,
+            "fill": {"type": "solid", "color": 1},
+        }
+    },
     "forum_topic_created": {"name": "Topic", "icon_color": 1},
     "forum_topic_edited": {"name": "Topic2"},
     "forum_topic_closed": {},
@@ -1180,13 +1738,25 @@ RAW_MESSAGE: dict[str, t.Any] = {
     "general_forum_topic_hidden": {},
     "general_forum_topic_unhidden": {},
     "giveaway_created": {"prize_star_count": 100},
-    "giveaway": {"chats": [{"id": -1001}], "winners_selection_date": 1},
-    "giveaway_winners": {"chat": {"id": -1001}, "winners": [{"id": 1}]},
+    "giveaway": {
+        "chats": [{"id": -1001, "type": "supergroup"}],
+        "winners_selection_date": 1,
+        "winner_count": 2,
+    },
+    "giveaway_winners": {
+        "chat": {"id": -1001, "type": "supergroup"},
+        "giveaway_message_id": 12,
+        "winners_selection_date": 1,
+        "winner_count": 1,
+        "winners": [{"id": 1, "is_bot": False, "first_name": "Winner"}],
+    },
     "giveaway_completed": {"winner_count": 1},
     "video_chat_scheduled": {"start_date": 1},
     "video_chat_started": {},
     "video_chat_ended": {"duration": 60},
-    "video_chat_participants_invited": {"users": [{"id": 1}]},
+    "video_chat_participants_invited": {
+        "users": [{"id": 1, "is_bot": False, "first_name": "Invited"}]
+    },
     "web_app_data": {"data": '{"k":1}', "button_text": "Open"},
     "reply_markup": {
         "inline_keyboard": [
@@ -1231,14 +1801,10 @@ RAW_MESSAGE: dict[str, t.Any] = {
         "file_unique_id": "lpu",
         "width": 1080,
         "height": 1920,
+        "duration": 3,
         "photo": [{"file_id": "lpp", "file_unique_id": "lppu", "width": 540, "height": 960}],
-        "video": {
-            "file_id": "lpv",
-            "file_unique_id": "lpvu",
-            "width": 1080,
-            "height": 1920,
-            "duration": 3,
-        },
+        "mime_type": "video/mp4",
+        "file_size": 2_400_000,
     },
 }
 
@@ -1256,6 +1822,49 @@ RAW_MESSAGE_POPULATED: dict[str, t.Any] = {
 }
 
 
+# A realistic ``getChat`` response: a value for every one of the 53 documented
+# ChatFullInfo fields, so the decode test can prove none of them is dropped.
+RAW_CHAT_FULL_INFO: dict[str, t.Any] = {
+    **RAW_CHAT_POPULATED,
+    "first_name": "Ada",
+    "last_name": "Lovelace",
+    "is_direct_messages": False,
+    "max_reaction_count": 3,
+    "parent_chat": {"id": -100555, "type": "channel", "title": "Announcements"},
+    "accepted_gift_types": {
+        "unlimited_gifts": True,
+        "limited_gifts": False,
+        "unique_gifts": True,
+        "premium_subscription": True,
+        "gifts_from_channels": False,
+    },
+    "can_send_paid_media": True,
+    "rating": {
+        "level": 4,
+        "rating": 120,
+        "current_level_rating": 100,
+        "next_level_rating": 200,
+    },
+    "first_profile_audio": {
+        "file_id": "au1",
+        "file_unique_id": "au1u",
+        "duration": 42,
+        "title": "Hello",
+    },
+    "unique_gift_colors": {
+        "model_custom_emoji_id": "model-emoji",
+        "symbol_custom_emoji_id": "symbol-emoji",
+        "light_theme_main_color": 16_755_660,
+        "light_theme_other_colors": [16_711_680, 65_280],
+        "dark_theme_main_color": 2_241_860,
+        "dark_theme_other_colors": [1_122_834],
+    },
+    "paid_message_star_count": 250,
+    "guard_bot": RAW_USER,
+    "community": {"id": 77, "name": "Telebot"},
+}
+
+
 class TestRoundTrips:
     def test_user_full(self) -> None:
         assert User.from_dict(RAW_USER).to_dict() == RAW_USER
@@ -1270,6 +1879,41 @@ class TestRoundTrips:
         assert isinstance(chat.birthdate, Birthdate)
         assert isinstance(chat.business_opening_hours, BusinessOpeningHours)
         assert chat.to_dict() == RAW_CHAT_POPULATED
+
+    def test_chat_full_info_populates_every_documented_field(self) -> None:
+        names = [field.name for field in dataclasses.fields(ChatFullInfo)]
+        assert len(names) == 53, "ChatFullInfo must carry every documented field"
+        assert set(RAW_CHAT_FULL_INFO) == set(names)
+
+        info = ChatFullInfo.from_dict(RAW_CHAT_FULL_INFO)
+        assert [name for name in names if getattr(info, name) is None] == []
+        assert isinstance(info.photo, ChatPhoto)
+        assert isinstance(info.birthdate, Birthdate)
+        assert isinstance(info.permissions, ChatPermissions)
+        assert isinstance(info.accepted_gift_types, AcceptedGiftTypes)
+        assert isinstance(info.rating, UserRating)
+        assert isinstance(info.first_profile_audio, Audio)
+        assert isinstance(info.unique_gift_colors, UniqueGiftColors)
+        assert isinstance(info.guard_bot, User)
+        assert isinstance(info.community, Community)
+        assert isinstance(info.parent_chat, Chat)
+        assert isinstance(info.personal_chat, Chat)
+        assert isinstance(info.location, ChatLocation)
+        assert isinstance(info.pinned_message, Message)
+        assert isinstance(info.available_reactions[0], ReactionTypeEmoji)
+        assert info.to_dict() == RAW_CHAT_FULL_INFO
+
+    def test_chat_full_info_keeps_the_docs_required_fields_required(self) -> None:
+        for name in (
+            "id",
+            "type",
+            "accent_color_id",
+            "max_reaction_count",
+            "accepted_gift_types",
+        ):
+            payload = {k: v for k, v in RAW_CHAT_FULL_INFO.items() if k != name}
+            with pytest.raises(TypeParseError):
+                ChatFullInfo.from_dict(payload)
 
     def test_message_full(self) -> None:
         message = Message.from_dict(RAW_MESSAGE_POPULATED)
@@ -1291,7 +1935,8 @@ class TestRoundTrips:
         assert isinstance(message.boost_added, ChatBoostAdded)
         assert isinstance(message.web_app_data, WebAppData)
         assert isinstance(message.community_chat_joined, CommunityChatJoined)
-        assert isinstance(message.sticker, dict)  # deferred node type stays raw
+        assert isinstance(message.sticker, Sticker)
+        assert isinstance(message.game, Game)
         assert message.to_dict() == RAW_MESSAGE_POPULATED
 
     def test_message_requires_chat(self) -> None:
@@ -1540,6 +2185,7 @@ class TestRoundTrips:
             "voter_chat": {"id": -100, "type": "group", "title": "Voters"},
             "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
             "option_ids": [0, 2],
+            "option_persistent_ids": ["opt-a", "opt-c"],
         }
         assert PollAnswer.from_dict(raw).to_dict() == raw
 
@@ -1577,10 +2223,13 @@ class TestRoundTrips:
             "user": RAW_USER,
             "user_chat_id": 7,
             "date": 1_700_000_000,
-            "can_reply": True,
+            "rights": dict(RAW_BUSINESS_BOT_RIGHTS),
             "is_enabled": True,
         }
-        assert BusinessConnection.from_dict(connection_raw).to_dict() == connection_raw
+        connection = BusinessConnection.from_dict(connection_raw)
+        assert connection.to_dict() == connection_raw
+        assert isinstance(connection.rights, BusinessBotRights)
+        assert connection.rights is not None and connection.rights.can_reply is True
         deleted_raw = {
             "business_connection_id": "biz-1",
             "chat": {"id": 7, "type": "private"},
@@ -1664,7 +2313,7 @@ class TestRoundTrips:
             "from": {"id": 7, "is_bot": False, "first_name": "Ada"},
             "paid_media_payload": "payload",
         }
-        assert PurchasedPaidMedia.from_dict(paid_raw).to_dict() == paid_raw
+        assert PaidMediaPurchased.from_dict(paid_raw).to_dict() == paid_raw
 
     def test_inline_types(self) -> None:
         inline_raw = {
@@ -1736,7 +2385,7 @@ class TestRoundTrips:
             (Community, {"id": 1, "name": "C"}),
             (CommunityChatJoined, {"community": {"id": 1, "name": "C"}}),
             (ChatLocation, {"location": {"latitude": 1.0, "longitude": 2.0}, "address": "A"}),
-            (BusinessIntro, {"title": "T", "message": "M", "sticker": {"file_id": "s"}}),
+            (BusinessIntro, {"title": "T", "message": "M", "sticker": RAW_STICKER}),
             (BusinessLocation, {"address": "A", "location": {"latitude": 1.0, "longitude": 2.0}}),
             (
                 BusinessOpeningHours,
@@ -1783,7 +2432,7 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
             "user": RAW_USER,
             "user_chat_id": 7,
             "date": 1,
-            "can_reply": True,
+            "rights": dict(RAW_BUSINESS_BOT_RIGHTS),
             "is_enabled": True,
         },
         BusinessConnection,
@@ -1816,6 +2465,17 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
             "message_ids": [1, 2],
         },
         BusinessMessagesDeleted,
+    ),
+    "guest_message": (
+        {
+            "message_id": 8,
+            "date": 1,
+            "chat": {"id": -100, "type": "channel"},
+            "sender_chat": {"id": -100999, "type": "channel", "title": "Guest"},
+            "guest_query_id": "gq-1",
+            "text": "posted by a guest bot",
+        },
+        Message,
     ),
     "message_reaction": (
         {
@@ -1876,16 +2536,21 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         {
             "id": "p",
             "question": "q",
-            "options": [{"text": "a", "voter_count": 0}],
+            "options": [{"persistent_id": "opt-a", "text": "a", "voter_count": 0}],
             "total_voter_count": 0,
             "is_closed": False,
             "is_anonymous": True,
             "type": "regular",
             "allows_multiple_answers": False,
+            "allows_revoting": False,
+            "members_only": True,
         },
         Poll,
     ),
-    "poll_answer": ({"poll_id": "p", "option_ids": [0]}, PollAnswer),
+    "poll_answer": (
+        {"poll_id": "p", "option_ids": [0], "option_persistent_ids": ["opt-a"]},
+        PollAnswer,
+    ),
     "my_chat_member": (
         {
             "chat": {"id": -100, "type": "supergroup"},
@@ -1936,7 +2601,22 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         },
         ChatBoostRemoved,
     ),
-    "purchased_paid_media": ({"from": RAW_USER, "paid_media_payload": "p"}, PurchasedPaidMedia),
+    "managed_bot": (
+        {
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "bot": {"id": 200, "is_bot": True, "first_name": "Managed", "username": "managedbot"},
+        },
+        ManagedBotUpdated,
+    ),
+    "subscription": (
+        {
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "invoice_payload": "monthly",
+            "state": "active",
+        },
+        BotSubscriptionUpdated,
+    ),
+    "purchased_paid_media": ({"from": RAW_USER, "paid_media_payload": "p"}, PaidMediaPurchased),
     "stopped_message_generation": (
         {"chat": {"id": -100, "type": "supergroup"}, "message_thread_id": 4, "draft_id": 9},
         MessageGenerationStopped,
@@ -1966,12 +2646,14 @@ class TestUpdateFidelity:
         poll = Poll(
             id="p",
             question="q",
-            options=[PollOption(text="a", voter_count=0)],
+            options=[PollOption(persistent_id="opt-a", text="a", voter_count=0)],
             total_voter_count=0,
             is_closed=False,
             is_anonymous=True,
             type="regular",
             allows_multiple_answers=False,
+            allows_revoting=False,
+            members_only=False,
         )
         with pytest.raises(ValueError, match="exactly one"):
             Update(update_id=1, message=message, poll=poll)
@@ -1993,4 +2675,126 @@ class TestUpdateFidelity:
         )
         assert update.effective_message is update.message
         assert update.effective_chat is update.message.chat
-        assert update.effective_user is update.message.from_user
+
+
+class TestBotApi103DocsShape:
+    """Pin the shapes written straight out of the Bot API 10.3 changelog.
+
+    These duplicate part of :data:`FIELD_SPECS` on purpose: the inventory can
+    be re-synced from the node reference, but these lists are transcriptions of
+    https://core.telegram.org/bots/api and must not move with it.
+    """
+
+    BUSINESS_BOT_RIGHTS_FIELDS: t.ClassVar[tuple[str, ...]] = (
+        "can_reply",
+        "can_read_messages",
+        "can_delete_sent_messages",
+        "can_delete_all_messages",
+        "can_edit_name",
+        "can_edit_bio",
+        "can_edit_profile_photo",
+        "can_edit_username",
+        "can_change_gift_settings",
+        "can_view_gifts_and_stars",
+        "can_convert_gifts_to_stars",
+        "can_transfer_and_upgrade_gifts",
+        "can_transfer_stars",
+        "can_manage_stories",
+    )
+
+    def test_business_bot_rights_matches_documented_field_list(self) -> None:
+        names = tuple(field.name for field in dataclasses.fields(BusinessBotRights))
+        assert names == self.BUSINESS_BOT_RIGHTS_FIELDS
+        assert issubclass(BusinessBotRights, TelegramObject)
+
+    def test_business_bot_rights_is_exported_from_types_package(self) -> None:
+        from telebot_py import types as types_module
+
+        assert types_module.BusinessBotRights is BusinessBotRights
+        assert "BusinessBotRights" in types_module.__all__
+
+    def test_partial_rights_payload_keeps_unset_rights_none(self) -> None:
+        rights = BusinessBotRights.from_dict({"can_reply": True, "can_edit_bio": True})
+        assert rights.can_reply is True
+        assert rights.can_edit_bio is True
+        assert rights.can_manage_stories is None
+        assert rights.to_dict() == {"can_reply": True, "can_edit_bio": True}
+
+    def test_live_v10_3_connection_without_can_reply_parses(self) -> None:
+        # What api.telegram.org actually sends since Bot API 10.3: `rights`
+        # replaced the old required top-level `can_reply` boolean.
+        live_payload = {
+            "id": "4b0b4d55-1",
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "user_chat_id": 42,
+            "date": 1_700_000_000,
+            "rights": {"can_reply": True, "can_read_messages": True},
+            "is_enabled": True,
+        }
+        connection = BusinessConnection.from_dict(live_payload)
+        assert connection.rights is not None
+        assert connection.rights.can_reply is True
+        assert connection.rights.can_read_messages is True
+        assert connection.rights.can_edit_name is None
+        assert not hasattr(connection, "can_reply")
+
+    def test_connection_rights_are_optional(self) -> None:
+        payload = {
+            "id": "b",
+            "user": {"id": 7, "is_bot": False, "first_name": "Ada"},
+            "user_chat_id": 42,
+            "date": 1,
+            "is_enabled": True,
+        }
+        assert BusinessConnection.from_dict(payload).rights is None
+
+    def test_gift_v10_3_optionals_match_documented_field_list(self) -> None:
+        names = tuple(field.name for field in dataclasses.fields(Gift))
+        assert names == (
+            "id",
+            "sticker",
+            "star_count",
+            "upgrade_star_count",
+            "is_premium",
+            "has_colors",
+            "total_count",
+            "remaining_count",
+            "personal_total_count",
+            "personal_remaining_count",
+            "background",
+            "unique_gift_variant_count",
+            "publisher_chat",
+        )
+
+    def test_gift_fully_populated_v10_3_payload(self) -> None:
+        raw = {
+            "id": "gift1",
+            "sticker": RAW_STICKER,
+            "star_count": 50,
+            "upgrade_star_count": 25,
+            "is_premium": True,
+            "has_colors": True,
+            "total_count": 10,
+            "remaining_count": 4,
+            "personal_total_count": 2,
+            "personal_remaining_count": 1,
+            "background": {"center_color": 1, "edge_color": 2, "text_color": 3},
+            "unique_gift_variant_count": 7,
+            "publisher_chat": {"id": -100, "type": "channel", "title": "P"},
+        }
+        gift = Gift.from_dict(raw)
+        assert gift.is_premium is True
+        assert gift.has_colors is True
+        assert gift.personal_total_count == 2
+        assert gift.personal_remaining_count == 1
+        assert gift.unique_gift_variant_count == 7
+        assert isinstance(gift.background, GiftBackground)
+        assert gift.background is not None and gift.background.text_color == 3
+        assert isinstance(gift.publisher_chat, Chat)
+        assert gift.to_dict() == raw
+
+    def test_gift_background_is_exported_from_types_package(self) -> None:
+        from telebot_py import types as types_module
+
+        assert types_module.GiftBackground is GiftBackground
+        assert "GiftBackground" in types_module.__all__

@@ -59,6 +59,19 @@ class TestBotDescription:
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setMyDescription"
         assert sent_payload(seen[0]) == {"description": "desc", "language_code": "en"}
 
+    async def test_set_my_description_distinguishes_unset_from_empty(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        """Omitting description sends nothing; "" removes the dedicated description."""
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_my_description() is True
+        assert sent_payload(seen[0]) == {}
+
+        assert await bot.set_my_description("") is True
+        assert sent_payload(seen[1]) == {"description": ""}
+
     async def test_get_my_description(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
         step = record_into(ok_response({"description": "desc"}), seen)
@@ -81,6 +94,19 @@ class TestBotShortDescription:
             "short_description": "short",
             "language_code": "en",
         }
+
+    async def test_set_my_short_description_distinguishes_unset_from_empty(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        """Omitting short_description sends nothing; "" removes the dedicated one."""
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_my_short_description() is True
+        assert sent_payload(seen[0]) == {}
+
+        assert await bot.set_my_short_description("") is True
+        assert sent_payload(seen[1]) == {"short_description": ""}
 
     async def test_get_my_short_description(self, bot_transport: Any, ok_response: Any) -> None:
         seen: list[httpx.Request] = []
@@ -135,6 +161,24 @@ class TestBotCommands:
         }
 
 
+class TestMyProfilePhoto:
+    async def test_set_my_profile_photo(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_my_profile_photo("photo_file_id") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setMyProfilePhoto"
+        assert sent_payload(seen[0]) == {"photo": "photo_file_id"}
+
+    async def test_remove_my_profile_photo(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.remove_my_profile_photo() is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/removeMyProfilePhoto"
+        assert sent_payload(seen[0]) == {}
+
+
 class TestProfileApiError:
     async def test_set_my_name_error(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: invalid"), [])
@@ -142,3 +186,11 @@ class TestProfileApiError:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.set_my_name(name="x")
         assert excinfo.value.error_code == 400
+
+    async def test_remove_my_profile_photo_error(
+        self, bot_transport: Any, error_response: Any
+    ) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: no photo"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError):
+            await bot.remove_my_profile_photo()

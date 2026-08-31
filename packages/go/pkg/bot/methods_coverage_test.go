@@ -79,23 +79,28 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	ctx := context.Background()
 
 	setResult(`{"message_id":11,"text":"photo caption"}`)
-	msg, err := b.SendPhoto(ctx, int64(1), "https://example.com/cat.jpg", "photo caption", &types.InlineKeyboardMarkup{
-		InlineKeyboard: [][]types.InlineKeyboardButton{{{Text: "btn", CallbackData: "d"}}},
+	msg, err := b.SendPhoto(ctx, &types.SendPhotoOptions{
+		ChatID:  int64(1),
+		Photo:   "https://example.com/cat.jpg",
+		Caption: "photo caption",
+		ReplyMarkup: &types.InlineKeyboardMarkup{
+			InlineKeyboard: [][]types.InlineKeyboardButton{{{Text: "btn", CallbackData: "d"}}},
+		},
 	})
 	if err != nil || msg.MessageID != 11 {
 		t.Fatalf("SendPhoto = (%+v, %v)", msg, err)
 	}
 
 	// Branch without caption/markup.
-	if _, err := b.SendPhoto(ctx, "@channel", "file_id", "", nil); err != nil {
+	if _, err := b.SendPhoto(ctx, &types.SendPhotoOptions{ChatID: "@channel", Photo: "file_id"}); err != nil {
 		t.Fatalf("SendPhoto minimal = %v", err)
 	}
 
 	setResult(`{"message_id":12}`)
-	if _, err := b.SendDocument(ctx, int64(1), "doc_id", ""); err != nil {
+	if _, err := b.SendDocument(ctx, &types.SendDocumentOptions{ChatID: int64(1), Document: "doc_id"}); err != nil {
 		t.Fatalf("SendDocument minimal = %v", err)
 	}
-	if _, err := b.SendDocument(ctx, int64(1), "doc_id", "caption"); err != nil {
+	if _, err := b.SendDocument(ctx, &types.SendDocumentOptions{ChatID: int64(1), Document: "doc_id", Caption: "caption"}); err != nil {
 		t.Fatalf("SendDocument with caption = %v", err)
 	}
 
@@ -108,18 +113,18 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	}
 
 	setResult(`{"message_id":14}`)
-	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14); err != nil {
+	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, 0, "", nil); err != nil {
 		t.Fatalf("ForwardMessage = %v", err)
 	}
 
 	setResult(`{"message_id":15}`)
-	mid, err := b.CopyMessage(ctx, int64(1), int64(2), 14)
+	mid, err := b.CopyMessage(ctx, &types.CopyMessageOptions{ChatID: int64(1), FromChatID: int64(2), MessageID: 14})
 	if err != nil || mid.MessageID != 15 {
 		t.Fatalf("CopyMessage = (%+v, %v)", mid, err)
 	}
 
 	setResult(`true`)
-	if ok, err := b.SendChatAction(ctx, int64(1), "typing"); err != nil || !ok {
+	if ok, err := b.SendChatAction(ctx, int64(1), "typing", ""); err != nil || !ok {
 		t.Fatalf("SendChatAction = (%v, %v)", ok, err)
 	}
 }
@@ -185,10 +190,10 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.UnbanChatMember(ctx, 1, 2, false); err == nil {
 		t.Error("UnbanChatMember: expected error")
 	}
-	if _, err := b.SendPhoto(ctx, 1, "p", "", nil); err == nil {
+	if _, err := b.SendPhoto(ctx, &types.SendPhotoOptions{ChatID: 1, Photo: "p"}); err == nil {
 		t.Error("SendPhoto: expected error")
 	}
-	if _, err := b.SendDocument(ctx, 1, "d", ""); err == nil {
+	if _, err := b.SendDocument(ctx, &types.SendDocumentOptions{ChatID: 1, Document: "d"}); err == nil {
 		t.Error("SendDocument: expected error")
 	}
 	if _, err := b.EditMessageText(ctx, &types.EditMessageTextOptions{}); err == nil {
@@ -197,13 +202,13 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.EditMessageReplyMarkup(ctx, &types.EditMessageReplyMarkupOptions{}); err == nil {
 		t.Error("EditMessageReplyMarkup: expected error")
 	}
-	if _, err := b.ForwardMessage(ctx, 1, 2, 3); err == nil {
+	if _, err := b.ForwardMessage(ctx, 1, 2, 3, 0, "", nil); err == nil {
 		t.Error("ForwardMessage: expected error")
 	}
-	if _, err := b.CopyMessage(ctx, 1, 2, 3); err == nil {
+	if _, err := b.CopyMessage(ctx, &types.CopyMessageOptions{ChatID: 1, FromChatID: 2, MessageID: 3}); err == nil {
 		t.Error("CopyMessage: expected error")
 	}
-	if _, err := b.SendChatAction(ctx, 1, "typing"); err == nil {
+	if _, err := b.SendChatAction(ctx, 1, "typing", ""); err == nil {
 		t.Error("SendChatAction: expected error")
 	}
 	if _, err := b.CreateForumTopic(ctx, 1, "n", 0, ""); err == nil {

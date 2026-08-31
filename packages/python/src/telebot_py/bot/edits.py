@@ -13,8 +13,9 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
-from telebot_py.types.common import MessageEntity, Poll
+from telebot_py.types.common import LinkPreviewOptions, MessageEntity
 from telebot_py.types.message import Message
+from telebot_py.types.poll_types import Poll
 
 
 class EditsMixin(Requester):
@@ -22,15 +23,16 @@ class EditsMixin(Requester):
 
     async def edit_message_text(
         self,
-        text: str,
+        text: str | None = None,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
-        message_thread_id: int | None = None,
         parse_mode: str | None = None,
         entities: Sequence[MessageEntity] | None = None,
-        link_preview_options: MarkupLike | None = None,
+        rich_message: MarkupLike | None = None,
+        link_preview_options: LinkPreviewOptions | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
         """Edit the text of a message sent by the bot or via the bot.
@@ -39,17 +41,22 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_text("new text", chat_id=1, message_id=2)
 
         Args:
-            text: New text of the message, 1-4096 characters.
+            text: New text of the message, 1-4096 characters after entity
+                parsing; required unless ``rich_message`` is given.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
                 ``inline_message_id`` is given.
             inline_message_id: Identifier of the inline message to edit,
                 instead of ``chat_id`` and ``message_id``.
-            message_thread_id: Unique identifier for the target message thread.
             parse_mode: Parse mode for the new text entities.
             entities: Special entities for the new text.
-            link_preview_options: Link preview generation options.
+            rich_message: InputRichMessage with the new rich content.
+            link_preview_options: Link preview generation options, as a
+                ``LinkPreviewOptions`` object or a mapping.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -60,15 +67,18 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagetext
         """
         payload = clean_payload(
             text=text,
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
-            message_thread_id=message_thread_id,
             parse_mode=parse_mode,
             entities=[entity.to_dict() for entity in entities] if entities is not None else None,
+            rich_message=to_wire(rich_message),
             link_preview_options=to_wire(link_preview_options),
             reply_markup=to_wire(reply_markup),
         )
@@ -77,6 +87,7 @@ class EditsMixin(Requester):
     async def edit_message_caption(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -91,6 +102,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_caption(chat_id=1, message_id=2, caption="new")
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -111,8 +125,11 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagecaption
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -129,6 +146,7 @@ class EditsMixin(Requester):
         self,
         media: MarkupLike,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -148,6 +166,9 @@ class EditsMixin(Requester):
                 ``type``, ``media``, and type-specific optionals) given as a
                 dict or ``to_dict`` object. Only ``file_id``/HTTP URL media
                 references are supported; file uploads are out of scope.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -164,9 +185,12 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagemedia
         """
         payload = clean_payload(
             media=to_wire(media),
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -179,13 +203,14 @@ class EditsMixin(Requester):
         latitude: float,
         longitude: float,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
         live_period: int | None = None,
         horizontal_accuracy: float | None = None,
-        vertical_accuracy: float | None = None,
         heading: int | None = None,
+        proximity_alert_radius: int | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
         """Edit the live location of a live-location message.
@@ -196,6 +221,9 @@ class EditsMixin(Requester):
         Args:
             latitude: New latitude of the location, in degrees.
             longitude: New longitude of the location, in degrees.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -206,8 +234,9 @@ class EditsMixin(Requester):
                 be updated, starting from the message send date.
             horizontal_accuracy: Radius of uncertainty for the location,
                 in meters; 0-1500.
-            vertical_accuracy: Accuracy of altitude, in meters; 0-1500.
             heading: Direction in which the user is moving, in degrees; 1-360.
+            proximity_alert_radius: Maximum distance for proximity alerts about
+                approaching another chat member, in meters; 1-100000.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -218,17 +247,20 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagelivelocation
         """
         payload = clean_payload(
             latitude=latitude,
             longitude=longitude,
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
             live_period=live_period,
             horizontal_accuracy=horizontal_accuracy,
-            vertical_accuracy=vertical_accuracy,
             heading=heading,
+            proximity_alert_radius=proximity_alert_radius,
             reply_markup=to_wire(reply_markup),
         )
         return parse_message_or_true(await self.request("editMessageLiveLocation", payload))
@@ -236,6 +268,7 @@ class EditsMixin(Requester):
     async def stop_message_live_location(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -247,6 +280,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.stop_message_live_location(chat_id=1, message_id=2)
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to stop; required unless
@@ -263,8 +299,11 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#stopmessagelivelocation
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -277,6 +316,7 @@ class EditsMixin(Requester):
         chat_id: int | str,
         message_id: int,
         *,
+        business_connection_id: str | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Poll:
         """Stop a poll which was sent by the bot.
@@ -289,6 +329,9 @@ class EditsMixin(Requester):
         Args:
             chat_id: Chat containing the poll message.
             message_id: Identifier of the message with the poll.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -299,10 +342,13 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#stoppoll
         """
         payload = clean_payload(
             chat_id=chat_id,
             message_id=message_id,
+            business_connection_id=business_connection_id,
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Poll, await self.request("stopPoll", payload))
@@ -310,6 +356,7 @@ class EditsMixin(Requester):
     async def edit_message_reply_markup(
         self,
         *,
+        business_connection_id: str | None = None,
         chat_id: int | str | None = None,
         message_id: int | None = None,
         inline_message_id: str | None = None,
@@ -321,6 +368,9 @@ class EditsMixin(Requester):
             >>> msg = await bot.edit_message_reply_markup(chat_id=1, message_id=2, reply_markup={})
 
         Args:
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message to be edited was
+                sent.
             chat_id: Chat containing the message; required unless
                 ``inline_message_id`` is given.
             message_id: Identifier of the message to edit; required unless
@@ -337,8 +387,11 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editmessagereplymarkup
         """
         payload = clean_payload(
+            business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -366,6 +419,67 @@ class EditsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemessage
         """
         payload = {"chat_id": chat_id, "message_id": message_id}
         return parse_flag(await self.request("deleteMessage", payload))
+
+    async def send_message_draft(
+        self,
+        chat_id: int | str,
+        draft_id: int,
+        *,
+        message_thread_id: int | None = None,
+        text: str | None = None,
+        parse_mode: str | None = None,
+        entities: Sequence[MarkupLike] | None = None,
+        can_stop: bool | None = None,
+        keep_on_stop: bool | None = None,
+    ) -> bool:
+        """Stream a partial message draft while the final answer is generated.
+
+        Remarks:
+            The draft is ephemeral: it acts as a temporary 30-second preview,
+            so the bot must still call ``sendMessage`` with the complete text
+            to persist the message. Passing an empty ``text`` shows a
+            "Thinking..." placeholder.
+
+        Example:
+            >>> ok = await bot.send_message_draft(123, 1, text="Working on it")
+
+        Args:
+            chat_id: Unique identifier for the target private chat.
+            draft_id: Unique identifier of the message draft; must be
+                non-zero. Drafts sharing an identifier are animated.
+            message_thread_id: Unique identifier of the target message thread.
+            text: Text of the draft, 0-4096 characters after entities parsing.
+            parse_mode: Mode for parsing entities in the draft text.
+            entities: MessageEntity items as ``to_dict`` objects or dicts; can
+                be specified instead of ``parse_mode``.
+            can_stop: Whether to show the user a button stopping further
+                drafts.
+            keep_on_stop: Whether to keep the draft in the chat when the stop
+                button is pressed.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendmessagedraft
+        """
+        payload = clean_payload(
+            chat_id=chat_id,
+            draft_id=draft_id,
+            message_thread_id=message_thread_id,
+            text=text,
+            parse_mode=parse_mode,
+            entities=[to_wire(entity) for entity in entities] if entities is not None else None,
+            can_stop=can_stop,
+            keep_on_stop=keep_on_stop,
+        )
+        return parse_flag(await self.request("sendMessageDraft", payload))

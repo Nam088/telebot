@@ -2,12 +2,16 @@ import type { CallbackGame } from "../business/index.js";
 
 /**
  * Represents a disabled button which does nothing (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#disabledbutton Telegram Bot API: DisabledButton}
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface DisabledButton {}
 
 /**
  * Describes a Web App that can be launched from a button.
+ *
+ * @see {@link https://core.telegram.org/bots/api#webappinfo Telegram Bot API: WebAppInfo}
  */
 export interface WebAppInfo {
   /** An HTTPS URL of a Web App to be opened. */
@@ -16,6 +20,8 @@ export interface WebAppInfo {
 
 /**
  * Parameter of the inline keyboard button used to automatically authorize a user.
+ *
+ * @see {@link https://core.telegram.org/bots/api#loginurl Telegram Bot API: LoginUrl}
  */
 export interface LoginUrl {
   /** An HTTPS URL used to automatically authorize the user. */
@@ -30,6 +36,8 @@ export interface LoginUrl {
 
 /**
  * Represents an inline button that switches the current user to inline mode in a chosen chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#switchinlinequerychosenchat Telegram Bot API: SwitchInlineQueryChosenChat}
  */
 export interface SwitchInlineQueryChosenChat {
   /** The default inline query to be inserted in the input field. */
@@ -46,6 +54,8 @@ export interface SwitchInlineQueryChosenChat {
 
 /**
  * Represents an inline keyboard button that copies specified text to the clipboard.
+ *
+ * @see {@link https://core.telegram.org/bots/api#copytextbutton Telegram Bot API: CopyTextButton}
  */
 export interface CopyTextButton {
   /** The text to be copied to the clipboard; 1-256 characters. */
@@ -54,6 +64,8 @@ export interface CopyTextButton {
 
 /**
  * Represents one button of an inline keyboard.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inlinekeyboardbutton Telegram Bot API: InlineKeyboardButton}
  */
 export interface InlineKeyboardButton {
   /** Label text on the button. */
@@ -88,6 +100,8 @@ export interface InlineKeyboardButton {
 
 /**
  * Represents an inline keyboard that appears right next to the message it belongs to.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inlinekeyboardmarkup Telegram Bot API: InlineKeyboardMarkup}
  */
 export interface InlineKeyboardMarkup {
   /** Array of button rows, each represented by an Array of InlineKeyboardButton objects. */
@@ -98,6 +112,8 @@ export interface InlineKeyboardMarkup {
 
 /**
  * Represents type of poll that can be created with a keyboard button.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbuttonpolltype Telegram Bot API: KeyboardButtonPollType}
  */
 export interface KeyboardButtonPollType {
   /** If quiz is passed, the user can only create a poll in quiz mode. */
@@ -106,6 +122,8 @@ export interface KeyboardButtonPollType {
 
 /**
  * Defines the criteria used to request suitable users.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbuttonrequestusers Telegram Bot API: KeyboardButtonRequestUsers}
  */
 export interface KeyboardButtonRequestUsers {
   /** Signed 32-bit identifier of the request that will be received back in the UserShared object. */
@@ -126,6 +144,8 @@ export interface KeyboardButtonRequestUsers {
 
 /**
  * Defines the criteria used to request a suitable chat.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbuttonrequestchat Telegram Bot API: KeyboardButtonRequestChat}
  */
 export interface KeyboardButtonRequestChat {
   /** Signed 32-bit identifier of the request that will be received back in the ChatShared object. */
@@ -153,15 +173,40 @@ export interface KeyboardButtonRequestChat {
 }
 
 /**
+ * This object defines the parameters for the creation of a managed bot.
+ *
+ * @remarks
+ * Information about the created bot will be returned in a service message.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbuttonrequestmanagedbot Telegram Bot API: KeyboardButtonRequestManagedBot}
+ */
+export interface KeyboardButtonRequestManagedBot {
+  /** Signed 32-bit identifier of the request. Must be unique within the message. */
+  request_id: number;
+  /** Suggested name for the bot. */
+  suggested_name?: string;
+  /** Suggested username for the bot. */
+  suggested_username?: string;
+}
+
+/**
  * Represents one button of the reply keyboard.
+ *
+ * @see {@link https://core.telegram.org/bots/api#keyboardbutton Telegram Bot API: KeyboardButton}
  */
 export interface KeyboardButton {
-  /** Text of the button. If none of the optional fields are used, it will be sent as a message when the button is pressed. */
+  /** Text of the button. If none of the fields other than text, icon_custom_emoji_id, and style are used, it will be sent as a message when the button is pressed. */
   text: string;
+  /** Unique identifier of the custom emoji shown before the text of the button. */
+  icon_custom_emoji_id?: string;
+  /** Style of the button ('danger', 'success', 'primary'). */
+  style?: "danger" | "success" | "primary" | string;
   /** If specified, pressing the button will open a list of suitable users. */
-  request_users?: KeyboardButtonRequestUsers | unknown;
+  request_users?: KeyboardButtonRequestUsers;
   /** If specified, pressing the button will open a list of suitable chats. */
-  request_chat?: KeyboardButtonRequestChat | unknown;
+  request_chat?: KeyboardButtonRequestChat;
+  /** If specified, pressing the button will ask the user to create and share a bot that will be managed by the current bot. Available in private chats only. */
+  request_managed_bot?: KeyboardButtonRequestManagedBot;
   /** If True, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only. */
   request_contact?: boolean;
   /** If True, the user's current location will be sent when the button is pressed. Available in private chats only. */
@@ -174,6 +219,8 @@ export interface KeyboardButton {
 
 /**
  * Represents a custom keyboard with reply options.
+ *
+ * @see {@link https://core.telegram.org/bots/api#replykeyboardmarkup Telegram Bot API: ReplyKeyboardMarkup}
  */
 export interface ReplyKeyboardMarkup {
   /** Array of button rows, each represented by an Array of KeyboardButton objects. */
@@ -194,6 +241,8 @@ export interface ReplyKeyboardMarkup {
 
 /**
  * Requests clients to remove the custom keyboard.
+ *
+ * @see {@link https://core.telegram.org/bots/api#replykeyboardremove Telegram Bot API: ReplyKeyboardRemove}
  */
 export interface ReplyKeyboardRemove {
   /** Requests clients to remove the custom keyboard. */
@@ -204,6 +253,8 @@ export interface ReplyKeyboardRemove {
 
 /**
  * Shows reply interface to the user, as if they had selected the bot's message and tapped 'Reply'.
+ *
+ * @see {@link https://core.telegram.org/bots/api#forcereply Telegram Bot API: ForceReply}
  */
 export interface ForceReply {
   /** Shows reply interface to the user, as if they had selected the bot's message and tapped 'Reply'. */

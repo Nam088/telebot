@@ -1,11 +1,14 @@
-"""Game Bot API methods (parity with packages/go/pkg/bot/games.go)."""
+"""Game and Telegram Passport Bot API methods (parity with games-passport.ts)."""
 
 from __future__ import annotations
+
+from collections.abc import Sequence
 
 from telebot_py.bot.base import (
     MarkupLike,
     Requester,
     clean_payload,
+    parse_flag,
     parse_list_result,
     parse_result,
     to_wire,
@@ -15,7 +18,7 @@ from telebot_py.types.message import Message
 
 
 class GamesMixin(Requester):
-    """Bot methods for sending games and managing game scores."""
+    """Bot methods for sending games, managing scores, and reporting Passport errors."""
 
     async def send_game(
         self,
@@ -26,6 +29,8 @@ class GamesMixin(Requester):
         message_thread_id: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a game.
@@ -41,6 +46,9 @@ class GamesMixin(Requester):
             message_thread_id: Unique identifier for the target message thread.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
             reply_markup: Inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -51,6 +59,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendgame
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -59,6 +69,8 @@ class GamesMixin(Requester):
             message_thread_id=message_thread_id,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Message, await self.request("sendGame", payload))
@@ -102,6 +114,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setgamescore
         """
         payload = clean_payload(
             user_id=user_id,
@@ -144,6 +158,8 @@ class GamesMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getgamehighscores
         """
         payload = clean_payload(
             user_id=user_id,
@@ -152,3 +168,43 @@ class GamesMixin(Requester):
             inline_message_id=inline_message_id,
         )
         return parse_list_result(GameHighScore, await self.request("getGameHighScores", payload))
+
+    async def set_passport_data_errors(self, user_id: int, errors: Sequence[MarkupLike]) -> bool:
+        """Tell a user that some Telegram Passport elements they provided are invalid.
+
+        The user will not be able to re-submit their Passport until the errors
+        are fixed. Each entry may be a plain dict or any object exposing
+        ``to_dict``; variant-specific keys (``field_name``, ``file_hash``,
+        ``element_hash``) are only reachable through the dict shape.
+
+        Example:
+            >>> ok = await bot.set_passport_data_errors(42, [
+            ...     {
+            ...         "source": "data_field",
+            ...         "type": "personal_details",
+            ...         "field_name": "first_name",
+            ...         "hash": "abc123",
+            ...         "message": "First name is invalid",
+            ...     }
+            ... ])
+
+        Args:
+            user_id: Unique identifier of the target user.
+            errors: One error per problematic Passport element, as dicts or
+                ``to_dict`` objects.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setpassportdataerrors
+        """
+        payload = clean_payload(
+            user_id=user_id,
+            errors=[to_wire(error) for error in errors],
+        )
+        return parse_flag(await self.request("setPassportDataErrors", payload))

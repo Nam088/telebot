@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Telegram Bot API</title>
+  </head>
+  <body>
+    <h1 id="dev_page_title">Telegram Bot API</h1>
+    <div id="dev_page_content">
+      <h3><a class="anchor" name="recent-changes" href="#recent-changes"><i class="anchor-icon"></i></a>Recent changes</h3>
+      <p><strong>Bot API 9.9</strong></p>
+      <h4><a class="anchor" name="june-1-2025" href="#june-1-2025"><i class="anchor-icon"></i></a>June 1, 2025</h4>
+      <p><strong>Bot API 9.9</strong></p>
+      <ul>
+        <li>Added the <code>TestType</code> object.</li>
+      </ul>
+
+      <h3><a class="anchor" name="available-types" href="#available-types"><i class="anchor-icon"></i></a>Available types</h3>
+      <h4><a class="anchor" name="testtype" href="#testtype"><i class="anchor-icon"></i></a>TestType</h4>
+      <p>This object represents a test type.</p>
+      <table>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>identifier</td>
+          <td>Integer</td>
+          <td>Unique identifier</td>
+        </tr>
+        <tr>
+          <td>photo</td>
+          <td><a href="#photosize">PhotoSize</a></td>
+          <td><em>Optional</em>. The photo &amp; its caption</td>
+        </tr>
+        <tr>
+          <td>rows</td>
+          <td>Array of Array of <a href="#keyboardbutton">KeyboardButton</a></td>
+          <td><em>Optional</em>. Button rows</td>
+        </tr>
+        <tr>
+          <td>payload</td>
+          <td><a href="#inputfile">InputFile</a> | String</td>
+          <td>File to send; pass a &lt;file_id&gt;</td>
+        </tr>
+        <tr>
+          <td>always</td>
+          <td>True</td>
+          <td><em>Optional</em>. Always True</td>
+        </tr>
+      </table>
+
+      <h3><a class="anchor" name="stickers" href="#stickers"><i class="anchor-icon"></i></a>Stickers</h3>
+      <p>Prose section whose table must never leak into TestType above it.</p>
+      <table>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>chat_id</td>
+          <td>Integer</td>
+          <td>Leaked field that must NOT land on TestType</td>
+        </tr>
+        <tr>
+          <td>reply_markup</td>
+          <td>InlineKeyboardMarkup</td>
+          <td><em>Optional</em>. Another leaked field</td>
+        </tr>
+      </table>
+
+      <h4><a class="anchor" name="abstractpoint" href="#abstracttype"><i class="anchor-icon"></i></a>AbstractType</h4>
+      <p>Serves as the base type for other objects and documents no fields.</p>
+      <h4><a class="anchor" name="nexttype" href="#nexttype"><i class="anchor-icon"></i></a>NextType</h4>
+      <p>Second concrete type, placed right after the table-less one.</p>
+      <table>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>String</td>
+          <td>Name of the thing</td>
+        </tr>
+      </table>
+
+      <h4><a class="anchor" name="emptytype" href="#emptytype"><i class="anchor-icon"></i></a>EmptyType</h4>
+      <h4><a class="anchor" name="floattype" href="#floattype"><i class="anchor-icon"></i></a>FloatType</h4>
+      <p>Has a Float field.</p>
+      <table>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>horizontal</td>
+          <td>Float</td>
+          <td>Wavelength in meters</td>
+        </tr>
+      </table>
+
+      <h3><a class="anchor" name="available-methods" href="#available-methods"><i class="anchor-icon"></i></a>Available methods</h3>
+      <h4><a class="anchor" name="sendmessage" href="#sendmessage"><i class="anchor-icon"></i></a>sendMessage</h4>
+      <p>Use this method to send text messages.</p>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>chat_id</td>
+          <td>Integer or String</td>
+          <td>Yes</td>
+          <td>Unique identifier for the target chat</td>
+        </tr>
+        <tr>
+          <td>text</td>
+          <td>String</td>
+          <td>Yes</td>
+          <td>Text of the message</td>
+        </tr>
+        <tr>
+          <td>business_connection_id</td>
+          <td>String</td>
+          <td>Optional</td>
+          <td>Connection on behalf of which the message is sent</td>
+        </tr>
+      </table>
+
+      <h4><a class="anchor" name="legacymethod" href="#legacymethod"><i class="anchor-icon"></i></a>legacyMethod</h4>
+      <p>Older 3-column layout that marks optionality with square brackets.</p>
+      <table>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>chat_id</td>
+          <td>Integer</td>
+          <td>Unique identifier for the target chat</td>
+        </tr>
+        <tr>
+          <td>[disable_notification]</td>
+          <td>Boolean</td>
+          <td>Sends the message silently</td>
+        </tr>
+      </table>
+
+      <h4><a class="anchor" name="getme" href="#getme"><i class="anchor-icon"></i></a>getMe</h4>
+      <p>Returns basic information about the bot in form of a <code>User</code> object.</p>
+      <h4><a class="anchor" name="sending-files" href="#sending-files"><i class="anchor-icon"></i></a>Sending files</h4>
+      <p>Prose heading with a space; not a declaration.</p>
+    </div>
+  </body>
+</html>

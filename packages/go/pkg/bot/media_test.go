@@ -366,7 +366,7 @@ func TestBot_SendPoll(t *testing.T) {
 	msg, err := b.SendPoll(context.Background(), &types.SendPollOptions{
 		ChatID:      123,
 		Question:    "Q?",
-		Options:     []string{"A", "B"},
+		Options:     []types.InputPollOption{{Text: "A"}, {Text: "B"}},
 		IsAnonymous: false,
 	})
 	if err != nil {

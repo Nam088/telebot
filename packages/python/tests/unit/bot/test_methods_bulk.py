@@ -24,6 +24,7 @@ class TestForwardMessages:
             [11, 12, 13],
             disable_notification=True,
             protect_content=True,
+            message_thread_id=4,
         )
         assert [message_id.message_id for message_id in ids] == [101, 102, 103]
         assert all(isinstance(message_id, MessageId) for message_id in ids)
@@ -33,10 +34,18 @@ class TestForwardMessages:
             "chat_id": 123,
             "from_chat_id": "@source",
             "message_ids": [11, 12, 13],
+            "message_thread_id": 4,
             "disable_notification": True,
             "protect_content": True,
         }
-        assert "message_thread_id" not in payload
+
+    async def test_rejects_business_connection_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        """forwardMessages takes no business_connection_id; the kwarg must not exist."""
+        bot = make_bot(bot_transport, record_into(ok_response([]), []))
+        with pytest.raises(TypeError):
+            await bot.forward_messages(123, 456, [1], business_connection_id="bc1")
 
     async def test_error_response_raises_with_retry_after(
         self, bot_transport: Any, error_response: Any
@@ -60,12 +69,22 @@ class TestCopyMessages:
         ids = await bot.copy_messages("@target", 456, [1, 2], remove_caption=True)
         assert [message_id.message_id for message_id in ids] == [201, 202]
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/copyMessages"
-        assert sent_payload(seen[0]) == {
+        payload = sent_payload(seen[0])
+        assert payload == {
             "chat_id": "@target",
             "from_chat_id": 456,
             "message_ids": [1, 2],
             "remove_caption": True,
         }
+        assert "business_connection_id" not in payload
+
+    async def test_rejects_business_connection_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        """copyMessages takes no business_connection_id; the kwarg must not exist."""
+        bot = make_bot(bot_transport, record_into(ok_response([]), []))
+        with pytest.raises(TypeError):
+            await bot.copy_messages(123, 456, [1], business_connection_id="bc1")
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: message to copy not found"), [])
@@ -83,10 +102,53 @@ class TestDeleteMessages:
         bot = make_bot(bot_transport, step)
         assert await bot.delete_messages(789, [5, 6]) is True
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/deleteMessages"
-        assert sent_payload(seen[0]) == {"chat_id": 789, "message_ids": [5, 6]}
+        payload = sent_payload(seen[0])
+        assert payload == {"chat_id": 789, "message_ids": [5, 6]}
+        assert "business_connection_id" not in payload
+
+    async def test_rejects_business_connection_id(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        """deleteMessages takes only chat_id and message_ids."""
+        bot = make_bot(bot_transport, record_into(ok_response(True), []))
+        with pytest.raises(TypeError):
+            await bot.delete_messages(789, [1], business_connection_id="bc1")
 
     async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: messages not found"), [])
         bot = make_bot(bot_transport, step, max_retries=0)
         with pytest.raises(TelegramApiError):
             await bot.delete_messages(789, [999])
+
+
+class TestDirectMessagesTopicId:
+    """forwardMessages/copyMessages accept direct_messages_topic_id (Bot API docs)."""
+
+    async def test_forward_messages(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.forward_messages(123, 456, [1], direct_messages_topic_id=77)
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "from_chat_id": 456,
+            "message_ids": [1],
+            "direct_messages_topic_id": 77,
+        }
+
+    async def test_copy_messages(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.copy_messages(123, 456, [1], direct_messages_topic_id=77, remove_caption=True)
+        assert sent_payload(seen[0]) == {
+            "chat_id": 123,
+            "from_chat_id": 456,
+            "message_ids": [1],
+            "direct_messages_topic_id": 77,
+            "remove_caption": True,
+        }
+
+    async def test_omitted_when_unset(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        bot = make_bot(bot_transport, record_into(ok_response([]), seen))
+        await bot.forward_messages(123, 456, [1])
+        assert "direct_messages_topic_id" not in sent_payload(seen[0])

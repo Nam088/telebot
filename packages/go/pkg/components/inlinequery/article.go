@@ -2,8 +2,9 @@ package inlinequery
 
 import "github.com/Nam088/telebot/packages/go/pkg/types"
 
-// InlineQueryResultArticle represents a link to an article or web page
-// (Telegram's InlineQueryResultArticle object).
+// InlineQueryResultArticle represents a link to an article or web page.
+//
+// Telegram API: https://core.telegram.org/bots/api#inlinequeryresultarticle
 type InlineQueryResultArticle struct {
 	// Type of the result, always "article".
 	Type string `json:"type"`

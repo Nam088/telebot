@@ -8,26 +8,41 @@ from collections.abc import Sequence
 
 import httpx
 
+from telebot_py.bot.attachments import AttachmentsMixin
 from telebot_py.bot.base import clean_payload, parse_list_result, parse_result
 from telebot_py.bot.bulk import BulkMixin
+from telebot_py.bot.business_account import BusinessAccountMixin
 from telebot_py.bot.chat_management import ChatManagementMixin
 from telebot_py.bot.chats import ChatsMixin
+from telebot_py.bot.checklists import ChecklistsMixin
 from telebot_py.bot.edits import EditsMixin
+from telebot_py.bot.ephemeral import EphemeralMixin
 from telebot_py.bot.errors import InvalidTokenError, NetworkError, TelegramApiError
 from telebot_py.bot.files import FilesMixin
 from telebot_py.bot.games import GamesMixin
+from telebot_py.bot.gifts import GiftsMixin
 from telebot_py.bot.inline import InlineMixin
 from telebot_py.bot.invite_links import InviteLinksMixin
+from telebot_py.bot.managed_bot import ManagedBotMixin
 from telebot_py.bot.media import MediaMixin
 from telebot_py.bot.members import MembersMixin
 from telebot_py.bot.messages import MessagesMixin
+from telebot_py.bot.mini_apps import MiniAppsMixin
+from telebot_py.bot.misc_media import MiscMediaMixin
+from telebot_py.bot.owned_gifts import OwnedGiftsMixin
+from telebot_py.bot.paid_media import PaidMediaMixin
 from telebot_py.bot.payments import PaymentsMixin
+from telebot_py.bot.polls import PollsMixin
 from telebot_py.bot.profile import ProfileMixin
 from telebot_py.bot.reactions import ReactionsMixin
 from telebot_py.bot.retry import RetryPolicy
+from telebot_py.bot.rich_messages import RichMessagesMixin
+from telebot_py.bot.sticker_sets import StickerSetsMixin
 from telebot_py.bot.stickers import StickersMixin
+from telebot_py.bot.stories import StoriesMixin
 from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
+from telebot_py.bot.verification import VerificationMixin
 from telebot_py.bot.webhook import WebhookMixin
 from telebot_py.types.update import Update
 from telebot_py.types.user import User
@@ -69,19 +84,34 @@ def _api_error(method: str, response: httpx.Response, envelope: object) -> Teleg
 
 class Bot(
     MessagesMixin,
+    AttachmentsMixin,
+    RichMessagesMixin,
     MediaMixin,
+    MiscMediaMixin,
+    PollsMixin,
     StickersMixin,
+    StickerSetsMixin,
     InlineMixin,
     PaymentsMixin,
     GamesMixin,
     StoriesGiftsMixin,
+    StoriesMixin,
+    ChecklistsMixin,
+    PaidMediaMixin,
+    MiniAppsMixin,
+    BusinessAccountMixin,
+    GiftsMixin,
+    OwnedGiftsMixin,
+    EphemeralMixin,
     ChatsMixin,
     ChatManagementMixin,
+    VerificationMixin,
     InviteLinksMixin,
     MembersMixin,
     TopicsMixin,
     ReactionsMixin,
     ProfileMixin,
+    ManagedBotMixin,
     FilesMixin,
     BulkMixin,
     EditsMixin,
@@ -93,8 +123,10 @@ class Bot(
     unwrapping, typed error mapping, and retry with exponential backoff
     (FR-012). The transport is injectable so tests can run fully offline.
     Typed Bot API methods (messages, media, stickers, inline, payments, games,
-    stories, chats, chat management, invite links, members, topics, reactions,
-    profile, files, bulk operations, edits, webhook) are composed onto this
+    stories, story management, checklists, paid media, mini app queries,
+    business accounts, gifts, owned gifts, ephemeral messages, chats, chat
+    management, verification, invite links, members, topics, reactions, profile,
+    managed bots, files, bulk operations, edits, webhook) are composed onto this
     class via mixins.
 
     Example:
@@ -217,6 +249,8 @@ class Bot(
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getme
         """
         return parse_result(User, await self.request("getMe"))
 
@@ -250,6 +284,8 @@ class Bot(
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getupdates
         """
         payload = clean_payload(
             offset=offset,

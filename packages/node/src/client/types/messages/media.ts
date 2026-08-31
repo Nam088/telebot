@@ -6,6 +6,8 @@ export type { InputFile };
 
 /**
  * Represents one size of a photo or a file / sticker thumbnail.
+ *
+ * @see {@link https://core.telegram.org/bots/api#photosize Telegram Bot API: PhotoSize}
  */
 export interface PhotoSize {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -22,6 +24,8 @@ export interface PhotoSize {
 
 /**
  * Represents an audio file to be treated as music by the Telegram clients.
+ *
+ * @see {@link https://core.telegram.org/bots/api#audio Telegram Bot API: Audio}
  */
 export interface Audio {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -46,6 +50,8 @@ export interface Audio {
 
 /**
  * Represents a general file (as opposed for photos or audio files).
+ *
+ * @see {@link https://core.telegram.org/bots/api#document Telegram Bot API: Document}
  */
 export interface Document {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -63,7 +69,29 @@ export interface Document {
 }
 
 /**
+ * Represents a video file of a specific quality.
+ *
+ * @see {@link https://core.telegram.org/bots/api#videoquality Telegram Bot API: VideoQuality}
+ */
+export interface VideoQuality {
+  /** Identifier for this file, which can be used to download or reuse the file. */
+  file_id: string;
+  /** Unique identifier for this file, which is supposed to be the same over time and for different bots. */
+  file_unique_id: string;
+  /** Video width. */
+  width: number;
+  /** Video height. */
+  height: number;
+  /** Codec that was used to encode the video, for example, "h264", "h265", or "av01". */
+  codec: string;
+  /** File size in bytes. */
+  file_size?: number;
+}
+
+/**
  * Represents a video file.
+ *
+ * @see {@link https://core.telegram.org/bots/api#video Telegram Bot API: Video}
  */
 export interface Video {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -78,6 +106,12 @@ export interface Video {
   duration: number;
   /** Video thumbnail. */
   thumbnail?: PhotoSize;
+  /** Available sizes of the cover of the video in the message. */
+  cover?: PhotoSize[];
+  /** Timestamp in seconds from which the video will play in the message. */
+  start_timestamp?: number;
+  /** List of available qualities of the video. */
+  qualities?: VideoQuality[];
   /** Original filename as defined by sender. */
   file_name?: string;
   /** MIME type of the file as defined by sender. */
@@ -88,6 +122,8 @@ export interface Video {
 
 /**
  * Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
+ *
+ * @see {@link https://core.telegram.org/bots/api#animation Telegram Bot API: Animation}
  */
 export interface Animation {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -112,6 +148,8 @@ export interface Animation {
 
 /**
  * Represents a voice note.
+ *
+ * @see {@link https://core.telegram.org/bots/api#voice Telegram Bot API: Voice}
  */
 export interface Voice {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -128,6 +166,8 @@ export interface Voice {
 
 /**
  * Represents a video message (round video).
+ *
+ * @see {@link https://core.telegram.org/bots/api#videonote Telegram Bot API: VideoNote}
  */
 export interface VideoNote {
   /** Identifier for this file, which can be used to download or reuse the file. */
@@ -146,24 +186,32 @@ export interface VideoNote {
 
 /**
  * Represents a Live Photo message object (Bot API 10.3+).
+ *
+ * @see {@link https://core.telegram.org/bots/api#livephoto Telegram Bot API: LivePhoto}
  */
 export interface LivePhoto {
-  /** Identifier for this file, which can be used to download or reuse the file. */
+  /** Available sizes of the corresponding static photo. */
+  photo?: PhotoSize[];
+  /** Identifier for the video file which can be used to download or reuse the file. */
   file_id: string;
-  /** Unique identifier for this file. */
+  /** Unique identifier for the video file which is supposed to be the same over time and for different bots. */
   file_unique_id: string;
-  /** Photo width. */
+  /** Video width as defined by the sender. */
   width: number;
-  /** Photo height. */
+  /** Video height as defined by the sender. */
   height: number;
-  /** Available sizes of the photo. */
-  photo: PhotoSize[];
-  /** Video file associated with the live photo. */
-  video: Video;
+  /** Duration of the video in seconds as defined by the sender. */
+  duration: number;
+  /** MIME type of the file as defined by the sender. */
+  mime_type?: string;
+  /** File size in bytes. */
+  file_size?: number;
 }
 
 /**
  * Represents a photo to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaphoto Telegram Bot API: InputMediaPhoto}
  */
 export interface InputMediaPhoto {
   /** Type of the result, must be 'photo'. */
@@ -184,6 +232,8 @@ export interface InputMediaPhoto {
 
 /**
  * Represents a video to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediavideo Telegram Bot API: InputMediaVideo}
  */
 export interface InputMediaVideo {
   /** Type of the result, must be 'video'. */
@@ -192,6 +242,10 @@ export interface InputMediaVideo {
   media: string | InputFile | unknown;
   /** Thumbnail of the file sent. */
   thumbnail?: string | InputFile | unknown;
+  /** Cover for the video in the message. Pass a file_id, an HTTP URL, or upload using InputFile. */
+  cover?: string | InputFile | unknown;
+  /** Start timestamp for the video in the message. */
+  start_timestamp?: number;
   /** Caption of the video to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the video caption. */
@@ -214,6 +268,8 @@ export interface InputMediaVideo {
 
 /**
  * Represents an animation file to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaanimation Telegram Bot API: InputMediaAnimation}
  */
 export interface InputMediaAnimation {
   /** Type of the result, must be 'animation'. */
@@ -242,6 +298,8 @@ export interface InputMediaAnimation {
 
 /**
  * Represents an audio file to be treated as music to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediaaudio Telegram Bot API: InputMediaAudio}
  */
 export interface InputMediaAudio {
   /** Type of the result, must be 'audio'. */
@@ -266,6 +324,8 @@ export interface InputMediaAudio {
 
 /**
  * Represents a general file to be sent as part of a media group or edited media.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmediadocument Telegram Bot API: InputMediaDocument}
  */
 export interface InputMediaDocument {
   /** Type of the result, must be 'document'. */
@@ -286,6 +346,8 @@ export interface InputMediaDocument {
 
 /**
  * Union of all input media types that can be sent in a media group or editMessageMedia.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputmedia Telegram Bot API: InputMedia}
  */
 export type InputMedia =
   InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;

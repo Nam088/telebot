@@ -279,10 +279,19 @@ func TestEntitiesSerialization(t *testing.T) {
 	b, _ := json.Marshal(entity)
 	assertContains(t, string(b), `"type":"bold"`)
 
-	rp := types.ReplyParameters{MessageID: 1, Quote: "q"}
+	rp := types.ReplyParameters{MessageID: types.Ptr(int64(1)), Quote: "q"}
 	b, _ = json.Marshal(rp)
 	assertContains(t, string(b), `"message_id":1`)
 	assertContains(t, string(b), `"quote":"q"`)
+
+	// message_id is optional on the wire: a quote-only reply must omit it
+	// rather than send 0.
+	quoteOnly, _ := json.Marshal(types.ReplyParameters{ChatID: int64(123), Quote: "q"})
+	assertNotContains(t, string(quoteOnly), `"message_id"`)
+
+	task, _ := json.Marshal(types.ReplyParameters{ChecklistTaskID: 9})
+	assertContains(t, string(task), `"checklist_task_id":9`)
+	assertNotContains(t, string(task), `"checklist_item_id"`)
 
 	lp := types.LinkPreviewOptions{IsDisabled: true, URL: "https://t.me"}
 	b, _ = json.Marshal(lp)

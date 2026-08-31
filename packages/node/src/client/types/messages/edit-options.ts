@@ -1,13 +1,25 @@
 import type { ParseMode } from "../../constants.js";
 import type { MessageEntity } from "./core.js";
 import type { InlineKeyboardMarkup } from "./keyboards.js";
+import type { LinkPreviewOptions } from "./reply-context.js";
 import type { InputMedia } from "./media.js";
 import type { InputRichMessage } from "../rich/index.js";
 import type { InlineQueryResult } from "../business/index.js";
 
+/**
+ * Options for {@link Bot.editMessageText}.
+ *
+ * @remarks
+ * `text` and `rich_message` are mutually exclusive: exactly one of them must be
+ * supplied. Provide either `chat_id`+`message_id` or `inline_message_id`.
+ *
+ * @see {@link https://core.telegram.org/bots/api#editmessagetext Telegram Bot API: editMessageText}
+ */
 export interface EditMessageTextOptions {
-  /** New text of the message, 1-4096 characters after entities parsing. */
-  text: string;
+  /** New text of the message, 1-4096 characters after entities parsing. Required if rich_message isn't specified. */
+  text?: string;
+  /** New rich content of the message; required if text isn't specified (Bot API 10.1+). */
+  rich_message?: InputRichMessage;
   /** Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel. */
   chat_id?: number | string;
   /** Required if inline_message_id is not specified. Identifier of the message to edit. */
@@ -19,9 +31,11 @@ export interface EditMessageTextOptions {
   /** A list of special entities that appear in message text. */
   entities?: MessageEntity[];
   /** Link preview generation options for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageCaptionOptions {
@@ -41,6 +55,8 @@ export interface EditMessageCaptionOptions {
   show_caption_above_media?: boolean;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageReplyMarkupOptions {
@@ -52,6 +68,8 @@ export interface EditMessageReplyMarkupOptions {
   inline_message_id?: string;
   /** A JSON-serialized object for an inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
+  /** Unique identifier of the business connection on behalf of which the message to be edited was sent. */
+  business_connection_id?: string;
 }
 
 export interface EditMessageMediaOptions {
@@ -114,6 +132,14 @@ export interface StopPollOptions {
   business_connection_id?: string;
 }
 
+/**
+ * Options for {@link Bot.editEphemeralMessageText}.
+ *
+ * @remarks
+ * `text` and `rich_message` are mutually exclusive: exactly one of them must be supplied.
+ *
+ * @see {@link https://core.telegram.org/bots/api#editephemeralmessagetext Telegram Bot API: editEphemeralMessageText}
+ */
 export interface EditEphemeralMessageTextOptions {
   /** Unique identifier for the target chat or username of the target supergroup. */
   chat_id: number | string;
@@ -130,7 +156,7 @@ export interface EditEphemeralMessageTextOptions {
   /** New rich content of the message; required if text isn't specified (Bot API 10.3+). */
   rich_message?: InputRichMessage;
   /** Link preview generation options for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** Inline keyboard markup. */
   reply_markup?: InlineKeyboardMarkup;
 }
@@ -187,6 +213,9 @@ export interface DeleteEphemeralMessageOptions {
   ephemeral_message_id: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#messageid Telegram Bot API: MessageId}
+ */
 export interface MessageId {
   /** Unique message identifier. */
   message_id: number;
@@ -203,6 +232,8 @@ export interface ForwardMessagesOptions {
   disable_notification?: boolean;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the messages will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Protects the contents of the forwarded messages from forwarding and saving. */
   protect_content?: boolean;
 }
@@ -218,12 +249,17 @@ export interface CopyMessagesOptions {
   disable_notification?: boolean;
   /** Unique identifier for the target message thread (topic) of the forum. */
   message_thread_id?: number;
+  /** Identifier of the topic the messages will be sent to in a direct messages chat. */
+  direct_messages_topic_id?: number;
   /** Protects the contents of the sent messages from forwarding and saving. */
   protect_content?: boolean;
   /** Pass True to copy the messages without their captions. */
   remove_caption?: boolean;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#preparedinlinemessage Telegram Bot API: PreparedInlineMessage}
+ */
 export interface PreparedInlineMessage {
   /** Unique identifier of the prepared message. */
   id: string;

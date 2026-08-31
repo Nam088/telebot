@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 import httpx
+import pytest
 
-from telebot_py.types import GameHighScore, Message
+from telebot_py.bot.errors import TelegramApiError
+from telebot_py.types import GameHighScore, Message, PassportElementError
 from unit.bot.helpers import TEST_TOKEN, make_bot, record_into, sent_payload, url_path
 
 
@@ -94,3 +96,57 @@ class TestGetGameHighScores:
         assert scores[0].user.first_name == "Alice"
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/getGameHighScores"
         assert sent_payload(seen[0]) == {"user_id": 1, "chat_id": 2, "message_id": 30}
+
+
+class TestSetPassportDataErrors:
+    async def test_serializes_typed_and_plain_errors(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        errors: list[Any] = [
+            PassportElementError(
+                source="data_field", type="personal_details", message="First name is invalid"
+            ),
+            {
+                "source": "file",
+                "type": "passport",
+                "file_hash": "abc123",
+                "message": "File is unreadable",
+            },
+        ]
+        assert await bot.set_passport_data_errors(42, errors) is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setPassportDataErrors"
+        assert sent_payload(seen[0]) == {
+            "user_id": 42,
+            "errors": [
+                {
+                    "source": "data_field",
+                    "type": "personal_details",
+                    "message": "First name is invalid",
+                },
+                {
+                    "source": "file",
+                    "type": "passport",
+                    "file_hash": "abc123",
+                    "message": "File is unreadable",
+                },
+            ],
+        }
+
+    async def test_empty_error_list_is_still_sent(
+        self, bot_transport: Any, ok_response: Any
+    ) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_passport_data_errors(42, []) is True
+        assert sent_payload(seen[0]) == {"user_id": 42, "errors": []}
+
+    async def test_api_error_raises(self, bot_transport: Any, error_response: Any) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: user not found"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError) as excinfo:
+            await bot.set_passport_data_errors(42, [])
+        assert excinfo.value.error_code == 400

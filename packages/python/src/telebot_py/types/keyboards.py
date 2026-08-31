@@ -5,6 +5,15 @@ from __future__ import annotations
 import dataclasses
 
 from telebot_py.types.base import TelegramObject
+from telebot_py.types.games import CallbackGame
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class DisabledButton(TelegramObject):
+    """An empty object marking an inline keyboard button as disabled.
+
+    Telegram API: https://core.telegram.org/bots/api#disabledbutton
+    """
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -13,6 +22,8 @@ class WebAppInfo(TelegramObject):
 
     Attributes:
         url: An HTTPS URL of a Web App to be opened.
+
+    Telegram API: https://core.telegram.org/bots/api#webappinfo
     """
 
     url: str
@@ -28,6 +39,8 @@ class LoginUrl(TelegramObject):
         bot_username: Username of a bot which will be used for authorization.
         request_write_access: Whether to request permission for the bot to
             send messages to the user.
+
+    Telegram API: https://core.telegram.org/bots/api#loginurl
     """
 
     url: str
@@ -46,6 +59,8 @@ class SwitchInlineQueryChosenChat(TelegramObject):
         allow_bot_chats: Whether private chats with bots can be chosen.
         allow_group_chats: Whether group and supergroup chats can be chosen.
         allow_channel_chats: Whether channel chats can be chosen.
+
+    Telegram API: https://core.telegram.org/bots/api#switchinlinequerychosenchat
     """
 
     query: str | None = None
@@ -61,6 +76,8 @@ class CopyTextButton(TelegramObject):
 
     Attributes:
         text: The text to be copied to the clipboard; 1-256 characters.
+
+    Telegram API: https://core.telegram.org/bots/api#copytextbutton
     """
 
     text: str
@@ -86,11 +103,12 @@ class InlineKeyboardButton(TelegramObject):
         switch_inline_query_chosen_chat: If set, prompts chat selection of the
             specified types.
         copy_text: Description of the button copying text to the clipboard.
-        callback_game: Description of the game launched when pressed
-            (payload kept raw; the node CallbackGame is a placeholder map).
+        callback_game: Description of the game launched when pressed.
         pay: Whether to send a Pay button.
         disabled: If set, the button is disabled and does nothing
-            (Bot API 10.3+; the node DisabledButton is an empty object).
+            (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#inlinekeyboardbutton
     """
 
     text: str
@@ -104,9 +122,9 @@ class InlineKeyboardButton(TelegramObject):
     switch_inline_query_current_chat: str | None = None
     switch_inline_query_chosen_chat: SwitchInlineQueryChosenChat | None = None
     copy_text: CopyTextButton | None = None
-    callback_game: object | None = None
+    callback_game: CallbackGame | None = None
     pay: bool | None = None
-    disabled: object | None = None
+    disabled: DisabledButton | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -118,6 +136,8 @@ class InlineKeyboardMarkup(TelegramObject):
             InlineKeyboardButton objects.
         force_reply: Whether the reply interface must be shown to the user
             (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#inlinekeyboardmarkup
     """
 
     inline_keyboard: list[list[InlineKeyboardButton]]
@@ -130,6 +150,8 @@ class KeyboardButtonPollType(TelegramObject):
 
     Attributes:
         type: If 'quiz', the user can only create a poll in quiz mode.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonpolltype
     """
 
     type: str | None = None
@@ -148,6 +170,8 @@ class KeyboardButtonRequestUsers(TelegramObject):
         request_name: Whether to request the users' first and last name.
         request_username: Whether to request the users' username.
         request_photo: Whether to request the users' photo.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonrequestusers
     """
 
     request_id: int
@@ -179,6 +203,8 @@ class KeyboardButtonRequestChat(TelegramObject):
         request_title: Whether to request the chat's title.
         request_username: Whether to request the chat's username.
         request_photo: Whether to request the chat's photo.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonrequestchat
     """
 
     request_id: int
@@ -195,14 +221,37 @@ class KeyboardButtonRequestChat(TelegramObject):
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class KeyboardButtonRequestManagedBot(TelegramObject):
+    """Defines criteria used to ask a user to create a bot managed by this bot.
+
+    Attributes:
+        request_id: Signed 32-bit identifier of the request; must be unique
+            within the message.
+        suggested_name: Suggested name for the bot.
+        suggested_username: Suggested username for the bot.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbuttonrequestmanagedbot
+    """
+
+    request_id: int
+    suggested_name: str | None = None
+    suggested_username: str | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class KeyboardButton(TelegramObject):
     """One button of the reply keyboard.
 
     Attributes:
-        text: Text of the button; sent as a message when pressed if none of
-            the optional fields are used.
+        text: Text of the button; sent as a message when pressed if only the
+            text, icon_custom_emoji_id and style fields are used.
+        icon_custom_emoji_id: Unique identifier of the custom emoji shown
+            before the text of the button.
+        style: Style of the button ('danger', 'success', 'primary').
         request_users: If specified, opens a list of suitable users.
         request_chat: If specified, opens a list of suitable chats.
+        request_managed_bot: If specified, asks the user to create and share a
+            bot managed by this bot.
         request_contact: If True, the user's phone number will be sent as a
             contact when pressed. Available in private chats only.
         request_location: If True, the user's current location will be sent
@@ -210,11 +259,16 @@ class KeyboardButton(TelegramObject):
         request_poll: If specified, the user is asked to create a poll.
             Available in private chats only.
         web_app: If specified, the described Web App launches when pressed.
+
+    Telegram API: https://core.telegram.org/bots/api#keyboardbutton
     """
 
     text: str
+    icon_custom_emoji_id: str | None = None
+    style: str | None = None
     request_users: KeyboardButtonRequestUsers | None = None
     request_chat: KeyboardButtonRequestChat | None = None
+    request_managed_bot: KeyboardButtonRequestManagedBot | None = None
     request_contact: bool | None = None
     request_location: bool | None = None
     request_poll: KeyboardButtonPollType | None = None
@@ -239,6 +293,8 @@ class ReplyKeyboardMarkup(TelegramObject):
         selective: Whether to show the keyboard to specific users only.
         force_reply: Whether the reply interface must be shown to the user
             (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#replykeyboardmarkup
     """
 
     keyboard: list[list[KeyboardButton]]
@@ -258,6 +314,8 @@ class ReplyKeyboardRemove(TelegramObject):
         remove_keyboard: Requests clients to remove the custom keyboard;
             always True on the wire.
         selective: Whether to remove the keyboard for specific users only.
+
+    Telegram API: https://core.telegram.org/bots/api#replykeyboardremove
     """
 
     remove_keyboard: bool = True
@@ -273,8 +331,23 @@ class ForceReply(TelegramObject):
         input_field_placeholder: Placeholder shown in the input field when the
             reply is active; 1-64 characters.
         selective: Whether to force reply from specific users only.
+
+    Telegram API: https://core.telegram.org/bots/api#forcereply
     """
 
     force_reply: bool = True
     input_field_placeholder: str | None = None
     selective: bool | None = None
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class PreparedKeyboardButton(TelegramObject):
+    """A keyboard button prepared for use by a user of a Mini App.
+
+    Attributes:
+        id: Unique identifier of the keyboard button.
+
+    Telegram API: https://core.telegram.org/bots/api#preparedkeyboardbutton
+    """
+
+    id: str

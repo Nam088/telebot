@@ -1,16 +1,22 @@
 package types
 
 // BotShortDescription represents the bot's short description.
+//
+// Telegram API: https://core.telegram.org/bots/api#botshortdescription
 type BotShortDescription struct {
 	ShortDescription string `json:"short_description"`
 }
 
 // BotCommandScope is the union of all supported bot command scope types.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscope
 type BotCommandScope interface {
 	botCommandScope()
 }
 
 // BotCommandScopeDefault represents the default bot command scope.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopedefault
 type BotCommandScopeDefault struct {
 	Type string `json:"type"`
 }
@@ -18,6 +24,8 @@ type BotCommandScopeDefault struct {
 func (BotCommandScopeDefault) botCommandScope() {}
 
 // BotCommandScopeAllPrivateChats represents a bot command scope for all private chats.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopeallprivatechats
 type BotCommandScopeAllPrivateChats struct {
 	Type string `json:"type"`
 }
@@ -25,6 +33,8 @@ type BotCommandScopeAllPrivateChats struct {
 func (BotCommandScopeAllPrivateChats) botCommandScope() {}
 
 // BotCommandScopeAllGroupChats represents a bot command scope for all group chats.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopeallgroupchats
 type BotCommandScopeAllGroupChats struct {
 	Type string `json:"type"`
 }
@@ -32,6 +42,8 @@ type BotCommandScopeAllGroupChats struct {
 func (BotCommandScopeAllGroupChats) botCommandScope() {}
 
 // BotCommandScopeAllChatAdministrators represents a bot command scope for all chat administrators.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopeallchatadministrators
 type BotCommandScopeAllChatAdministrators struct {
 	Type string `json:"type"`
 }
@@ -39,6 +51,8 @@ type BotCommandScopeAllChatAdministrators struct {
 func (BotCommandScopeAllChatAdministrators) botCommandScope() {}
 
 // BotCommandScopeChat represents a bot command scope for a specific chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopechat
 type BotCommandScopeChat struct {
 	Type   string `json:"type"`
 	ChatID any    `json:"chat_id"`
@@ -47,6 +61,8 @@ type BotCommandScopeChat struct {
 func (BotCommandScopeChat) botCommandScope() {}
 
 // BotCommandScopeChatAdministrators represents a bot command scope for all administrators of a specific chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopechatadministrators
 type BotCommandScopeChatAdministrators struct {
 	Type   string `json:"type"`
 	ChatID any    `json:"chat_id"`
@@ -55,6 +71,8 @@ type BotCommandScopeChatAdministrators struct {
 func (BotCommandScopeChatAdministrators) botCommandScope() {}
 
 // BotCommandScopeChatMember represents a bot command scope for a specific member of a specific chat.
+//
+// Telegram API: https://core.telegram.org/bots/api#botcommandscopechatmember
 type BotCommandScopeChatMember struct {
 	Type   string `json:"type"`
 	ChatID any    `json:"chat_id"`

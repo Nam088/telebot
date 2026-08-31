@@ -34,6 +34,12 @@ class TestChatTitleAndDescription:
         assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setChatDescription"
         assert sent_payload(seen[0]) == {"chat_id": "@channel", "description": "desc"}
 
+        assert await bot.set_chat_description("@channel") is True
+        assert sent_payload(seen[1]) == {"chat_id": "@channel"}
+
+        assert await bot.set_chat_description("@channel", "") is True
+        assert sent_payload(seen[2]) == {"chat_id": "@channel", "description": ""}
+
 
 class TestChatPhoto:
     async def test_set_chat_photo(self, bot_transport: Any, ok_response: Any) -> None:
@@ -181,6 +187,24 @@ class TestDefaultAdministratorRights:
         assert sent_payload(seen[0]) == {"for_channels": True}
 
 
+class TestChatStickerSet:
+    async def test_set_chat_sticker_set(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.set_chat_sticker_set(-100, "test_set_by_bot") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/setChatStickerSet"
+        assert sent_payload(seen[0]) == {"chat_id": -100, "sticker_set_name": "test_set_by_bot"}
+
+    async def test_delete_chat_sticker_set(self, bot_transport: Any, ok_response: Any) -> None:
+        seen: list[httpx.Request] = []
+        step = record_into(ok_response(True), seen)
+        bot = make_bot(bot_transport, step)
+        assert await bot.delete_chat_sticker_set("@supergroup") is True
+        assert url_path(seen[0]) == f"/bot{TEST_TOKEN}/deleteChatStickerSet"
+        assert sent_payload(seen[0]) == {"chat_id": "@supergroup"}
+
+
 class TestChatManagementApiError:
     async def test_set_chat_title_error(self, bot_transport: Any, error_response: Any) -> None:
         step = record_into(error_response(400, 400, "Bad Request: chat not found"), [])
@@ -188,3 +212,11 @@ class TestChatManagementApiError:
         with pytest.raises(TelegramApiError) as excinfo:
             await bot.set_chat_title(1, "x")
         assert excinfo.value.error_code == 400
+
+    async def test_set_chat_sticker_set_error(
+        self, bot_transport: Any, error_response: Any
+    ) -> None:
+        step = record_into(error_response(400, 400, "Bad Request: sticker set not found"), [])
+        bot = make_bot(bot_transport, step, max_retries=0)
+        with pytest.raises(TelegramApiError):
+            await bot.set_chat_sticker_set(1, "missing_set")

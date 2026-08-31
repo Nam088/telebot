@@ -18,7 +18,6 @@ import {
 } from "../routing/handlers.js";
 import { filters } from "../filters/matchers.js";
 import type { BaseFilter } from "../filters/base.js";
-import { ConversationHandler } from "../routing/conversation.js";
 
 import { CallbackContext } from "./context.js";
 import { type Persistence, MemoryPersistence } from "../storage/index.js";

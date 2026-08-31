@@ -10,6 +10,7 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
+from telebot_py.types.business import UserChatBoosts
 from telebot_py.types.chat_members import ChatMember
 
 
@@ -34,6 +35,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatmember
         """
         payload = clean_payload(chat_id=chat_id, user_id=user_id)
         return parse_result(ChatMember, await self.request("getChatMember", payload))
@@ -99,6 +102,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#promotechatmember
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -156,6 +161,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#restrictchatmember
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -187,6 +194,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatadministratorcustomtitle
         """
         payload = clean_payload(chat_id=chat_id, user_id=user_id, custom_title=custom_title)
         return parse_flag(await self.request("setChatAdministratorCustomTitle", payload))
@@ -209,6 +218,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#banchatsenderchat
         """
         payload = clean_payload(chat_id=chat_id, sender_chat_id=sender_chat_id)
         return parse_flag(await self.request("banChatSenderChat", payload))
@@ -231,6 +242,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#unbanchatsenderchat
         """
         payload = clean_payload(chat_id=chat_id, sender_chat_id=sender_chat_id)
         return parse_flag(await self.request("unbanChatSenderChat", payload))
@@ -253,6 +266,8 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#approvechatjoinrequest
         """
         payload = clean_payload(chat_id=chat_id, user_id=user_id)
         return parse_flag(await self.request("approveChatJoinRequest", payload))
@@ -275,6 +290,65 @@ class MembersMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#declinechatjoinrequest
         """
         payload = clean_payload(chat_id=chat_id, user_id=user_id)
         return parse_flag(await self.request("declineChatJoinRequest", payload))
+
+    async def get_user_chat_boosts(self, chat_id: int | str, user_id: int) -> UserChatBoosts:
+        """Get the list of boosts added to a chat by a user.
+
+        Requires administrator rights in the chat.
+
+        Example:
+            >>> boosts = await bot.get_user_chat_boosts(-100, 42)
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target channel.
+            user_id: Unique identifier of the target user.
+
+        Returns:
+            The UserChatBoosts list of boosts the user added to the chat.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getuserchatboosts
+        """
+        payload = clean_payload(chat_id=chat_id, user_id=user_id)
+        return parse_result(UserChatBoosts, await self.request("getUserChatBoosts", payload))
+
+    async def set_chat_member_tag(
+        self, chat_id: int | str, user_id: int, tag: str | None = None
+    ) -> bool:
+        """Set or remove a custom tag on a regular member of a forum supergroup.
+
+        The bot must be an administrator with the ``can_manage_tags`` right.
+        Passing an empty tag removes the current one.
+
+        Example:
+            >>> ok = await bot.set_chat_member_tag(-100, 42, "VIP")
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target supergroup.
+            user_id: Unique identifier of the target user.
+            tag: New tag for the member; 0-64 characters. Omit to leave the
+                existing tag untouched.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setchatmembertag
+        """
+        payload = clean_payload(chat_id=chat_id, user_id=user_id, tag=tag)
+        return parse_flag(await self.request("setChatMemberTag", payload))

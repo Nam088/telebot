@@ -41,6 +41,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createchatinvitelink
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -85,6 +87,8 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editchatinvitelink
         """
         payload = clean_payload(
             chat_id=chat_id,
@@ -117,6 +121,89 @@ class InviteLinksMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#revokechatinvitelink
         """
         payload = clean_payload(chat_id=chat_id, invite_link=invite_link)
         return parse_result(ChatInviteLink, await self.request("revokeChatInviteLink", payload))
+
+    async def create_chat_subscription_invite_link(
+        self,
+        chat_id: int | str,
+        subscription_period: int,
+        subscription_price: int,
+        *,
+        name: str | None = None,
+    ) -> ChatInviteLink:
+        """Create a subscription invite link for a channel chat.
+
+        The bot must have the ``can_invite_users`` administrator right.
+
+        Example:
+            >>> link = await bot.create_chat_subscription_invite_link(-100, 2592000, 50)
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target channel.
+            subscription_period: Number of seconds the subscription will be
+                active for; 30-2548560, i.e. one month to one year.
+            subscription_price: Number of Telegram Stars that must be paid to
+                subscribe after the initial period; 1-2500.
+            name: Invite link name; 0-32 characters.
+
+        Returns:
+            The new subscription ChatInviteLink.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createchatsubscriptioninvitelink
+        """
+        payload = clean_payload(
+            chat_id=chat_id,
+            subscription_period=subscription_period,
+            subscription_price=subscription_price,
+            name=name,
+        )
+        return parse_result(
+            ChatInviteLink,
+            await self.request("createChatSubscriptionInviteLink", payload),
+        )
+
+    async def edit_chat_subscription_invite_link(
+        self,
+        chat_id: int | str,
+        invite_link: str,
+        *,
+        name: str | None = None,
+    ) -> ChatInviteLink:
+        """Edit the name of a subscription invite link created by the bot.
+
+        The subscription period and price of an existing link can't be changed.
+
+        Example:
+            >>> link = await bot.edit_chat_subscription_invite_link(-100, url, name="VIP")
+
+        Args:
+            chat_id: Unique identifier for the target chat or username of the
+                target channel.
+            invite_link: The subscription invite link to edit.
+            name: New invite link name; 0-32 characters.
+
+        Returns:
+            The edited subscription ChatInviteLink.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#editchatsubscriptioninvitelink
+        """
+        payload = clean_payload(chat_id=chat_id, invite_link=invite_link, name=name)
+        return parse_result(
+            ChatInviteLink,
+            await self.request("editChatSubscriptionInviteLink", payload),
+        )

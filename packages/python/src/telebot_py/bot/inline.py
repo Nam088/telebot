@@ -49,6 +49,8 @@ class InlineMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerinlinequery
         """
         payload = clean_payload(
             inline_query_id=inline_query_id,
@@ -79,6 +81,8 @@ class InlineMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerwebappquery
         """
         payload = clean_payload(
             web_app_query_id=web_app_query_id,
@@ -116,6 +120,8 @@ class InlineMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#savepreparedinlinemessage
         """
         payload = clean_payload(
             user_id=user_id,

@@ -6,6 +6,8 @@
 
 /**
  * Represents a binary file or file payload to be uploaded to the Telegram Bot API.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputfile Telegram Bot API: InputFile}
  */
 export interface InputFile {
   /**

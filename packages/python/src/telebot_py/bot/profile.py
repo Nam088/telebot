@@ -5,14 +5,18 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from telebot_py.bot.base import (
+    UNSET,
     MarkupLike,
     Requester,
+    Unset,
     clean_payload,
+    omit_unset,
     parse_flag,
     parse_list_result,
     parse_result,
     to_wire,
 )
+from telebot_py.types.files import UserProfileAudios
 from telebot_py.types.topics import (
     BotCommand,
     BotDescription,
@@ -22,7 +26,7 @@ from telebot_py.types.topics import (
 
 
 class ProfileMixin(Requester):
-    """Bot methods for the bot's own name, descriptions, commands, and lifecycle."""
+    """Bot methods for the bot's own name, descriptions, commands, photo, and lifecycle."""
 
     async def log_out(self) -> bool:
         """Log out from the cloud Bot API server before switching local servers.
@@ -37,6 +41,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#logout
         """
         return parse_flag(await self.request("logOut", {}))
 
@@ -53,6 +59,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#close
         """
         return parse_flag(await self.request("close", {}))
 
@@ -75,6 +83,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyname
         """
         payload = clean_payload(name=name, language_code=language_code)
         return parse_flag(await self.request("setMyName", payload))
@@ -95,12 +105,14 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmyname
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(BotName, await self.request("getMyName", payload))
 
     async def set_my_description(
-        self, description: str, *, language_code: str | None = None
+        self, description: str | Unset = UNSET, *, language_code: str | None = None
     ) -> bool:
         """Change the bot's description shown on its profile page.
 
@@ -108,7 +120,9 @@ class ProfileMixin(Requester):
             >>> ok = await bot.set_my_description("A helpful bot")
 
         Args:
-            description: New bot description; 0-512 characters.
+            description: New bot description; 0-512 characters. Omit the
+                parameter to leave it untouched; pass an empty string to remove
+                the dedicated description for the given language.
             language_code: User language the description applies to.
 
         Returns:
@@ -118,8 +132,10 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmydescription
         """
-        payload = clean_payload(description=description, language_code=language_code)
+        payload = clean_payload(description=omit_unset(description), language_code=language_code)
         return parse_flag(await self.request("setMyDescription", payload))
 
     async def get_my_description(self, *, language_code: str | None = None) -> BotDescription:
@@ -138,12 +154,14 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmydescription
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(BotDescription, await self.request("getMyDescription", payload))
 
     async def set_my_short_description(
-        self, short_description: str, *, language_code: str | None = None
+        self, short_description: str | Unset = UNSET, *, language_code: str | None = None
     ) -> bool:
         """Change the bot's short description shown in chats.
 
@@ -151,7 +169,9 @@ class ProfileMixin(Requester):
             >>> ok = await bot.set_my_short_description("Say hi!")
 
         Args:
-            short_description: New short description; 0-120 characters.
+            short_description: New short description; 0-120 characters. Omit the
+                parameter to leave it untouched; pass an empty string to remove
+                the dedicated short description for the given language.
             language_code: User language the short description applies to.
 
         Returns:
@@ -161,8 +181,12 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyshortdescription
         """
-        payload = clean_payload(short_description=short_description, language_code=language_code)
+        payload = clean_payload(
+            short_description=omit_unset(short_description), language_code=language_code
+        )
         return parse_flag(await self.request("setMyShortDescription", payload))
 
     async def get_my_short_description(
@@ -183,6 +207,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmyshortdescription
         """
         payload = clean_payload(language_code=language_code)
         return parse_result(
@@ -213,6 +239,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmycommands
         """
         payload = clean_payload(
             commands=[to_wire(command) for command in commands],
@@ -240,6 +268,8 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmycommands
         """
         payload = clean_payload(scope=to_wire(scope), language_code=language_code)
         return parse_list_result(BotCommand, await self.request("getMyCommands", payload))
@@ -263,6 +293,80 @@ class ProfileMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletemycommands
         """
         payload = clean_payload(scope=to_wire(scope), language_code=language_code)
         return parse_flag(await self.request("deleteMyCommands", payload))
+
+    async def set_my_profile_photo(self, photo: str) -> bool:
+        """Set a new profile photo for the bot.
+
+        Accepts a ``file_id`` string or a URL; multipart uploads are
+        intentionally out of scope (JSON payloads only).
+
+        Example:
+            >>> ok = await bot.set_my_profile_photo("photo_file_id")
+
+        Args:
+            photo: New bot profile photo as a ``file_id`` or URL.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#setmyprofilephoto
+        """
+        payload = clean_payload(photo=photo)
+        return parse_flag(await self.request("setMyProfilePhoto", payload))
+
+    async def remove_my_profile_photo(self) -> bool:
+        """Delete the bot's profile photo.
+
+        Example:
+            >>> ok = await bot.remove_my_profile_photo()
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#removemyprofilephoto
+        """
+        return parse_flag(await self.request("removeMyProfilePhoto"))
+
+    async def get_user_profile_audios(
+        self, user_id: int, offset: int | None = None, limit: int | None = None
+    ) -> UserProfileAudios:
+        """Get the list of audios displayed on a user's profile.
+
+        Example:
+            >>> audios = await bot.get_user_profile_audios(42, 0, 10)
+            >>> print(audios.total_count)
+
+        Args:
+            user_id: Unique identifier of the target user.
+            offset: Sequential number of the first audio to be returned; omit
+                to return all audios.
+            limit: Maximum number of audios to retrieve, 1-100; defaults
+                to 100.
+
+        Returns:
+            The UserProfileAudios object carrying the requested audios.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getuserprofileaudios
+        """
+        payload = clean_payload(user_id=user_id, offset=offset, limit=limit)
+        return parse_result(UserProfileAudios, await self.request("getUserProfileAudios", payload))

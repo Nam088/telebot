@@ -14,14 +14,17 @@ from telebot_py.types.business import (
 from telebot_py.types.callback_query import CallbackQuery
 from telebot_py.types.chat import Chat
 from telebot_py.types.chat_members import ChatJoinRequest, ChatMemberUpdated
-from telebot_py.types.common import ChosenInlineResult, InlineQuery, Poll
+from telebot_py.types.common import ChosenInlineResult, InlineQuery
 from telebot_py.types.message import Message
+from telebot_py.types.message_community import ManagedBotUpdated
 from telebot_py.types.message_extras import PollAnswer
 from telebot_py.types.payments import (
+    BotSubscriptionUpdated,
+    PaidMediaPurchased,
     PreCheckoutQuery,
-    PurchasedPaidMedia,
     ShippingQuery,
 )
+from telebot_py.types.poll_types import Poll
 from telebot_py.types.reactions import (
     MessageReactionCountUpdated,
     MessageReactionUpdated,
@@ -37,6 +40,7 @@ _PAYLOAD_FIELDS: tuple[str, ...] = (
     "business_message",
     "edited_business_message",
     "deleted_business_messages",
+    "guest_message",
     "message_reaction",
     "message_reaction_count",
     "inline_query",
@@ -44,6 +48,7 @@ _PAYLOAD_FIELDS: tuple[str, ...] = (
     "callback_query",
     "shipping_query",
     "pre_checkout_query",
+    "purchased_paid_media",
     "poll",
     "poll_answer",
     "my_chat_member",
@@ -51,7 +56,8 @@ _PAYLOAD_FIELDS: tuple[str, ...] = (
     "chat_join_request",
     "chat_boost",
     "removed_chat_boost",
-    "purchased_paid_media",
+    "managed_bot",
+    "subscription",
     "stopped_message_generation",
 )
 
@@ -65,6 +71,8 @@ class MessageGenerationStopped(TelegramObject):
         draft_id: Unique identifier of the message draft which was stopped.
         message_thread_id: Unique identifier of the message thread in which
             the message is generated.
+
+    Telegram API: https://core.telegram.org/bots/api#messagegenerationstopped
     """
 
     chat: Chat
@@ -92,6 +100,8 @@ class Update(TelegramObject):
             business account.
         deleted_business_messages: Messages were deleted from a connected
             business account.
+        guest_message: New incoming message sent by a guest bot in a chat
+            where it isn't a member.
         message_reaction: A reaction to a message was changed by a user.
         message_reaction_count: Reactions to a message with anonymous
             reactions were changed.
@@ -101,6 +111,7 @@ class Update(TelegramObject):
         callback_query: New incoming callback query.
         shipping_query: New incoming shipping query (flexible-price invoices).
         pre_checkout_query: New incoming pre-checkout query.
+        purchased_paid_media: A user purchased paid media with Telegram Stars.
         poll: New poll state (stopped polls and polls sent by the bot only).
         poll_answer: A user changed their answer in a non-anonymous poll.
         my_chat_member: The bot's chat member status was updated in a chat.
@@ -108,9 +119,14 @@ class Update(TelegramObject):
         chat_join_request: A request to join the chat has been sent.
         chat_boost: A chat boost was added or changed.
         removed_chat_boost: A boost was removed from a chat.
-        purchased_paid_media: A user purchased paid media with Telegram Stars.
+        managed_bot: A bot created and managed by the business account was
+            updated.
+        subscription: A user's subscription to the payments toward the bot
+            changed state.
         stopped_message_generation: A user asked the bot to stop the
             generation of a message (Bot API 10.3+).
+
+    Telegram API: https://core.telegram.org/bots/api#update
     """
 
     update_id: int
@@ -122,6 +138,7 @@ class Update(TelegramObject):
     business_message: Message | None = None
     edited_business_message: Message | None = None
     deleted_business_messages: BusinessMessagesDeleted | None = None
+    guest_message: Message | None = None
     message_reaction: MessageReactionUpdated | None = None
     message_reaction_count: MessageReactionCountUpdated | None = None
     inline_query: InlineQuery | None = None
@@ -129,6 +146,7 @@ class Update(TelegramObject):
     callback_query: CallbackQuery | None = None
     shipping_query: ShippingQuery | None = None
     pre_checkout_query: PreCheckoutQuery | None = None
+    purchased_paid_media: PaidMediaPurchased | None = None
     poll: Poll | None = None
     poll_answer: PollAnswer | None = None
     my_chat_member: ChatMemberUpdated | None = None
@@ -136,7 +154,8 @@ class Update(TelegramObject):
     chat_join_request: ChatJoinRequest | None = None
     chat_boost: ChatBoostUpdated | None = None
     removed_chat_boost: ChatBoostRemoved | None = None
-    purchased_paid_media: PurchasedPaidMedia | None = None
+    managed_bot: ManagedBotUpdated | None = None
+    subscription: BotSubscriptionUpdated | None = None
     stopped_message_generation: MessageGenerationStopped | None = None
 
     def __post_init__(self) -> None:

@@ -1,0 +1,1059 @@
+#!/usr/bin/env node
+/**
+ * Field-level fidelity audit: compares every Bot API type the three packages
+ * declare against the field tables in the documentation oracle
+ * (`scripts/bot-api-docs.mjs`) and reports
+ *
+ *   (a) concrete documented types the package does not model at all, and
+ *   (b) for each modelled type, which documented fields are missing, split
+ *       into MISSING-REQUIRED and missing-optional.
+ *
+ * A missing required field is the serious one: the field is always present on
+ * the wire, so the object simply cannot be decoded correctly. That case fails
+ * the build (exit 1) unless `--report` is passed.
+ *
+ * Field names are mapped back to wire keys per package:
+ *
+ * - node    interface property keys under `packages/node/src`, already snake_case.
+ * - go      struct `json:"..."` tags under `packages/go/pkg`.
+ * - python  dataclass attribute names under `packages/python/src/telebot_py/types`,
+ *           plus that class's `_KEY_OVERRIDES` (e.g. `from_user` -> `from`).
+ *
+ * Usage:
+ *   node scripts/bot-api-fidelity.mjs --report
+ *   node scripts/bot-api-fidelity.mjs --package go
+ *   node scripts/bot-api-fidelity.mjs --oracle path/to/oracle.json
+ *   node scripts/bot-api-fidelity.mjs --json build/fidelity.json
+ *   node scripts/bot-api-fidelity.mjs --oracle scripts/bot-api-oracle.json \
+ *     --baseline scripts/bot-api-fidelity-baseline.json
+ *
+ * Zero dependencies: Node 22+ built-ins only, per the repo NFR-1 policy.
+ *
+ * @module
+ */
+
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+
+import { DOCS_URL, REPO_ROOT, formatCounts, oraclePath, parseDocs } from './bot-api-docs.mjs';
+import { bracketDelta, maskCommentsAndStrings, matchBrace } from './bot-api-source.mjs';
+import {
+  extractGoMethodParams,
+  extractPythonMethodParams,
+  extractTypeScriptMethodParams,
+} from './bot-api-params.mjs';
+
+/**
+ * Parses `export interface X { ... }` declarations into wire-key sets.
+ *
+ * Only depth-0 property keys inside the body count, so nested object literals
+ * and index signatures are never mistaken for Bot API fields. Inherited keys are
+ * NOT folded in here: the body is the only place they can be resolved once
+ * every file has been read, so the heritage names travel in `parents` and
+ * `collectDeclaredTypes` expands them.
+ *
+ * @param {string} masked Masked file text.
+ * @returns {Array<{name: string, fields: Set<string>, parents: string[]>}> One entry per interface.
+ */
+export function extractTypeScript(masked) {
+  const declarations = [];
+  const header = /^export\s+(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)\s*([^{}]*)\{/gm;
+  let match;
+  while ((match = header.exec(masked)) !== null) {
+    const open = match.index + match[0].length - 1;
+    const close = matchBrace(masked, open);
+    if (close === -1) break;
+    const fields = new Set();
+    let depth = 0;
+    for (const line of masked.slice(open + 1, close).split('\n')) {
+      if (depth === 0) {
+        const key = /^(?:readonly\s+)?([A-Za-z_$][\w$]*)\??\s*:/.exec(line.trim());
+        if (key) fields.add(key[1]);
+      }
+      depth = Math.max(0, depth + bracketDelta(line));
+    }
+    declarations.push({ name: match[1], fields, parents: heritageNames(match[2]) });
+    header.lastIndex = close;
+  }
+  return declarations;
+}
+
+/**
+ * Reads an interface heritage clause (`extends Chat, Poll`, possibly a
+ * generic-qualified or dotted name) into the parent type names.
+ *
+ * @param {string} clause Text between the interface name and its opening brace.
+ * @returns {string[]} Parent names, empty for a bare interface.
+ */
+export function heritageNames(clause) {
+  const extends_ = /\bextends\b([\s\S]*)$/.exec(clause ?? '');
+  if (!extends_) return [];
+  return extends_[1]
+    .split(',')
+    .map((part) => part.trim().replace(/<[\s\S]*$/, '').trim())
+    .filter((part) => /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(part));
+}
+
+/**
+ * Parses `type X struct { ... }` declarations into wire-key sets.
+ *
+ * The `json:"..."` tag is authoritative. An untagged field falls back to the
+ * lower-cased Go name, which is what `encoding/json` matches case-insensitively.
+ *
+ * @param {string} masked Masked file text.
+ * @returns {Array<{name: string, fields: Set<string>}>} One entry per struct.
+ */
+export function extractGo(masked) {
+  const declarations = [];
+  const re = /^type\s+([A-Z]\w*)\s+struct\s*\{/gm;
+  let match;
+  while ((match = re.exec(masked)) !== null) {
+    const open = match.index + match[0].length - 1;
+    const close = matchBrace(masked, open);
+    if (close === -1) break;
+    const fields = new Set();
+    for (const line of masked.slice(open + 1, close).split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed === '') continue;
+      const tag = /json:"([^"]*)"/.exec(trimmed);
+      if (tag) {
+        const key = tag[1].split(',')[0];
+        if (key !== '' && key !== '-') fields.add(key);
+        continue;
+      }
+      const named = /^([A-Za-z_]\w*)/.exec(trimmed);
+      if (named) fields.add(named[1].toLowerCase());
+    }
+    declarations.push({ name: match[1], fields });
+    re.lastIndex = close;
+  }
+  return declarations;
+}
+
+/**
+ * Parses `class X(...):` bodies into wire-key sets.
+ *
+ * A field is a 4-space-indented `name: annotation` line at bracket depth 0, so
+ * wrapped annotations and nested blocks are handled. The class's own
+ * `_KEY_OVERRIDES` is read from the *raw* source (masking blanks string bodies)
+ * and applied so `from_user` is credited as the `from` wire key.
+ *
+ * @param {string} masked Masked file text.
+ * @param {string} raw Original file text.
+ * @returns {Array<{name: string, fields: Set<string>}>} One entry per class.
+ */
+export function extractPython(masked, raw) {
+  const maskedLines = masked.split('\n');
+  const rawLines = raw.split('\n');
+  const declarations = [];
+  const re = /^class\s+([A-Z]\w*)[^:\n]*:/gm;
+  let match;
+  while ((match = re.exec(masked)) !== null) {
+    const startLine = masked.slice(0, match.index).split('\n').length - 1;
+    let endLine = startLine + 1;
+    while (endLine < maskedLines.length) {
+      const line = maskedLines[endLine];
+      if (line.trim() !== '' && !/^[ \t]/.test(line)) break;
+      endLine += 1;
+    }
+    const body = maskedLines.slice(startLine + 1, endLine);
+    const rawBody = rawLines.slice(startLine + 1, endLine).join('\n');
+
+    const overrides = {};
+    const overrideMatch = /_KEY_OVERRIDES[^=]*=\s*\{([^}]*)\}/.exec(rawBody);
+    if (overrideMatch) {
+      for (const pair of overrideMatch[1].matchAll(/(["'])([^"']+)\1\s*:\s*(["'])([^"']+)\3/g)) {
+        overrides[pair[2]] = pair[4];
+      }
+    }
+
+    const fields = new Set();
+    let depth = 0;
+    for (const line of body) {
+      if (depth === 0) {
+        const key = /^ {4}([a-z_]\w*)\s*:(?![=:])/.exec(line);
+        if (key && !key[1].startsWith('_') && !/ClassVar/.test(line)) {
+          fields.add(overrides[key[1]] || key[1]);
+        }
+      }
+      depth = Math.max(0, depth + bracketDelta(line));
+    }
+    declarations.push({ name: match[1], fields });
+    // Resume scanning at the first line after the class body.
+    let cursor = 0;
+    for (let n = 0; n < endLine && n < maskedLines.length; n += 1) cursor += maskedLines[n].length + 1;
+    re.lastIndex = Math.max(re.lastIndex, cursor);
+  }
+  return declarations;
+}
+
+/**
+ * Where each package keeps its type declarations, and which extractor reads them.
+ */
+const PACKAGES = {
+  node: {
+    label: 'TypeScript interfaces',
+    dir: 'packages/node/src',
+    extension: '.ts',
+    mask: {},
+    // node models the documented `Update` object as `interface RawUpdate`
+    // because `Update` is taken by the rich wrapper class in kernel/update.ts
+    // (`export class Update implements RawUpdate`). It is the only docs type
+    // node declares under a different identifier.
+    rename: { RawUpdate: 'Update' },
+    extract: (masked) => extractTypeScript(masked),
+    methodsDir: 'packages/node/src',
+    // The wire name a method issues is a string literal, so unlike the type
+    // audit this must not blank string bodies.
+    paramMask: { keepStrings: true },
+    extractMethods: extractTypeScriptMethodParams,
+  },
+  go: {
+    label: 'Go structs',
+    dir: 'packages/go/pkg',
+    extension: '.go',
+    // Backticks open a raw string in Go and that raw string holds the json
+    // tag, so template literals must not be treated as TS templates and the
+    // tag body must not be blanked out.
+    mask: { templateLiterals: false, keepStrings: true },
+    skipFile: (name) => name.endsWith('_test.go'),
+    extract: (masked) => extractGo(masked),
+    methodsDir: 'packages/go/pkg/bot',
+    paramMask: { templateLiterals: false, keepStrings: true },
+    extractMethods: extractGoMethodParams,
+  },
+  python: {
+    label: 'Python dataclasses',
+    dir: 'packages/python/src/telebot_py/types',
+    extension: '.py',
+    mask: { hashComments: true },
+    skipFile: (name) => name === '__init__.py',
+    extract: (masked, raw) => extractPython(masked, raw),
+    // The `Bot` class is split across mixin modules beside `types/`.
+    methodsDir: 'packages/python/src/telebot_py/bot',
+    paramMask: { hashComments: true, keepStrings: true },
+    extractMethods: extractPythonMethodParams,
+  },
+};
+
+/**
+ * Recursively lists files with a given extension.
+ *
+ * @param {string} dir Directory to walk.
+ * @param {string} extension Extension to keep, e.g. `.ts`.
+ * @returns {Promise<string[]>} Absolute paths, sorted for deterministic output.
+ */
+async function walk(dir, extension) {
+  const found = [];
+  const entries = await readdir(dir, { withFileTypes: true }).catch(() => []);
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      found.push(...(await walk(full, extension)));
+    } else if (path.extname(entry.name).toLowerCase() === extension) {
+      found.push(full);
+    }
+  }
+  return found;
+}
+
+/**
+ * Collects a package's declared types as candidate field sets per name.
+ *
+ * A name can legitimately have several declarations (Go declares two unrelated
+ * `WebAppData` structs), so they are kept as separate candidates ordered
+ * largest-first rather than unioned: unioning would credit a type with keys that
+ * belong to a different struct and could mask a real gap. `auditPackage` picks
+ * the best candidate and surfaces the ambiguity.
+ *
+ * @param {string} key Package key.
+ * @param {string} root Repository root.
+ * @returns {Promise<Map<string, Array<{fields: Set<string>, parents: string[], file: string}>>>}
+ *   Type name to candidate declarations, widest first. `file` is repo-relative.
+ */
+export async function collectDeclaredTypes(key, root = REPO_ROOT) {
+  const pkg = PACKAGES[key];
+  if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
+  const declared = new Map();
+  const push = (name, fields, parents = [], file = '') => {
+    const candidates = declared.get(name);
+    if (candidates) candidates.push({ fields, parents, file });
+    else declared.set(name, [{ fields, parents, file }]);
+  };
+
+  for (const file of await walk(path.join(root, pkg.dir), pkg.extension)) {
+    if (pkg.skipFile && pkg.skipFile(path.basename(file))) continue;
+    const raw = await readFile(file, 'utf-8');
+    const masked = maskCommentsAndStrings(raw, pkg.mask);
+    const relative = path.relative(root, file);
+    const entries = pkg.extract(masked, raw);
+    for (const entry of entries) push(entry.name, entry.fields, entry.parents, relative);
+  }
+
+  // node models the documented `Update` under the identifier `RawUpdate`; move
+  // those candidates onto the documented name.
+  for (const [alias, docsName] of Object.entries(pkg.rename ?? {})) {
+    const candidates = declared.get(alias);
+    if (!candidates) continue;
+    for (const candidate of candidates) {
+      push(docsName, candidate.fields, candidate.parents, candidate.file);
+    }
+    declared.delete(alias);
+  }
+
+  // An interface that extends a documented one really does carry the parent's
+  // keys, so credit them; otherwise every child has to re-declare the whole
+  // parent just to keep the audit happy.
+  const inherited = (parents, stack) => {
+    const out = new Set();
+    for (const parent of parents) {
+      if (stack.has(parent)) continue;
+      const candidates = declared.get(parent);
+      if (!candidates) continue;
+      const widest = candidates.reduce((a, b) => (b.fields.size > a.fields.size ? b : a));
+      stack.add(parent);
+      for (const field of widest.fields) out.add(field);
+      for (const field of inherited(widest.parents, stack)) out.add(field);
+      stack.delete(parent);
+    }
+    return out;
+  };
+
+  const resolved = new Map();
+  for (const [name, candidates] of declared) {
+    const judged = candidates.map((candidate) => {
+      const keys =
+        candidate.parents.length === 0
+          ? candidate.fields
+          : new Set([
+              ...candidate.fields,
+              ...inherited(candidate.parents, new Set([name])),
+            ]);
+      // Provenance stays the declaring file: keys inherited from a parent
+      // defined elsewhere must not send a reviewer to the parent to fix a gap
+      // that is only visible on the child.
+      return { fields: keys, file: candidate.file };
+    });
+    judged.sort((a, b) => b.fields.size - a.fields.size);
+    resolved.set(name, judged);
+  }
+  return resolved;
+}
+
+/**
+ * Collects what params each documented method can actually send.
+ *
+ * @param {string} key Package key (`node` | `go` | `python`).
+ * @param {string} root Repository root.
+ * @param {Map<string, Array<{fields: Set<string>}>>} declaredTypes Output of
+ *   {@link collectDeclaredTypes}, used to resolve a named options type.
+ * @param {string[]} [wires] Documented method names to watch for as literals.
+ * @returns {Promise<{methods: Map<string, {keys: Set<string>, partial: boolean, file: string}>, seen: Set<string>}>}
+ *   `methods` is keyed by documented method name; `seen` holds every wire name
+ *   issued somewhere in the package, whether or not a method was attributed.
+ */
+export async function collectDeclaredMethods(key, root, declaredTypes, wires = []) {
+  const pkg = PACKAGES[key];
+  if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
+
+  // Same rule as the type audit: a name with several declarations is judged by
+  // its widest one, so a `SendMessageOptions` split over files is not short-changed.
+  const resolve = (type) => {
+    const candidates = declaredTypes.get(type);
+    if (!candidates || candidates.length === 0) return null;
+    return candidates[0].fields;
+  };
+
+  const watch = wires.map((wire) => new RegExp(`["'\`]${wire}["'\`]`)).filter(Boolean);
+  const merged = new Map();
+  const seen = new Set();
+  for (const file of await walk(path.join(root, pkg.methodsDir ?? pkg.dir), pkg.extension)) {
+    if (pkg.skipFile && pkg.skipFile(path.basename(file))) continue;
+    const raw = await readFile(file, 'utf-8');
+    const masked = maskCommentsAndStrings(raw, pkg.paramMask ?? pkg.mask);
+    const relative = path.relative(root, file);
+    for (let i = 0; i < watch.length; i += 1) {
+      if (watch[i].test(masked)) seen.add(wires[i]);
+    }
+    for (const [wire, read] of pkg.extractMethods(masked, resolve)) {
+      const existing = merged.get(wire);
+      if (!existing) {
+        merged.set(wire, { keys: new Set(read.keys), partial: read.partial, file: relative });
+        continue;
+      }
+      // Reachable from either file, so union the keys and only stay "partial"
+      // while every path is partial.
+      for (const k of read.keys) existing.keys.add(k);
+      existing.partial = existing.partial && read.partial;
+    }
+  }
+  return { methods: merged, seen };
+}
+
+/**
+ * Compares one package against the oracle.
+ *
+ * @param {string} key Package key (`node` | `go` | `python`).
+ * @param {object} oracle Parsed documentation oracle.
+ * @param {string} [root] Repository root.
+ * @returns {Promise<object>} Audit report for that package.
+ */
+export async function auditPackage(key, oracle, root = REPO_ROOT) {
+  const pkg = PACKAGES[key];
+  if (!pkg) throw new Error(`Unknown package "${key}" (expected node|go|python)`);
+
+  const declared = await collectDeclaredTypes(key, root);
+
+  // "Concrete" = the docs table lists at least one field. The 35 field-less
+  // headings (MessageOrigin, InputMedia, CallbackGame, ...) are abstract
+  // unions, so their absence is not a modelling gap.
+  const concrete = new Map(
+    Object.entries(oracle.types)
+      .filter(([, type]) => Object.keys(type.fields).length > 0)
+      .map(([name, type]) => [name, type]),
+  );
+
+  const unmodelled = [...concrete.keys()].filter((name) => !declared.has(name)).sort();
+
+  const rows = [];
+  const ambiguous = [];
+  for (const [name, candidates] of declared) {
+    const docsType = concrete.get(name);
+    if (!docsType) continue;
+    if (candidates.length > 1) ambiguous.push(name);
+
+    // A package models a type faithfully if ANY of its same-named declarations
+    // does, so judge by the best candidate rather than by an average.
+    let best = null;
+    for (const candidate of candidates) {
+      const required = [];
+      const optional = [];
+      for (const [field, meta] of Object.entries(docsType.fields)) {
+        if (candidate.fields.has(field)) continue;
+        if (meta.optional) optional.push(field);
+        else required.push(field);
+      }
+      const score = required.length * 1000 + optional.length;
+      if (best === null || score < best.score) {
+        best = { required, optional, score, file: candidate.file };
+      }
+    }
+
+    if (best.required.length > 0 || best.optional.length > 0) {
+      rows.push({
+        name,
+        file: best.file,
+        required: best.required,
+        optional: best.optional,
+        total: Object.keys(docsType.fields).length,
+        declarations: candidates.length,
+      });
+    }
+  }
+  rows.sort(
+    (a, b) =>
+      b.required.length - a.required.length ||
+      a.optional.length - b.optional.length ||
+      a.name.localeCompare(b.name),
+  );
+
+  // Method parameters: a separate question from the type audit above. A
+  // package can decode every documented field of `Message` and still refuse to
+  // accept a documented argument of `sendMessage`.
+  const { methods, seen } = await collectDeclaredMethods(key, root, declared, Object.keys(oracle.methods ?? {}));
+  const methodRows = [];
+  const methodsUnresolved = [];
+  for (const [wire, def] of Object.entries(oracle.methods ?? {})) {
+    const params = Object.entries(def.params ?? {});
+    const declaredMethod = methods.get(wire);
+    if (declaredMethod === undefined) {
+      // Issued somewhere but not attributed to a method means the extractor
+      // met a shape it could not read; that is a tool gap, not a library gap.
+      if (seen.has(wire)) methodsUnresolved.push(wire);
+      else {
+        methodRows.push({
+          name: wire,
+          file: '',
+          required: params.filter(([, meta]) => !meta.optional).map(([name]) => name),
+          optional: params.filter(([, meta]) => meta.optional).map(([name]) => name),
+          total: params.length,
+          absent: true,
+        });
+      }
+      continue;
+    }
+    if (declaredMethod.partial) {
+      methodsUnresolved.push(wire);
+      continue;
+    }
+    const required = [];
+    const optional = [];
+    for (const [name, meta] of params) {
+      if (declaredMethod.keys.has(name)) continue;
+      if (meta.optional) optional.push(name);
+      else required.push(name);
+    }
+    if (required.length > 0 || optional.length > 0) {
+      methodRows.push({
+        name: wire,
+        file: declaredMethod.file,
+        required,
+        optional,
+        total: params.length,
+        absent: false,
+      });
+    }
+  }
+  methodRows.sort(
+    (a, b) =>
+      b.required.length - a.required.length ||
+      b.optional.length - a.optional.length ||
+      a.name.localeCompare(b.name),
+  );
+
+  return {
+    key,
+    label: pkg.label,
+    declared: declared.size,
+    modelled: [...declared.keys()].filter((name) => concrete.has(name)).length,
+    unmodelled,
+    rows,
+    ambiguous: ambiguous.sort(),
+    typesWithMissing: rows.length,
+    missingRequired: rows.reduce((sum, row) => sum + row.required.length, 0),
+    missingOptional: rows.reduce((sum, row) => sum + row.optional.length, 0),
+    documentMethods: Object.keys(oracle.methods ?? {}).length,
+    methodRows,
+    methodsUnresolved: methodsUnresolved.sort(),
+    methodsWithMissing: methodRows.length,
+    missingMethodRequired: methodRows.reduce((sum, row) => sum + row.required.length, 0),
+    missingMethodOptional: methodRows.reduce((sum, row) => sum + row.optional.length, 0),
+  };
+}
+
+/**
+ * Renders a fixed-width summary table.
+ *
+ * @param {object[]} reports Per-package audit results.
+ * @returns {string} Table text.
+ */
+export function renderTable(reports) {
+  const header = [
+    'package',
+    'declared',
+    'modelled docs types',
+    'types w/ missing fields',
+    'missing REQUIRED',
+    'missing optional',
+    'unmodelled docs types',
+    'methods w/ missing params',
+    'missing param REQ',
+    'missing param opt',
+    'unmeasurable methods',
+  ];
+  const widths = header.map((text) => text.length);
+  const body = reports.map((report) => [
+    report.key,
+    String(report.declared),
+    String(report.modelled),
+    String(report.typesWithMissing),
+    String(report.missingRequired),
+    String(report.missingOptional),
+    String(report.unmodelled.length),
+    String(report.methodsWithMissing ?? 0),
+    String(report.missingMethodRequired ?? 0),
+    String(report.missingMethodOptional ?? 0),
+    String((report.methodsUnresolved ?? []).length),
+  ]);
+  for (const row of body) {
+    row.forEach((cell, index) => {
+      widths[index] = Math.max(widths[index], cell.length);
+    });
+  }
+  const line = (cells) => cells.map((cell, index) => cell.padEnd(widths[index])).join('  ').trimEnd();
+  return [line(header), line(widths.map((w) => '-'.repeat(w))), ...body.map(line)].join('\n');
+}
+
+/**
+ * Diffs a fresh audit against a baseline report (the `--json` dump committed
+ * from a known-good tree).
+ *
+ * The baseline records the accepted state of the code, so only drift away from
+ * it is worth failing a build over: a documented field that was already absent
+ * stays absent without noise, while one that only just went missing is a
+ * regression — and so is a concrete docs type nobody models any more. Closing a
+ * gap is reported as progress, meaning the baseline is due a refresh.
+ *
+ * @param {object[]} reports Fresh per-package audit results.
+ * @param {{packages?: object[]}} baseline Parsed baseline report.
+ * @returns {{entries: object[], unbaselined: string[], regressions: number, improvements: number}}
+ */
+export function compareBaseline(reports, baseline) {
+  const previous = new Map((baseline?.packages ?? []).map((report) => [report.key, report]));
+  const entries = [];
+  const unbaselined = [];
+  let regressions = 0;
+  let improvements = 0;
+
+  for (const report of reports) {
+    const before = previous.get(report.key);
+    if (before === undefined) {
+      unbaselined.push(report.key);
+      regressions += 1;
+      continue;
+    }
+
+    const beforeRows = new Map((before.rows ?? []).map((row) => [row.name, row]));
+    const afterNames = new Set(report.rows.map((row) => row.name));
+    const newGaps = [];
+    for (const row of report.rows) {
+      const known = beforeRows.get(row.name);
+      const knownRequired = new Set(known?.required ?? []);
+      const knownOptional = new Set(known?.optional ?? []);
+      const required = row.required.filter((field) => !knownRequired.has(field));
+      const optional = row.optional.filter((field) => !knownOptional.has(field));
+      if (required.length > 0 || optional.length > 0) {
+        newGaps.push({ name: row.name, file: row.file ?? '', required, optional });
+      }
+    }
+
+    const beforeUnmodelled = new Set(before.unmodelled ?? []);
+    const afterUnmodelled = new Set(report.unmodelled);
+    const newlyUnmodelled = report.unmodelled.filter((name) => !beforeUnmodelled.has(name));
+    const nowModelled = [...beforeUnmodelled]
+      .filter((name) => !afterUnmodelled.has(name))
+      .sort();
+    const closed = [...beforeRows.keys()].filter((name) => !afterNames.has(name)).sort();
+
+    // Same ratchet logic one layer up. A baseline written before the param
+    // layer existed has no `methodRows` key, which correctly makes every
+    // measured param gap new drift until it is deliberately refreshed.
+    const beforeMethodRows = new Map((before.methodRows ?? []).map((row) => [row.name, row]));
+    const afterMethodNames = new Set((report.methodRows ?? []).map((row) => row.name));
+    const newMethodGaps = [];
+    for (const row of report.methodRows ?? []) {
+      const known = beforeMethodRows.get(row.name);
+      const knownRequired = new Set(known?.required ?? []);
+      const knownOptional = new Set(known?.optional ?? []);
+      const required = row.required.filter((field) => !knownRequired.has(field));
+      const optional = row.optional.filter((field) => !knownOptional.has(field));
+      if (required.length > 0 || optional.length > 0) {
+        newMethodGaps.push({ name: row.name, required, optional });
+      }
+    }
+    const beforeUnresolved = new Set(before.methodsUnresolved ?? []);
+    const afterUnresolved = new Set(report.methodsUnresolved ?? []);
+    const newlyUnresolved = (report.methodsUnresolved ?? []).filter(
+      (name) => !beforeUnresolved.has(name),
+    );
+    const nowResolved = [...beforeUnresolved]
+      .filter((name) => !afterUnresolved.has(name))
+      .sort();
+    const closedMethods = [...beforeMethodRows.keys()]
+      .filter((name) => !afterMethodNames.has(name))
+      .sort();
+
+    regressions +=
+      newGaps.length + newlyUnmodelled.length + newMethodGaps.length + newlyUnresolved.length;
+    improvements +=
+      closed.length + nowModelled.length + closedMethods.length + nowResolved.length;
+    entries.push({
+      key: report.key,
+      newGaps,
+      newlyUnmodelled,
+      closed,
+      nowModelled,
+      newMethodGaps,
+      newlyUnresolved,
+      closedMethods,
+      nowResolved,
+    });
+  }
+
+  return { entries, unbaselined, regressions, improvements };
+}
+
+/**
+ * Renders the audit as a GitHub-flavoured markdown document, for a job summary
+ * or a PR comment. Takes the same report objects the console prints — it never
+ * re-measures anything, so the prose cannot disagree with the gate.
+ *
+ * @param {object[]} reports Per-package audit results.
+ * @param {{oracleVersion?: string, baselineVersion?: string|null, verdict?: object|null}} [options]
+ *   `verdict` is a `compareBaseline` result; without one the full gap list is
+ *   shown, because there is no reference point to filter against.
+ * @returns {string} Markdown document.
+ */
+export function renderMarkdown(reports, options = {}) {
+  const { oracleVersion = 'unknown', baselineVersion = null, verdict = null } = options;
+  const lines = ['## Bot API field fidelity', ''];
+  lines.push(`Declared types vs the [official Bot API docs](${DOCS_URL}) — oracle ${oracleVersion}.`);
+  if (baselineVersion !== null && baselineVersion !== oracleVersion) {
+    lines.push('');
+    lines.push(
+      `> The baseline was recorded against Bot API ${baselineVersion}, so differing ` +
+        'counts are expected until it is refreshed.',
+    );
+  }
+
+  lines.push(
+    '',
+    '| package | declared | modelled | missing REQUIRED | missing optional | unmodelled | methods w/ missing params | missing param REQ | missing param opt | unmeasurable |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+  );
+  for (const report of reports) {
+    lines.push(
+      `| ${report.key} | ${report.declared} | ${report.modelled} | ` +
+        `${report.missingRequired} | ${report.missingOptional} | ${report.unmodelled.length} | ` +
+        `${report.methodsWithMissing ?? 0} | ${report.missingMethodRequired ?? 0} | ` +
+        `${report.missingMethodOptional ?? 0} | ${(report.methodsUnresolved ?? []).length} |`,
+    );
+  }
+
+  if (verdict !== null) {
+    lines.push('');
+    if (verdict.regressions > 0) {
+      lines.push(`**${verdict.regressions} regression(s) versus the baseline.**`);
+    } else if (verdict.improvements > 0) {
+      lines.push(
+        `**No drift versus the baseline**, plus ${verdict.improvements} improvement(s) — ` +
+          'refresh it with `npm run audit:baseline`.',
+      );
+    } else {
+      lines.push('**No drift versus the baseline.**');
+    }
+    const bullets = [];
+    for (const entry of verdict.entries) {
+      for (const gap of entry.newGaps) {
+        const marks = [
+          ...gap.required.map((field) => `\`${field}\` (required)`),
+          ...gap.optional.map((field) => `\`${field}\``),
+        ];
+        bullets.push(
+          `- ${entry.key} **${gap.name}** lost ${marks.join(', ')}` +
+            (gap.file ? ` — ${gap.file}` : ''),
+        );
+      }
+      for (const name of entry.newlyUnmodelled) {
+        bullets.push(`- ${entry.key} **${name}** is no longer modelled at all`);
+      }
+      for (const name of entry.closed) {
+        bullets.push(`- ${entry.key} **${name}** now carries every documented field`);
+      }
+      for (const name of entry.nowModelled) {
+        bullets.push(`- ${entry.key} **${name}** is modelled again`);
+      }
+    }
+    if (verdict.unbaselined.length > 0) {
+      bullets.push(`- no baseline entry for ${verdict.unbaselined.join(', ')} — regenerate it`);
+    }
+    if (bullets.length > 0) lines.push('', ...bullets);
+  } else if (reports.some((report) => report.rows.length > 0)) {
+    lines.push('', '<details>', '<summary>documented fields missing from modelled types</summary>', '');
+    for (const report of reports) {
+      for (const row of report.rows) {
+        const marks = [
+          ...row.required.map((field) => `\`${field}\` (required)`),
+          ...row.optional.map((field) => `\`${field}\``),
+        ];
+        lines.push(`- ${report.key} **${row.name}** — ${marks.join(', ')}`);
+        if (row.file) lines.push(`  - ${row.file}`);
+      }
+    }
+    lines.push('', '</details>');
+  }
+
+  if (reports.some((report) => report.unmodelled.length > 0)) {
+    lines.push('', '<details>', '<summary>concrete docs types not modelled at all</summary>', '');
+    for (const report of reports) {
+      if (report.unmodelled.length === 0) continue;
+      lines.push(`- **${report.key}** (${report.unmodelled.length}): ${report.unmodelled.join(', ')}`);
+    }
+    lines.push('', '</details>');
+  }
+
+  return `${lines.join('\n')}\n`;
+}
+
+/**
+ * Resolves the oracle from the most specific source the CLI was given.
+ *
+ * @param {{offline?: string, oracle?: string, refresh?: boolean}} options Parsed flags.
+ * @returns {Promise<{oracle: object, source: string}>} Oracle plus where it came from.
+ * @throws {Error} When the live page cannot be fetched or a path is missing.
+ */
+async function resolveOracle(options) {
+  if (options.offline !== undefined) {
+    if (!fs.existsSync(options.offline)) throw new Error(`No such file: ${options.offline}`);
+    return { oracle: parseDocs(await readFile(options.offline, 'utf-8')), source: options.offline };
+  }
+  if (options.oracle !== undefined) {
+    if (!fs.existsSync(options.oracle)) {
+      throw new Error(`No such oracle: ${options.oracle} (build it: node scripts/bot-api-docs.mjs)`);
+    }
+    return { oracle: JSON.parse(await readFile(options.oracle, 'utf-8')), source: options.oracle };
+  }
+  const target = oraclePath();
+  if (options.refresh || !fs.existsSync(target)) {
+    const response = await fetch(DOCS_URL, { headers: { 'User-Agent': 'telebot-bot-api-oracle/1.0' } });
+    if (!response.ok) throw new Error(`Failed to fetch ${DOCS_URL}: HTTP ${response.status}`);
+    const fresh = parseDocs(await response.text(), DOCS_URL);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, `${JSON.stringify(fresh, null, 2)}\n`, 'utf-8');
+    return { oracle: fresh, source: `${DOCS_URL} (fetched, cached to ${target})` };
+  }
+  return { oracle: JSON.parse(await readFile(target, 'utf-8')), source: target };
+}
+
+/**
+ * CLI entry point.
+ *
+ * @param {string[]} argv Arguments after the script name.
+ * @returns {Promise<number>} Process exit code: 0 pass, 1 gate failure, 2 usage error.
+ */
+export async function main(argv = process.argv.slice(2)) {
+  const options = {};
+  for (let i = 0; i < argv.length; i += 1) {
+    const flag = argv[i];
+    if (flag === '--report') options.report = true;
+    else if (flag === '--refresh') options.refresh = true;
+    else if (flag === '--package') [options.package, i] = [argv[i + 1], i + 1];
+    else if (flag === '--oracle') [options.oracle, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--offline') [options.offline, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--json') [options.json, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--markdown-out') {
+      [options.markdown, i] = [path.resolve(argv[i + 1]), i + 1];
+    }
+    else if (flag === '--baseline') [options.baseline, i] = [path.resolve(argv[i + 1]), i + 1];
+    else if (flag === '--help' || flag === '-h') options.help = true;
+    else {
+      console.error(`Unknown argument: ${flag}`);
+      options.help = true;
+      options.bad = true;
+    }
+  }
+
+  if (options.help) {
+    console.log(
+      [
+        'Usage: node scripts/bot-api-fidelity.mjs [--report] [--package node|go|python]',
+        '                          [--oracle <path> | --offline <page.html>] [--refresh]',
+        '                          [--json <report.json>] [--baseline <report.json>]',
+        '                          [--markdown-out <report.md>]',
+        '',
+        'Reports, per package, which documented Bot API types are not modelled at',
+        'all and which documented fields are missing from the types that are.',
+        '',
+        'Exits non-zero when a package is missing a REQUIRED documented field on a',
+        'type it declares. --report prints the same tables but never fails.',
+        '--json writes that same report as JSON: oracle metadata plus one entry',
+        'per audited package, every row stamped with the file declaring it.',
+        '--markdown-out renders it as markdown (drift only, when --baseline is',
+        'given) for a CI job summary; it never re-measures anything.',
+        '--baseline compares against such a dump instead of failing absolutely:',
+        'only drift away from it fails (a field that was not already missing, or a',
+        'docs type that stopped being modelled). Use it once the tree is clean.',
+        `Oracle defaults to ${oraclePath()}; build it with node scripts/bot-api-docs.mjs.`,
+      ].join('\n'),
+    );
+    return options.bad ? 2 : 0;
+  }
+
+  let resolved;
+  try {
+    resolved = await resolveOracle(options);
+  } catch (error) {
+    console.error(error.message);
+    return 2;
+  }
+  const { oracle, source } = resolved;
+
+  const keys = options.package === undefined ? Object.keys(PACKAGES) : [options.package];
+  for (const key of keys) {
+    if (!PACKAGES[key]) {
+      console.error(`Unknown package "${key}" (expected node|go|python)`);
+      return 2;
+    }
+  }
+
+  // Read before auditing: --json may target this same path to refresh it, and
+  // the comparison has to be against what was on disk when the run started.
+  let baseline = null;
+  if (options.baseline !== undefined) {
+    if (!fs.existsSync(options.baseline)) {
+      console.error(
+        `No such baseline: ${options.baseline}\n` +
+          `Create one with: node scripts/bot-api-fidelity.mjs --json ${options.baseline}`,
+      );
+      return 2;
+    }
+    baseline = JSON.parse(await readFile(options.baseline, 'utf-8'));
+  }
+
+  console.log(`Docs oracle: Bot API ${oracle.version}  [${source}]`);
+  console.log(`Parser counts: ${formatCounts(oracle.counts)}`);
+  console.log('');
+
+  const reports = [];
+  for (const key of keys) reports.push(await auditPackage(key, oracle));
+
+  console.log(renderTable(reports));
+
+  for (const report of reports) {
+    console.log('');
+    console.log(`--- ${report.key}: ${report.label} ---`);
+    if (report.rows.length === 0) {
+      console.log('  modelled types carry every documented field');
+    }
+    for (const row of report.rows) {
+      const marks = [...row.required.map((field) => `${field}*`), ...row.optional];
+      const kind = row.required.length ? 'REQUIRED' : 'optional';
+      console.log(`  ${row.name.padEnd(32)} ${kind}  ${marks.join(', ')}`);
+      if (row.file) console.log(`      ${row.file}`);
+    }
+    if (report.ambiguous.length > 0) {
+      console.log(`  judged from several same-named declarations: ${report.ambiguous.join(', ')}`);
+    }
+    if (report.unmodelled.length > 0) {
+      console.log(`  concrete docs types not modelled at all (${report.unmodelled.length}):`);
+      console.log(`    ${report.unmodelled.join(', ')}`);
+    }
+  }
+
+  // Derived once: the markdown report, the console summary and the exit code
+  // must all describe the same drift.
+  const verdict = baseline === null ? null : compareBaseline(reports, baseline);
+  const baselineVersion = baseline?.oracle?.version ?? null;
+
+  if (options.json !== undefined) {
+    const payload = {
+      oracle: {
+        version: oracle.version,
+        // Relative so a committed baseline does not carry this machine's paths.
+        source: path.isAbsolute(source) ? path.relative(REPO_ROOT, source) : source,
+        counts: oracle.counts,
+      },
+      packages: reports,
+    };
+    try {
+      await mkdir(path.dirname(options.json), { recursive: true });
+      await writeFile(options.json, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8');
+      console.log('');
+      console.log(`JSON report written to ${options.json}`);
+    } catch (error) {
+      console.error(`--json: ${error.message}`);
+      return 2;
+    }
+  }
+
+  if (options.markdown !== undefined) {
+    const doc = renderMarkdown(reports, {
+      oracleVersion: oracle.version,
+      baselineVersion,
+      verdict,
+    });
+    try {
+      await mkdir(path.dirname(options.markdown), { recursive: true });
+      await writeFile(options.markdown, doc, 'utf-8');
+      console.log(`Markdown report written to ${options.markdown}`);
+    } catch (error) {
+      console.error(`--markdown-out: ${error.message}`);
+      return 2;
+    }
+  }
+
+  if (verdict !== null) {
+    console.log('');
+    console.log(`Baseline: ${options.baseline} (Bot API ${baselineVersion})`);
+    if (baselineVersion !== oracle.version) {
+      console.log(
+        `  NOTE: the oracle is Bot API ${oracle.version}; counts shifting is expected ` +
+          'until the baseline is refreshed deliberately.',
+      );
+    }
+    for (const entry of verdict.entries) {
+      const parts = [];
+      if (entry.newGaps.length > 0) parts.push(`${entry.newGaps.length} new field gap(s)`);
+      if (entry.newlyUnmodelled.length > 0) {
+        parts.push(`${entry.newlyUnmodelled.length} newly unmodelled`);
+      }
+      if (entry.closed.length > 0) parts.push(`${entry.closed.length} gap row(s) closed`);
+      if (entry.nowModelled.length > 0) parts.push(`${entry.nowModelled.length} newly modelled`);
+      if ((entry.newMethodGaps ?? []).length > 0) {
+        parts.push(`${entry.newMethodGaps.length} new param gap(s)`);
+      }
+      if ((entry.newlyUnresolved ?? []).length > 0) {
+        parts.push(`${entry.newlyUnresolved.length} newly unmeasurable method(s)`);
+      }
+      if ((entry.closedMethods ?? []).length > 0) {
+        parts.push(`${entry.closedMethods.length} param row(s) closed`);
+      }
+      if ((entry.nowResolved ?? []).length > 0) {
+        parts.push(`${entry.nowResolved.length} newly measurable`);
+      }
+      console.log(`  ${entry.key.padEnd(8)} ${parts.length > 0 ? parts.join(', ') : 'unchanged'}`);
+      for (const gap of entry.newGaps) {
+        const marks = [...gap.required.map((field) => `${field}*`), ...gap.optional];
+        console.log(`      ${gap.name}: ${marks.join(', ')}`);
+        if (gap.file) console.log(`        ${gap.file}`);
+      }
+      for (const gap of entry.newMethodGaps ?? []) {
+        const marks = [...gap.required.map((field) => `${field}*`), ...gap.optional];
+        console.log(`      ${gap.name}(): ${marks.join(', ')}`);
+      }
+      if ((entry.newlyUnresolved ?? []).length > 0) {
+        console.log(`      cannot measure: ${entry.newlyUnresolved.join(', ')}`);
+      }
+      if (entry.newlyUnmodelled.length > 0) {
+        console.log(`      ${entry.newlyUnmodelled.join(', ')}`);
+      }
+    }
+    if (verdict.unbaselined.length > 0) {
+      console.log(`  no baseline entry for: ${verdict.unbaselined.join(', ')}`);
+    }
+    if (verdict.regressions > 0) {
+      console.error(
+        `FAIL: ${verdict.regressions} regression(s) versus the baseline ` +
+          `(improvements: ${verdict.improvements})`,
+      );
+      return 1;
+    }
+    console.log(
+      verdict.improvements > 0
+        ? `PASS: no regressions; ${verdict.improvements} improvement(s) -> refresh the baseline.`
+        : 'PASS: no drift versus the baseline.',
+    );
+    return 0;
+  }
+
+  const failing = reports.filter(
+    (report) => report.missingRequired > 0 || (report.missingMethodRequired ?? 0) > 0,
+  );
+  const detail = (report) =>
+    `type:${report.missingRequired} param:${report.missingMethodRequired ?? 0}`;
+  console.log('');
+  if (options.report) {
+    console.log(
+      failing.length === 0
+        ? '--report: no missing REQUIRED docs fields.'
+        : `--report: NOT failing. ${failing.map((r) => `${r.key}=${detail(r)}`).join(' ')} missing REQUIRED docs fields.`,
+    );
+    return 0;
+  }
+  if (failing.length > 0) {
+    console.error(
+      `FAIL: missing REQUIRED docs fields -> ${failing.map((r) => `${r.key}=${detail(r)}`).join(' ')}`,
+    );
+    return 1;
+  }
+  console.log('PASS: no missing REQUIRED docs fields on any modelled type.');
+  return 0;
+}
+
+if (process.argv[1] !== undefined && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url))) {
+  main().then((code) => process.exit(code));
+}

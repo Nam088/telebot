@@ -4,14 +4,7 @@
  * @packageDocumentation
  */
 
-import {
-  Frequency,
-  FrequencyType,
-  Weekday,
-  RRuleOptions,
-  RRuleFrequency,
-  RRuleWeekday,
-} from "./types.js";
+import { Frequency, Weekday, RRuleOptions } from "./types.js";
 import { parseRRuleString } from "./parser.js";
 import { getDayOfYear, isLeapYear, getZonedParts } from "./helpers.js";
 

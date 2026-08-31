@@ -2,6 +2,9 @@ import type { InputFile } from "../../../utils/http.js";
 import type { File } from "../common/index.js";
 import type { PhotoSize } from "../messages/index.js";
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#sticker Telegram Bot API: Sticker}
+ */
 export interface Sticker {
   /** Identifier for this file, which can be used to download or reuse the file. */
   file_id: string;
@@ -35,6 +38,9 @@ export interface Sticker {
   file_size?: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#maskposition Telegram Bot API: MaskPosition}
+ */
 export interface MaskPosition {
   /** The part of the face relative to which the mask should be placed. One of "forehead", "eyes", "mouth", or "chin". */
   point: string;
@@ -46,6 +52,9 @@ export interface MaskPosition {
   scale: number;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#stickerset Telegram Bot API: StickerSet}
+ */
 export interface StickerSet {
   /** Sticker set name. */
   name: string;
@@ -59,6 +68,9 @@ export interface StickerSet {
   thumbnail?: PhotoSize;
 }
 
+/**
+ * @see {@link https://core.telegram.org/bots/api#inputsticker Telegram Bot API: InputSticker}
+ */
 export interface InputSticker {
   /** The added sticker. Pass a file_id as a string or an InputFile object. */
   sticker: string | InputFile;

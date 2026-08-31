@@ -1,4 +1,4 @@
-"""Telegram game types: Game and GameHighScore."""
+"""Telegram game types: CallbackGame, Game and GameHighScore."""
 
 from __future__ import annotations
 
@@ -8,6 +8,14 @@ from telebot_py.types.base import TelegramObject
 from telebot_py.types.common import MessageEntity
 from telebot_py.types.media import Animation, PhotoSize
 from telebot_py.types.user import User
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class CallbackGame(TelegramObject):
+    """A placeholder, empty response sent when a game button is pressed.
+
+    Telegram API: https://core.telegram.org/bots/api#callbackgame
+    """
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -22,6 +30,8 @@ class Game(TelegramObject):
         text_entities: Special entities that appear in ``text``.
         animation: Animation that will be displayed in the game message in
             chats.
+
+    Telegram API: https://core.telegram.org/bots/api#game
     """
 
     title: str
@@ -40,6 +50,8 @@ class GameHighScore(TelegramObject):
         position: Position in the high score table for the game.
         user: User who scored the points.
         score: Score value.
+
+    Telegram API: https://core.telegram.org/bots/api#gamehighscore
     """
 
     position: int

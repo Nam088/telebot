@@ -1,4 +1,4 @@
-"""Bot profile and forum-topic types: names, commands, topics, menu buttons."""
+"""Bot profile and forum-topic types: names, commands, topics, menu buttons, access settings."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import typing as t
 
 from telebot_py.types.base import TelegramObject
 from telebot_py.types.keyboards import WebAppInfo
+from telebot_py.types.user import User
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -15,6 +16,8 @@ class BotName(TelegramObject):
 
     Attributes:
         name: The bot's name.
+
+    Telegram API: https://core.telegram.org/bots/api#botname
     """
 
     name: str
@@ -26,6 +29,8 @@ class BotDescription(TelegramObject):
 
     Attributes:
         description: The bot's description.
+
+    Telegram API: https://core.telegram.org/bots/api#botdescription
     """
 
     description: str
@@ -37,9 +42,28 @@ class BotShortDescription(TelegramObject):
 
     Attributes:
         short_description: The bot's short description.
+
+    Telegram API: https://core.telegram.org/bots/api#botshortdescription
     """
 
     short_description: str
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class BotAccessSettings(TelegramObject):
+    """The access settings of a managed bot.
+
+    Attributes:
+        is_access_restricted: True if only selected users can access the bot.
+            The bot's owner can always access it.
+        added_users: The list of other users who have access to the bot if the
+            access is restricted.
+
+    Telegram API: https://core.telegram.org/bots/api#botaccesssettings
+    """
+
+    is_access_restricted: bool
+    added_users: list[User] | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -52,12 +76,17 @@ class ForumTopic(TelegramObject):
         icon_color: Color of the topic icon in RGB format.
         icon_custom_emoji_id: Unique identifier of the custom emoji shown as
             the topic icon.
+        is_name_implicit: Whether the name of the topic wasn't specified
+            explicitly by its creator and likely needs editing.
+
+    Telegram API: https://core.telegram.org/bots/api#forumtopic
     """
 
     message_thread_id: int
     name: str
     icon_color: int
     icon_custom_emoji_id: str | None = None
+    is_name_implicit: bool | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -68,10 +97,15 @@ class BotCommand(TelegramObject):
         command: Text of the command; 1-32 characters, lowercase English
             letters, digits and underscores only.
         description: Description of the command; 1-256 characters.
+        is_ephemeral: Whether the command sends an ephemeral message, visible
+            only to the user who sent it.
+
+    Telegram API: https://core.telegram.org/bots/api#botcommand
     """
 
     command: str
     description: str
+    is_ephemeral: bool | None = None
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -80,6 +114,8 @@ class MenuButtonDefault(TelegramObject):
 
     Attributes:
         type: Type of the menu button, always ``default``.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttondefault
     """
 
     type: str
@@ -93,6 +129,8 @@ class MenuButtonCommands(TelegramObject):
 
     Attributes:
         type: Type of the menu button, always ``commands``.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttoncommands
     """
 
     type: str
@@ -109,6 +147,8 @@ class MenuButtonWebApp(TelegramObject):
         text: Text on the button.
         web_app: Description of the Web App that will be launched when the
             user presses the button.
+
+    Telegram API: https://core.telegram.org/bots/api#menubuttonwebapp
     """
 
     type: str

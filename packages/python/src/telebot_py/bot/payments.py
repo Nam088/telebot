@@ -14,7 +14,9 @@ from telebot_py.bot.base import (
     to_wire,
 )
 from telebot_py.types.message import Message
-from telebot_py.types.payments import StarTransactions
+from telebot_py.types.message_extras import ReplyParameters
+from telebot_py.types.payments import StarAmount, StarTransactions
+from telebot_py.types.suggested_post_types import SuggestedPostParameters
 
 
 class PaymentsMixin(Requester):
@@ -31,6 +33,7 @@ class PaymentsMixin(Requester):
         *,
         provider_token: str | None = None,
         message_thread_id: int | None = None,
+        direct_messages_topic_id: int | None = None,
         max_tip_amount: int | None = None,
         suggested_tip_amounts: Sequence[int] | None = None,
         start_parameter: str | None = None,
@@ -48,7 +51,10 @@ class PaymentsMixin(Requester):
         is_flexible: bool | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
-        reply_parameters: MarkupLike | None = None,
+        allow_paid_broadcast: bool | None = None,
+        message_effect_id: str | None = None,
+        suggested_post_parameters: SuggestedPostParameters | MarkupLike | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send an invoice.
@@ -65,6 +71,9 @@ class PaymentsMixin(Requester):
             prices: LabeledPrice items as dicts or ``to_dict`` objects.
             provider_token: Payment provider token (omit for Telegram Stars).
             message_thread_id: Unique identifier for the target message thread.
+            direct_messages_topic_id: Identifier of the direct messages topic to
+                which the message will be sent; required if the message is sent
+                to a direct messages chat.
             max_tip_amount: Maximum accepted tip amount.
             suggested_tip_amounts: Suggested tip amounts in ascending order;
                 at most 4 items.
@@ -86,7 +95,13 @@ class PaymentsMixin(Requester):
                 method.
             disable_notification: Send silently.
             protect_content: Protect the content from forwarding and saving.
-            reply_parameters: Description of the message to reply to.
+            allow_paid_broadcast: Pass True to ignore broadcasting limits for a
+                fee of 0.1 Telegram Stars per message.
+            message_effect_id: Unique identifier of the message effect to add.
+            suggested_post_parameters: SuggestedPostParameters as a ``to_dict``
+                object or dict; for direct messages chats only.
+            reply_parameters: Description of the message to reply to, as a
+                ``ReplyParameters`` object or a mapping.
             reply_markup: Inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -97,6 +112,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#sendinvoice
         """
         wire = clean_payload(
             chat_id=chat_id,
@@ -107,6 +124,7 @@ class PaymentsMixin(Requester):
             prices=[to_wire(price) for price in prices],
             provider_token=provider_token,
             message_thread_id=message_thread_id,
+            direct_messages_topic_id=direct_messages_topic_id,
             max_tip_amount=max_tip_amount,
             suggested_tip_amounts=list(suggested_tip_amounts)
             if suggested_tip_amounts is not None
@@ -126,6 +144,9 @@ class PaymentsMixin(Requester):
             is_flexible=is_flexible,
             disable_notification=disable_notification,
             protect_content=protect_content,
+            allow_paid_broadcast=allow_paid_broadcast,
+            message_effect_id=message_effect_id,
+            suggested_post_parameters=to_wire(suggested_post_parameters),
             reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
@@ -139,6 +160,7 @@ class PaymentsMixin(Requester):
         currency: str,
         prices: Sequence[MarkupLike],
         *,
+        business_connection_id: str | None = None,
         provider_token: str | None = None,
         subscription_period: int | None = None,
         max_tip_amount: int | None = None,
@@ -169,6 +191,9 @@ class PaymentsMixin(Requester):
             payload: Bot-defined invoice payload, 1-128 bytes.
             currency: Three-letter ISO 4217 currency code, or ``XTR``.
             prices: LabeledPrice items as dicts or ``to_dict`` objects.
+            business_connection_id: Unique identifier of the business
+                connection on behalf of which the message with the invoice will
+                be sent.
             provider_token: Payment provider token (omit for Telegram Stars).
             subscription_period: Subscription period in seconds for recurring
                 payments.
@@ -197,8 +222,11 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#createinvoicelink
         """
         wire = clean_payload(
+            business_connection_id=business_connection_id,
             title=title,
             description=description,
             payload=payload,
@@ -253,6 +281,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answershippingquery
         """
         payload = clean_payload(
             shipping_query_id=shipping_query_id,
@@ -289,6 +319,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#answerprecheckoutquery
         """
         payload = clean_payload(
             pre_checkout_query_id=pre_checkout_query_id,
@@ -316,6 +348,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getstartransactions
         """
         payload = clean_payload(offset=offset, limit=limit)
         return parse_result(StarTransactions, await self.request("getStarTransactions", payload))
@@ -337,6 +371,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#refundstarpayment
         """
         payload = clean_payload(
             user_id=user_id, telegram_payment_charge_id=telegram_payment_charge_id
@@ -364,6 +400,8 @@ class PaymentsMixin(Requester):
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
             TelegramApiError: If Telegram responds not-ok or retries exhaust.
             NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#edituserstarsubscription
         """
         payload = clean_payload(
             user_id=user_id,
@@ -371,3 +409,22 @@ class PaymentsMixin(Requester):
             is_canceled=is_canceled,
         )
         return parse_flag(await self.request("editUserStarSubscription", payload))
+
+    async def get_my_star_balance(self) -> StarAmount:
+        """Get the current amount of Telegram Stars owned by the bot.
+
+        Example:
+            >>> balance = await bot.get_my_star_balance()
+            >>> print(balance.amount)
+
+        Returns:
+            The StarAmount held by the bot.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getmystarbalance
+        """
+        return parse_result(StarAmount, await self.request("getMyStarBalance"))

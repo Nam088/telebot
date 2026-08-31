@@ -75,6 +75,10 @@ type WebAppChat struct {
 
 // WebAppData is the parsed representation of a Telegram Mini App initData
 // query string.
+//
+// This is a framework helper for validated initData, not the Bot API object of
+// the same name (Message.WebAppData in package types carries the payload a Web
+// App button sent to the bot).
 type WebAppData struct {
 	// QueryID is the unique identifier of the Web App session.
 	QueryID string
