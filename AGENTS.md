@@ -108,13 +108,15 @@ Gate rules that follow:
 
 ## Versioning & release parity (node = go = python)
 
-All three frameworks share ONE version number (currently `1.5.0`):
+## Independent Versioning & Package Releases (Node, Go, Python)
 
-- **Node** — `packages/node/package.json`, published to npm as `telebot-ts` by semantic-release on pushes to `main`; tags are `vX.Y.Z`.
-- **Go** — no embedded version; tags `packages/go/vX.Y.Z` are mirrored by `.github/workflows/release-pipeline.yml` with the same version as the node release (GitHub Releases only).
-- **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py`; tags `packages/python/vX.Y.Z` are mirrored the same way and `python-release.yml` stamps the tag version into the package before building. PyPI publishing uses trusted publishing (OIDC): the release job must declare `environment: pypi`, matching the Environment name registered in the PyPI trusted publisher.
+Each of the three frameworks is released independently based on changes within its package directory:
 
-Rules: never bump one package without the others; never hand-push `packages/go/v*` or `packages/python/v*` tags ahead of the node release line; keep conventional-commit scopes per package (`feat(py)`, `fix(go)`, ...) so git-cliff release notes stay correct. Per-package details live in the `telebot-{node,go,python}-conventions` skills.
+- **Node** — `packages/node/package.json`, published to npm as `telebot-ts` via `.github/workflows/node-release.yml` on pushes to `main` when `packages/node/**` has changes; tags are `vX.Y.Z`.
+- **Go** — published to GitHub Releases as `telebot-go` via `.github/workflows/go-release.yml` on pushes to `main` when `packages/go/**` has changes or when a `packages/go/v*` tag is pushed; tags are `packages/go/vX.Y.Z`.
+- **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py` and GitHub Releases via `.github/workflows/python-release.yml` on pushes to `main` when `packages/python/**` has changes or when a `packages/python/v*` tag is pushed; tags are `packages/python/vX.Y.Z`. PyPI publishing uses trusted publishing (OIDC) with `environment: pypi`.
+
+Rules: keep conventional-commit scopes per package (`feat(node)`, `feat(go)`, `feat(py)`, `fix(node)`, `fix(go)`, `fix(py)`) so changelog generation and automated version bumping isolate cleanly per package.
 
 ## How to actually build this project
 

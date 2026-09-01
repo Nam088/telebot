@@ -1,65 +1,115 @@
 name: Python Release
 
-# Creates a GitHub Release and publishes telebot-py to PyPI whenever a
-# telebot-py tag (packages/python/vX.Y.Z) is pushed. Tags are mirrored
-# automatically by the release pipeline so Node, Go, and Python always share
-# the same version number. Release notes are generated automatically from
-# conventional commits by git-cliff. PyPI publishing uses trusted publishing
-# (OpenID Connect) — no long-lived API tokens are stored as secrets.
+# Creates a GitHub Release and publishes telebot-py to PyPI whenever changes
+# in packages/python are merged to main or a telebot-py tag (packages/python/v*)
+# is pushed. Release notes are generated automatically by git-cliff. PyPI
+# publishing uses trusted publishing (OIDC) — no static API tokens required.
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "packages/python/**"
+      - ".github/workflows/python-release.yml"
     tags:
       - "packages/python/v*"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.7.1, or leave empty for auto-bump)"
+        required: false
+        type: string
 
 permissions:
   contents: write
 
+concurrency:
+  group: python-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
+    name: Python Test, Build & Publish
     runs-on: ubuntu-latest
-    # Must match the Environment name registered in the PyPI trusted
-    # publisher for telebot-py.
     environment: pypi
     permissions:
       contents: write
-      # Required by pypa/gh-action-pypi-publish for trusted publishing.
       id-token: write
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: packages/python/pyproject.toml
 
-      - name: Sync package version with tag
+      - name: Set up Node.js (for version resolution)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
         working-directory: packages/python
+        run: |
+          pip install -e ".[dev]"
+          pip install build
+
+      - name: Run Python Quality Gates
+        working-directory: packages/python
+        run: |
+          ruff check src tests
+          ruff format --check src tests
+          mypy --strict src
+          pytest --cov=telebot_py --cov-report=term-missing --cov-fail-under=80
+
+      - name: Resolve Release Version
+        id: resolver
         env:
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_TYPE: ${{ github.ref_type }}
           REF_NAME: ${{ github.ref_name }}
         run: |
-          case "$REF_NAME" in
-            packages/python/v*) ;;
-            *) echo "Ref '$REF_NAME' is not a packages/python/v* tag"; exit 1 ;;
-          esac
-          VERSION="${REF_NAME#packages/python/v}"
-          case "$VERSION" in
-            *[!0-9a-zA-Z.+!-]*) echo "Unexpected version format"; exit 1 ;;
-          esac
+          EXTRA_ARGS=""
+          if [ "$REF_TYPE" = "tag" ]; then
+            EXTRA_ARGS="--tag $REF_NAME"
+          elif [ -n "$INPUT_VERSION" ]; then
+            EXTRA_ARGS="--version $INPUT_VERSION"
+          fi
+          node scripts/resolve-release-version.mjs --package python $EXTRA_ARGS --output-file "$GITHUB_OUTPUT"
+
+      - name: Sync Package Version
+        if: steps.resolver.outputs.should_release == 'true'
+        working-directory: packages/python
+        env:
+          VERSION: ${{ steps.resolver.outputs.version }}
+        run: |
           sed -i "s/^version = \".*\"/version = \"${VERSION}\"/" pyproject.toml
           sed -i "s/^__version__ = \".*\"/__version__ = \"${VERSION}\"/" src/telebot_py/__init__.py
 
-      - name: Verify tagged commit builds
+      - name: Build Wheel and Sdist
+        if: steps.resolver.outputs.should_release == 'true'
         working-directory: packages/python
-        run: |
-          pip install build
-          python -m build
+        run: python -m build
 
-      - name: Generate release notes
+      - name: Push Git Tag if New Release
+        if: steps.resolver.outputs.should_release == 'true' && github.ref_type != 'tag'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.resolver.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG_NAME"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${TAG_NAME}"
+
+      - name: Generate Python Release Notes
+        if: steps.resolver.outputs.should_release == 'true'
         uses: orhun/git-cliff-action@v4
         with:
           config: packages/python/cliff.toml
@@ -68,22 +118,21 @@ jobs:
           OUTPUT: python-release-notes.md
           GITHUB_REPO: ${{ github.repository }}
 
-      - name: Resolve version name
-        id: ver
-        run: echo "version=${GITHUB_REF_NAME#packages/python/}" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub Release
+        if: steps.resolver.outputs.should_release == 'true'
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: telebot-py ${{ steps.ver.outputs.version }}
-          tag_name: ${{ github.ref_name }}
+          name: telebot-py v${{ steps.resolver.outputs.version }}
+          tag_name: ${{ steps.resolver.outputs.tag }}
           body_path: python-release-notes.md
           draft: false
           prerelease: false
-          # Node releases (vX.Y.Z from semantic-release) remain the repo "latest".
           make_latest: "false"
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI (Trusted Publishing)
+        if: steps.resolver.outputs.should_release == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: packages/python/dist/

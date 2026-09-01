@@ -37,5 +37,8 @@ commit_parsers = [
 ]
 # Only telebot-go release tags participate; Node releases use plain vX.Y.Z.
 tag_pattern = "packages/go/v[0-9].*"
+# Scope changelog entries to commits touching the Go package so that
+# Node/Python changes never leak into telebot-go release notes.
+include_paths = ["packages/go/*"]
 topo_order = false
 sort_commits = "oldest"
