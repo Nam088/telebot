@@ -2,6 +2,23 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.8.0](https://github.com/Nam088/telebot/compare/packages/node/v1.7.0...packages/node/v1.8.0) (2026-09-01)
+
+
+### Bug Fixes
+
+* **ci:** grant workflows write permission for Go and Python tag pushes ([7cd323b](https://github.com/Nam088/telebot/commit/7cd323b4466ae6ff1a5f0caf1adf1441852db107))
+* **ci:** retain release-pipeline.yml filename for npm OIDC trusted publisher compatibility ([2a73e0b](https://github.com/Nam088/telebot/commit/2a73e0bd8166054544f123b2ec2ec70c278040cc))
+* **ci:** use action-gh-release to manage release tags cleanly without manual git push ([286b8ef](https://github.com/Nam088/telebot/commit/286b8ef4b8ddbb6da5dc80285eef60595fd68a3e)), closes [action-#release](https://github.com/action-/issues/release)
+* **py:** wrap long docstring lines to satisfy ruff E501 ([5a491fd](https://github.com/Nam088/telebot/commit/5a491fda10fb2b1817a62ad41583612fc06f808e))
+
+
+### Features
+
+* achieve 100% parameter fidelity and strict typing for Telegram Bot API 10.3 across Node, Go, and Python ([cdec1bb](https://github.com/Nam088/telebot/commit/cdec1bbbfc63f243c918806e37a805e49f0f447a))
+* **ci:** add path filtering to CI jobs to only test modified packages ([eceeccf](https://github.com/Nam088/telebot/commit/eceeccfe7d1a2401f5c802d90a8d4ae38f4c0472))
+* **ci:** separate independent release workflows and add workflow tests ([b57a683](https://github.com/Nam088/telebot/commit/b57a683bae404f73cb62ead35433cea5b5a55a66))
+
 # 1.0.0 (2026-09-01)
 
 
