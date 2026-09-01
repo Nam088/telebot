@@ -361,11 +361,12 @@ export interface PassportElementError {
 }
 
 /**
+ * A placeholder, currently holds no information. Use BotFather to set up your game.
+ *
  * @see {@link https://core.telegram.org/bots/api#callbackgame Telegram Bot API: CallbackGame}
  */
-export interface CallbackGame {
-  [key: string]: unknown;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CallbackGame {}
 
 /**
  * @see {@link https://core.telegram.org/bots/api#game Telegram Bot API: Game}

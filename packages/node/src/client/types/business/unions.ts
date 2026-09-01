@@ -1,4 +1,4 @@
-import type { Location } from "../common/index.js";
+import type { Location, LocationAddress } from "../common/index.js";
 import type { ReactionType } from "../messages/index.js";
 import type {
   ChatBoostSourceGiftCode,
@@ -14,7 +14,7 @@ import type {
  * @see {@link https://core.telegram.org/bots/api#storyareatype Telegram Bot API: StoryAreaType}
  */
 export type StoryAreaType =
-  | { type: "location"; location: Location; address?: unknown }
+  | { type: "location"; location: Location; address?: LocationAddress }
   | {
       type: "suggested_reaction";
       reaction_type: ReactionType;
@@ -22,7 +22,8 @@ export type StoryAreaType =
       is_flipped?: boolean;
     }
   | { type: "link"; url: string }
-  | { type: "weather"; temperature_c: number; emoji: string; background_color: number };
+  | { type: "weather"; temperature_c: number; emoji: string; background_color: number }
+  | { type: "unique_gift"; name: string };
 
 /**
  * This object describes the content of a story to post.

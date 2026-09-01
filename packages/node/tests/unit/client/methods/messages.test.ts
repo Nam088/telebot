@@ -339,4 +339,95 @@ describe("MessageMethods payloads match the official Bot API 10.3 parameter name
       (calls[0]?.payload["reply_parameters"] as Record<string, unknown>)["checklist_item_id"],
     ).toBeUndefined();
   });
+
+  it("copyMessage forwards show_caption_above_media and video_start_timestamp", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.copyMessage({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_id: 3,
+      show_caption_above_media: true,
+      video_start_timestamp: 42,
+      reply_parameters: { message_id: 10 },
+    });
+    expect(calls[0]?.method).toBe("copyMessage");
+    expect(calls[0]?.payload).toEqual({
+      chat_id: 1,
+      from_chat_id: 2,
+      message_id: 3,
+      show_caption_above_media: true,
+      video_start_timestamp: 42,
+      reply_parameters: { message_id: 10 },
+    });
+  });
+
+  it("sendPaidMedia forwards typed InputPaidMedia array", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.sendPaidMedia({
+      chat_id: 1,
+      star_count: 25,
+      media: [
+        { type: "photo", media: "photo_id_123" },
+        { type: "video", media: "video_id_456", start_timestamp: 10 },
+      ],
+      show_caption_above_media: true,
+    });
+    expect(calls[0]?.method).toBe("sendPaidMedia");
+    expect(calls[0]?.payload).toEqual({
+      chat_id: 1,
+      star_count: 25,
+      media: [
+        { type: "photo", media: "photo_id_123" },
+        { type: "video", media: "video_id_456", start_timestamp: 10 },
+      ],
+      show_caption_above_media: true,
+    });
+  });
+
+  it("sendChecklist and editMessageChecklist forward InputChecklist", async () => {
+    const { client, calls } = createPayloadRecorder();
+    await client.sendChecklist({
+      business_connection_id: "bc_1",
+      chat_id: 1,
+      checklist: {
+        title: "Sprint Tasks",
+        tasks: [
+          { id: 1, text: "Task 1" },
+          { id: 2, text: "Task 2" },
+        ],
+      },
+    });
+    expect(calls[0]?.method).toBe("sendChecklist");
+    expect(calls[0]?.payload).toEqual({
+      business_connection_id: "bc_1",
+      chat_id: 1,
+      checklist: {
+        title: "Sprint Tasks",
+        tasks: [
+          { id: 1, text: "Task 1" },
+          { id: 2, text: "Task 2" },
+        ],
+      },
+    });
+
+    await client.editMessageChecklist({
+      business_connection_id: "bc_1",
+      chat_id: 1,
+      message_id: 200,
+      checklist: {
+        title: "Sprint Tasks Done",
+        tasks: [{ id: 1, text: "Task 1 (Completed)" }],
+      },
+    });
+    expect(calls[1]?.method).toBe("editMessageChecklist");
+    expect(calls[1]?.payload).toEqual({
+      business_connection_id: "bc_1",
+      chat_id: 1,
+      message_id: 200,
+      checklist: {
+        title: "Sprint Tasks Done",
+        tasks: [{ id: 1, text: "Task 1 (Completed)" }],
+      },
+    });
+  });
 });

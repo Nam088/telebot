@@ -10,6 +10,7 @@ type SendGameOptions struct {
 	ProtectContent       bool                  `json:"protect_content,omitempty"`
 	AllowPaidBroadcast   bool                  `json:"allow_paid_broadcast,omitempty"`
 	MessageEffectID      string                `json:"message_effect_id,omitempty"`
+	ReplyParameters      *ReplyParameters      `json:"reply_parameters,omitempty"`
 	ReplyMarkup          *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 

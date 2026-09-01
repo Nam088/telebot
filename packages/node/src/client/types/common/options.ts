@@ -1,6 +1,7 @@
 import type { ParseMode } from "../../constants.js";
 import type { StoryArea, InlineQueryResult } from "../business/index.js";
-import type { MessageEntity, ReactionType } from "../messages/index.js";
+import type { MessageEntity, ReactionType, InputFile } from "../messages/index.js";
+import type { InlineQueryResultsButton } from "./models.js";
 
 export interface GetUpdatesOptions {
   /** Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. */
@@ -38,14 +39,14 @@ export interface AnswerInlineQueryOptions {
   /** Pass the offset that a client should send in the next query with the same text to receive more results. */
   next_offset?: string;
   /** An object describing a button to be shown above inline query results. */
-  button?: unknown;
+  button?: InlineQueryResultsButton;
 }
 
 export interface SetWebhookOptions {
   /** HTTPS URL to send updates to. Use an empty string to remove webhook integration. */
   url: string;
   /** Upload your public key certificate so that the root certificate in use can be checked. */
-  certificate?: unknown;
+  certificate?: InputFile;
   /** The fixed IP address which will be used to send webhook requests. */
   ip_address?: string;
   /** The maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery, 1-100. Defaults to 40. */

@@ -41,7 +41,12 @@ class ChatsMixin(Requester):
         """
         return parse_result(ChatFullInfo, await self.request("getChat", {"chat_id": chat_id}))
 
-    async def get_chat_administrators(self, chat_id: int | str) -> list[ChatMember]:
+    async def get_chat_administrators(
+        self,
+        chat_id: int | str,
+        *,
+        return_bots: bool | None = None,
+    ) -> list[ChatMember]:
         """Get a list of administrators in a chat.
 
         Example:
@@ -49,10 +54,10 @@ class ChatsMixin(Requester):
 
         Args:
             chat_id: Unique identifier for the target chat or channel username.
+            return_bots: Pass True to include bots in the list of administrators.
 
         Returns:
-            Every administrator except other bots; empty list if the chat has
-            no explicit administrators.
+            List of ChatMember objects representing administrators.
 
         Raises:
             InvalidTokenError: If Telegram rejects the token (HTTP 401).
@@ -61,7 +66,8 @@ class ChatsMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#getchatadministrators
         """
-        result = await self.request("getChatAdministrators", {"chat_id": chat_id})
+        payload = clean_payload(chat_id=chat_id, return_bots=return_bots)
+        result = await self.request("getChatAdministrators", payload)
         return parse_list_result(ChatMember, result)
 
     async def get_chat_member_count(self, chat_id: int | str) -> int:

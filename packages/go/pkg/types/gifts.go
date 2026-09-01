@@ -197,3 +197,72 @@ type GiftPremiumSubscriptionOptions struct {
 	// A JSON-serialized list of special entities that appear in the text.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
+
+// GetBusinessAccountGiftsOptions represents parameters for the getBusinessAccountGifts method.
+//
+// Telegram API: https://core.telegram.org/bots/api#getbusinessaccountgifts
+type GetBusinessAccountGiftsOptions struct {
+	BusinessConnectionID        string `json:"business_connection_id"`
+	ExcludeUnsaved              bool   `json:"exclude_unsaved,omitempty"`
+	ExcludeSaved                bool   `json:"exclude_saved,omitempty"`
+	ExcludeUnlimited            bool   `json:"exclude_unlimited,omitempty"`
+	ExcludeLimitedUpgradable    bool   `json:"exclude_limited_upgradable,omitempty"`
+	ExcludeLimitedNonUpgradable bool   `json:"exclude_limited_non_upgradable,omitempty"`
+	ExcludeUnique               bool   `json:"exclude_unique,omitempty"`
+	ExcludeFromBlockchain       bool   `json:"exclude_from_blockchain,omitempty"`
+	SortByPrice                 bool   `json:"sort_by_price,omitempty"`
+	Offset                      string `json:"offset,omitempty"`
+	Limit                       int    `json:"limit,omitempty"`
+}
+
+// GetChatGiftsOptions represents parameters for the getChatGifts method.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatgifts
+type GetChatGiftsOptions struct {
+	ChatID                      any    `json:"chat_id"`
+	ExcludeUnsaved              bool   `json:"exclude_unsaved,omitempty"`
+	ExcludeSaved                bool   `json:"exclude_saved,omitempty"`
+	ExcludeUnlimited            bool   `json:"exclude_unlimited,omitempty"`
+	ExcludeLimitedUpgradable    bool   `json:"exclude_limited_upgradable,omitempty"`
+	ExcludeLimitedNonUpgradable bool   `json:"exclude_limited_non_upgradable,omitempty"`
+	ExcludeFromBlockchain       bool   `json:"exclude_from_blockchain,omitempty"`
+	ExcludeUnique               bool   `json:"exclude_unique,omitempty"`
+	SortByPrice                 bool   `json:"sort_by_price,omitempty"`
+	Offset                      string `json:"offset,omitempty"`
+	Limit                       int    `json:"limit,omitempty"`
+}
+
+// GetUserGiftsOptions represents parameters for the getUserGifts method.
+//
+// Telegram API: https://core.telegram.org/bots/api#getusergifts
+type GetUserGiftsOptions struct {
+	UserID                      int64  `json:"user_id"`
+	ExcludeUnlimited            bool   `json:"exclude_unlimited,omitempty"`
+	ExcludeLimitedUpgradable    bool   `json:"exclude_limited_upgradable,omitempty"`
+	ExcludeLimitedNonUpgradable bool   `json:"exclude_limited_non_upgradable,omitempty"`
+	ExcludeFromBlockchain       bool   `json:"exclude_from_blockchain,omitempty"`
+	ExcludeUnique               bool   `json:"exclude_unique,omitempty"`
+	SortByPrice                 bool   `json:"sort_by_price,omitempty"`
+	Offset                      string `json:"offset,omitempty"`
+	Limit                       int    `json:"limit,omitempty"`
+}
+
+// UpgradeGiftOptions represents parameters for the upgradeGift method.
+//
+// Telegram API: https://core.telegram.org/bots/api#upgradegift
+type UpgradeGiftOptions struct {
+	BusinessConnectionID string `json:"business_connection_id"`
+	OwnedGiftID          string `json:"owned_gift_id"`
+	KeepOriginalDetails  bool   `json:"keep_original_details,omitempty"`
+	StarCount            int    `json:"star_count,omitempty"`
+}
+
+// TransferGiftOptions represents parameters for the transferGift method.
+//
+// Telegram API: https://core.telegram.org/bots/api#transfergift
+type TransferGiftOptions struct {
+	BusinessConnectionID string `json:"business_connection_id"`
+	OwnedGiftID          string `json:"owned_gift_id"`
+	NewOwnerChatID       any    `json:"new_owner_chat_id"`
+	StarCount            int    `json:"star_count,omitempty"`
+}

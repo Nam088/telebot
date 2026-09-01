@@ -1,3 +1,4 @@
+import type { ParseMode } from "../../constants.js";
 import type { User, Chat } from "../common/index.js";
 import type { MessageEntity, Message } from "./core.js";
 
@@ -75,4 +76,40 @@ export interface ChecklistTasksDone {
   marked_as_done_task_ids?: number[];
   /** Identifiers of the tasks that were marked as not done. */
   marked_as_not_done_task_ids?: number[];
+}
+
+/**
+ * Describes a task to be added to a checklist.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputchecklisttask Telegram Bot API: InputChecklistTask}
+ */
+export interface InputChecklistTask {
+  /** Unique identifier of the task within the checklist, 1-100. */
+  id: number;
+  /** Text of the task, 1-1024 characters. */
+  text: string;
+  /** Mode for parsing entities in the task text. */
+  parse_mode?: ParseMode;
+  /** Special entities that appear in the task text. */
+  text_entities?: MessageEntity[];
+}
+
+/**
+ * Describes a checklist to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputchecklist Telegram Bot API: InputChecklist}
+ */
+export interface InputChecklist {
+  /** Title of the checklist, 1-255 characters. */
+  title: string;
+  /** Mode for parsing entities in the checklist title. */
+  parse_mode?: ParseMode;
+  /** Special entities that appear in the checklist title. */
+  title_entities?: MessageEntity[];
+  /** List of 1-10 tasks in the checklist. */
+  tasks: InputChecklistTask[];
+  /** Pass True if users other than the creator can add tasks to the checklist. */
+  others_can_add_tasks?: boolean;
+  /** Pass True if users other than the creator can mark tasks as done or not done. */
+  others_can_mark_tasks_as_done?: boolean;
 }

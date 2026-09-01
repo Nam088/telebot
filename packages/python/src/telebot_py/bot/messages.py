@@ -203,6 +203,7 @@ class MessagesMixin(Requester):
         *,
         message_thread_id: int | None = None,
         direct_messages_topic_id: int | None = None,
+        video_start_timestamp: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         message_effect_id: str | None = None,
@@ -221,6 +222,7 @@ class MessagesMixin(Requester):
             direct_messages_topic_id: Identifier of the direct messages topic to
                 which the message will be sent; required if the message is sent
                 to a direct messages chat.
+            video_start_timestamp: New start timestamp for the forwarded video in seconds.
             disable_notification: Forward silently.
             protect_content: Protect the forwarded content.
             message_effect_id: Unique identifier of the message effect to add.
@@ -243,6 +245,7 @@ class MessagesMixin(Requester):
             message_id=message_id,
             message_thread_id=message_thread_id,
             direct_messages_topic_id=direct_messages_topic_id,
+            video_start_timestamp=video_start_timestamp,
             disable_notification=disable_notification,
             protect_content=protect_content,
             message_effect_id=message_effect_id,
@@ -261,6 +264,8 @@ class MessagesMixin(Requester):
         caption: str | None = None,
         parse_mode: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
+        show_caption_above_media: bool | None = None,
+        video_start_timestamp: int | None = None,
         disable_notification: bool | None = None,
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
@@ -285,6 +290,8 @@ class MessagesMixin(Requester):
             caption: New caption for the copy, 0-1024 characters.
             parse_mode: Parse mode for the new caption.
             caption_entities: Special entities for the new caption.
+            show_caption_above_media: Pass True, if the caption must be shown above the message media.
+            video_start_timestamp: New start timestamp for the copied video in seconds.
             disable_notification: Send the copy silently.
             protect_content: Protect the copied content.
             allow_paid_broadcast: Pass True to ignore broadcasting limits for a
@@ -318,6 +325,8 @@ class MessagesMixin(Requester):
             caption_entities=[entity.to_dict() for entity in caption_entities]
             if caption_entities is not None
             else None,
+            show_caption_above_media=show_caption_above_media,
+            video_start_timestamp=video_start_timestamp,
             disable_notification=disable_notification,
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,

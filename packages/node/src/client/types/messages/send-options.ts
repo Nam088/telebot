@@ -3,7 +3,11 @@ import type { SuggestedPostParameters } from "../payments/index.js";
 import type { MessageEntity } from "./core.js";
 import type { InputMedia } from "./media.js";
 import type { InputPollOption } from "./polls.js";
-import type { ReplyParameters, EphemeralMessageParameters } from "./reply-context.js";
+import type {
+  ReplyParameters,
+  EphemeralMessageParameters,
+  LinkPreviewOptions,
+} from "./reply-context.js";
 import type { ReplyMarkup } from "./keyboards.js";
 
 export interface SendMessageOptions {
@@ -22,7 +26,7 @@ export interface SendMessageOptions {
   /** A list of special entities that appear in message text, which can be specified instead of parse_mode. */
   entities?: MessageEntity[];
   /** Link preview generation options for the message. */
-  link_preview_options?: unknown;
+  link_preview_options?: LinkPreviewOptions;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */

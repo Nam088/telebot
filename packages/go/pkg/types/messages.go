@@ -226,3 +226,29 @@ type InaccessibleMessage struct {
 	// messages.
 	Date int64 `json:"date"`
 }
+
+// ForwardMessageOptions represents parameters for the forwardMessage method.
+//
+// Telegram API: https://core.telegram.org/bots/api#forwardmessage
+type ForwardMessageOptions struct {
+	ChatID                  any                      `json:"chat_id"`
+	FromChatID              any                      `json:"from_chat_id"`
+	MessageID               int64                    `json:"message_id"`
+	MessageThreadID         int64                    `json:"message_thread_id,omitempty"`
+	DirectMessagesTopicID   int64                    `json:"direct_messages_topic_id,omitempty"`
+	VideoStartTimestamp     int64                    `json:"video_start_timestamp,omitempty"`
+	DisableNotification     bool                     `json:"disable_notification,omitempty"`
+	ProtectContent          bool                     `json:"protect_content,omitempty"`
+	MessageEffectID         string                   `json:"message_effect_id,omitempty"`
+	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
+}
+
+// SendChatActionOptions represents parameters for the sendChatAction method.
+//
+// Telegram API: https://core.telegram.org/bots/api#sendchataction
+type SendChatActionOptions struct {
+	ChatID               any    `json:"chat_id"`
+	Action               string `json:"action"`
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+	MessageThreadID      int64  `json:"message_thread_id,omitempty"`
+}

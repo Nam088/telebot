@@ -162,7 +162,11 @@ func TestBot_MessageMethods_OptionalParams(t *testing.T) {
 		}
 	}
 
-	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, 8, "effect-2", &types.SuggestedPostParameters{SendDate: 1700000000}); err != nil {
+	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, &types.ForwardMessageOptions{
+		DirectMessagesTopicID:   8,
+		MessageEffectID:         "effect-2",
+		SuggestedPostParameters: &types.SuggestedPostParameters{SendDate: 1700000000},
+	}); err != nil {
 		t.Fatalf("ForwardMessage with optional params = %v", err)
 	}
 	if payload["direct_messages_topic_id"] != float64(8) {
@@ -243,7 +247,7 @@ func TestBot_MessageMethods_OptionalParams(t *testing.T) {
 		}
 	}
 
-	if _, err := b.SendChatAction(ctx, int64(1), "typing", "bc-2"); err != nil {
+	if _, err := b.SendChatAction(ctx, int64(1), "typing", &types.SendChatActionOptions{BusinessConnectionID: "bc-2"}); err != nil {
 		t.Fatalf("SendChatAction with optional params = %v", err)
 	}
 	if payload["business_connection_id"] != "bc-2" {

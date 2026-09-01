@@ -122,7 +122,10 @@ func TestBot_SetWebhook(t *testing.T) {
 	defer server.Close()
 
 	b := bot.NewBot("token", bot.WithBaseURL(server.URL))
-	ok, err := b.SetWebhook(context.Background(), "https://example.com/hook", "s3cret", 40)
+	ok, err := b.SetWebhook(context.Background(), "https://example.com/hook", &types.SetWebhookOptions{
+		SecretToken:    "s3cret",
+		MaxConnections: 40,
+	})
 	if err != nil {
 		t.Fatalf("SetWebhook failed: %v", err)
 	}
@@ -149,7 +152,7 @@ func TestBot_SetWebhook_OmitsOptionalFields(t *testing.T) {
 	defer server.Close()
 
 	b := bot.NewBot("token", bot.WithBaseURL(server.URL))
-	if _, err := b.SetWebhook(context.Background(), "https://example.com/hook", "", 0); err != nil {
+	if _, err := b.SetWebhook(context.Background(), "https://example.com/hook"); err != nil {
 		t.Fatalf("SetWebhook failed: %v", err)
 	}
 	if _, present := payload["secret_token"]; present {

@@ -250,7 +250,7 @@ func runChatScoped(ctx context.Context, b *bot.Bot, chatID any, iconStickers []t
 	} else {
 		skip("getChatMember", "needs numeric chat id")
 	}
-	if _, err := b.SendChatAction(ctx, chatID, "typing", ""); err != nil {
+	if _, err := b.SendChatAction(ctx, chatID, "typing"); err != nil {
 		check("sendChatAction", err)
 	} else {
 		record("sendChatAction", "PASS", "")
@@ -346,7 +346,7 @@ func runChatScoped(ctx context.Context, b *bot.Bot, chatID any, iconStickers []t
 			Reaction:  []types.ReactionType{types.ReactionTypeEmoji{Type: "emoji", Emoji: "👍"}},
 		})))
 
-		fwd1, err := b.ForwardMessage(ctx, chatID, chatID, msg.MessageID, 0, "", nil)
+		fwd1, err := b.ForwardMessage(ctx, chatID, chatID, msg.MessageID)
 		d.trackMsg("forwardMessage", fwd1, err)
 		if cp, err := b.CopyMessage(ctx, &types.CopyMessageOptions{ChatID: chatID, FromChatID: chatID, MessageID: msg.MessageID}); err != nil {
 			check("copyMessage", err)

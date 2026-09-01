@@ -47,7 +47,7 @@ func run(ctx context.Context) error {
 
 	if webhookURL != "" {
 		log.Printf("Configuring webhook URL: %s", webhookURL)
-		if _, err := b.SetWebhook(ctx, webhookURL, secretToken, 50); err != nil {
+		if _, err := b.SetWebhook(ctx, webhookURL, &types.SetWebhookOptions{SecretToken: secretToken, MaxConnections: 50}); err != nil {
 			return fmt.Errorf("failed to set webhook: %w", err)
 		}
 	}

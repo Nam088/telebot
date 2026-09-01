@@ -15,6 +15,7 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.games import GameHighScore
 from telebot_py.types.message import Message
+from telebot_py.types.message_extras import ReplyParameters
 
 
 class GamesMixin(Requester):
@@ -31,6 +32,7 @@ class GamesMixin(Requester):
         protect_content: bool | None = None,
         allow_paid_broadcast: bool | None = None,
         message_effect_id: str | None = None,
+        reply_parameters: ReplyParameters | MarkupLike | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message:
         """Send a game.
@@ -49,6 +51,7 @@ class GamesMixin(Requester):
             allow_paid_broadcast: Pass True to ignore broadcasting limits for a
                 fee of 0.1 Telegram Stars per message.
             message_effect_id: Unique identifier of the message effect to add.
+            reply_parameters: Description of the message to reply to.
             reply_markup: Inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -71,6 +74,7 @@ class GamesMixin(Requester):
             protect_content=protect_content,
             allow_paid_broadcast=allow_paid_broadcast,
             message_effect_id=message_effect_id,
+            reply_parameters=to_wire(reply_parameters),
             reply_markup=to_wire(reply_markup),
         )
         return parse_result(Message, await self.request("sendGame", payload))

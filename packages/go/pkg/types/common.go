@@ -109,3 +109,16 @@ type WebhookInfo struct {
 	MaxConnections               int      `json:"max_connections,omitempty"`
 	AllowedUpdates               []string `json:"allowed_updates,omitempty"`
 }
+
+// SetWebhookOptions represents parameters for the setWebhook method.
+//
+// Telegram API: https://core.telegram.org/bots/api#setwebhook
+type SetWebhookOptions struct {
+	URL                string   `json:"url"`
+	Certificate        any      `json:"certificate,omitempty"`
+	IPAddress          string   `json:"ip_address,omitempty"`
+	MaxConnections     int      `json:"max_connections,omitempty"`
+	AllowedUpdates     []string `json:"allowed_updates,omitempty"`
+	DropPendingUpdates bool     `json:"drop_pending_updates,omitempty"`
+	SecretToken        string   `json:"secret_token,omitempty"`
+}

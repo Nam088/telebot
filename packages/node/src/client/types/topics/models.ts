@@ -1,3 +1,5 @@
+import type { WebAppInfo } from "../messages/index.js";
+
 /**
  * @see {@link https://core.telegram.org/bots/api#botname Telegram Bot API: BotName}
  */
@@ -51,14 +53,45 @@ export interface BotCommand {
 }
 
 /**
+ * Describes that no specific value for the menu button is set.
+ *
+ * @see {@link https://core.telegram.org/bots/api#menubuttondefault Telegram Bot API: MenuButtonDefault}
+ */
+export interface MenuButtonDefault {
+  /** Type of the button, must be 'default'. */
+  type: "default";
+}
+
+/**
+ * Represents a menu button, which opens the bot's list of commands.
+ *
+ * @see {@link https://core.telegram.org/bots/api#menubuttoncommands Telegram Bot API: MenuButtonCommands}
+ */
+export interface MenuButtonCommands {
+  /** Type of the button, must be 'commands'. */
+  type: "commands";
+}
+
+/**
+ * Represents a menu button, which launches a Web App.
+ *
+ * @see {@link https://core.telegram.org/bots/api#menubuttonwebapp Telegram Bot API: MenuButtonWebApp}
+ */
+export interface MenuButtonWebApp {
+  /** Type of the button, must be 'web_app'. */
+  type: "web_app";
+  /** Text on the button. */
+  text: string;
+  /** Description of the Web App that will be launched when the user presses the button. */
+  web_app: WebAppInfo;
+}
+
+/**
  * This object describes the bot's menu button in a private chat.
  *
  * @see {@link https://core.telegram.org/bots/api#menubutton Telegram Bot API: MenuButton}
  */
-export type MenuButton =
-  | { type: "default" }
-  | { type: "commands" }
-  | { type: "web_app"; text: string; web_app: { url: string } };
+export type MenuButton = MenuButtonCommands | MenuButtonWebApp | MenuButtonDefault;
 
 /**
  * This object represents the scope to which bot commands are applied.

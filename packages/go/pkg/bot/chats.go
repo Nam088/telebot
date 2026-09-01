@@ -57,8 +57,12 @@ func (b *Bot) GetChatFullInfo(ctx context.Context, chatID any) (*types.ChatFullI
 // GetChatAdministrators gets a list of administrators in a chat.
 //
 // Telegram API: https://core.telegram.org/bots/api#getchatadministrators
-func (b *Bot) GetChatAdministrators(ctx context.Context, chatID any) ([]types.ChatMember, error) {
-	payload := map[string]any{"chat_id": chatID}
+func (b *Bot) GetChatAdministrators(ctx context.Context, chatID any, opts ...*types.GetChatAdministratorsOptions) ([]types.ChatMember, error) {
+	var payload any = map[string]any{"chat_id": chatID}
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].ChatID = chatID
+		payload = opts[0]
+	}
 	var admins []types.ChatMember
 	if err := b.Request(ctx, "getChatAdministrators", payload, &admins); err != nil {
 		return nil, err

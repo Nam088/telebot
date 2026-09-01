@@ -188,3 +188,11 @@ type RestrictChatMemberOptions struct {
 	UseIndependentChatPermissions bool            `json:"use_independent_chat_permissions,omitempty"`
 	UntilDate                     int64           `json:"until_date,omitempty"`
 }
+
+// GetChatAdministratorsOptions represents parameters for the getChatAdministrators method.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatadministrators
+type GetChatAdministratorsOptions struct {
+	ChatID     any  `json:"chat_id"`
+	ReturnBots bool `json:"return_bots,omitempty"`
+}
