@@ -22,7 +22,6 @@ on:
 
 permissions:
   contents: write
-  workflows: write
 
 concurrency:
   group: go-release-${{ github.ref }}
@@ -70,17 +69,6 @@ jobs:
           fi
           node scripts/resolve-release-version.mjs --package go $EXTRA_ARGS --output-file "$GITHUB_OUTPUT"
 
-      - name: Push Git Tag if New Release
-        if: steps.resolver.outputs.should_release == 'true' && github.ref_type != 'tag'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ steps.resolver.outputs.tag }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$TAG_NAME"
-          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${TAG_NAME}"
-
       - name: Generate Go Release Notes
         if: steps.resolver.outputs.should_release == 'true'
         uses: orhun/git-cliff-action@v4
@@ -99,6 +87,7 @@ jobs:
         with:
           name: telebot-go v${{ steps.resolver.outputs.version }}
           tag_name: ${{ steps.resolver.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           body_path: go-release-notes.md
           draft: false
           prerelease: false
