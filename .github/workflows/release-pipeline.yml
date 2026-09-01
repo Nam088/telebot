@@ -14,7 +14,7 @@ on:
       - "package-lock.json"
       - ".releaserc.json"
       - ".release/**"
-      - ".github/workflows/node-release.yml"
+      - ".github/workflows/release-pipeline.yml"
   workflow_dispatch: {}
 
 permissions:

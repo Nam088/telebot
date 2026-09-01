@@ -42,7 +42,7 @@ function parseSimpleYaml(content) {
 test("CI and Release workflow files exist and are not empty", () => {
   const workflows = [
     ".github/workflows/ci.yml",
-    ".github/workflows/node-release.yml",
+    ".github/workflows/release-pipeline.yml",
     ".github/workflows/go-release.yml",
     ".github/workflows/python-release.yml",
   ];
@@ -55,7 +55,7 @@ test("CI and Release workflow files exist and are not empty", () => {
 });
 
 test("Node release workflow is scoped strictly to packages/node", () => {
-  const content = fs.readFileSync(".github/workflows/node-release.yml", "utf-8");
+  const content = fs.readFileSync(".github/workflows/release-pipeline.yml", "utf-8");
   assert.ok(content.includes("packages/node/**"), "Must trigger on packages/node/** changes");
   assert.equal(
     content.includes("packages/go/**"),
