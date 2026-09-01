@@ -4,6 +4,7 @@
     "main",
     { "name": "beta", "prerelease": true }
   ],
+  "tagFormat": "packages/node/v${version}",
   "plugins": [
     [
       "@semantic-release/commit-analyzer",

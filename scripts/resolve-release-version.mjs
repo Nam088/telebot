@@ -105,7 +105,7 @@ export function analyzeCommits(commits) {
 }
 
 export function getLatestTag(pkg, cwd = process.cwd()) {
-  const prefix = pkg === "node" ? "v" : `packages/${pkg}/v`;
+  const prefix = `packages/${pkg}/v`;
   try {
     const output = execSync(`git tag -l "${prefix}*" --sort=-v:refname`, {
       cwd,
@@ -116,7 +116,22 @@ export function getLatestTag(pkg, cwd = process.cwd()) {
       .split("\n")
       .map((t) => t.trim())
       .filter((t) => t.startsWith(prefix));
-    return tags[0] || null;
+    if (tags[0]) return tags[0];
+
+    // Fallback for legacy node vX.Y.Z tags
+    if (pkg === "node") {
+      const legacyOutput = execSync(`git tag -l "v[0-9]*" --sort=-v:refname`, {
+        cwd,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      const legacyTags = legacyOutput
+        .split("\n")
+        .map((t) => t.trim())
+        .filter((t) => /^v\d+\.\d+\.\d+/.test(t));
+      return legacyTags[0] || null;
+    }
+    return null;
   } catch {
     return null;
   }
@@ -146,7 +161,7 @@ export function resolveRelease(options, cwd = process.cwd()) {
     throw new Error("--package is required (node, go, python)");
   }
 
-  const prefix = pkg === "node" ? "v" : `packages/${pkg}/v`;
+  const prefix = `packages/${pkg}/v`;
 
   // Case 1: Explicit version provided via CLI input
   if (options.version) {

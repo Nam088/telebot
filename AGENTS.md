@@ -112,7 +112,7 @@ Gate rules that follow:
 
 Each of the three frameworks is released independently based on changes within its package directory:
 
-- **Node** — `packages/node/package.json`, published to npm as `telebot-ts` via `.github/workflows/release-pipeline.yml` on pushes to `main` when `packages/node/**` has changes; tags are `vX.Y.Z`.
+- **Node** — `packages/node/package.json`, published to npm as `telebot-ts` via `.github/workflows/release-pipeline.yml` on pushes to `main` when `packages/node/**` has changes; tags are `packages/node/vX.Y.Z`.
 - **Go** — published to GitHub Releases as `telebot-go` via `.github/workflows/go-release.yml` on pushes to `main` when `packages/go/**` has changes or when a `packages/go/v*` tag is pushed; tags are `packages/go/vX.Y.Z`.
 - **Python** — `packages/python/pyproject.toml` + `__version__` in `src/telebot_py/__init__.py`, published to PyPI as `telebot-py` and GitHub Releases via `.github/workflows/python-release.yml` on pushes to `main` when `packages/python/**` has changes or when a `packages/python/v*` tag is pushed; tags are `packages/python/vX.Y.Z`. PyPI publishing uses trusted publishing (OIDC) with `environment: pypi`.
 

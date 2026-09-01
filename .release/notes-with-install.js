@@ -50,11 +50,12 @@ bun add telebot-ts@${version}
   const { writeFileSync } = await import("node:fs");
   writeFileSync("/tmp/gh-release-notes.md", fullNotes, "utf8");
 
+  const tagName = nextRelease.gitTag ?? `packages/node/v${version}`;
   try {
-    execSync(`gh release edit "v${version}" --notes-file /tmp/gh-release-notes.md`, {
+    execSync(`gh release edit "${tagName}" --notes-file /tmp/gh-release-notes.md`, {
       stdio: "inherit",
     });
-    logger.log(`GitHub Release v${version} updated with installation section.`);
+    logger.log(`GitHub Release ${tagName} updated with installation section.`);
   } catch (err) {
     logger.error("Failed to edit GitHub release notes:", err);
   }
