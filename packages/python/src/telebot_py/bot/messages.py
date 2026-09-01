@@ -290,7 +290,8 @@ class MessagesMixin(Requester):
             caption: New caption for the copy, 0-1024 characters.
             parse_mode: Parse mode for the new caption.
             caption_entities: Special entities for the new caption.
-            show_caption_above_media: Pass True, if the caption must be shown above the message media.
+            show_caption_above_media: Pass True, if the caption must be
+                shown above the message media.
             video_start_timestamp: New start timestamp for the copied video in seconds.
             disable_notification: Send the copy silently.
             protect_content: Protect the copied content.

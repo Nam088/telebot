@@ -52,8 +52,10 @@ class WebhookMixin(Requester):
 
         Args:
             url: HTTPS URL Telegram posts updates to.
-            certificate: Upload your public key certificate so that the root certificate in use can be checked.
-            ip_address: The fixed IP address which will be used to send webhook requests instead of the IP address resolved through DNS.
+            certificate: Upload your public key certificate so that the root
+                certificate in use can be checked.
+            ip_address: The fixed IP address which will be used to send webhook
+                requests instead of the IP address resolved through DNS.
             secret_token: Sent back in the ``X-Telegram-Bot-Api-Secret-Token``
                 header of every delivery so the endpoint can verify origin.
             max_connections: Maximum simultaneous connections for deliveries.

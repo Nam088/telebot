@@ -116,7 +116,8 @@ class EditsMixin(Requester):
                 remove the caption.
             parse_mode: Parse mode for the new caption entities.
             caption_entities: Special entities for the new caption.
-            show_caption_above_media: Pass True, if the caption must be shown above the message media.
+            show_caption_above_media: Pass True, if the caption must be
+                shown above the message media.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
