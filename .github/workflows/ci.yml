@@ -31,7 +31,7 @@ jobs:
               - "package-lock.json"
               - "tsconfig.json"
               - ".github/workflows/ci.yml"
-              - ".github/workflows/node-release.yml"
+              - ".github/workflows/release-pipeline.yml"
             go:
               - "packages/go/**"
               - ".github/workflows/ci.yml"
