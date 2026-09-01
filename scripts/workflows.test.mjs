@@ -197,3 +197,12 @@ test("parseArgs parses CLI arguments cleanly", () => {
   assert.equal(args.version, "1.7.0");
   assert.equal(args.outputFile, "/tmp/out.txt");
 });
+
+test("CI workflow has path filter job to optimize PR execution", () => {
+  const content = fs.readFileSync(".github/workflows/ci.yml", "utf-8");
+  assert.ok(content.includes("dorny/paths-filter"), "Must use paths-filter to detect modified packages");
+  assert.ok(content.includes("needs.changes.outputs.node"), "Node job must depend on changes.outputs.node");
+  assert.ok(content.includes("needs.changes.outputs.go"), "Go job must depend on changes.outputs.go");
+  assert.ok(content.includes("needs.changes.outputs.python"), "Python job must depend on changes.outputs.python");
+  assert.ok(content.includes("needs.changes.outputs.fidelity"), "Fidelity job must depend on changes.outputs.fidelity");
+});
