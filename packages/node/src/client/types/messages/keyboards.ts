@@ -1,4 +1,5 @@
 import type { CallbackGame } from "../business/index.js";
+import type { ChatAdministratorRights } from "../chats/index.js";
 
 /**
  * Represents a disabled button which does nothing (Bot API 10.3+).
@@ -159,9 +160,9 @@ export interface KeyboardButtonRequestChat {
   /** Pass True to request a chat owned by the user. */
   chat_is_created?: boolean;
   /** A JSON-serialized object listing the required administrator rights of the user in the chat. */
-  user_administrator_rights?: unknown;
+  user_administrator_rights?: ChatAdministratorRights;
   /** A JSON-serialized object listing the required administrator rights of the bot in the chat. */
-  bot_administrator_rights?: unknown;
+  bot_administrator_rights?: ChatAdministratorRights;
   /** Pass True to request a chat with the bot as a member. */
   bot_is_member?: boolean;
   /** Pass True to request the chat's title. */

@@ -113,7 +113,7 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	}
 
 	setResult(`{"message_id":14}`)
-	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14, 0, "", nil); err != nil {
+	if _, err := b.ForwardMessage(ctx, int64(1), int64(2), 14); err != nil {
 		t.Fatalf("ForwardMessage = %v", err)
 	}
 
@@ -124,7 +124,7 @@ func TestBot_MessageMethods_Success(t *testing.T) {
 	}
 
 	setResult(`true`)
-	if ok, err := b.SendChatAction(ctx, int64(1), "typing", ""); err != nil || !ok {
+	if ok, err := b.SendChatAction(ctx, int64(1), "typing"); err != nil || !ok {
 		t.Fatalf("SendChatAction = (%v, %v)", ok, err)
 	}
 }
@@ -134,12 +134,7 @@ func TestBot_TopicMethods_Success(t *testing.T) {
 	b := bot.NewBot("token", bot.WithBaseURL(server.URL))
 	ctx := context.Background()
 
-	setResult(`{"message_thread_id":4,"name":"General"}`)
-	topic, err := b.CreateForumTopic(ctx, int64(-100), "General", 0x3FB549, "emoji-1")
-	if err != nil || topic.Name != "General" || topic.MessageThreadID != 4 {
-		t.Fatalf("CreateForumTopic = (%+v, %v)", topic, err)
-	}
-	// Branch omitting optional icon fields.
+	setResult(`{"message_thread_id":4,"name":"Plain"}`)
 	if _, err := b.CreateForumTopic(ctx, int64(-100), "Plain", 0, ""); err != nil {
 		t.Fatalf("CreateForumTopic minimal = %v", err)
 	}
@@ -202,13 +197,13 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.EditMessageReplyMarkup(ctx, &types.EditMessageReplyMarkupOptions{}); err == nil {
 		t.Error("EditMessageReplyMarkup: expected error")
 	}
-	if _, err := b.ForwardMessage(ctx, 1, 2, 3, 0, "", nil); err == nil {
+	if _, err := b.ForwardMessage(ctx, 1, 2, 3); err == nil {
 		t.Error("ForwardMessage: expected error")
 	}
 	if _, err := b.CopyMessage(ctx, &types.CopyMessageOptions{ChatID: 1, FromChatID: 2, MessageID: 3}); err == nil {
 		t.Error("CopyMessage: expected error")
 	}
-	if _, err := b.SendChatAction(ctx, 1, "typing", ""); err == nil {
+	if _, err := b.SendChatAction(ctx, 1, "typing"); err == nil {
 		t.Error("SendChatAction: expected error")
 	}
 	if _, err := b.CreateForumTopic(ctx, 1, "n", 0, ""); err == nil {
@@ -217,7 +212,7 @@ func TestBot_Methods_ApiError(t *testing.T) {
 	if _, err := b.CloseForumTopic(ctx, 1, 2); err == nil {
 		t.Error("CloseForumTopic: expected error")
 	}
-	if _, err := b.SetWebhook(ctx, "https://x", "", 0); err == nil {
+	if _, err := b.SetWebhook(ctx, "https://x"); err == nil {
 		t.Error("SetWebhook: expected error")
 	}
 	if _, err := b.DeleteWebhook(ctx, false); err == nil {

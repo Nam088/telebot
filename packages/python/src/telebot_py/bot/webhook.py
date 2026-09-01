@@ -38,6 +38,8 @@ class WebhookMixin(Requester):
         self,
         url: str,
         *,
+        certificate: str | bytes | None = None,
+        ip_address: str | None = None,
         secret_token: str | None = None,
         max_connections: int | None = None,
         allowed_updates: Sequence[str] | None = None,
@@ -50,6 +52,10 @@ class WebhookMixin(Requester):
 
         Args:
             url: HTTPS URL Telegram posts updates to.
+            certificate: Upload your public key certificate so that the root
+                certificate in use can be checked.
+            ip_address: The fixed IP address which will be used to send webhook
+                requests instead of the IP address resolved through DNS.
             secret_token: Sent back in the ``X-Telegram-Bot-Api-Secret-Token``
                 header of every delivery so the endpoint can verify origin.
             max_connections: Maximum simultaneous connections for deliveries.
@@ -69,6 +75,8 @@ class WebhookMixin(Requester):
         """
         payload = clean_payload(
             url=url,
+            certificate=certificate,
+            ip_address=ip_address,
             secret_token=secret_token,
             max_connections=max_connections,
             allowed_updates=list(allowed_updates) if allowed_updates is not None else None,

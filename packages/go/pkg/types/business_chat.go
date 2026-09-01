@@ -47,3 +47,21 @@ type BusinessOpeningHours struct {
 	// List of time intervals describing business opening hours.
 	OpeningHours []BusinessOpeningHoursInterval `json:"opening_hours"`
 }
+
+// ApproveSuggestedPostOptions represents parameters for the approveSuggestedPost method.
+//
+// Telegram API: https://core.telegram.org/bots/api#approvesuggestedpost
+type ApproveSuggestedPostOptions struct {
+	ChatID    any   `json:"chat_id"`
+	MessageID int64 `json:"message_id"`
+	SendDate  int64 `json:"send_date,omitempty"`
+}
+
+// DeclineSuggestedPostOptions represents parameters for the declineSuggestedPost method.
+//
+// Telegram API: https://core.telegram.org/bots/api#declinesuggestedpost
+type DeclineSuggestedPostOptions struct {
+	ChatID    any    `json:"chat_id"`
+	MessageID int64  `json:"message_id"`
+	Comment   string `json:"comment,omitempty"`
+}

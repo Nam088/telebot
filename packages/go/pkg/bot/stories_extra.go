@@ -31,12 +31,31 @@ import (
 //	}, map[string]any{"caption": "Updated", "parse_mode": "HTML"})
 //
 // Telegram API: https://core.telegram.org/bots/api#editstory
-func (b *Bot) EditStory(ctx context.Context, businessConnectionID string, storyID int64, content any, options map[string]any) (*types.Story, error) {
-	payload := mergePayload(map[string]any{
-		"business_connection_id": businessConnectionID,
-		"story_id":               storyID,
-		"content":                content,
-	}, options)
+func (b *Bot) EditStory(ctx context.Context, businessConnectionID string, storyID int64, content any, options any, opts ...*types.EditStoryOptions) (*types.Story, error) {
+	var payload any
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].BusinessConnectionID = businessConnectionID
+		opts[0].StoryID = storyID
+		opts[0].Content = content
+		payload = opts[0]
+	} else if optMap, ok := options.(map[string]any); ok {
+		payload = mergePayload(map[string]any{
+			"business_connection_id": businessConnectionID,
+			"story_id":               storyID,
+			"content":                content,
+		}, optMap)
+	} else if optStruct, ok := options.(*types.EditStoryOptions); ok && optStruct != nil {
+		optStruct.BusinessConnectionID = businessConnectionID
+		optStruct.StoryID = storyID
+		optStruct.Content = content
+		payload = optStruct
+	} else {
+		payload = map[string]any{
+			"business_connection_id": businessConnectionID,
+			"story_id":               storyID,
+			"content":                content,
+		}
+	}
 
 	var story types.Story
 	if err := b.Request(ctx, "editStory", payload, &story); err != nil {

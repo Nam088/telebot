@@ -1,7 +1,10 @@
 import type { ParseMode } from "../../constants.js";
+import type { SuggestedPostParameters } from "../payments/index.js";
 import type { MessageEntity } from "./core.js";
 import type { ReplyParameters } from "./reply-context.js";
 import type { ReplyMarkup } from "./keyboards.js";
+import type { InputChecklist } from "./checklist.js";
+import type { InputPaidMedia } from "./media.js";
 
 /**
  * Options for {@link Bot.sendChecklist}.
@@ -18,7 +21,7 @@ export interface SendChecklistOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Checklist to send. */
-  checklist: Record<string, unknown>;
+  checklist: InputChecklist;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
@@ -44,7 +47,7 @@ export interface EditMessageChecklistOptions {
   /** Identifier of the message to edit. */
   message_id: number;
   /** New checklist content. */
-  checklist: Record<string, unknown>;
+  checklist: InputChecklist;
   /** Additional interface options. */
   reply_markup?: ReplyMarkup;
 }
@@ -54,7 +57,7 @@ export interface EditMessageChecklistOptions {
  *
  * @remarks
  * `media` holds up to 10 InputPaidMedia objects (InputPaidMediaPhoto /
- * InputPaidMediaVideo). The JSON-only client can't attach new files, so pass a
+ * InputPaidMediaVideo / InputPaidMediaLivePhoto). The JSON-only client can't attach new files, so pass a
  * `file_id` or an HTTP URL.
  *
  * @see {@link https://core.telegram.org/bots/api#sendpaidmedia Telegram Bot API: sendPaidMedia}
@@ -65,7 +68,7 @@ export interface SendPaidMediaOptions {
   /** Number of Telegram Stars that must be paid to buy access to the media; 1-25000. */
   star_count: number;
   /** Array describing the media to send; up to 10 items. */
-  media: Record<string, unknown>[];
+  media: InputPaidMedia[];
   /** Bot-defined paid media payload, 0-128 bytes. Not shown to the user. */
   payload?: string;
   /** Media caption, 0-1024 characters after entities parsing. */
@@ -83,7 +86,7 @@ export interface SendPaidMediaOptions {
   /** Pass True to allow paid broadcast of the message. */
   allow_paid_broadcast?: boolean;
   /** Parameters of the suggested post to send in a business chat. */
-  suggested_post_parameters?: unknown;
+  suggested_post_parameters?: SuggestedPostParameters;
   /** Unique identifier of the business connection on behalf of which the message will be sent. */
   business_connection_id?: string;
   /** Unique identifier for the target message thread (topic) of the forum. */

@@ -24,6 +24,8 @@ import type {
   PollAnswer,
   MessageReactionUpdated,
   MessageReactionCountUpdated,
+  ReactionType,
+  WebAppInfo,
 } from "../messages/index.js";
 import type { ShippingQuery, PreCheckoutQuery, PurchasedPaidMedia } from "../payments/index.js";
 import type { BotSubscriptionUpdated, ManagedBotUpdated } from "./update-payloads.js";
@@ -117,7 +119,7 @@ export interface Chat {
   /** For private chats, the personal channel of the user. */
   personal_chat?: Chat;
   /** List of available reactions allowed in the chat. */
-  available_reactions?: unknown[];
+  available_reactions?: ReactionType[];
   /** Identifier of the accent color for the chat name and backgrounds. */
   accent_color_id?: number;
   /** Custom emoji identifier of emoji chosen for chat background. */
@@ -214,6 +216,22 @@ export interface Location {
   heading?: number;
   /** The maximum distance for proximity alerts about approaching another chat member, in meters. */
   proximity_alert_radius?: number;
+}
+
+/**
+ * Describes the address of a location.
+ *
+ * @see {@link https://core.telegram.org/bots/api#locationaddress Telegram Bot API: LocationAddress}
+ */
+export interface LocationAddress {
+  /** Two-letter ISO 3166-1 alpha-2 country code. */
+  country_code: string;
+  /** State, if available. */
+  state?: string;
+  /** City, if available. */
+  city?: string;
+  /** Street, if available. */
+  street?: string;
 }
 
 /**
@@ -337,6 +355,25 @@ export interface MessageGenerationStopped {
   draft_id: number;
 }
 
+/**
+ * Represents a button to be shown above inline query results.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inlinequeryresultsbutton Telegram Bot API: InlineQueryResultsButton}
+ */
+export interface InlineQueryResultsButton {
+  /** Label text on the button. */
+  text: string;
+  /** Description of the Web App that will be launched when the user presses the button. */
+  web_app?: WebAppInfo;
+  /** Deep-linking parameter for the /start message sent to the bot when a user presses the button. */
+  start_parameter?: string;
+}
+
+/**
+ * Generic response wrapper returned by the Telegram Bot API.
+ *
+ * @typeParam T - The unwrapped result payload type returned on success.
+ */
 export interface ApiResponse<T = unknown> {
   /** True, if the request was successful. */
   ok: boolean;

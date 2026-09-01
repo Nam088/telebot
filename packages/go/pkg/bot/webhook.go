@@ -14,15 +14,11 @@ import (
 // SetWebhook specifies a URL and receive incoming updates via an outgoing webhook.
 //
 // Telegram API: https://core.telegram.org/bots/api#setwebhook
-func (b *Bot) SetWebhook(ctx context.Context, url string, secretToken string, maxConnections int) (bool, error) {
-	payload := map[string]any{
-		"url": url,
-	}
-	if secretToken != "" {
-		payload["secret_token"] = secretToken
-	}
-	if maxConnections > 0 {
-		payload["max_connections"] = maxConnections
+func (b *Bot) SetWebhook(ctx context.Context, url string, opts ...*types.SetWebhookOptions) (bool, error) {
+	var payload any = map[string]any{"url": url}
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].URL = url
+		payload = opts[0]
 	}
 	var ok bool
 	if err := b.Request(ctx, "setWebhook", payload, &ok); err != nil {

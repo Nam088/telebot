@@ -100,6 +100,7 @@ func (b *Bot) DeleteBusinessMessages(ctx context.Context, businessConnectionID s
 // Parameters:
 //   - ctx: Context for cancellation and timeout.
 //   - businessConnectionID: Unique identifier of the business connection.
+//   - opts: Optional GetBusinessAccountGiftsOptions.
 //
 // Returns:
 //   - map[string]any: The raw SavedGifts-style object returned by Telegram.
@@ -111,8 +112,12 @@ func (b *Bot) DeleteBusinessMessages(ctx context.Context, businessConnectionID s
 //	fmt.Println(gifts["total_count"])
 //
 // Telegram API: https://core.telegram.org/bots/api#getbusinessaccountgifts
-func (b *Bot) GetBusinessAccountGifts(ctx context.Context, businessConnectionID string) (map[string]any, error) {
-	payload := map[string]any{"business_connection_id": businessConnectionID}
+func (b *Bot) GetBusinessAccountGifts(ctx context.Context, businessConnectionID string, opts ...*types.GetBusinessAccountGiftsOptions) (map[string]any, error) {
+	var payload any = map[string]any{"business_connection_id": businessConnectionID}
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].BusinessConnectionID = businessConnectionID
+		payload = opts[0]
+	}
 	var gifts map[string]any
 	if err := b.Request(ctx, "getBusinessAccountGifts", payload, &gifts); err != nil {
 		return nil, err

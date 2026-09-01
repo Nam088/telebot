@@ -233,3 +233,16 @@ type RepostStoryOptions struct {
 	// and saving.
 	ProtectContent bool `json:"protect_content,omitempty"`
 }
+
+// EditStoryOptions represents parameters for the editStory method.
+//
+// Telegram API: https://core.telegram.org/bots/api#editstory
+type EditStoryOptions struct {
+	BusinessConnectionID string          `json:"business_connection_id"`
+	StoryID              int64           `json:"story_id"`
+	Content              any             `json:"content"`
+	Caption              string          `json:"caption,omitempty"`
+	ParseMode            string          `json:"parse_mode,omitempty"`
+	CaptionEntities      []MessageEntity `json:"caption_entities,omitempty"`
+	Areas                []StoryArea     `json:"areas,omitempty"`
+}

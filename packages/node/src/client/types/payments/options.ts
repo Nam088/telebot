@@ -1,4 +1,4 @@
-import type { InlineKeyboardMarkup, MessageEntity } from "../messages/index.js";
+import type { InlineKeyboardMarkup, MessageEntity, ReplyParameters } from "../messages/index.js";
 import type { LabeledPrice, ShippingOption, SuggestedPostParameters } from "./models.js";
 
 export interface SendInvoiceOptions {
@@ -57,7 +57,7 @@ export interface SendInvoiceOptions {
   /** Parameters of the suggested post to send in a business chat. */
   suggested_post_parameters?: SuggestedPostParameters;
   /** Description of the message to reply to. */
-  reply_parameters?: unknown;
+  reply_parameters?: ReplyParameters;
   /** An inline keyboard. */
   reply_markup?: InlineKeyboardMarkup;
   /** Unique identifier for the target message thread (topic) of the forum. */

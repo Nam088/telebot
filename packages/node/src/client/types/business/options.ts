@@ -1,6 +1,7 @@
 import type { ParseMode } from "../../constants.js";
-import type { MessageEntity } from "../messages/index.js";
+import type { MessageEntity, KeyboardButton } from "../messages/index.js";
 import type { AcceptedGiftTypes } from "./models.js";
+import type { InlineQueryResult } from "./unions.js";
 
 /**
  * Options for {@link Bot.giftPremiumSubscription}.
@@ -97,7 +98,7 @@ export interface SavePreparedKeyboardButtonOptions {
   /** Unique identifier of the target user that can use the button. */
   user_id: number;
   /** A KeyboardButton object describing the button to save. */
-  button: Record<string, unknown>;
+  button: KeyboardButton;
 }
 
 /**
@@ -109,7 +110,7 @@ export interface AnswerChatJoinRequestQueryOptions {
   /** Unique identifier of the chat join request query to be answered. */
   chat_join_request_query_id: string;
   /** An object describing the result of the join request interaction. */
-  result: Record<string, unknown>;
+  result: InlineQueryResult;
 }
 
 /**

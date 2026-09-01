@@ -24,6 +24,9 @@ import type {
   EditMessageLiveLocationOptions,
   StopMessageLiveLocationOptions,
   SuggestedPostParameters,
+  ReplyParameters,
+  ReplyMarkup,
+  MessageEntity,
 } from "../../types/index.js";
 
 /**
@@ -149,6 +152,7 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
     chat_id: number | string;
     from_chat_id: number | string;
     message_id: number;
+    video_start_timestamp?: number;
     disable_notification?: boolean;
     protect_content?: boolean;
     message_thread_id?: number;
@@ -210,10 +214,13 @@ export abstract class MessageBasicMethods extends MessageMediaMethods {
     message_id: number;
     caption?: string;
     parse_mode?: ParseMode;
-    caption_entities?: unknown[];
+    caption_entities?: MessageEntity[];
+    show_caption_above_media?: boolean;
+    video_start_timestamp?: number;
     disable_notification?: boolean;
     protect_content?: boolean;
-    reply_markup?: unknown;
+    reply_parameters?: ReplyParameters;
+    reply_markup?: ReplyMarkup;
     message_thread_id?: number;
     direct_messages_topic_id?: number;
     allow_paid_broadcast?: boolean;

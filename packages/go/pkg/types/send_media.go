@@ -33,6 +33,8 @@ type SendVideoOptions struct {
 	Width                      int                         `json:"width,omitempty"`
 	Height                     int                         `json:"height,omitempty"`
 	Thumbnail                  any                         `json:"thumbnail,omitempty"`
+	Cover                      any                         `json:"cover,omitempty"`
+	StartTimestamp             int                         `json:"start_timestamp,omitempty"`
 	Caption                    string                      `json:"caption,omitempty"`
 	ParseMode                  string                      `json:"parse_mode,omitempty"`
 	CaptionEntities            []MessageEntity             `json:"caption_entities,omitempty"`

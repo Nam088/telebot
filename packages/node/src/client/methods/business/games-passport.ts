@@ -5,7 +5,13 @@
  */
 
 import { BusinessQueriesMethods } from "./queries.js";
-import type { Message, GameHighScore, PassportElementError } from "../../types/index.js";
+import type {
+  Message,
+  GameHighScore,
+  PassportElementError,
+  ReplyParameters,
+  InlineKeyboardMarkup,
+} from "../../types/index.js";
 
 /**
  * Mixin providing games, game scores, and Telegram Passport operations.
@@ -32,7 +38,8 @@ export abstract class BusinessGamesPassportMethods extends BusinessQueriesMethod
       protect_content?: boolean;
       allow_paid_broadcast?: boolean;
       message_effect_id?: string;
-      reply_markup?: unknown;
+      reply_parameters?: ReplyParameters;
+      reply_markup?: InlineKeyboardMarkup;
     } = {},
   ): Promise<Message> {
     return this.request<Message>("sendGame", {

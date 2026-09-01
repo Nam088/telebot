@@ -108,29 +108,42 @@ func (b *Bot) EditMessageReplyMarkup(ctx context.Context, opts *types.EditMessag
 //   - chatID: Unique identifier for the destination chat.
 //   - fromChatID: Unique identifier for the chat where the original message was sent.
 //   - messageID: Message identifier in the chat specified in fromChatID.
-//   - directMessagesTopicID: Optional identifier of the topic the message will be sent to in a direct messages chat; 0 omits it.
-//   - messageEffectID: Optional unique identifier of the message effect to be added to the message; empty omits it.
-//   - suggestedPostParameters: Optional suggested post parameters; nil omits them.
+//   - opts: Optional ForwardMessageOptions.
 //
 // Returns:
 //   - *types.Message: The forwarded Message object on success.
 //   - error: An error if forwarding failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#forwardmessage
-func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64, directMessagesTopicID int64, messageEffectID string, suggestedPostParameters *types.SuggestedPostParameters) (*types.Message, error) {
+func (b *Bot) ForwardMessage(ctx context.Context, chatID, fromChatID any, messageID int64, opts ...*types.ForwardMessageOptions) (*types.Message, error) {
 	payload := map[string]any{
 		"chat_id":      chatID,
 		"from_chat_id": fromChatID,
 		"message_id":   messageID,
 	}
-	if directMessagesTopicID > 0 {
-		payload["direct_messages_topic_id"] = directMessagesTopicID
-	}
-	if messageEffectID != "" {
-		payload["message_effect_id"] = messageEffectID
-	}
-	if suggestedPostParameters != nil {
-		payload["suggested_post_parameters"] = suggestedPostParameters
+	if len(opts) > 0 && opts[0] != nil {
+		o := opts[0]
+		if o.MessageThreadID != 0 {
+			payload["message_thread_id"] = o.MessageThreadID
+		}
+		if o.DirectMessagesTopicID != 0 {
+			payload["direct_messages_topic_id"] = o.DirectMessagesTopicID
+		}
+		if o.VideoStartTimestamp != 0 {
+			payload["video_start_timestamp"] = o.VideoStartTimestamp
+		}
+		if o.DisableNotification {
+			payload["disable_notification"] = o.DisableNotification
+		}
+		if o.ProtectContent {
+			payload["protect_content"] = o.ProtectContent
+		}
+		if o.MessageEffectID != "" {
+			payload["message_effect_id"] = o.MessageEffectID
+		}
+		if o.SuggestedPostParameters != nil {
+			payload["suggested_post_parameters"] = o.SuggestedPostParameters
+		}
 	}
 	var msg types.Message
 	if err := b.Request(ctx, "forwardMessage", payload, &msg); err != nil {
@@ -174,20 +187,26 @@ func (b *Bot) CopyMessage(ctx context.Context, opts *types.CopyMessageOptions) (
 //   - ctx: Cancellation context.
 //   - chatID: Target chat identifier.
 //   - action: Type of action to broadcast (e.g. "typing", "upload_photo", "find_location").
-//   - businessConnectionID: Optional unique identifier of the business connection on behalf of which the action will be sent; empty omits it.
+//   - opts: Optional SendChatActionOptions.
 //
 // Returns:
 //   - bool: True on success.
 //   - error: An error if the action failed.
 //
 // Telegram API: https://core.telegram.org/bots/api#sendchataction
-func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string, businessConnectionID string) (bool, error) {
+func (b *Bot) SendChatAction(ctx context.Context, chatID any, action string, opts ...*types.SendChatActionOptions) (bool, error) {
 	payload := map[string]any{
 		"chat_id": chatID,
 		"action":  action,
 	}
-	if businessConnectionID != "" {
-		payload["business_connection_id"] = businessConnectionID
+	if len(opts) > 0 && opts[0] != nil {
+		o := opts[0]
+		if o.BusinessConnectionID != "" {
+			payload["business_connection_id"] = o.BusinessConnectionID
+		}
+		if o.MessageThreadID != 0 {
+			payload["message_thread_id"] = o.MessageThreadID
+		}
 	}
 	var ok bool
 	if err := b.Request(ctx, "sendChatAction", payload, &ok); err != nil {

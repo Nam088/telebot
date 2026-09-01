@@ -131,6 +131,8 @@ class MediaMixin(Requester):
         width: int | None = None,
         height: int | None = None,
         thumbnail: str | None = None,
+        cover: str | None = None,
+        start_timestamp: int | None = None,
         caption: str | None = None,
         parse_mode: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
@@ -165,6 +167,8 @@ class MediaMixin(Requester):
             width: Video width.
             height: Video height.
             thumbnail: Thumbnail file_id or URL of the file sent.
+            cover: Cover photo for the video. Pass a file_id string or HTTP URL.
+            start_timestamp: Start timestamp for the video in the message.
             caption: Video caption, 0-1024 characters.
             parse_mode: Parse mode for the caption.
             caption_entities: Special entities for the caption.
@@ -204,6 +208,8 @@ class MediaMixin(Requester):
             width=width,
             height=height,
             thumbnail=thumbnail,
+            cover=cover,
+            start_timestamp=start_timestamp,
             caption=caption,
             parse_mode=parse_mode,
             caption_entities=[entity.to_dict() for entity in caption_entities]

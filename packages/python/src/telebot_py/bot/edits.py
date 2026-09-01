@@ -94,6 +94,7 @@ class EditsMixin(Requester):
         caption: str | None = None,
         parse_mode: str | None = None,
         caption_entities: Sequence[MessageEntity] | None = None,
+        show_caption_above_media: bool | None = None,
         reply_markup: MarkupLike | None = None,
     ) -> Message | bool:
         """Edit the caption of a media message sent by the bot or via the bot.
@@ -115,6 +116,8 @@ class EditsMixin(Requester):
                 remove the caption.
             parse_mode: Parse mode for the new caption entities.
             caption_entities: Special entities for the new caption.
+            show_caption_above_media: Pass True, if the caption must be
+                shown above the message media.
             reply_markup: New inline keyboard for the message; dict or
                 ``to_dict`` object.
 
@@ -138,6 +141,7 @@ class EditsMixin(Requester):
             caption_entities=[entity.to_dict() for entity in caption_entities]
             if caption_entities is not None
             else None,
+            show_caption_above_media=show_caption_above_media,
             reply_markup=to_wire(reply_markup),
         )
         return parse_message_or_true(await self.request("editMessageCaption", payload))

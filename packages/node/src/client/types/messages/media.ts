@@ -217,7 +217,7 @@ export interface InputMediaPhoto {
   /** Type of the result, must be 'photo'. */
   type: "photo";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, an HTTP URL, or upload using InputFile. */
-  media: string | InputFile | unknown;
+  media: string | InputFile;
   /** Caption of the photo to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the photo caption. */
@@ -239,11 +239,11 @@ export interface InputMediaVideo {
   /** Type of the result, must be 'video'. */
   type: "video";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, an HTTP URL, or upload using InputFile. */
-  media: string | InputFile | unknown;
+  media: string | InputFile;
   /** Thumbnail of the file sent. */
-  thumbnail?: string | InputFile | unknown;
+  thumbnail?: string | InputFile;
   /** Cover for the video in the message. Pass a file_id, an HTTP URL, or upload using InputFile. */
-  cover?: string | InputFile | unknown;
+  cover?: string | InputFile;
   /** Start timestamp for the video in the message. */
   start_timestamp?: number;
   /** Caption of the video to be sent, 0-1024 characters after entities parsing. */
@@ -275,9 +275,9 @@ export interface InputMediaAnimation {
   /** Type of the result, must be 'animation'. */
   type: "animation";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, an HTTP URL, or upload using InputFile. */
-  media: string | InputFile | unknown;
+  media: string | InputFile;
   /** Thumbnail of the file sent. */
-  thumbnail?: string | InputFile | unknown;
+  thumbnail?: string | InputFile;
   /** Caption of the animation to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the animation caption. */
@@ -305,9 +305,9 @@ export interface InputMediaAudio {
   /** Type of the result, must be 'audio'. */
   type: "audio";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, an HTTP URL, or upload using InputFile. */
-  media: string | InputFile | unknown;
+  media: string | InputFile;
   /** Thumbnail of the file sent. */
-  thumbnail?: string | InputFile | unknown;
+  thumbnail?: string | InputFile;
   /** Caption of the audio to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the audio caption. */
@@ -331,9 +331,9 @@ export interface InputMediaDocument {
   /** Type of the result, must be 'document'. */
   type: "document";
   /** File to send. Pass a file_id to send a file that exists on the Telegram servers, an HTTP URL, or upload using InputFile. */
-  media: string | InputFile | unknown;
+  media: string | InputFile;
   /** Thumbnail of the file sent. */
-  thumbnail?: string | InputFile | unknown;
+  thumbnail?: string | InputFile;
   /** Caption of the document to be sent, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the document caption. */
@@ -351,3 +351,62 @@ export interface InputMediaDocument {
  */
 export type InputMedia =
   InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;
+
+/**
+ * The paid media to send is a photo.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputpaidmediaphoto Telegram Bot API: InputPaidMediaPhoto}
+ */
+export interface InputPaidMediaPhoto {
+  /** Type of the media, must be 'photo'. */
+  type: "photo";
+  /** File to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
+  media: string;
+}
+
+/**
+ * The paid media to send is a video.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputpaidmediavideo Telegram Bot API: InputPaidMediaVideo}
+ */
+export interface InputPaidMediaVideo {
+  /** Type of the media, must be 'video'. */
+  type: "video";
+  /** File to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
+  media: string;
+  /** Thumbnail of the file sent. */
+  thumbnail?: string;
+  /** Cover for the video in the message. */
+  cover?: string;
+  /** Start timestamp for the video in the message. */
+  start_timestamp?: number;
+  /** Video width. */
+  width?: number;
+  /** Video height. */
+  height?: number;
+  /** Video duration in seconds. */
+  duration?: number;
+  /** Pass True, if the uploaded video is suitable for streaming. */
+  supports_streaming?: boolean;
+}
+
+/**
+ * The paid media to send is a live photo.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputpaidmedialivephoto Telegram Bot API: InputPaidMediaLivePhoto}
+ */
+export interface InputPaidMediaLivePhoto {
+  /** Type of the media, must be 'live_photo'. */
+  type: "live_photo";
+  /** File to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
+  media: string;
+  /** Photo to send. Pass a file_id to send a file that exists on the Telegram servers, or an HTTP URL. */
+  photo: string;
+}
+
+/**
+ * Describes the paid media to be sent.
+ *
+ * @see {@link https://core.telegram.org/bots/api#inputpaidmedia Telegram Bot API: InputPaidMedia}
+ */
+export type InputPaidMedia = InputPaidMediaPhoto | InputPaidMediaVideo | InputPaidMediaLivePhoto;

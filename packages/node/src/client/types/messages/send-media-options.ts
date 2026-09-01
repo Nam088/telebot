@@ -9,7 +9,7 @@ export interface SendPhotoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers, or an HTTP URL, or upload a new photo using InputFile. */
-  photo: unknown;
+  photo: string | InputFile;
   /** Photo caption (may also be used when resending photos by file_id), 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the photo caption. */
@@ -48,7 +48,7 @@ export interface SendAudioOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Audio file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
-  audio: unknown;
+  audio: string | InputFile;
   /** Audio caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the audio caption. */
@@ -62,7 +62,7 @@ export interface SendAudioOptions {
   /** Track name. */
   title?: string;
   /** Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. */
-  thumbnail?: unknown;
+  thumbnail?: string | InputFile;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */
@@ -91,9 +91,9 @@ export interface SendDocumentOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** File to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
-  document: unknown;
+  document: string | InputFile;
   /** Thumbnail of the file sent. */
-  thumbnail?: unknown;
+  thumbnail?: string | InputFile;
   /** Document caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the document caption. */
@@ -130,15 +130,19 @@ export interface SendVideoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Video to send. Pass a file_id as String, an HTTP URL, or upload a new video file using InputFile. */
-  video: unknown;
+  video: string | InputFile;
   /** Duration of sent video in seconds. */
   duration?: number;
   /** Video width. */
   width?: number;
   /** Video height. */
   height?: number;
+  /** Cover photo for the video. Pass a file_id as String, an HTTP URL, or upload a new photo using InputFile. */
+  cover?: string | InputFile;
+  /** Start timestamp for the video in the message. */
+  start_timestamp?: number;
   /** Thumbnail of the file sent. */
-  thumbnail?: unknown;
+  thumbnail?: string | InputFile;
   /** Video caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the video caption. */
@@ -179,7 +183,7 @@ export interface SendAnimationOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Animation file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
-  animation: unknown;
+  animation: string | InputFile;
   /** Duration of sent animation in seconds. */
   duration?: number;
   /** Animation width. */
@@ -187,7 +191,7 @@ export interface SendAnimationOptions {
   /** Animation height. */
   height?: number;
   /** Thumbnail of the file sent. */
-  thumbnail?: unknown;
+  thumbnail?: string | InputFile;
   /** Animation caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the animation caption. */
@@ -226,7 +230,7 @@ export interface SendVoiceOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Audio file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
-  voice: unknown;
+  voice: string | InputFile;
   /** Voice message caption, 0-1024 characters after entities parsing. */
   caption?: string;
   /** Mode for parsing entities in the voice message caption. */
@@ -263,13 +267,13 @@ export interface SendVideoNoteOptions {
   /** Unique identifier for the target chat or username of the target channel. */
   chat_id: number | string;
   /** Video note to send. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
-  video_note: unknown;
+  video_note: string | InputFile;
   /** Duration of sent video in seconds. */
   duration?: number;
   /** Video width and height (diameter of the video message). */
   length?: number;
   /** Thumbnail of the file sent. */
-  thumbnail?: unknown;
+  thumbnail?: string | InputFile;
   /** Sends the message silently. Users will receive a notification with no sound. */
   disable_notification?: boolean;
   /** Protects the contents of the sent message from forwarding and saving. */

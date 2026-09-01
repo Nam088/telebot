@@ -184,8 +184,14 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#getchatadministrators Telegram Bot API: getChatAdministrators}
    */
-  public async getChatAdministrators(chatId: number | string): Promise<ChatMember[]> {
-    return this.request<ChatMember[]>("getChatAdministrators", { chat_id: chatId });
+  public async getChatAdministrators(
+    chatId: number | string,
+    options: { return_bots?: boolean } = {},
+  ): Promise<ChatMember[]> {
+    return this.request<ChatMember[]>("getChatAdministrators", {
+      chat_id: chatId,
+      ...options,
+    });
   }
 
   /**

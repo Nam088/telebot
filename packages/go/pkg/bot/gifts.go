@@ -91,11 +91,27 @@ func (b *Bot) ConvertGiftToStars(ctx context.Context, businessConnectionID strin
 //	})
 //
 // Telegram API: https://core.telegram.org/bots/api#upgradegift
-func (b *Bot) UpgradeGift(ctx context.Context, businessConnectionID string, ownedGiftID string, options map[string]any) (bool, error) {
-	payload := mergePayload(map[string]any{
-		"business_connection_id": businessConnectionID,
-		"owned_gift_id":          ownedGiftID,
-	}, options)
+func (b *Bot) UpgradeGift(ctx context.Context, businessConnectionID string, ownedGiftID string, options any, opts ...*types.UpgradeGiftOptions) (bool, error) {
+	var payload any
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].BusinessConnectionID = businessConnectionID
+		opts[0].OwnedGiftID = ownedGiftID
+		payload = opts[0]
+	} else if optMap, ok := options.(map[string]any); ok {
+		payload = mergePayload(map[string]any{
+			"business_connection_id": businessConnectionID,
+			"owned_gift_id":          ownedGiftID,
+		}, optMap)
+	} else if optStruct, ok := options.(*types.UpgradeGiftOptions); ok && optStruct != nil {
+		optStruct.BusinessConnectionID = businessConnectionID
+		optStruct.OwnedGiftID = ownedGiftID
+		payload = optStruct
+	} else {
+		payload = map[string]any{
+			"business_connection_id": businessConnectionID,
+			"owned_gift_id":          ownedGiftID,
+		}
+	}
 	var ok bool
 	if err := b.Request(ctx, "upgradeGift", payload, &ok); err != nil {
 		return false, err
@@ -126,12 +142,31 @@ func (b *Bot) UpgradeGift(ctx context.Context, businessConnectionID string, owne
 //	ok, err := b.TransferGift(ctx, "423778511293324225", "1234567890abcdef", int64(-1001234567890), nil)
 //
 // Telegram API: https://core.telegram.org/bots/api#transfergift
-func (b *Bot) TransferGift(ctx context.Context, businessConnectionID string, ownedGiftID string, newOwnerChatID any, options map[string]any) (bool, error) {
-	payload := mergePayload(map[string]any{
-		"business_connection_id": businessConnectionID,
-		"owned_gift_id":          ownedGiftID,
-		"new_owner_chat_id":      newOwnerChatID,
-	}, options)
+func (b *Bot) TransferGift(ctx context.Context, businessConnectionID string, ownedGiftID string, newOwnerChatID any, options any, opts ...*types.TransferGiftOptions) (bool, error) {
+	var payload any
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].BusinessConnectionID = businessConnectionID
+		opts[0].OwnedGiftID = ownedGiftID
+		opts[0].NewOwnerChatID = newOwnerChatID
+		payload = opts[0]
+	} else if optMap, ok := options.(map[string]any); ok {
+		payload = mergePayload(map[string]any{
+			"business_connection_id": businessConnectionID,
+			"owned_gift_id":          ownedGiftID,
+			"new_owner_chat_id":      newOwnerChatID,
+		}, optMap)
+	} else if optStruct, ok := options.(*types.TransferGiftOptions); ok && optStruct != nil {
+		optStruct.BusinessConnectionID = businessConnectionID
+		optStruct.OwnedGiftID = ownedGiftID
+		optStruct.NewOwnerChatID = newOwnerChatID
+		payload = optStruct
+	} else {
+		payload = map[string]any{
+			"business_connection_id": businessConnectionID,
+			"owned_gift_id":          ownedGiftID,
+			"new_owner_chat_id":      newOwnerChatID,
+		}
+	}
 	var ok bool
 	if err := b.Request(ctx, "transferGift", payload, &ok); err != nil {
 		return false, err
@@ -161,8 +196,19 @@ func (b *Bot) TransferGift(ctx context.Context, businessConnectionID string, own
 //	fmt.Println(gifts["total_count"])
 //
 // Telegram API: https://core.telegram.org/bots/api#getusergifts
-func (b *Bot) GetUserGifts(ctx context.Context, userID int64, options map[string]any) (map[string]any, error) {
-	payload := mergePayload(map[string]any{"user_id": userID}, options)
+func (b *Bot) GetUserGifts(ctx context.Context, userID int64, options any, opts ...*types.GetUserGiftsOptions) (map[string]any, error) {
+	var payload any
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].UserID = userID
+		payload = opts[0]
+	} else if optMap, ok := options.(map[string]any); ok {
+		payload = mergePayload(map[string]any{"user_id": userID}, optMap)
+	} else if optStruct, ok := options.(*types.GetUserGiftsOptions); ok && optStruct != nil {
+		optStruct.UserID = userID
+		payload = optStruct
+	} else {
+		payload = map[string]any{"user_id": userID}
+	}
 	var gifts map[string]any
 	if err := b.Request(ctx, "getUserGifts", payload, &gifts); err != nil {
 		return nil, err
@@ -194,8 +240,19 @@ func (b *Bot) GetUserGifts(ctx context.Context, userID int64, options map[string
 //	fmt.Println(gifts["total_count"])
 //
 // Telegram API: https://core.telegram.org/bots/api#getchatgifts
-func (b *Bot) GetChatGifts(ctx context.Context, chatID any, options map[string]any) (map[string]any, error) {
-	payload := mergePayload(map[string]any{"chat_id": chatID}, options)
+func (b *Bot) GetChatGifts(ctx context.Context, chatID any, options any, opts ...*types.GetChatGiftsOptions) (map[string]any, error) {
+	var payload any
+	if len(opts) > 0 && opts[0] != nil {
+		opts[0].ChatID = chatID
+		payload = opts[0]
+	} else if optMap, ok := options.(map[string]any); ok {
+		payload = mergePayload(map[string]any{"chat_id": chatID}, optMap)
+	} else if optStruct, ok := options.(*types.GetChatGiftsOptions); ok && optStruct != nil {
+		optStruct.ChatID = chatID
+		payload = optStruct
+	} else {
+		payload = map[string]any{"chat_id": chatID}
+	}
 	var gifts map[string]any
 	if err := b.Request(ctx, "getChatGifts", payload, &gifts); err != nil {
 		return nil, err
