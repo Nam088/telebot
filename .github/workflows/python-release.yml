@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  workflows: write
 
 concurrency:
   group: python-release-${{ github.ref }}
@@ -35,6 +36,7 @@ jobs:
     environment: pypi
     permissions:
       contents: write
+      workflows: write
       id-token: write
     steps:
       - name: Checkout Code
