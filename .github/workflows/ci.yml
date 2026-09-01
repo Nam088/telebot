@@ -5,10 +5,50 @@ on:
     branches: [main, master, develop]
   pull_request:
     branches: [main, master, develop]
+  workflow_dispatch: {}
 
 jobs:
+  changes:
+    name: Detect Changed Paths
+    runs-on: ubuntu-latest
+    outputs:
+      node: ${{ steps.filter.outputs.node }}
+      go: ${{ steps.filter.outputs.go }}
+      python: ${{ steps.filter.outputs.python }}
+      fidelity: ${{ steps.filter.outputs.fidelity }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Filter Changed Paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            node:
+              - "packages/node/**"
+              - "package.json"
+              - "package-lock.json"
+              - "tsconfig.json"
+              - ".github/workflows/ci.yml"
+              - ".github/workflows/node-release.yml"
+            go:
+              - "packages/go/**"
+              - ".github/workflows/ci.yml"
+              - ".github/workflows/go-release.yml"
+            python:
+              - "packages/python/**"
+              - ".github/workflows/ci.yml"
+              - ".github/workflows/python-release.yml"
+            fidelity:
+              - "packages/**"
+              - "scripts/**"
+              - ".github/workflows/ci.yml"
+
   test-node:
     name: Node.js Test & Lint (${{ matrix.node-version }})
+    needs: changes
+    if: ${{ needs.changes.outputs.node == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -44,6 +84,8 @@ jobs:
 
   test-go:
     name: Golang Test & Build (${{ matrix.go-version }})
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -69,6 +111,8 @@ jobs:
 
   test-python:
     name: Python Test & Lint (${{ matrix.python-version }})
+    needs: changes
+    if: ${{ needs.changes.outputs.python == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -119,6 +163,8 @@ jobs:
   # and commit the diff when the API changes.
   bot-api-fidelity:
     name: Bot API Docs Fidelity
+    needs: changes
+    if: ${{ needs.changes.outputs.fidelity == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:

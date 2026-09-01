@@ -1,25 +1,38 @@
 name: Go Release
 
-# Creates a GitHub Release for the Go framework whenever a telebot-go tag
-# (packages/go/vX.Y.Z) is pushed. Tags are mirrored automatically by the
-# release pipeline so Node, Go, and Python always share the same version
-# number. Release notes are generated automatically from conventional commits
-# by git-cliff.
+# Creates a GitHub Release for telebot-go whenever changes in packages/go are
+# merged to main or a telebot-go tag (packages/go/v*) is pushed. Release notes
+# are generated automatically from conventional commits by git-cliff.
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - "packages/go/**"
+      - ".github/workflows/go-release.yml"
     tags:
       - "packages/go/v*"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 1.7.1, or leave empty for auto-bump)"
+        required: false
+        type: string
 
 permissions:
   contents: write
 
+concurrency:
+  group: go-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
+    name: Go Release & Tagging
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,13 +42,46 @@ jobs:
         with:
           go-version-file: packages/go/go.mod
 
-      - name: Verify tagged commit builds
+      - name: Set up Node.js (for version resolution)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify Go Tests & Build
         working-directory: packages/go
         run: |
-          go build ./...
+          go test -v -race ./...
           go vet ./...
+          go build ./...
 
-      - name: Generate release notes
+      - name: Resolve Release Version
+        id: resolver
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          EXTRA_ARGS=""
+          if [ "$REF_TYPE" = "tag" ]; then
+            EXTRA_ARGS="--tag $REF_NAME"
+          elif [ -n "$INPUT_VERSION" ]; then
+            EXTRA_ARGS="--version $INPUT_VERSION"
+          fi
+          node scripts/resolve-release-version.mjs --package go $EXTRA_ARGS --output-file "$GITHUB_OUTPUT"
+
+      - name: Push Git Tag if New Release
+        if: steps.resolver.outputs.should_release == 'true' && github.ref_type != 'tag'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.resolver.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG_NAME"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "refs/tags/${TAG_NAME}"
+
+      - name: Generate Go Release Notes
+        if: steps.resolver.outputs.should_release == 'true'
         uses: orhun/git-cliff-action@v4
         with:
           config: packages/go/cliff.toml
@@ -44,17 +90,15 @@ jobs:
           OUTPUT: go-release-notes.md
           GITHUB_REPO: ${{ github.repository }}
 
-      - name: Resolve version name
-        id: ver
-        run: echo "version=${GITHUB_REF_NAME#packages/go/}" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub Release
+        if: steps.resolver.outputs.should_release == 'true'
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: telebot-go ${{ steps.ver.outputs.version }}
-          tag_name: ${{ github.ref_name }}
+          name: telebot-go v${{ steps.resolver.outputs.version }}
+          tag_name: ${{ steps.resolver.outputs.tag }}
           body_path: go-release-notes.md
           draft: false
           prerelease: false
-          # Node releases (vX.Y.Z from semantic-release) remain the repo "latest".
           make_latest: "false"

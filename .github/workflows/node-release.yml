@@ -1,0 +1,60 @@
+name: Node Release
+
+# Publishes telebot-ts to npm and creates GitHub Releases whenever changes
+# to packages/node are merged to main or beta branches.
+
+on:
+  push:
+    branches:
+      - main
+      - beta
+    paths:
+      - "packages/node/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".releaserc.json"
+      - ".release/**"
+      - ".github/workflows/node-release.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: node-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Node Semantic Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Quality Gates
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+          npm run test:node
+
+      - name: Run Semantic Release (npm & GitHub Release)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
