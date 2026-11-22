@@ -2,6 +2,13 @@
 
 All notable changes to `telebot-ts` will be documented in this file.
 
+# [1.9.0](https://github.com/Nam088/telebot/compare/packages/node/v1.8.0...packages/node/v1.9.0) (2026-11-22)
+
+
+### Features
+
+* **api:** Telegram Bot API 10.4 support ([#15](https://github.com/Nam088/telebot/issues/15)) ([efed843](https://github.com/Nam088/telebot/commit/efed843f6f717188cee08cdde977eaf69a0bbc26)), closes [#14](https://github.com/Nam088/telebot/issues/14)
+
 # [1.8.0](https://github.com/Nam088/telebot/compare/packages/node/v1.7.0...packages/node/v1.8.0) (2026-09-01)
 
 
