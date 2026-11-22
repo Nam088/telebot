@@ -7,7 +7,7 @@ import type { InputMedia, InputFile } from "./media.js";
 
 export interface SendPhotoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers, or an HTTP URL, or upload a new photo using InputFile. */
   photo: string | InputFile;
   /** Photo caption (may also be used when resending photos by file_id), 0-1024 characters after entities parsing. */
@@ -46,7 +46,7 @@ export interface SendPhotoOptions {
 
 export interface SendAudioOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Audio file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
   audio: string | InputFile;
   /** Audio caption, 0-1024 characters after entities parsing. */
@@ -89,7 +89,7 @@ export interface SendAudioOptions {
 
 export interface SendDocumentOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** File to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
   document: string | InputFile;
   /** Thumbnail of the file sent. */
@@ -128,7 +128,7 @@ export interface SendDocumentOptions {
 
 export interface SendVideoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Video to send. Pass a file_id as String, an HTTP URL, or upload a new video file using InputFile. */
   video: string | InputFile;
   /** Duration of sent video in seconds. */
@@ -181,7 +181,7 @@ export interface SendVideoOptions {
 
 export interface SendAnimationOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Animation file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
   animation: string | InputFile;
   /** Duration of sent animation in seconds. */
@@ -228,7 +228,7 @@ export interface SendAnimationOptions {
 
 export interface SendVoiceOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Audio file to send. Pass a file_id as String, an HTTP URL, or upload a new file using InputFile. */
   voice: string | InputFile;
   /** Voice message caption, 0-1024 characters after entities parsing. */
@@ -265,7 +265,7 @@ export interface SendVoiceOptions {
 
 export interface SendVideoNoteOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Video note to send. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
   video_note: string | InputFile;
   /** Duration of sent video in seconds. */
@@ -305,7 +305,7 @@ export interface SendVideoNoteOptions {
  */
 export interface SendLivePhotoOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Live photo video to send. Pass a file_id as String, an HTTP URL, or upload a new video using InputFile. */
   live_photo: string | InputFile;
   /** Static photo to send as the live photo cover. Pass a file_id as String, an HTTP URL, or upload a new photo using InputFile. */

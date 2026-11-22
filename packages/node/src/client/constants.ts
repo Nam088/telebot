@@ -132,6 +132,9 @@ export const MessageEntityType = {
   TEXT_LINK: "text_link",
   TEXT_MENTION: "text_mention",
   CUSTOM_EMOJI: "custom_emoji",
+  DATE_TIME: "date_time",
+  TON_ADDRESS: "ton_address",
+  BANK_CARD_NUMBER: "bank_card_number",
 } as const;
 
 export type MessageEntityType = (typeof MessageEntityType)[keyof typeof MessageEntityType];
@@ -177,6 +180,8 @@ export const UpdateType = {
   INLINE_QUERY: "inline_query",
   CHOSEN_INLINE_RESULT: "chosen_inline_result",
   CALLBACK_QUERY: "callback_query",
+  WIDGET_QUERY: "widget_query",
+  SHARED_WIDGET_QUERY: "shared_widget_query",
   SHIPPING_QUERY: "shipping_query",
   PRE_CHECKOUT_QUERY: "pre_checkout_query",
   POLL: "poll",

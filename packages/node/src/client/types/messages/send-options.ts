@@ -14,7 +14,7 @@ export interface SendMessageOptions {
   /** Unique identifier of the business connection on behalf of which the message will be sent. */
   business_connection_id?: string;
   /** Unique identifier for the target chat or username of the target channel (in the format @channelusername). */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Text of the message to be sent, 1-4096 characters after entities parsing. */
   text: string;
   /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
@@ -47,7 +47,7 @@ export interface SendMessageOptions {
 
 export interface SendLocationOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Latitude of the location. */
   latitude: number;
   /** Longitude of the location. */
@@ -86,7 +86,7 @@ export interface SendLocationOptions {
 
 export interface SendVenueOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Latitude of the venue. */
   latitude: number;
   /** Longitude of the venue. */
@@ -129,7 +129,7 @@ export interface SendVenueOptions {
 
 export interface SendContactOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Contact's phone number. */
   phone_number: string;
   /** Contact's first name. */

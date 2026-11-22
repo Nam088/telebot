@@ -383,6 +383,20 @@ export interface RichTextReferenceLink {
 }
 
 /**
+ * Represents an address in the TON blockchain.
+ *
+ * @see {@link https://core.telegram.org/bots/api#richtexttonaddress Telegram Bot API: RichTextTonAddress}
+ */
+export interface RichTextTonAddress {
+  /** Type of the rich text, always 'ton_address'. */
+  type: "ton_address";
+  /** The address text. */
+  text: RichText;
+  /** The TON address. */
+  address: string;
+}
+
+/**
  * Union of rich text entity objects.
  */
 export type RichTextEntity =
@@ -411,7 +425,8 @@ export type RichTextEntity =
   | RichTextAnchor
   | RichTextAnchorLink
   | RichTextReference
-  | RichTextReferenceLink;
+  | RichTextReferenceLink
+  | RichTextTonAddress;
 
 /**
  * Represents rich formatted text (string, rich text entity, or array of rich text).

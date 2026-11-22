@@ -1,6 +1,15 @@
-import type { MessageEntityType, PollType } from "../../constants.js";
+import type { PollType } from "../../constants.js";
+import type { MessageEntity } from "./entity.js";
+export type { MessageEntity } from "./entity.js";
 import type { User, Chat, Location } from "../common/index.js";
-import type { Story, ChatBoostAdded, Game, PassportData } from "../business/index.js";
+import type {
+  Story,
+  ChatBoostAdded,
+  Game,
+  PassportData,
+  TonWalletTransfer,
+  Widget,
+} from "../business/index.js";
 import type {
   Invoice,
   SuccessfulPayment,
@@ -53,6 +62,7 @@ import type {
   ManagedBotCreated,
   MessageAutoDeleteTimerChanged,
   PaidMessagePriceChanged,
+  PaidMessagesWaived,
   ProximityAlertTriggered,
   WebAppData,
   WriteAccessAllowed,
@@ -73,30 +83,6 @@ import type {
   VideoChatScheduled,
   VideoChatStarted,
 } from "./video-chats.js";
-
-/**
- * @see {@link https://core.telegram.org/bots/api#messageentity Telegram Bot API: MessageEntity}
- */
-export interface MessageEntity {
-  /** Type of the entity (e.g. 'mention', 'hashtag', 'bot_command', 'url', 'bold', 'italic', etc.). */
-  type: MessageEntityType;
-  /** Offset in UTF-16 code units to the start of the entity. */
-  offset: number;
-  /** Length of the entity in UTF-16 code units. */
-  length: number;
-  /** For 'text_link' only, URL that will be opened after user taps on the text. */
-  url?: string;
-  /** For 'text_mention' only, the mentioned user. */
-  user?: User;
-  /** For 'pre' only, the programming language of the entity text. */
-  language?: string;
-  /** For 'custom_emoji' only, unique identifier of the custom emoji. */
-  custom_emoji_id?: string;
-  /** For 'date_time' only, the Unix time associated with the entity. */
-  unix_time?: number;
-  /** For 'date_time' only, the string that defines the formatting of the date and time. */
-  date_time_format?: string;
-}
 
 /**
  * @see {@link https://core.telegram.org/bots/api#contact Telegram Bot API: Contact}
@@ -484,4 +470,10 @@ export interface Message {
   suggested_post_paid?: SuggestedPostPaid;
   /** Service message: payment for a suggested post was refunded. */
   suggested_post_refunded?: SuggestedPostRefunded;
+  /** Message is an HTML widget. */
+  widget?: Widget;
+  /** Service message: the sender used a link which allows sending messages without paying Telegram Stars. */
+  paid_messages_waived?: PaidMessagesWaived;
+  /** Service message: a transfer with a TON wallet was made. */
+  ton_wallet_transfer?: TonWalletTransfer;
 }

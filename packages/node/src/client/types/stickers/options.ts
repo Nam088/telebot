@@ -9,7 +9,7 @@ import type { InputSticker } from "./models.js";
 
 export interface SendStickerOptions {
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Sticker to send. Pass a file_id as String to send a file that exists on the Telegram servers, or an HTTP URL as String, or upload a new one using InputFile. */
   sticker: string | InputFile;
   /** Unique identifier for the target message thread (topic) of the forum. */

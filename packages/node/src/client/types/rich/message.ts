@@ -81,7 +81,7 @@ export interface SendRichMessageOptions {
   /** Unique identifier of the business connection on behalf of which the message will be sent. */
   business_connection_id?: string;
   /** Unique identifier for the target chat or username of the target channel. */
-  chat_id: number | string;
+  chat_id?: number | string;
   /** Unique identifier for the target message thread (topic) of the forum; for forum supergroups only. */
   message_thread_id?: number;
   /** Identifier of the topic the message will be sent to in a direct messages chat. */

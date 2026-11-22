@@ -1,4 +1,4 @@
-import { BusinessEphemeralMethods } from "./ephemeral.js";
+import { BusinessWidgetsMethods } from "./widgets.js";
 
 export * from "./queries.js";
 export * from "./games-passport.js";
@@ -6,8 +6,9 @@ export * from "./stories-boosts.js";
 export * from "./business-account.js";
 export * from "./gifts.js";
 export * from "./ephemeral.js";
+export * from "./widgets.js";
 
 /**
  * Full domain mixin containing games, passport, stories, and business operations.
  */
-export abstract class BusinessAndEcosystemMethods extends BusinessEphemeralMethods {}
+export abstract class BusinessAndEcosystemMethods extends BusinessWidgetsMethods {}
