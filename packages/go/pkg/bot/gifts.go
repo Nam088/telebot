@@ -66,6 +66,51 @@ func (b *Bot) ConvertGiftToStars(ctx context.Context, businessConnectionID strin
 	return ok, nil
 }
 
+// GetUniqueGift returns information about a unique gift by its name.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - name: Unique name of the gift.
+//
+// Returns:
+//   - *types.UniqueGift: Information about the unique gift.
+//   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getuniquegift
+func (b *Bot) GetUniqueGift(ctx context.Context, name string) (*types.UniqueGift, error) {
+	payload := map[string]any{"name": name}
+	var gift types.UniqueGift
+	if err := b.Request(ctx, "getUniqueGift", payload, &gift); err != nil {
+		return nil, err
+	}
+	return &gift, nil
+}
+
+// DeleteBusinessAccountGift deletes a regular gift owned by a managed business
+// account without receiving Telegram Stars for it.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//   - businessConnectionID: Unique identifier of the business connection.
+//   - ownedGiftID: Unique identifier of the regular gift to delete.
+//
+// Returns:
+//   - bool: True on success.
+//   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#deletebusinessaccountgift
+func (b *Bot) DeleteBusinessAccountGift(ctx context.Context, businessConnectionID string, ownedGiftID string) (bool, error) {
+	payload := map[string]any{
+		"business_connection_id": businessConnectionID,
+		"owned_gift_id":          ownedGiftID,
+	}
+	var ok bool
+	if err := b.Request(ctx, "deleteBusinessAccountGift", payload, &ok); err != nil {
+		return false, err
+	}
+	return ok, nil
+}
+
 // UpgradeGift upgrades a regular gift owned by a business account to a unique gift.
 //
 // Requires the can_transfer_and_upgrade_gifts business bot right and, for a paid

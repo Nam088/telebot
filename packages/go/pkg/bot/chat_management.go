@@ -289,6 +289,7 @@ func (b *Bot) verifyRequest(ctx context.Context, method, idKey string, id any, c
 //   - userID: Unique identifier of the target user.
 //   - customDescription: Custom description for the verification status, 0-70
 //     characters; pass an empty string to omit it.
+//   - opts: Optional formatting options (custom_description_parse_mode, custom_description_entities).
 //
 // Returns:
 //   - bool: True on success.
@@ -299,8 +300,24 @@ func (b *Bot) verifyRequest(ctx context.Context, method, idKey string, id any, c
 //	ok, err := b.VerifyUser(ctx, 123456, "Official Staff")
 //
 // Telegram API: https://core.telegram.org/bots/api#verifyuser
-func (b *Bot) VerifyUser(ctx context.Context, userID int64, customDescription string) (bool, error) {
-	return b.verifyRequest(ctx, "verifyUser", "user_id", userID, customDescription)
+func (b *Bot) VerifyUser(ctx context.Context, userID int64, customDescription string, opts ...*types.VerifyDescriptionOptions) (bool, error) {
+	payload := map[string]any{"user_id": userID}
+	if customDescription != "" {
+		payload["custom_description"] = customDescription
+	}
+	if len(opts) > 0 && opts[0] != nil {
+		if opts[0].CustomDescriptionParseMode != "" {
+			payload["custom_description_parse_mode"] = opts[0].CustomDescriptionParseMode
+		}
+		if len(opts[0].CustomDescriptionEntities) > 0 {
+			payload["custom_description_entities"] = opts[0].CustomDescriptionEntities
+		}
+	}
+	var result bool
+	if err := b.Request(ctx, "verifyUser", payload, &result); err != nil {
+		return false, err
+	}
+	return result, nil
 }
 
 // VerifyChat verifies a chat on behalf of the organization which owns the bot.
@@ -311,6 +328,7 @@ func (b *Bot) VerifyUser(ctx context.Context, userID int64, customDescription st
 //     channel (in the format @channelusername).
 //   - customDescription: Custom description for the verification status, 0-70
 //     characters; pass an empty string to omit it.
+//   - opts: Optional formatting options (custom_description_parse_mode, custom_description_entities).
 //
 // Returns:
 //   - bool: True on success.
@@ -321,8 +339,43 @@ func (b *Bot) VerifyUser(ctx context.Context, userID int64, customDescription st
 //	ok, err := b.VerifyChat(ctx, "@channel", "Verified Community")
 //
 // Telegram API: https://core.telegram.org/bots/api#verifychat
-func (b *Bot) VerifyChat(ctx context.Context, chatID any, customDescription string) (bool, error) {
-	return b.verifyRequest(ctx, "verifyChat", "chat_id", chatID, customDescription)
+func (b *Bot) VerifyChat(ctx context.Context, chatID any, customDescription string, opts ...*types.VerifyDescriptionOptions) (bool, error) {
+	payload := map[string]any{"chat_id": chatID}
+	if customDescription != "" {
+		payload["custom_description"] = customDescription
+	}
+	if len(opts) > 0 && opts[0] != nil {
+		if opts[0].CustomDescriptionParseMode != "" {
+			payload["custom_description_parse_mode"] = opts[0].CustomDescriptionParseMode
+		}
+		if len(opts[0].CustomDescriptionEntities) > 0 {
+			payload["custom_description_entities"] = opts[0].CustomDescriptionEntities
+		}
+	}
+	var result bool
+	if err := b.Request(ctx, "verifyChat", payload, &result); err != nil {
+		return false, err
+	}
+	return result, nil
+}
+
+// GetChatShareThemeBackdrops returns the list of backdrops that can be used as
+// the background of a chat share theme.
+//
+// Parameters:
+//   - ctx: Context for cancellation and timeout.
+//
+// Returns:
+//   - *types.ChatShareThemeBackdrops: List of available backdrops.
+//   - error: TelegramError if the API returns an error.
+//
+// Telegram API: https://core.telegram.org/bots/api#getchatsharethemebackdrops
+func (b *Bot) GetChatShareThemeBackdrops(ctx context.Context) (*types.ChatShareThemeBackdrops, error) {
+	var res types.ChatShareThemeBackdrops
+	if err := b.Request(ctx, "getChatShareThemeBackdrops", nil, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
 // RemoveUserVerification removes verification from a user that was previously

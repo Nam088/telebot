@@ -14,7 +14,7 @@ type InputSticker struct {
 // SendStickerOptions represents parameters for the sendSticker method.
 type SendStickerOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Sticker                    any                         `json:"sticker"`
 	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`

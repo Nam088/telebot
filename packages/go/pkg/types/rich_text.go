@@ -374,6 +374,20 @@ type RichTextUrl struct {
 
 func (RichTextUrl) richTextEntity() {}
 
+// RichTextTonAddress represents an address in the TON blockchain.
+//
+// Telegram API: https://core.telegram.org/bots/api#richtexttonaddress
+type RichTextTonAddress struct {
+	// Type of the rich text, always "ton_address".
+	Type string `json:"type"`
+	// The address text.
+	Text RichText `json:"text"`
+	// The TON address.
+	Address string `json:"address"`
+}
+
+func (RichTextTonAddress) richTextEntity() {}
+
 // RichMessageButton represents a button in a RichMessage. Exactly one of the fields other than text and style must be used to specify the type of the button.
 //
 // Telegram API: https://core.telegram.org/bots/api#richmessagebutton

@@ -54,10 +54,11 @@ type PollMedia struct {
 //
 // Telegram API: https://core.telegram.org/bots/api#textquote
 type TextQuote struct {
-	Text     string          `json:"text"`
-	Entities []MessageEntity `json:"entities,omitempty"`
-	Position int64           `json:"position"`
-	IsManual bool            `json:"is_manual,omitempty"`
+	Text      string          `json:"text"`
+	Entities  []MessageEntity `json:"entities,omitempty"`
+	RichTexts []RichText      `json:"rich_texts,omitempty"`
+	Position  int64           `json:"position"`
+	IsManual  bool            `json:"is_manual,omitempty"`
 }
 
 // ExternalReplyInfo contains information about a message that is being
@@ -80,6 +81,7 @@ type ExternalReplyInfo struct {
 	Video              *Video              `json:"video,omitempty"`
 	VideoNote          *VideoNote          `json:"video_note,omitempty"`
 	Voice              *Voice              `json:"voice,omitempty"`
+	Widget             *Widget             `json:"widget,omitempty"`
 	HasMediaSpoiler    bool                `json:"has_media_spoiler,omitempty"`
 	Checklist          *Checklist          `json:"checklist,omitempty"`
 	Contact            *Contact            `json:"contact,omitempty"`

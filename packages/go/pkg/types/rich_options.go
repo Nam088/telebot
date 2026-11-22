@@ -18,7 +18,7 @@ type SendRichMessageOptions struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 	// Unique identifier for the target chat or username of the target bot,
 	// supergroup or channel in the format @username.
-	ChatID any `json:"chat_id"`
+	ChatID any `json:"chat_id,omitempty"`
 	// Unique identifier for the target message thread (topic) of a forum; for
 	// forum supergroups and private chats of bots with forum topic mode enabled only.
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -61,7 +61,7 @@ type SendRichMessageOptions struct {
 // Telegram API: https://core.telegram.org/bots/api#sendrichmessagedraft
 type SendRichMessageDraftOptions struct {
 	// Unique identifier for the target private chat.
-	ChatID any `json:"chat_id"`
+	ChatID any `json:"chat_id,omitempty"`
 	// Unique identifier for the target message thread.
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
 	// Unique identifier of the message draft; must be non-zero. Changes to drafts

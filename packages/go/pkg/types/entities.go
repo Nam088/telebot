@@ -45,6 +45,7 @@ type ReplyParameters struct {
 	Quote                    string          `json:"quote,omitempty"`
 	QuoteParseMode           string          `json:"quote_parse_mode,omitempty"`
 	QuoteEntities            []MessageEntity `json:"quote_entities,omitempty"`
+	QuoteRichTexts           []RichText      `json:"quote_rich_texts,omitempty"`
 	QuotePosition            int             `json:"quote_position,omitempty"`
 	ChecklistTaskID          int             `json:"checklist_task_id,omitempty"`
 	PollOptionID             string          `json:"poll_option_id,omitempty"`
