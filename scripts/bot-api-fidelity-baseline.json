@@ -1,21 +1,21 @@
 {
   "oracle": {
-    "version": "10.3",
+    "version": "10.4",
     "source": "scripts/bot-api-oracle.json",
     "counts": {
-      "anchors": 622,
-      "methods": 185,
-      "types": 400,
-      "types_with_fields": 365,
-      "fields": 1888
+      "anchors": 654,
+      "methods": 193,
+      "types": 425,
+      "types_with_fields": 386,
+      "fields": 1983
     }
   },
   "packages": [
     {
       "key": "node",
       "label": "TypeScript interfaces",
-      "declared": 413,
-      "modelled": 288,
+      "declared": 451,
+      "modelled": 319,
       "unmodelled": [
         "BotAccessSettings",
         "BotCommandScopeAllChatAdministrators",
@@ -50,9 +50,6 @@
         "InlineQueryResultVenue",
         "InlineQueryResultVideo",
         "InlineQueryResultVoice",
-        "InlineQueryResultsButton",
-        "InputChecklist",
-        "InputChecklistTask",
         "InputContactMessageContent",
         "InputInvoiceMessageContent",
         "InputLocationMessageContent",
@@ -61,17 +58,10 @@
         "InputMediaLocation",
         "InputMediaSticker",
         "InputMediaVenue",
-        "InputPaidMediaLivePhoto",
-        "InputPaidMediaPhoto",
-        "InputPaidMediaVideo",
         "InputProfilePhotoAnimated",
         "InputProfilePhotoStatic",
         "InputTextMessageContent",
         "InputVenueMessageContent",
-        "LocationAddress",
-        "MenuButtonCommands",
-        "MenuButtonDefault",
-        "MenuButtonWebApp",
         "OwnedGiftRegular",
         "OwnedGiftUnique",
         "OwnedGifts",
@@ -100,72 +90,18 @@
       "typesWithMissing": 0,
       "missingRequired": 0,
       "missingOptional": 0,
-      "documentMethods": 185,
-      "methodRows": [
-        {
-          "name": "copyMessage",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "video_start_timestamp",
-            "show_caption_above_media",
-            "reply_parameters"
-          ],
-          "total": 17,
-          "absent": false
-        },
-        {
-          "name": "sendVideo",
-          "file": "packages/node/src/client/methods/messages/send-media.ts",
-          "required": [],
-          "optional": [
-            "cover",
-            "start_timestamp"
-          ],
-          "total": 25,
-          "absent": false
-        },
-        {
-          "name": "forwardMessage",
-          "file": "packages/node/src/client/methods/messages/send-basic.ts",
-          "required": [],
-          "optional": [
-            "video_start_timestamp"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "getChatAdministrators",
-          "file": "packages/node/src/client/methods/chats/management.ts",
-          "required": [],
-          "optional": [
-            "return_bots"
-          ],
-          "total": 2,
-          "absent": false
-        },
-        {
-          "name": "sendGame",
-          "file": "packages/node/src/client/methods/business/games-passport.ts",
-          "required": [],
-          "optional": [
-            "reply_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        }
-      ],
+      "documentMethods": 193,
+      "methodRows": [],
       "methodsUnresolved": [],
-      "methodsWithMissing": 5,
+      "methodsWithMissing": 0,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 8
+      "missingMethodOptional": 0
     },
     {
       "key": "go",
       "label": "Go structs",
-      "declared": 455,
-      "modelled": 301,
+      "declared": 499,
+      "modelled": 322,
       "unmodelled": [
         "BackgroundFillFreeformGradient",
         "BackgroundFillGradient",
@@ -239,195 +175,18 @@
       "typesWithMissing": 0,
       "missingRequired": 0,
       "missingOptional": 0,
-      "documentMethods": 185,
-      "methodRows": [
-        {
-          "name": "getBusinessAccountGifts",
-          "file": "packages/go/pkg/bot/business.go",
-          "required": [],
-          "optional": [
-            "exclude_unsaved",
-            "exclude_saved",
-            "exclude_unlimited",
-            "exclude_limited_upgradable",
-            "exclude_limited_non_upgradable",
-            "exclude_unique",
-            "exclude_from_blockchain",
-            "sort_by_price",
-            "offset",
-            "limit"
-          ],
-          "total": 11,
-          "absent": false
-        },
-        {
-          "name": "getChatGifts",
-          "file": "packages/go/pkg/bot/gifts.go",
-          "required": [],
-          "optional": [
-            "exclude_unsaved",
-            "exclude_saved",
-            "exclude_unlimited",
-            "exclude_limited_upgradable",
-            "exclude_limited_non_upgradable",
-            "exclude_from_blockchain",
-            "exclude_unique",
-            "sort_by_price",
-            "offset",
-            "limit"
-          ],
-          "total": 11,
-          "absent": false
-        },
-        {
-          "name": "getUserGifts",
-          "file": "packages/go/pkg/bot/gifts.go",
-          "required": [],
-          "optional": [
-            "exclude_unlimited",
-            "exclude_limited_upgradable",
-            "exclude_limited_non_upgradable",
-            "exclude_from_blockchain",
-            "exclude_unique",
-            "sort_by_price",
-            "offset",
-            "limit"
-          ],
-          "total": 9,
-          "absent": false
-        },
-        {
-          "name": "editStory",
-          "file": "packages/go/pkg/bot/stories_extra.go",
-          "required": [],
-          "optional": [
-            "caption",
-            "parse_mode",
-            "caption_entities",
-            "areas"
-          ],
-          "total": 7,
-          "absent": false
-        },
-        {
-          "name": "forwardMessage",
-          "file": "packages/go/pkg/bot/messages.go",
-          "required": [],
-          "optional": [
-            "message_thread_id",
-            "video_start_timestamp",
-            "disable_notification",
-            "protect_content"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "setWebhook",
-          "file": "packages/go/pkg/bot/webhook.go",
-          "required": [],
-          "optional": [
-            "certificate",
-            "ip_address",
-            "allowed_updates",
-            "drop_pending_updates"
-          ],
-          "total": 7,
-          "absent": false
-        },
-        {
-          "name": "sendVideo",
-          "file": "packages/go/pkg/bot/media.go",
-          "required": [],
-          "optional": [
-            "cover",
-            "start_timestamp"
-          ],
-          "total": 25,
-          "absent": false
-        },
-        {
-          "name": "upgradeGift",
-          "file": "packages/go/pkg/bot/gifts.go",
-          "required": [],
-          "optional": [
-            "keep_original_details",
-            "star_count"
-          ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "approveSuggestedPost",
-          "file": "packages/go/pkg/bot/suggested_posts.go",
-          "required": [],
-          "optional": [
-            "send_date"
-          ],
-          "total": 3,
-          "absent": false
-        },
-        {
-          "name": "declineSuggestedPost",
-          "file": "packages/go/pkg/bot/suggested_posts.go",
-          "required": [],
-          "optional": [
-            "comment"
-          ],
-          "total": 3,
-          "absent": false
-        },
-        {
-          "name": "getChatAdministrators",
-          "file": "packages/go/pkg/bot/chats.go",
-          "required": [],
-          "optional": [
-            "return_bots"
-          ],
-          "total": 2,
-          "absent": false
-        },
-        {
-          "name": "sendChatAction",
-          "file": "packages/go/pkg/bot/messages.go",
-          "required": [],
-          "optional": [
-            "message_thread_id"
-          ],
-          "total": 4,
-          "absent": false
-        },
-        {
-          "name": "sendGame",
-          "file": "packages/go/pkg/bot/games.go",
-          "required": [],
-          "optional": [
-            "reply_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "transferGift",
-          "file": "packages/go/pkg/bot/gifts.go",
-          "required": [],
-          "optional": [
-            "star_count"
-          ],
-          "total": 4,
-          "absent": false
-        }
-      ],
+      "documentMethods": 193,
+      "methodRows": [],
       "methodsUnresolved": [],
-      "methodsWithMissing": 14,
+      "methodsWithMissing": 0,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 50
+      "missingMethodOptional": 0
     },
     {
       "key": "python",
       "label": "Python dataclasses",
-      "declared": 311,
-      "modelled": 299,
+      "declared": 333,
+      "modelled": 320,
       "unmodelled": [
         "BotCommandScopeAllChatAdministrators",
         "BotCommandScopeAllGroupChats",
@@ -501,86 +260,12 @@
       "typesWithMissing": 0,
       "missingRequired": 0,
       "missingOptional": 0,
-      "documentMethods": 185,
-      "methodRows": [
-        {
-          "name": "copyMessage",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
-          "required": [],
-          "optional": [
-            "video_start_timestamp",
-            "show_caption_above_media"
-          ],
-          "total": 17,
-          "absent": false
-        },
-        {
-          "name": "sendVideo",
-          "file": "packages/python/src/telebot_py/bot/media.py",
-          "required": [],
-          "optional": [
-            "cover",
-            "start_timestamp"
-          ],
-          "total": 25,
-          "absent": false
-        },
-        {
-          "name": "setWebhook",
-          "file": "packages/python/src/telebot_py/bot/webhook.py",
-          "required": [],
-          "optional": [
-            "certificate",
-            "ip_address"
-          ],
-          "total": 7,
-          "absent": false
-        },
-        {
-          "name": "editMessageCaption",
-          "file": "packages/python/src/telebot_py/bot/edits.py",
-          "required": [],
-          "optional": [
-            "show_caption_above_media"
-          ],
-          "total": 9,
-          "absent": false
-        },
-        {
-          "name": "forwardMessage",
-          "file": "packages/python/src/telebot_py/bot/messages.py",
-          "required": [],
-          "optional": [
-            "video_start_timestamp"
-          ],
-          "total": 10,
-          "absent": false
-        },
-        {
-          "name": "getChatAdministrators",
-          "file": "packages/python/src/telebot_py/bot/chats.py",
-          "required": [],
-          "optional": [
-            "return_bots"
-          ],
-          "total": 2,
-          "absent": false
-        },
-        {
-          "name": "sendGame",
-          "file": "packages/python/src/telebot_py/bot/games.py",
-          "required": [],
-          "optional": [
-            "reply_parameters"
-          ],
-          "total": 10,
-          "absent": false
-        }
-      ],
+      "documentMethods": 193,
+      "methodRows": [],
       "methodsUnresolved": [],
-      "methodsWithMissing": 7,
+      "methodsWithMissing": 0,
       "missingMethodRequired": 0,
-      "missingMethodOptional": 10
+      "missingMethodOptional": 0
     }
   ]
 }
