@@ -17,7 +17,7 @@ from telebot_py.bot.base import (
     parse_result,
     to_wire,
 )
-from telebot_py.types.gifts import Gifts
+from telebot_py.types.gifts import Gifts, UniqueGift
 
 
 class GiftsMixin(Requester):
@@ -291,3 +291,56 @@ class GiftsMixin(Requester):
             star_count=star_count,
         )
         return parse_flag(await self.request("transferGift", payload))
+
+    async def get_unique_gift(self, name: str) -> UniqueGift:
+        """Get information about a unique gift by its name.
+
+        Example:
+            >>> gift = await bot.get_unique_gift("Star-1")
+
+        Args:
+            name: Unique name of the gift.
+
+        Returns:
+            A :class:`UniqueGift` object on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getuniquegift
+        """
+        payload = clean_payload(name=name)
+        return parse_result(UniqueGift, await self.request("getUniqueGift", payload))
+
+    async def delete_business_account_gift(
+        self,
+        business_connection_id: str,
+        owned_gift_id: str,
+    ) -> bool:
+        """Delete a regular gift owned by a managed business account.
+
+        Example:
+            >>> ok = await bot.delete_business_account_gift("bc1", "og1")
+
+        Args:
+            business_connection_id: Unique identifier of the business
+                connection.
+            owned_gift_id: Unique identifier of the regular gift to delete.
+
+        Returns:
+            True on success.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#deletebusinessaccountgift
+        """
+        payload = clean_payload(
+            business_connection_id=business_connection_id,
+            owned_gift_id=owned_gift_id,
+        )
+        return parse_flag(await self.request("deleteBusinessAccountGift", payload))

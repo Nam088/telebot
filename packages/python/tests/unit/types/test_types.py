@@ -295,6 +295,7 @@ class TestReplyParameters:
             "quote",
             "quote_parse_mode",
             "quote_entities",
+            "quote_rich_texts",
             "quote_position",
             "checklist_task_id",
             "poll_option_id",

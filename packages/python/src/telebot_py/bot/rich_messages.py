@@ -25,7 +25,7 @@ class RichMessagesMixin(Requester):
 
     async def send_rich_message(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         rich_message: InputRichMessage | MarkupLike,
         *,
         business_connection_id: str | None = None,

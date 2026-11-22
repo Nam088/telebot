@@ -44,6 +44,7 @@ from telebot_py.bot.stories_gifts import StoriesGiftsMixin
 from telebot_py.bot.topics import TopicsMixin
 from telebot_py.bot.verification import VerificationMixin
 from telebot_py.bot.webhook import WebhookMixin
+from telebot_py.bot.widgets import WidgetsMixin
 from telebot_py.types.update import Update
 from telebot_py.types.user import User
 
@@ -116,6 +117,7 @@ class Bot(
     BulkMixin,
     EditsMixin,
     WebhookMixin,
+    WidgetsMixin,
 ):
     """Telegram Bot API HTTP client.
 

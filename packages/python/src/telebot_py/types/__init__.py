@@ -137,7 +137,7 @@ from telebot_py.types.media import (
     VideoQuality,
     Voice,
 )
-from telebot_py.types.message import InaccessibleMessage, Message
+from telebot_py.types.message import InaccessibleMessage, Message, PaidMessagesWaived
 from telebot_py.types.message_community import (
     ChatOwnerChanged,
     ChatOwnerLeft,
@@ -230,8 +230,19 @@ from telebot_py.types.reactions import (
 )
 from telebot_py.types.rich import *  # rich.__all__ fixes the exported set.
 from telebot_py.types.rich import __all__ as _RICH_NAMES
+from telebot_py.types.share_theme import (
+    ChatShareTheme,
+    ChatShareThemeBackdrop,
+    ChatShareThemeBackdrops,
+    ChatShareThemeEmoji,
+    ChatShareThemeUniqueGift,
+    EmojiType,
+    EmojiTypeCustomEmoji,
+    EmojiTypeEmoji,
+)
 from telebot_py.types.stickers import InputSticker, MaskPosition, Sticker, StickerSet
 from telebot_py.types.stories import (
+    AreaPosition,
     InputStoryContentPhoto,
     InputStoryContentVideo,
     LocationAddress,
@@ -245,6 +256,13 @@ from telebot_py.types.stories import (
 )
 from telebot_py.types.suggested_post_types import *  # __all__ fixes the exported set.
 from telebot_py.types.suggested_post_types import __all__ as _SUGGESTED_POST_NAMES
+from telebot_py.types.ton_wallet import (
+    TonNft,
+    TonNftAttribute,
+    TonWalletCard,
+    TonWalletCardSticker,
+    TonWalletTransfer,
+)
 from telebot_py.types.topics import (
     BotAccessSettings,
     BotCommand,
@@ -258,6 +276,18 @@ from telebot_py.types.topics import (
 )
 from telebot_py.types.update import MessageGenerationStopped, Update
 from telebot_py.types.user import User
+from telebot_py.types.widgets import (
+    InputSharedWidgetMessageContent,
+    InputWidgetMessageContent,
+    SharedWidgetQuery,
+    Widget,
+    WidgetQuery,
+    WidgetQueryType,
+    WidgetQueryTypeData,
+    WidgetQueryTypeSentTransaction,
+    WidgetQueryTypeSignData,
+    WidgetQueryWallet,
+)
 
 # Merged with the rich-message and suggested-post names imported above, then
 # kept alphabetical so that ``from telebot_py.types import *`` exposes exactly
@@ -447,6 +477,19 @@ __all__ = [
     "StarAmount",
     "StarTransaction",
     "StarTransactions",
+    "AreaPosition",
+    "ChatShareTheme",
+    "ChatShareThemeBackdrop",
+    "ChatShareThemeBackdrops",
+    "ChatShareThemeEmoji",
+    "ChatShareThemeUniqueGift",
+    "EmojiType",
+    "EmojiTypeCustomEmoji",
+    "EmojiTypeEmoji",
+    "InputSharedWidgetMessageContent",
+    "InputWidgetMessageContent",
+    "PaidMessagesWaived",
+    "SharedWidgetQuery",
     "Sticker",
     "StickerSet",
     "Story",
@@ -461,6 +504,11 @@ __all__ = [
     "SwitchInlineQueryChosenChat",
     "TelegramObject",
     "TextQuote",
+    "TonNft",
+    "TonNftAttribute",
+    "TonWalletCard",
+    "TonWalletCardSticker",
+    "TonWalletTransfer",
     "TypeParseError",
     "UniqueGift",
     "UniqueGiftBackdrop",
@@ -488,6 +536,13 @@ __all__ = [
     "WebAppData",
     "WebAppInfo",
     "WebhookInfo",
+    "Widget",
+    "WidgetQuery",
+    "WidgetQueryType",
+    "WidgetQueryTypeData",
+    "WidgetQueryTypeSentTransaction",
+    "WidgetQueryTypeSignData",
+    "WidgetQueryWallet",
     "WriteAccessAllowed",
 ]
 __all__.sort()

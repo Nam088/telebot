@@ -18,24 +18,24 @@ from telebot_py.types.reactions import (
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
-class StoryAreaPosition(TelegramObject):
-    """The position of a clickable area within a story.
+class AreaPosition(TelegramObject):
+    """The position of a clickable area within a story or TON wallet card.
 
     Attributes:
         x_percentage: The abscissa of the area's center, as a percentage of
-            the media width.
+            the container width.
         y_percentage: The ordinate of the area's center, as a percentage of
-            the media height.
+            the container height.
         width_percentage: The width of the area's rectangle, as a percentage
-            of the media width.
+            of the container width.
         height_percentage: The height of the area's rectangle, as a percentage
-            of the media height.
+            of the container height.
         rotation_angle: The clockwise rotation angle of the rectangle, in
             degrees; 0-360.
         corner_radius_percentage: The radius of the rectangle corner rounding,
-            as a percentage of the media width.
+            as a percentage of the container width.
 
-    Telegram API: https://core.telegram.org/bots/api#storyareaposition
+    Telegram API: https://core.telegram.org/bots/api#areaposition
     """
 
     x_percentage: float
@@ -44,6 +44,9 @@ class StoryAreaPosition(TelegramObject):
     height_percentage: float
     rotation_angle: float
     corner_radius_percentage: float
+
+
+StoryAreaPosition = AreaPosition
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -191,7 +194,7 @@ class StoryArea(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#storyarea
     """
 
-    position: StoryAreaPosition
+    position: AreaPosition
     type: StoryAreaType
 
 

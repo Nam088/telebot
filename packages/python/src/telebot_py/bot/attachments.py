@@ -26,7 +26,7 @@ class AttachmentsMixin(Requester):
 
     async def send_photo(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         photo: str,
         *,
         business_connection_id: str | None = None,
@@ -114,7 +114,7 @@ class AttachmentsMixin(Requester):
 
     async def send_document(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         document: str,
         *,
         business_connection_id: str | None = None,

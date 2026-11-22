@@ -6,13 +6,23 @@ verifyChat, removeUserVerification, removeChatVerification).
 
 from __future__ import annotations
 
-from telebot_py.bot.base import Requester, clean_payload, parse_flag
+from collections.abc import Sequence
+
+from telebot_py.bot.base import Requester, clean_payload, parse_flag, to_wire
+from telebot_py.types.common import MessageEntity
 
 
 class VerificationMixin(Requester):
     """Bot methods for verifying users and chats on behalf of the owner."""
 
-    async def verify_user(self, user_id: int, custom_description: str | None = None) -> bool:
+    async def verify_user(
+        self,
+        user_id: int,
+        custom_description: str | None = None,
+        *,
+        custom_description_parse_mode: str | None = None,
+        custom_description_entities: Sequence[MessageEntity] | None = None,
+    ) -> bool:
         """Verify a user on behalf of the organization which owns the bot.
 
         Only available to bots owned by an organization that has been granted
@@ -25,6 +35,10 @@ class VerificationMixin(Requester):
             user_id: Unique identifier of the target user.
             custom_description: Custom description for the verification
                 status; 0-70 characters.
+            custom_description_parse_mode: Mode for parsing entities in the
+                custom description.
+            custom_description_entities: List of special entities that appear
+                in the custom description.
 
         Returns:
             True on success.
@@ -36,10 +50,24 @@ class VerificationMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#verifyuser
         """
-        payload = clean_payload(user_id=user_id, custom_description=custom_description)
+        payload = clean_payload(
+            user_id=user_id,
+            custom_description=custom_description,
+            custom_description_parse_mode=custom_description_parse_mode,
+            custom_description_entities=[to_wire(e) for e in custom_description_entities]
+            if custom_description_entities is not None
+            else None,
+        )
         return parse_flag(await self.request("verifyUser", payload))
 
-    async def verify_chat(self, chat_id: int | str, custom_description: str | None = None) -> bool:
+    async def verify_chat(
+        self,
+        chat_id: int | str,
+        custom_description: str | None = None,
+        *,
+        custom_description_parse_mode: str | None = None,
+        custom_description_entities: Sequence[MessageEntity] | None = None,
+    ) -> bool:
         """Verify a chat on behalf of the organization which owns the bot.
 
         Example:
@@ -50,6 +78,10 @@ class VerificationMixin(Requester):
                 target channel.
             custom_description: Custom description for the verification
                 status; 0-70 characters.
+            custom_description_parse_mode: Mode for parsing entities in the
+                custom description.
+            custom_description_entities: List of special entities that appear
+                in the custom description.
 
         Returns:
             True on success.
@@ -61,7 +93,14 @@ class VerificationMixin(Requester):
 
         Telegram API: https://core.telegram.org/bots/api#verifychat
         """
-        payload = clean_payload(chat_id=chat_id, custom_description=custom_description)
+        payload = clean_payload(
+            chat_id=chat_id,
+            custom_description=custom_description,
+            custom_description_parse_mode=custom_description_parse_mode,
+            custom_description_entities=[to_wire(e) for e in custom_description_entities]
+            if custom_description_entities is not None
+            else None,
+        )
         return parse_flag(await self.request("verifyChat", payload))
 
     async def remove_user_verification(self, user_id: int) -> bool:

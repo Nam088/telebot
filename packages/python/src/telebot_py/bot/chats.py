@@ -12,6 +12,7 @@ from telebot_py.bot.base import (
 )
 from telebot_py.types.chat_full_info import ChatFullInfo
 from telebot_py.types.chat_members import ChatMember
+from telebot_py.types.share_theme import ChatShareThemeBackdrops
 
 
 class ChatsMixin(Requester):
@@ -184,3 +185,24 @@ class ChatsMixin(Requester):
             only_if_banned=only_if_banned,
         )
         return parse_flag(await self.request("unbanChatMember", payload))
+
+    async def get_chat_share_theme_backdrops(self) -> ChatShareThemeBackdrops:
+        """Get the list of backdrops usable as a chat share theme background.
+
+        Example:
+            >>> backdrops = await bot.get_chat_share_theme_backdrops()
+
+        Returns:
+            A :class:`ChatShareThemeBackdrops` object.
+
+        Raises:
+            InvalidTokenError: If Telegram rejects the token (HTTP 401).
+            TelegramApiError: If Telegram responds not-ok or retries exhaust.
+            NetworkError: If the transport keeps failing after retries.
+
+        Telegram API: https://core.telegram.org/bots/api#getchatsharethemebackdrops
+        """
+        return parse_result(
+            ChatShareThemeBackdrops,
+            await self.request("getChatShareThemeBackdrops", {}),
+        )

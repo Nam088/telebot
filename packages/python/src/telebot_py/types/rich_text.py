@@ -457,6 +457,23 @@ class RichTextReferenceLink(TelegramObject):
     _DISCRIMINATOR = ("type", "reference_link")
 
 
+@dataclasses.dataclass(frozen=True, slots=True)
+class RichTextTonAddress(TelegramObject):
+    """An address in the TON blockchain; ``type`` is always ``'ton_address'``.
+
+    Attributes:
+        text: The address text.
+        address: The TON address.
+
+    Telegram API: https://core.telegram.org/bots/api#richtexttonaddress
+    """
+
+    text: RichText
+    address: str
+    type: str = "ton_address"
+    _DISCRIMINATOR = ("type", "ton_address")
+
+
 #: A rich text entity node, excluding plain text.
 RichTextNode = (
     RichTextBold
@@ -485,6 +502,7 @@ RichTextNode = (
     | RichTextAnchorLink
     | RichTextReference
     | RichTextReferenceLink
+    | RichTextTonAddress
 )
 
 #: A rich formatted text: a bare ``str`` for plain text, a sequence of nodes,

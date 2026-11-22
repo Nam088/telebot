@@ -100,7 +100,7 @@ class MiscMediaMixin(Requester):
 
     async def send_location(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         latitude: float,
         longitude: float,
         *,
@@ -189,7 +189,7 @@ class MiscMediaMixin(Requester):
 
     async def send_venue(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         latitude: float,
         longitude: float,
         title: str,
@@ -281,7 +281,7 @@ class MiscMediaMixin(Requester):
 
     async def send_contact(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         phone_number: str,
         first_name: str,
         *,
