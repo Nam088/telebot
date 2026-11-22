@@ -475,7 +475,7 @@ class TestRichTypes:
         assert obj.__dataclass_params__.frozen  # type: ignore[union-attr]
 
     def test_unions_cover_the_docs_variant_lists(self) -> None:
-        assert len(typing.get_args(RichTextNode)) == 26
+        assert len(typing.get_args(RichTextNode)) == 27
         assert len(typing.get_args(RichBlock)) == 24
         assert len(typing.get_args(InputRichBlock)) == 24
         assert str in typing.get_args(RichText)

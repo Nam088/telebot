@@ -151,6 +151,7 @@ from telebot_py.types import (
     ReplyKeyboardRemove,
     ResponseParameters,
     SharedUser,
+    SharedWidgetQuery,
     ShippingAddress,
     ShippingQuery,
     Sticker,
@@ -188,6 +189,7 @@ from telebot_py.types import (
     Voice,
     WebAppData,
     WebAppInfo,
+    WidgetQuery,
     WriteAccessAllowed,
 )
 from telebot_py.types.base import TelegramObject, TypeParseError
@@ -327,6 +329,8 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("paid_message_star_count", False),
         ("guard_bot", False),
         ("community", False),
+        ("ton_wallet_card", False),
+        ("share_theme", False),
     ),
     UserRating: (
         ("level", True),
@@ -355,7 +359,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("send_date", False),
     ),
     EphemeralMessageParameters: (
-        ("receiver_user_id", True),
+        ("receiver_user_id", False),
         ("callback_query_id", False),
         ("replace_callback_query_message", False),
     ),
@@ -623,6 +627,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("text", True),
         ("position", True),
         ("entities", False),
+        ("rich_texts", False),
         ("is_manual", False),
     ),
     ExternalReplyInfo: (
@@ -641,6 +646,7 @@ FIELD_SPECS: dict[type, tuple[tuple[str, bool], ...]] = {
         ("video", False),
         ("video_note", False),
         ("voice", False),
+        ("widget", False),
         ("has_media_spoiler", False),
         ("checklist", False),
         ("contact", False),
@@ -1154,6 +1160,8 @@ UPDATE_PAYLOAD_FIELDS: tuple[str, ...] = (
     "inline_query",
     "chosen_inline_result",
     "callback_query",
+    "widget_query",
+    "shared_widget_query",
     "shipping_query",
     "pre_checkout_query",
     "purchased_paid_media",
@@ -1175,6 +1183,7 @@ FROM_USER_CLASSES: tuple[type, ...] = (
     CallbackQuery,
     InlineQuery,
     ChosenInlineResult,
+    SharedWidgetQuery,
     ShippingQuery,
     PreCheckoutQuery,
     PaidMediaPurchased,
@@ -1862,6 +1871,8 @@ RAW_CHAT_FULL_INFO: dict[str, t.Any] = {
     "paid_message_star_count": 250,
     "guard_bot": RAW_USER,
     "community": {"id": 77, "name": "Telebot"},
+    "ton_wallet_card": {"address": "EQ...", "amount": "1000", "stickers": []},
+    "share_theme": {"type": "emoji", "emojis": [{"type": "emoji", "emoji": "🔥"}]},
 }
 
 
@@ -1882,7 +1893,7 @@ class TestRoundTrips:
 
     def test_chat_full_info_populates_every_documented_field(self) -> None:
         names = [field.name for field in dataclasses.fields(ChatFullInfo)]
-        assert len(names) == 53, "ChatFullInfo must carry every documented field"
+        assert len(names) == 55, "ChatFullInfo must carry every documented field"
         assert set(RAW_CHAT_FULL_INFO) == set(names)
 
         info = ChatFullInfo.from_dict(RAW_CHAT_FULL_INFO)
@@ -2617,6 +2628,26 @@ UPDATE_PAYLOAD_SAMPLES: dict[str, tuple[dict[str, t.Any], type]] = {
         BotSubscriptionUpdated,
     ),
     "purchased_paid_media": ({"from": RAW_USER, "paid_media_payload": "p"}, PaidMediaPurchased),
+    "widget_query": (
+        {
+            "id": "wq1",
+            "from": RAW_USER,
+            "chat_instance": "ci1",
+            "type": {"type": "data"},
+            "data": "{}",
+        },
+        WidgetQuery,
+    ),
+    "shared_widget_query": (
+        {
+            "id": "swq1",
+            "from": RAW_USER,
+            "type": {"type": "data"},
+            "data": "{}",
+            "widget_id": "w1",
+        },
+        SharedWidgetQuery,
+    ),
     "stopped_message_generation": (
         {"chat": {"id": -100, "type": "supergroup"}, "message_thread_id": 4, "draft_id": 9},
         MessageGenerationStopped,

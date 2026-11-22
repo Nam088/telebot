@@ -26,7 +26,7 @@ class MediaMixin(Requester):
 
     async def send_audio(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         audio: str,
         *,
         business_connection_id: str | None = None,
@@ -120,7 +120,7 @@ class MediaMixin(Requester):
 
     async def send_video(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         video: str,
         *,
         business_connection_id: str | None = None,
@@ -230,7 +230,7 @@ class MediaMixin(Requester):
 
     async def send_animation(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         animation: str,
         *,
         business_connection_id: str | None = None,
@@ -330,7 +330,7 @@ class MediaMixin(Requester):
 
     async def send_voice(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         voice: str,
         *,
         business_connection_id: str | None = None,
@@ -416,7 +416,7 @@ class MediaMixin(Requester):
 
     async def send_video_note(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         video_note: str,
         *,
         business_connection_id: str | None = None,

@@ -25,7 +25,7 @@ class StickersMixin(Requester):
 
     async def send_sticker(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         sticker: str,
         *,
         business_connection_id: str | None = None,

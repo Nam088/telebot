@@ -30,8 +30,10 @@ from telebot_py.types.media import (
 from telebot_py.types.paid_media import PaidMediaInfo
 from telebot_py.types.payments import Invoice
 from telebot_py.types.poll_types import Poll
+from telebot_py.types.rich_text import RichText
 from telebot_py.types.stickers import Sticker
 from telebot_py.types.user import User
+from telebot_py.types.widgets import Widget
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -149,6 +151,7 @@ class TextQuote(TelegramObject):
     text: str
     position: int
     entities: list[MessageEntity] | None = None
+    rich_texts: list[RichText] | None = None
     is_manual: bool | None = None
 
 
@@ -205,6 +208,7 @@ class ExternalReplyInfo(TelegramObject):
     video: Video | None = None
     video_note: VideoNote | None = None
     voice: Voice | None = None
+    widget: Widget | None = None
     has_media_spoiler: bool | None = None
     checklist: Checklist | None = None
     contact: Contact | None = None
@@ -343,6 +347,7 @@ class ReplyParameters(TelegramObject):
     quote: str | None = None
     quote_parse_mode: str | None = None
     quote_entities: list[MessageEntity] | None = None
+    quote_rich_texts: list[RichText] | None = None
     quote_position: int | None = None
     checklist_task_id: int | None = None
     poll_option_id: str | None = None
@@ -371,6 +376,6 @@ class EphemeralMessageParameters(TelegramObject):
     Telegram API: https://core.telegram.org/bots/api#ephemeralmessageparameters
     """
 
-    receiver_user_id: int
+    receiver_user_id: int | None = None
     callback_query_id: str | None = None
     replace_callback_query_message: bool | None = None

@@ -1,26 +1,26 @@
 package types
 
-// StoryAreaPosition describes the rectangular position of a story area,
-// expressed as percentages of the story dimensions.
+// AreaPosition describes the rectangular position of a story area or TON wallet card sticker,
+// expressed as percentages of the container dimensions.
 //
-// Field-for-field port of the StoryAreaPosition interface in
-// packages/node/src/client/types/business/models.ts.
-//
-// See https://core.telegram.org/bots/api#storyareaposition
-type StoryAreaPosition struct {
-	// The abscissa of the rectangle's center, as a percentage of the story width.
+// Telegram API: https://core.telegram.org/bots/api#areaposition
+type AreaPosition struct {
+	// The abscissa of the rectangle's center, as a percentage of the width.
 	XPercentage float64 `json:"x_percentage"`
-	// The ordinate of the rectangle's center, as a percentage of the story height.
+	// The ordinate of the rectangle's center, as a percentage of the height.
 	YPercentage float64 `json:"y_percentage"`
-	// The width of the rectangle, as a percentage of the story width.
+	// The width of the rectangle, as a percentage of the width.
 	WidthPercentage float64 `json:"width_percentage"`
-	// The height of the rectangle, as a percentage of the story height.
+	// The height of the rectangle, as a percentage of the height.
 	HeightPercentage float64 `json:"height_percentage"`
 	// Clockwise rotation angle of the rectangle, in degrees; 0-360.
 	RotationAngle float64 `json:"rotation_angle"`
-	// The radius of the rectangle corner rounding, as a percentage of the story width.
+	// The radius of the rectangle corner rounding, as a percentage of the width.
 	CornerRadiusPercentage float64 `json:"corner_radius_percentage"`
 }
+
+// StoryAreaPosition is a deprecated alias for AreaPosition (renamed in Bot API 10.4).
+type StoryAreaPosition = AreaPosition
 
 // LocationAddress describes the physical address of a location.
 //
@@ -131,7 +131,7 @@ func (StoryAreaTypeUniqueGift) storyAreaType() {}
 // See https://core.telegram.org/bots/api#storyarea
 type StoryArea struct {
 	// Position of the story area.
-	Position StoryAreaPosition `json:"position"`
+	Position AreaPosition `json:"position"`
 	// Type of the story area.
 	Type StoryAreaType `json:"type"`
 }

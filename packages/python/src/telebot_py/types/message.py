@@ -93,7 +93,9 @@ from telebot_py.types.suggested_post_types import (
     SuggestedPostPaid,
     SuggestedPostRefunded,
 )
+from telebot_py.types.ton_wallet import TonWalletTransfer
 from telebot_py.types.user import User
+from telebot_py.types.widgets import Widget
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -431,8 +433,19 @@ class Message(TelegramObject):
     video_chat_participants_invited: VideoChatParticipantsInvited | None = None
     web_app_data: WebAppData | None = None
     reply_markup: InlineKeyboardMarkup | None = None
+    widget: Widget | None = None
+    paid_messages_waived: PaidMessagesWaived | None = None
+    ton_wallet_transfer: TonWalletTransfer | None = None
 
     _KEY_OVERRIDES: t.ClassVar[t.Mapping[str, str]] = {"from_user": "from"}
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class PaidMessagesWaived(TelegramObject):
+    """Service message about the sender using a link allowing free messages.
+
+    Telegram API: https://core.telegram.org/bots/api#paidmessageswaived
+    """
 
 
 # Close reference cycles with modules that annotate a Message field: their

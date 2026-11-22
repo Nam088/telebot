@@ -17,6 +17,7 @@ import type {
   SavePreparedKeyboardButtonOptions,
   Story,
   ChatInviteLink,
+  UniqueGift,
 } from "../../types/index.js";
 
 /**
@@ -313,6 +314,49 @@ export abstract class BusinessGiftsMethods extends BusinessAccountMethods {
       "savePreparedKeyboardButton",
       options as unknown as Record<string, unknown>,
     );
+  }
+
+  /**
+   * Gets information about a unique gift by its name.
+   *
+   * @param name - Unique name of the gift.
+   * @returns A {@link UniqueGift} object on success.
+   * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @example
+   * ```ts
+   * const gift = await bot.getUniqueGift("Star-1");
+   * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getuniquegift Telegram Bot API: getUniqueGift}
+   */
+  public async getUniqueGift(name: string): Promise<UniqueGift> {
+    return this.request<UniqueGift>("getUniqueGift", { name });
+  }
+
+  /**
+   * Deletes a regular gift owned by a managed business account without receiving Telegram Stars for it.
+   *
+   * @param businessConnectionId - Unique identifier of the business connection.
+   * @param ownedGiftId - Unique identifier of the regular gift to delete.
+   * @returns `true` on success.
+   * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @example
+   * ```ts
+   * await bot.deleteBusinessAccountGift("bc_123", "og_456");
+   * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#deletebusinessaccountgift Telegram Bot API: deleteBusinessAccountGift}
+   */
+  public async deleteBusinessAccountGift(
+    businessConnectionId: string,
+    ownedGiftId: string,
+  ): Promise<boolean> {
+    return this.request<boolean>("deleteBusinessAccountGift", {
+      business_connection_id: businessConnectionId,
+      owned_gift_id: ownedGiftId,
+    });
   }
 
   /**

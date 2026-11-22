@@ -1,6 +1,7 @@
 import type { ParseMode } from "../../constants.js";
 import type { User, Chat, Location } from "../common/index.js";
-import type { Story, Game } from "../business/index.js";
+import type { Story, Game, Widget } from "../business/index.js";
+import type { RichText } from "../rich/index.js";
 import type { Sticker } from "../stickers/index.js";
 import type {
   PhotoSize,
@@ -134,6 +135,8 @@ export interface ExternalReplyInfo {
   video_note?: VideoNote;
   /** Message is a voice message, information about the file. */
   voice?: Voice;
+  /** Message is an HTML widget. */
+  widget?: Widget;
   /** True, if the message media is covered by a spoiler animation. */
   has_media_spoiler?: boolean;
   /** Message is a checklist. */
@@ -166,6 +169,8 @@ export interface TextQuote {
   text: string;
   /** Special entities that appear in the quote. */
   entities?: MessageEntity[];
+  /** Rich text blocks chosen from a rich message. */
+  rich_texts?: RichText[];
   /** Approximate quote position in the original message in UTF-16 code units. */
   position: number;
   /** True, if the quote was chosen manually by the message sender. */
@@ -179,7 +184,7 @@ export interface TextQuote {
  */
 export interface EphemeralMessageParameters {
   /** Identifier of the user who will receive the message. */
-  receiver_user_id: number;
+  receiver_user_id?: number;
   /** Identifier of the callback query which triggered the message, if any. */
   callback_query_id?: string;
   /** Pass True if the ephemeral message must be shown in place of the original message. */
@@ -204,6 +209,8 @@ export interface ReplyParameters {
   quote_parse_mode?: ParseMode | string;
   /** A list of special entities that appear in the quote. */
   quote_entities?: MessageEntity[];
+  /** Rich text blocks to quote from a rich message. */
+  quote_rich_texts?: RichText[];
   /** Position of the quote in the original message in UTF-16 code units. */
   quote_position?: number;
   /** Identifier of the specific checklist task to be replied to. */

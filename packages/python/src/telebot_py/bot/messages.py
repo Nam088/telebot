@@ -24,7 +24,7 @@ class MessagesMixin(Requester):
 
     async def send_message(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         text: str,
         *,
         business_connection_id: str | None = None,

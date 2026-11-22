@@ -30,6 +30,7 @@ from telebot_py.types.reactions import (
     MessageReactionUpdated,
 )
 from telebot_py.types.user import User
+from telebot_py.types.widgets import SharedWidgetQuery, WidgetQuery
 
 _PAYLOAD_FIELDS: tuple[str, ...] = (
     "message",
@@ -46,6 +47,8 @@ _PAYLOAD_FIELDS: tuple[str, ...] = (
     "inline_query",
     "chosen_inline_result",
     "callback_query",
+    "widget_query",
+    "shared_widget_query",
     "shipping_query",
     "pre_checkout_query",
     "purchased_paid_media",
@@ -144,6 +147,8 @@ class Update(TelegramObject):
     inline_query: InlineQuery | None = None
     chosen_inline_result: ChosenInlineResult | None = None
     callback_query: CallbackQuery | None = None
+    widget_query: WidgetQuery | None = None
+    shared_widget_query: SharedWidgetQuery | None = None
     shipping_query: ShippingQuery | None = None
     pre_checkout_query: PreCheckoutQuery | None = None
     purchased_paid_media: PaidMediaPurchased | None = None

@@ -1,4 +1,5 @@
 export * from "./core.js";
+export * from "./entity.js";
 export * from "./reply-context.js";
 export * from "./keyboards.js";
 export * from "./media.js";

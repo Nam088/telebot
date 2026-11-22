@@ -47,29 +47,36 @@ export interface BusinessOpeningHours {
 }
 
 /**
- * @see {@link https://core.telegram.org/bots/api#storyareaposition Telegram Bot API: StoryAreaPosition}
+ * Describes the position of a clickable area within a story or TON wallet card.
+ *
+ * @see {@link https://core.telegram.org/bots/api#areaposition Telegram Bot API: AreaPosition}
  */
-export interface StoryAreaPosition {
-  /** The abscissa of the rectangle's center, as a percentage of the story width. */
+export interface AreaPosition {
+  /** The abscissa of the rectangle's center, as a percentage of the width. */
   x_percentage: number;
-  /** The ordinate of the rectangle's center, as a percentage of the story height. */
+  /** The ordinate of the rectangle's center, as a percentage of the height. */
   y_percentage: number;
-  /** The width of the rectangle, as a percentage of the story width. */
+  /** The width of the rectangle, as a percentage of the width. */
   width_percentage: number;
-  /** The height of the rectangle, as a percentage of the story height. */
+  /** The height of the rectangle, as a percentage of the height. */
   height_percentage: number;
   /** Clockwise rotation angle of the rectangle, in degrees; 0-360. */
   rotation_angle: number;
-  /** The radius of the rectangle corner rounding, as a percentage of the story width. */
+  /** The radius of the rectangle corner rounding, as a percentage of the width. */
   corner_radius_percentage: number;
 }
+
+/**
+ * @deprecated Use {@link AreaPosition} instead (renamed in Bot API 10.4).
+ */
+export type StoryAreaPosition = AreaPosition;
 
 /**
  * @see {@link https://core.telegram.org/bots/api#storyarea Telegram Bot API: StoryArea}
  */
 export interface StoryArea {
   /** Position of the story area. */
-  position: StoryAreaPosition;
+  position: AreaPosition;
   /** Type of the story area. */
   type: StoryAreaType;
 }

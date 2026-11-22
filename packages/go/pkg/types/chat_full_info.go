@@ -200,4 +200,8 @@ type ChatFullInfo struct {
 	GuardBot *User `json:"guard_bot,omitempty"`
 	// The Community to which the chat belongs.
 	Community *Community `json:"community,omitempty"`
+	// TON wallet card of the user or chat.
+	TonWalletCard *TonWalletCard `json:"ton_wallet_card,omitempty"`
+	// Theme of the screen for sharing a link to the user or chat.
+	ShareTheme *ChatShareTheme `json:"share_theme,omitempty"`
 }

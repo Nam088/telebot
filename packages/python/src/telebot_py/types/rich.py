@@ -106,6 +106,7 @@ from telebot_py.types.rich_text import (
     RichTextSubscript,
     RichTextSuperscript,
     RichTextTextMention,
+    RichTextTonAddress,
     RichTextUnderline,
     RichTextUrl,
 )
@@ -191,6 +192,7 @@ __all__ = [
     "RichTextPhoneNumber",
     "RichTextReference",
     "RichTextReferenceLink",
+    "RichTextTonAddress",
     "RichTextSpoiler",
     "RichTextStrikethrough",
     "RichTextSubscript",

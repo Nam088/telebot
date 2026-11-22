@@ -128,3 +128,11 @@ export interface ManagedBotCreated {
   /** Information about the bot. The bot's token can be fetched using the method getManagedBotToken. */
   bot: User;
 }
+
+/**
+ * Describes a service message about the sender using a link which allows sending messages without paying Telegram Stars.
+ *
+ * @see {@link https://core.telegram.org/bots/api#paidmessageswaived Telegram Bot API: PaidMessagesWaived}
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PaidMessagesWaived {}

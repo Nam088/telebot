@@ -68,6 +68,8 @@ const CHAT_FULL_INFO_FIELDS = assertChatFullInfoKeys([
   "paid_message_star_count",
   "guard_bot",
   "community",
+  "ton_wallet_card",
+  "share_theme",
 ] as const);
 
 /** Docs fields not marked "Optional", so they are always present on the wire. */
@@ -203,6 +205,8 @@ const FULL_CHAT_INFO = {
   paid_message_star_count: 50,
   guard_bot: { id: 99, is_bot: true, first_name: "Guard", username: "guard_bot" },
   community: { id: -1004242424242, name: "Telebot Community" },
+  ton_wallet_card: { address: "EQ...", amount: "1000", stickers: [] },
+  share_theme: { type: "emoji", emojis: [{ type: "emoji", emoji: "🔥" }] },
 } satisfies ChatFullInfo;
 
 /** The 5 required fields only, proving every other field is optional. */
@@ -235,8 +239,8 @@ const OPTIONAL_FIELDS = CHAT_FULL_INFO_FIELDS.filter(
 );
 
 describe("ChatFullInfo Bot API 10.3 parity", () => {
-  it("declares all 53 fields the docs define", () => {
-    expect(CHAT_FULL_INFO_FIELDS).toHaveLength(53);
+  it("declares all 55 fields the docs define", () => {
+    expect(CHAT_FULL_INFO_FIELDS).toHaveLength(55);
     expect(FULL_INFO_ONLY_FIELDS).toHaveLength(10);
     const declared = new Set<string>(CHAT_FULL_INFO_FIELDS);
     for (const field of FULL_INFO_ONLY_FIELDS) {
@@ -259,7 +263,7 @@ describe("ChatFullInfo Bot API 10.3 parity", () => {
       -1001234567890,
     );
 
-    expect(Object.keys(decoded)).toHaveLength(53);
+    expect(Object.keys(decoded)).toHaveLength(55);
     for (const field of CHAT_FULL_INFO_FIELDS) {
       expect(decoded[field], field).toBeDefined();
     }
@@ -300,7 +304,7 @@ describe("ChatFullInfo Bot API 10.3 parity", () => {
     expect(Object.keys(JSON.parse(JSON.stringify(MINIMAL_CHAT_INFO))).sort()).toEqual(
       [...REQUIRED_FIELDS].sort(),
     );
-    expect(OPTIONAL_FIELDS).toHaveLength(48);
+    expect(OPTIONAL_FIELDS).toHaveLength(50);
     for (const field of OPTIONAL_FIELDS) {
       expect(MINIMAL_CHAT_INFO[field], field).toBeUndefined();
     }

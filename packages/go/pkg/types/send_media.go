@@ -3,7 +3,7 @@ package types
 // SendAudioOptions represents parameters for the sendAudio method.
 type SendAudioOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Audio                      any                         `json:"audio"`
 	Caption                    string                      `json:"caption,omitempty"`
 	ParseMode                  string                      `json:"parse_mode,omitempty"`
@@ -27,7 +27,7 @@ type SendAudioOptions struct {
 // SendVideoOptions represents parameters for the sendVideo method.
 type SendVideoOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Video                      any                         `json:"video"`
 	Duration                   int                         `json:"duration,omitempty"`
 	Width                      int                         `json:"width,omitempty"`
@@ -56,7 +56,7 @@ type SendVideoOptions struct {
 // SendAnimationOptions represents parameters for the sendAnimation method.
 type SendAnimationOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Animation                  any                         `json:"animation"`
 	Duration                   int                         `json:"duration,omitempty"`
 	Width                      int                         `json:"width,omitempty"`
@@ -82,7 +82,7 @@ type SendAnimationOptions struct {
 // SendVoiceOptions represents parameters for the sendVoice method.
 type SendVoiceOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Voice                      any                         `json:"voice"`
 	Caption                    string                      `json:"caption,omitempty"`
 	ParseMode                  string                      `json:"parse_mode,omitempty"`
@@ -103,7 +103,7 @@ type SendVoiceOptions struct {
 // SendVideoNoteOptions represents parameters for the sendVideoNote method.
 type SendVideoNoteOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	VideoNote                  any                         `json:"video_note"`
 	Duration                   int                         `json:"duration,omitempty"`
 	Length                     int                         `json:"length,omitempty"`
@@ -123,7 +123,7 @@ type SendVideoNoteOptions struct {
 // SendLocationOptions represents parameters for the sendLocation method.
 type SendLocationOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Latitude                   float64                     `json:"latitude"`
 	Longitude                  float64                     `json:"longitude"`
 	HorizontalAccuracy         float64                     `json:"horizontal_accuracy,omitempty"`
@@ -145,7 +145,7 @@ type SendLocationOptions struct {
 // SendVenueOptions represents parameters for the sendVenue method.
 type SendVenueOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Latitude                   float64                     `json:"latitude"`
 	Longitude                  float64                     `json:"longitude"`
 	Title                      string                      `json:"title"`
@@ -169,7 +169,7 @@ type SendVenueOptions struct {
 // SendContactOptions represents parameters for the sendContact method.
 type SendContactOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	PhoneNumber                string                      `json:"phone_number"`
 	FirstName                  string                      `json:"first_name"`
 	LastName                   string                      `json:"last_name,omitempty"`
@@ -189,7 +189,7 @@ type SendContactOptions struct {
 // SendPhotoOptions represents parameters for the sendPhoto method.
 type SendPhotoOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`
 	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
@@ -211,7 +211,7 @@ type SendPhotoOptions struct {
 // SendDocumentOptions represents parameters for the sendDocument method.
 type SendDocumentOptions struct {
 	BusinessConnectionID        string                      `json:"business_connection_id,omitempty"`
-	ChatID                      any                         `json:"chat_id"`
+	ChatID                      any                         `json:"chat_id,omitempty"`
 	MessageThreadID             int64                       `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID       int64                       `json:"direct_messages_topic_id,omitempty"`
 	EphemeralMessageParameters  *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
@@ -314,7 +314,7 @@ type SendMediaGroupOptions struct {
 type SendLivePhotoOptions struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 	// Unique identifier for the target chat or username of the target channel.
-	ChatID any `json:"chat_id"`
+	ChatID any `json:"chat_id,omitempty"`
 	// Photo to send: a file_id, an HTTP URL, or an InputFile for an upload.
 	Photo any `json:"photo"`
 	// Live photo video to send: a file_id, an HTTP URL, or an InputFile for

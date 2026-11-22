@@ -6,7 +6,13 @@
 
 import { ChatMemberMethods } from "./members.js";
 import type { InputFile } from "../../../utils/http.js";
-import type { ChatMember, ChatFullInfo, UserChatBoosts } from "../../types/index.js";
+import type {
+  ChatMember,
+  ChatFullInfo,
+  ChatShareThemeBackdrops,
+  UserChatBoosts,
+  VerifyDescriptionOptions,
+} from "../../types/index.js";
 
 /**
  * Mixin providing chat metadata, administrator query, and photo operations.
@@ -271,6 +277,7 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @param userId - Unique identifier of the target user.
    * @param customDescription - Custom description for the verification status; 0-70 characters.
+   * @param options - Optional formatting parameters (`custom_description_parse_mode`, `custom_description_entities`).
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When verification fails.
    *
@@ -281,9 +288,19 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#verifyuser Telegram Bot API: verifyUser}
    */
-  public async verifyUser(userId: number, customDescription?: string): Promise<boolean> {
+  public async verifyUser(
+    userId: number,
+    customDescription?: string,
+    options?: VerifyDescriptionOptions,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { user_id: userId };
     if (customDescription !== undefined) payload["custom_description"] = customDescription;
+    if (options?.custom_description_parse_mode !== undefined) {
+      payload["custom_description_parse_mode"] = options.custom_description_parse_mode;
+    }
+    if (options?.custom_description_entities !== undefined) {
+      payload["custom_description_entities"] = options.custom_description_entities;
+    }
     return this.request<boolean>("verifyUser", payload);
   }
 
@@ -292,6 +309,7 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @param chatId - Unique identifier for the target chat or username of the target channel.
    * @param customDescription - Custom description for the verification status; 0-70 characters.
+   * @param options - Optional formatting parameters (`custom_description_parse_mode`, `custom_description_entities`).
    * @returns `true` on success.
    * @throws {@link TelegramApiError} When verification fails.
    *
@@ -302,10 +320,37 @@ export abstract class ChatManagementMethods extends ChatMemberMethods {
    *
    * @see {@link https://core.telegram.org/bots/api#verifychat Telegram Bot API: verifyChat}
    */
-  public async verifyChat(chatId: number | string, customDescription?: string): Promise<boolean> {
+  public async verifyChat(
+    chatId: number | string,
+    customDescription?: string,
+    options?: VerifyDescriptionOptions,
+  ): Promise<boolean> {
     const payload: Record<string, unknown> = { chat_id: chatId };
     if (customDescription !== undefined) payload["custom_description"] = customDescription;
+    if (options?.custom_description_parse_mode !== undefined) {
+      payload["custom_description_parse_mode"] = options.custom_description_parse_mode;
+    }
+    if (options?.custom_description_entities !== undefined) {
+      payload["custom_description_entities"] = options.custom_description_entities;
+    }
     return this.request<boolean>("verifyChat", payload);
+  }
+
+  /**
+   * Returns the list of backdrops that can be used as the background of a chat share theme.
+   *
+   * @returns A {@link ChatShareThemeBackdrops} object.
+   * @throws {@link TelegramApiError} When the request fails.
+   *
+   * @example
+   * ```ts
+   * const { backdrops } = await bot.getChatShareThemeBackdrops();
+   * ```
+   *
+   * @see {@link https://core.telegram.org/bots/api#getchatsharethemebackdrops Telegram Bot API: getChatShareThemeBackdrops}
+   */
+  public async getChatShareThemeBackdrops(): Promise<ChatShareThemeBackdrops> {
+    return this.request<ChatShareThemeBackdrops>("getChatShareThemeBackdrops");
   }
 
   /**

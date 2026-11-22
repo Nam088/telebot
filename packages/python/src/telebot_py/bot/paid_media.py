@@ -126,7 +126,7 @@ class PaidMediaMixin(Requester):
 
     async def send_live_photo(
         self,
-        chat_id: int | str,
+        chat_id: int | str | None,
         live_photo: str,
         photo: str,
         *,

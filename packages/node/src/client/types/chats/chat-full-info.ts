@@ -5,11 +5,13 @@ import type {
   BusinessIntro,
   BusinessLocation,
   BusinessOpeningHours,
+  TonWalletCard,
 } from "../business/index.js";
 import type { Message, Audio, ReactionType } from "../messages/index.js";
 import type { UniqueGiftColors } from "../payments/index.js";
 import type { ChatPermissions, Community } from "./permissions.js";
 import type { ChatLocation } from "./member.js";
+import type { ChatShareTheme } from "./share-theme.js";
 
 /**
  * Represents the rating of a user in Telegram's public-profile rating system.
@@ -155,4 +157,8 @@ export interface ChatFullInfo extends Chat {
   guard_bot?: User;
   /** The community to which the chat belongs. */
   community?: Community;
+  /** TON wallet card of the user or chat. */
+  ton_wallet_card?: TonWalletCard;
+  /** Theme of the screen for sharing a link to the user or chat. */
+  share_theme?: ChatShareTheme;
 }

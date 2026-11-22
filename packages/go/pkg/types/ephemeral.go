@@ -107,7 +107,7 @@ type DeleteEphemeralMessageOptions struct {
 // See https://core.telegram.org/bots/api#ephemeralmessageparameters
 type EphemeralMessageParameters struct {
 	// Identifier of the user who will receive the message.
-	ReceiverUserID int64 `json:"receiver_user_id"`
+	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
 	// Identifier of the callback query which triggered the sending of the
 	// message, if any.
 	CallbackQueryID string `json:"callback_query_id,omitempty"`

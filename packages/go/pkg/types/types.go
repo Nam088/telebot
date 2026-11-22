@@ -124,7 +124,15 @@ type Message struct {
 	PinnedMessage                 *Message                       `json:"pinned_message,omitempty"`
 	ReplyToMessage                *Message                       `json:"reply_to_message,omitempty"`
 	ReplyMarkup                   *InlineKeyboardMarkup          `json:"reply_markup,omitempty"`
+	Widget                        *Widget                        `json:"widget,omitempty"`
+	PaidMessagesWaived            *PaidMessagesWaived            `json:"paid_messages_waived,omitempty"`
+	TonWalletTransfer             *TonWalletTransfer             `json:"ton_wallet_transfer,omitempty"`
 }
+
+// PaidMessagesWaived describes a service message about the sender using a link which allows sending messages without paying Telegram Stars.
+//
+// Telegram API: https://core.telegram.org/bots/api#paidmessageswaived
+type PaidMessagesWaived struct{}
 
 // MessageOrigin describes the origin of a forwarded message.
 //
@@ -189,6 +197,8 @@ type Update struct {
 	InlineQuery              *InlineQuery                 `json:"inline_query,omitempty"`
 	ChosenInlineResult       *ChosenInlineResult          `json:"chosen_inline_result,omitempty"`
 	CallbackQuery            *CallbackQuery               `json:"callback_query,omitempty"`
+	WidgetQuery              *WidgetQuery                 `json:"widget_query,omitempty"`
+	SharedWidgetQuery        *SharedWidgetQuery           `json:"shared_widget_query,omitempty"`
 	ShippingQuery            *ShippingQuery               `json:"shipping_query,omitempty"`
 	PreCheckoutQuery         *PreCheckoutQuery            `json:"pre_checkout_query,omitempty"`
 	PurchasedPaidMedia       *PaidMediaPurchased          `json:"purchased_paid_media,omitempty"`
@@ -372,7 +382,7 @@ type InlineKeyboardMarkup struct {
 // SendMessageOptions represents parameters for the sendMessage method.
 type SendMessageOptions struct {
 	BusinessConnectionID       string                      `json:"business_connection_id,omitempty"`
-	ChatID                     any                         `json:"chat_id"`
+	ChatID                     any                         `json:"chat_id,omitempty"`
 	Text                       string                      `json:"text"`
 	MessageThreadID            int64                       `json:"message_thread_id,omitempty"`
 	DirectMessagesTopicID      int64                       `json:"direct_messages_topic_id,omitempty"`

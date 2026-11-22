@@ -32,6 +32,8 @@ from telebot_py.types.reactions import (
     ReactionTypeEmoji,
     ReactionTypePaid,
 )
+from telebot_py.types.share_theme import ChatShareTheme
+from telebot_py.types.ton_wallet import TonWalletCard
 from telebot_py.types.user import User
 
 if t.TYPE_CHECKING:  # annotation-only; bound at runtime by message.py
@@ -236,6 +238,8 @@ class ChatFullInfo(TelegramObject):
     paid_message_star_count: int | None = None
     guard_bot: User | None = None
     community: Community | None = None
+    ton_wallet_card: TonWalletCard | None = None
+    share_theme: ChatShareTheme | None = None
 
     def __post_init__(self) -> None:
         if self.type not in CHAT_TYPES:

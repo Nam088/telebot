@@ -10,6 +10,8 @@ import type {
   ChatBoostRemoved,
   BusinessConnection,
   BusinessMessagesDeleted,
+  WidgetQuery,
+  SharedWidgetQuery,
 } from "../business/index.js";
 import type {
   ChatPermissions,
@@ -313,6 +315,10 @@ export interface RawUpdate {
   chosen_inline_result?: ChosenInlineResult;
   /** New incoming callback query. */
   callback_query?: CallbackQuery;
+  /** New incoming query from a widget in a message sent by the bot or via the bot. */
+  widget_query?: WidgetQuery;
+  /** New incoming query from a forwarded message with a shared widget. */
+  shared_widget_query?: SharedWidgetQuery;
   /** New incoming shipping query. Only for invoices with flexible prices. */
   shipping_query?: ShippingQuery;
   /** New incoming pre-checkout query. Contains full information about checkout. */
