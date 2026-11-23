@@ -1,71 +1,26 @@
 {
-  "version": "Bot API 10.4",
-  "date": "November 9, 2026",
+  "version": "Bot API 10.5",
+  "date": "November 22, 2026",
   "features": [
     {
-      "category": "Widgets",
+      "category": "Bot Settings",
       "items": [
-        "Added the class Widget and the field widget to the classes Message and ExternalReplyInfo for messages with HTML widgets.",
-        "Added the method sendWidget, allowing bots to send messages with HTML widgets. Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.",
-        "Added the method sendSharedWidget, allowing bots to send again shared widgets created by the bot.",
-        "Added the class WidgetQuery and the field widget_query to the class Update for queries sent to the bot by widgets in messages sent by the bot or via the bot.",
-        "Added the class SharedWidgetQuery and the field shared_widget_query to the class Update for queries sent to the bot from forwarded messages with shared widgets.",
-        "Added the classes WidgetQueryType, WidgetQueryTypeData, WidgetQueryTypeSignData, WidgetQueryTypeSentTransaction and WidgetQueryWallet, describing the type of a query from a widget. A query can contain data for the bot together with the TON wallet card of the user, data signed by a TON wallet of the user, or a notification about a transaction sent from a TON wallet of the user.",
-        "Added the method answerWidgetQuery, allowing bots to answer queries from widgets.",
-        "Added the method editMessageWidgetData, allowing bots to change data of a widget in a message.",
-        "Added the method editSharedWidgetData, allowing bots to change public data of a shared widget.",
-        "Added the classes InputWidgetMessageContent and InputSharedWidgetMessageContent, allowing bots to send widgets in response to inline queries. Currently, widgets can't be sent in response to inline queries in the production environment.",
-        "Widget messages can't be copied using the methods copyMessage and copyMessages.",
-        "The right can_send_other_messages in the classes ChatPermissions and ChatMemberRestricted now also allows sending widgets."
-      ]
-    },
-    {
-      "category": "Ephemeral messages",
-      "items": [
-        "Allowed bots to send ephemeral replies to callback queries in any chat except channel direct messages chats by specifying callback_query_id without receiver_user_id in the parameter ephemeral_message_parameters of the methods sendMessage, sendRichMessage, sendAnimation, sendAudio, sendContact, sendDocument, sendLivePhoto, sendLocation, sendPhoto, sendSticker, sendVenue, sendVideo, sendVideoNote and sendVoice.",
-        "The field receiver_user_id of the class EphemeralMessageParameters and the parameter chat_id of the mentioned methods are optional now."
-      ]
-    },
-    {
-      "category": "Quotes from rich messages",
-      "items": [
-        "Added the field rich_texts to the class TextQuote for quotes chosen from a RichMessage.",
-        "Added the field quote_rich_texts to the class ReplyParameters, allowing bots to quote rich messages."
-      ]
-    },
-    {
-      "category": "TON wallet",
-      "items": [
-        "Added the classes TonWalletCard, TonWalletCardSticker, TonNft and TonNftAttribute, and the field ton_wallet_card to the class ChatFullInfo.",
-        "Added the class TonWalletTransfer and the field ton_wallet_transfer to the class Message for service messages about transfers with a TON wallet.",
-        "Renamed the class StoryAreaPosition to AreaPosition, because it is now also used to describe the position of stickers on TON wallet cards."
-      ]
-    },
-    {
-      "category": "Chat share themes",
-      "items": [
-        "Added the classes ChatShareTheme, ChatShareThemeEmoji and ChatShareThemeUniqueGift, and the field share_theme to the class ChatFullInfo, describing the theme of the screen for sharing a link to a user or a chat.",
-        "Added the classes EmojiType, EmojiTypeEmoji and EmojiTypeCustomEmoji.",
-        "Added the classes ChatShareThemeBackdrop and ChatShareThemeBackdrops and the method getChatShareThemeBackdrops."
-      ]
-    },
-    {
-      "category": "Gifts",
-      "items": [
-        "Added the method getUniqueGift, allowing bots to get information about a unique gift by its name.",
-        "Added the method deleteBusinessAccountGift, allowing bots to delete regular gifts owned by a managed business account without receiving Telegram Stars for them."
+        "Added the method setMySettings, allowing bots to change their settings, including inline mode settings, privacy mode, the ability to be added to groups, forum topic mode in private chats, and the mode of receiving callback queries.",
+        "Added the ability to receive callback queries from buttons in messages sent by the bot with the field inline_message_id instead of the field message in the class CallbackQuery, depending on the parameter callback_query_mode of the method setMySettings.",
+        "Added the ability for bots to show the list of topics in a sidebar in private chats with the bot using the parameter has_topic_sidebar of the method setMySettings.",
+        "Split out the class BotFullInfo from the class User and changed the return type of the method getMe to BotFullInfo. The fields that were returned only in getMe were removed from the class User.",
+        "Added the field active_usernames to the class BotFullInfo, allowing the bot to get the list of all its active usernames.",
+        "Added the field inline_query_placeholder to the class BotFullInfo, allowing the bot to get its placeholder for inline queries.",
+        "Added the field needs_inline_query_location to the class BotFullInfo, allowing the bot to check whether it requests the location of the user with every inline query.",
+        "Added the field has_topic_sidebar to the class BotFullInfo, allowing the bot to check whether topics in private chats with the bot are shown in a sidebar."
       ]
     },
     {
       "category": "General",
       "items": [
-        "Allowed users with a Telegram Premium subscription to assign secondary usernames ending with “agent”, “ai”, “app”, “game”, or “gay” to up to 2 owned bots. Such usernames can be suggested in the field suggested_username of the class KeyboardButtonRequestManagedBot.",
-        "Added the class RichTextTonAddress representing an address in the TON blockchain in a RichMessage.",
-        "Added the type “ton_address” to the class MessageEntity for addresses in the TON blockchain.",
-        "Added the type “bank_card_number” to the class MessageEntity for bank card numbers.",
-        "Added the parameters custom_description_parse_mode and custom_description_entities to the methods verifyUser and verifyChat.",
-        "Added the class PaidMessagesWaived and the field paid_messages_waived to the class Message for service messages about the sender using a link which allows sending messages without paying Telegram Stars.",
-        "Added the ability to create links to topics in private chats with the bot in the format https://t.me/<bot_username>/<message_thread_id>. Such a link opens the topic only for the user in the private chat with whom the topic exists."
+        "Added the ability for bot owners to invite up to 10 users at once to private chats with the bot by pressing the link https://t.me/botinvite/<bot_username>. The bot can send messages to the invited users.",
+        "Added the field inviter to the class WriteAccessAllowed for service messages about users invited to the private chat with the bot by the owner of the bot.",
+        "Replaced the field text with the field blocks in the classes RichBlockExpandableBlockQuotation and InputRichBlockExpandableBlockQuotation, allowing expandable block quotations to contain arbitrary blocks."
       ]
     }
   ],
